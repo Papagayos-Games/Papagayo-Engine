@@ -1,0 +1,14 @@
+==============================================================================
+PARA COMPILAR OGRE
+==============================================================================
+
+1. Abrir la carpeta bats y ejecutar el primer .bat.
+2. Configurar en cmake la carpeta del codigo fuente (dependencies/Ogre/src)
+y la carpeta donde quereis que vaya la build (dependencies/Ogre/build).
+3. Configurar y generar la build en cmake.
+4. Cuando cmake haya terminado ejecutar el segundo .bat.
+5. Compilar en Debug y Release
+6. Ejecutar el último .bat.
+7. Abrir nuestro proyecto y ya va todo.
+
+==============================================================================

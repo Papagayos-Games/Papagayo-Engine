@@ -1,11 +1,29 @@
 # Prerequisites
 *.d
 
+# Visual Studio 2019 cache/options directory
+.vs/
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Oo]bj/
+[Ll]og/
+
+# Temporary files
+[Tt]emp/
+[Tt]mp/
+*.log
+
 # Compiled Object files
 *.slo
 *.lo
 *.o
 *.obj
+*.iobj
+*.pdb
+*.ipdb
+*.ilk
 
 # Precompiled Headers
 *.gch
@@ -30,3 +48,11 @@
 *.exe
 *.out
 *.app
+
+# CMake stuff
+[Mm]an/
+[Dd]oc/
+[Bb]uild
+
+# Don't ignore Ogre plugins
+!bin/Ogre/plugins.cfg
