@@ -1,0 +1,59 @@
+{
+  "Entities": {
+    "Muro": {
+      "RenderComponent": {
+        "Mesh": "malla.mesh"
+      },
+      "transform": {
+        "posicion": [ 0, 0, 0 ],
+        "escala": [ 1, 1, 1 ],
+        "rotacion": [ 0, 0, 0 ]
+      },
+      "physic": {
+        "collision": true,
+        "escala": [ 1, 1, 1 ]
+      }
+    },
+    "Coleccionable": {
+      "RenderComponent": {
+        "Mesh": "malla.mesh"
+      },
+      "animacion": {
+        "nombre": "animColeccionable",
+        "keyframes": 4,
+        "kf1": [
+          [ 0, 0, 0 ],
+          [ 0, 0, 0 ],
+          [ 0, 0, 0 ]
+        ],
+        "kf2": [
+          [ 0, 0, 0 ],
+          [ 0, 0, 0 ],
+          [ 0, 0, 0 ]
+        ],
+        "kf3": [
+          [ 0, 0, 0 ],
+          [ 0, 0, 0 ],
+          [ 0, 0, 0 ]
+        ],
+        "kf4": [
+          [ 0, 0, 0 ],
+          [ 0, 0, 0 ],
+          [ 0, 0, 0 ]
+        ]
+      },
+      "transform": {
+        "posicion": [ 0, 0, 0 ],
+        "escala": [ 1, 1, 1 ],
+        "rotacion": [ 0, 0, 0 ]
+      },
+      "physic": {
+        "collision": false,
+        "escala": [ 1, 1, 1 ]
+      },
+      "coleccionableComponent": {
+        "timeIncreased": 0.1
+      }
+    }
+  }
+}

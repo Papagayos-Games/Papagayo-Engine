@@ -1,0 +1,52 @@
+{
+    "Map": 
+    [
+      {
+        "id": "Muro",
+        "nombre": "MuroC",
+        "components":
+            [
+              {
+                "id": "transform",
+                "posicion": [ 0, 0, -10 ]
+              }
+            ]
+        },
+        {
+          "id": "Muro",
+          "nombre": "MuroD",
+          "components":
+              [
+                {
+                  "id": "transform",
+                  "posicion": [ 0, 0, 10 ]
+                }
+              ]
+          },
+          {
+            "id": "Muro",
+            "nombre": "MuroB",
+            "components":
+                [
+                  {
+                    "id": "transform",
+                    "posicion": [ 10, 0, 0 ]
+                  }
+                ]
+            },
+      {
+        "id": "Muro",
+        "nombre": "MuroA",
+        "components": [
+          {
+            "id": "transform",
+            "posicion": [ -10, 0, 0 ]
+          }
+        ]
+      },
+      {
+        "id": "Coleccionable",
+        "nombre": "Col1"
+      }
+    ]
+}
