@@ -24,6 +24,12 @@ echo moviendo CODEC
 copy ..\Engine\dependencies\Ogre\build\bin\debug\Codec_STBI_d.dll ..\Engine\bin\OgreD
 copy ..\Engine\dependencies\Ogre\build\bin\release\Codec_STBI.dll ..\Engine\bin\Ogre
 
+::Para cargar sonidos
+echo moviendo FMOD
+copy ..\Engine\dependencies\fmod\build\lib\fmod.dll ..\Engine\bin
+copy ..\Engine\dependencies\fmod\build\lib\fmodL.dll ..\Engine\bin
+
+
 echo ---------------------------------------------------
 echo FIN
 echo ---------------------------------------------------
