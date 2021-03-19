@@ -12,3 +12,5 @@ y la carpeta donde quereis que vaya la build (dependencies/Ogre/build).
 7. Abrir nuestro proyecto y ya va todo.
 
 ==============================================================================
+
+Borrar el .zip de FMOD cuando se haya extraído.
