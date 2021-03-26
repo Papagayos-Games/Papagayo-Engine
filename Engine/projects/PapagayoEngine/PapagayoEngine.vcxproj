@@ -19,9 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\PapagayoEngine.h" />
     <ClInclude Include="..\..\include\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\PapagayoEngine.cpp" />
     <ClCompile Include="..\..\src\Scene\Scene.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
