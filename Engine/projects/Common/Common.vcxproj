@@ -22,11 +22,13 @@
     <ClInclude Include="..\..\src\Common\Component.h" />
     <ClInclude Include="..\..\src\Common\ecs.h" />
     <ClInclude Include="..\..\src\Common\Entity.h" />
+    <ClInclude Include="..\..\src\Common\Transform.h" />
     <ClInclude Include="..\..\src\Common\Vector3.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Common\Component.cpp" />
     <ClCompile Include="..\..\src\Common\Entity.cpp" />
+    <ClCompile Include="..\..\src\Common\Transform.cpp" />
     <ClCompile Include="..\..\src\Common\Vector3.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

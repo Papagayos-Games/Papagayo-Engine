@@ -7,8 +7,7 @@ public:
 	 float x; //Guarda el valor en el eje X
 	 float y; //Guarda el valor en el eje X
 	 float z; //Guarda el valor en el eje X
-private:
-	float pad; //
+
 public:
 	//Constructor por defecto(todos los valores a cero
 	Vector3() : x(0.0f), y(0.0f), z(0.0f) {}
@@ -53,6 +52,11 @@ public:
 	//producto vectorial
 	Vector3 operator%(const Vector3& v);
 
+	//setter 
+	void set(Vector3 pos);
+	void setX(float n);
+	void setY(float n);
+	void setZ(float n);
 
 
 
