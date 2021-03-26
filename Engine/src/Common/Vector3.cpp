@@ -52,6 +52,13 @@ Vector3 Vector3::operator+(const Vector3& other)
 	return Vector3(x + other.x, y + other.y, z + other.z);
 }
 
+void Vector3::operator+=(const Vector3& other)
+{
+	x += other.x;
+	y += other.y;
+	z += other.z;
+}
+
 Vector3 Vector3::operator-(const Vector3& other)
 {
 	return Vector3(x - other.x, y - other.y, z - other.z);
@@ -64,7 +71,7 @@ void Vector3::operator-=(const Vector3& other)
 	z -= other.z;
 }
 
-Vector3 Vector3::operator%(const Vector3&)
+Vector3 Vector3::operator%(const Vector3& v)
 {
 	return Vector3(y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x);
 }
