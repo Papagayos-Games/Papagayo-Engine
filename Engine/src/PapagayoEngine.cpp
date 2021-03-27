@@ -2,6 +2,9 @@
 
 #include <stdexcept>
 
+#include "Managers/ResourceManager.h"
+#include "Managers/SceneManager.h"
+
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
 
 PapagayoEngine::PapagayoEngine(const std::string& appName) :appName_(appName) {
@@ -20,10 +23,6 @@ PapagayoEngine* PapagayoEngine::getInstance()
 	return instance_;
 }
 
-void PapagayoEngine::init()
-{
-	// iniciar resto de singletons
-}
 
 bool PapagayoEngine::setupInstance(const std::string& appName)
 {
@@ -33,4 +32,35 @@ bool PapagayoEngine::setupInstance(const std::string& appName)
 	}
 
 	return false;
+}
+
+void PapagayoEngine::clean()
+{
+	delete instance_;
+}
+
+void PapagayoEngine::init()
+{
+	// iniciar resto de singletons/managers
+	try { ResourceManager::setupInstance("assets/"); }
+	catch (const std::exception& e)
+	{
+		throw std::runtime_error("ResourceManager init fail \n" + (std::string)e.what() + "\n");	return;
+	}
+
+	try { SceneManager::setupInstance(); }
+	catch (const std::exception& e)
+	{
+		throw std::runtime_error("SceneManager init fail \n" + (std::string)e.what() + "\n");	return;
+	}
+}
+
+void PapagayoEngine::initTestScene()
+{
+	SceneManager::getInstance()->loadScene("test");
+}
+
+void PapagayoEngine::update()
+{
+	SceneManager::getInstance()->update();
 }

@@ -8,14 +8,16 @@ class PapagayoEngine {
 public:
 	~PapagayoEngine();
 	static PapagayoEngine* getInstance();
+	static bool setupInstance(const std::string& appName);
+	static void clean();
+
 	void init();
-	bool setupInstance(const std::string& appName);
+	void initTestScene();
+	void update();
 private:
 	PapagayoEngine(const std::string& appName);
 
-
-
+	std::string appName_;
 
 	static PapagayoEngine* instance_;
-	std::string appName_;
 };
