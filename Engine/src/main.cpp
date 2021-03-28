@@ -1,8 +1,8 @@
 #include <iostream>
 #include <OgreRoot.h>
+#include "Test.h"
 
 using namespace Ogre;
-
 
 #if (defined _DEBUG) || !(defined _WIN32)
 int main() {
@@ -24,5 +24,7 @@ WinMain(HINSTANCE zhInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nCmdS
 
 	std::cout << "KEKW\n";
 
+	Test* t = new Test();
+	delete t;
 	return 0;
 }
