@@ -15,6 +15,9 @@ PapagayoEngine::~PapagayoEngine()
 {
 }
 
+int main() {}
+
+
 PapagayoEngine* PapagayoEngine::getInstance()
 {
 	if (instance_ == nullptr)

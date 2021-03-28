@@ -2,15 +2,28 @@
 PARA COMPILAR OGRE
 ==============================================================================
 
-1. Abrir la carpeta bats y ejecutar el primer .bat.
+1. Abrir la carpeta bats y ejecutar el primer .bat de Ogre.
 2. Configurar en cmake la carpeta del codigo fuente (dependencies/Ogre/src)
-y la carpeta donde quereis que vaya la build (dependencies/Ogre/build).
+y la carpeta donde queréis que vaya la build (dependencies/Ogre/build).
 3. Configurar y generar la build en cmake.
-4. Cuando cmake haya terminado ejecutar el segundo .bat.
-5. Compilar en Debug y Release
-6. Ejecutar el último .bat.
-7. Abrir nuestro proyecto y ya va todo.
+4. Cuando cmake haya terminado, ejecutar el segundo .bat Ogre.
+5. Compilar en Debug y Release x64.
+6. Ejecutar el último .bat de Ogre.
+7. Compilar las demás librerías.
 
 ==============================================================================
+PARA COMPILAR BULLET
+==============================================================================
 
+1. Abrir la carpeta bats y ejecutar el primer .bat de Bullet
+2. Configurar en cmake la carpeta del codigo fuente (dependencies/Bullet) y la
+carpeta donde queréis que vaya la build (dependencies/Bullet/build).
+3. Configurar y elegir las opciones que se muestran en la captura de pantalla del
+canal de Discord referente a Bullet en el canal de avisos llamada Configuración Bullet.
+4. Cuando cmake haya terminado, ejecutar el segundo .bat de Bullet
+5. Compilar en Debug y Release x64.
+6. Ejecutar el último .bat de Bullet.
+7. Abrir proyecto y compilar.
+
+==============================================================================
 Borrar el .zip de FMOD cuando se haya extraído.
