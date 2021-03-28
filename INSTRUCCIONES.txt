@@ -15,7 +15,7 @@ y la carpeta donde queréis que vaya la build (dependencies/Ogre/build).
 PARA COMPILAR BULLET
 ==============================================================================
 
-1. Abrir la carpeta bats y ejecutar el primer .bat de Bullet
+1. Abrir CMake
 2. Configurar en cmake la carpeta del codigo fuente (dependencies/Bullet) y la
 carpeta donde queréis que vaya la build (dependencies/Bullet/build).
 3. Configurar y elegir las opciones que se muestran en la captura de pantalla del
