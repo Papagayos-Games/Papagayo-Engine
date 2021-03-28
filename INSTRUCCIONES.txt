@@ -22,8 +22,7 @@ carpeta donde queréis que vaya la build (dependencies/Bullet/build).
 canal de Discord referente a Bullet en el canal de avisos llamada Configuración Bullet.
 4. Cuando cmake haya terminado, ejecutar el segundo .bat de Bullet
 5. Compilar en Debug y Release x64.
-6. Ejecutar el último .bat de Bullet.
-7. Abrir proyecto y compilar.
+6. Abrir proyecto y compilar.
 
 ==============================================================================
 Borrar el .zip de FMOD cuando se haya extraído.
