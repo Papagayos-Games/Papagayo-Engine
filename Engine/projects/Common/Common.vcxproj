@@ -19,17 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\Common\Component.h" />
-    <ClInclude Include="..\..\src\Common\ecs.h" />
-    <ClInclude Include="..\..\src\Common\Entity.h" />
-    <ClInclude Include="..\..\src\Common\Transform.h" />
-    <ClInclude Include="..\..\src\Common\Vector3.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\src\Common\Component.cpp" />
     <ClCompile Include="..\..\src\Common\Entity.cpp" />
     <ClCompile Include="..\..\src\Common\Transform.cpp" />
     <ClCompile Include="..\..\src\Common\Vector3.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\Common\Component.h" />
+    <ClInclude Include="..\..\include\Common\ecs.h" />
+    <ClInclude Include="..\..\include\Common\Entity.h" />
+    <ClInclude Include="..\..\include\Common\Transform.h" />
+    <ClInclude Include="..\..\include\Common\Vector3.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -86,23 +86,23 @@
     <OutDir>$(SolutionDir)bin</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>$(SolutionDir)scr\$(ProjectName);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include\$(ProjectName);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
-    <IncludePath>$(SolutionDir)scr\$(ProjectName);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include\$(ProjectName);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)bin</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>$(SolutionDir)scr\$(ProjectName);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include\$(ProjectName);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)bin</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
-    <IncludePath>$(SolutionDir)scr\$(ProjectName);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include\$(ProjectName);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

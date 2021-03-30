@@ -87,14 +87,14 @@
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include\$(ProjectName);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)dependencies\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
-    <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include\$(ProjectName);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)dependencies\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -102,14 +102,14 @@
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include\$(ProjectName);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)dependencies\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
-    <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include\$(ProjectName);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)dependencies\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

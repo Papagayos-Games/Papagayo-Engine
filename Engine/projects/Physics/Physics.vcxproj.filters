@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\Physics\Test.h">
+    <ClInclude Include="..\..\include\Physics\Test.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

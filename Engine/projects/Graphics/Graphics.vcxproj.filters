@@ -15,15 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\Graphics\headers\WindowGenerator.h">
+    <ClInclude Include="..\..\include\Graphics\WindowGenerator.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\Graphics\source\main.cpp">
+    <ClCompile Include="..\..\src\Graphics\WindowGenerator.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Graphics\source\WindowGenerator.cpp">
+    <ClCompile Include="..\..\src\Graphics\main.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
