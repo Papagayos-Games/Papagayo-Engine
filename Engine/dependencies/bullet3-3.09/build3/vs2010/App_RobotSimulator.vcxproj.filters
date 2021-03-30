@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="examples">
+      <UniqueIdentifier>{BA32F7A1-3971-494B-93A8-2F7D3DB1C453}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\ThirdPartyLibs">
+      <UniqueIdentifier>{C619CF55-A9B3-9941-9745-600D84E4A952}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\ThirdPartyLibs\glad">
+      <UniqueIdentifier>{F1487BFE-87AD-6B47-A25C-7A5D4246619B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\SharedMemory">
+      <UniqueIdentifier>{3FB1026B-52B9-134A-B91A-7139AA5BE956}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\RobotSimulator">
+      <UniqueIdentifier>{B3A01C10-5F1B-D144-BAD0-A6B5E7B87A45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\ExampleBrowser">
+      <UniqueIdentifier>{87D73539-9838-8345-8D5D-89263089007B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\SharedMemory\plugins">
+      <UniqueIdentifier>{A29BB641-EF3C-A14B-A018-C032C05E7A98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\SharedMemory\plugins\vrSyncPlugin">
+      <UniqueIdentifier>{94B5CDAE-9ABF-BD4A-97A8-EEA45C31AEE8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\examples\SharedMemory\PhysicsClientUDP.h">
+      <Filter>examples\SharedMemory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\SharedMemory\PhysicsClientUDP_C_API.h">
+      <Filter>examples\SharedMemory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\SharedMemory\PhysicsClientTCP.h">
+      <Filter>examples\SharedMemory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\SharedMemory\PhysicsClientTCP_C_API.h">
+      <Filter>examples\SharedMemory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\RobotSimulator\b3RobotSimulatorClientAPI.h">
+      <Filter>examples\RobotSimulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\RobotSimulator\MinitaurSetup.h">
+      <Filter>examples\RobotSimulator</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\examples\ThirdPartyLibs\glad\gl.c">
+      <Filter>examples\ThirdPartyLibs\glad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\SharedMemory\PhysicsClientUDP.cpp">
+      <Filter>examples\SharedMemory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\SharedMemory\PhysicsClientUDP_C_API.cpp">
+      <Filter>examples\SharedMemory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\SharedMemory\PhysicsClientTCP.cpp">
+      <Filter>examples\SharedMemory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\SharedMemory\PhysicsClientTCP_C_API.cpp">
+      <Filter>examples\SharedMemory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\RobotSimulator\RobotSimulatorMain.cpp">
+      <Filter>examples\RobotSimulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\RobotSimulator\b3RobotSimulatorClientAPI.cpp">
+      <Filter>examples\RobotSimulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\RobotSimulator\MinitaurSetup.cpp">
+      <Filter>examples\RobotSimulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\ExampleBrowser\InProcessExampleBrowser.cpp">
+      <Filter>examples\ExampleBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\SharedMemory\PhysicsServerExample.cpp">
+      <Filter>examples\SharedMemory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\SharedMemory\PhysicsServerExampleBullet2.cpp">
+      <Filter>examples\SharedMemory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\SharedMemory\SharedMemoryInProcessPhysicsC_API.cpp">
+      <Filter>examples\SharedMemory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\SharedMemory\plugins\vrSyncPlugin\vrSyncPlugin.cpp">
+      <Filter>examples\SharedMemory\plugins\vrSyncPlugin</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

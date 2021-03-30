@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="examples">
+      <UniqueIdentifier>{207525B1-394A-0C46-A9FE-285615F8056F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\ThirdPartyLibs">
+      <UniqueIdentifier>{28A39C0C-AB14-954E-BF15-2887DFB039ED}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\ThirdPartyLibs\glad">
+      <UniqueIdentifier>{835B83D3-5FB1-4C46-9BE1-FEC7523029E9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\SimpleOpenGL3">
+      <UniqueIdentifier>{3C1D35AC-9637-8A47-82C8-D44E55F0DE9E}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\examples\ThirdPartyLibs\glad\gl.c">
+      <Filter>examples\ThirdPartyLibs\glad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\SimpleOpenGL3\main.cpp">
+      <Filter>examples\SimpleOpenGL3</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

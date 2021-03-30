@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Extras">
+      <UniqueIdentifier>{C69B3E88-81FE-8746-8C4F-6736B4999C99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras\VHACD">
+      <UniqueIdentifier>{ED56ADFC-3E1C-F049-BFB0-48E32896B3D1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras\VHACD\test">
+      <UniqueIdentifier>{EAF7A349-BB8B-CA4C-9228-FEB34A65D18B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras\VHACD\test\src">
+      <UniqueIdentifier>{3C357189-1A7D-E848-9463-5E6E9C05A466}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Extras\VHACD\test\src\main.cpp">
+      <Filter>Extras\VHACD\test\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Extras\VHACD\test\src\main_vhacd.cpp">
+      <Filter>Extras\VHACD\test\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
