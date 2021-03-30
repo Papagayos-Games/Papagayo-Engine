@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Archivos de origen">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Archivos de encabezado">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Archivos de recursos">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Archivos de encabezado\Scene">
+      <UniqueIdentifier>{bf6570fc-4ae9-4c77-8ce4-3bd0c48ee294}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\Scene">
+      <UniqueIdentifier>{a174dfcf-3b31-495b-9b52-a5a025a05a38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\Managers">
+      <UniqueIdentifier>{84a9494b-08d4-4e97-8040-ffe65961f9bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\Managers">
+      <UniqueIdentifier>{0796ee31-b969-4e62-a855-f1322c454ab4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\Scene\Scene.cpp">
+      <Filter>Archivos de origen\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\PapagayoEngine.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Managers\SceneManager.cpp">
+      <Filter>Archivos de origen\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Managers\ResourceManager.cpp">
+      <Filter>Archivos de origen\Managers</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\Scene\Scene.h">
+      <Filter>Archivos de encabezado\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\PapagayoEngine.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Managers\SceneManager.h">
+      <Filter>Archivos de encabezado\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Managers\ResourceManager.h">
+      <Filter>Archivos de encabezado\Managers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
