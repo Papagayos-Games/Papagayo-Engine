@@ -60,3 +60,18 @@ WindowGenerator::~WindowGenerator()
 	delete mRoot_;
 	mRoot_ = nullptr;
 }
+
+inline Root* WindowGenerator::getOgreRoot()const
+{
+	return mRoot_;
+}
+
+inline RenderWindow* WindowGenerator::getRenderWindow()const
+{
+	return renderWindow_;
+}
+
+inline RenderSystem* WindowGenerator::getRenderSystem()const
+{
+	return renderSystem_;
+}

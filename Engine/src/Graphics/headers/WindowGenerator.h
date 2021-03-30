@@ -1,11 +1,9 @@
 #pragma once
 #include "OgreFrameListener.h"
 
-//
 class OgreRenderWindow;
 class OgreRoot;
 class OgreRenderSystem;
-
 
 using namespace Ogre;
 
@@ -23,5 +21,10 @@ private:
 public:
 	WindowGenerator();
 	virtual ~WindowGenerator();
+
+	//Getters
+	inline Root* getOgreRoot()const;
+	inline RenderWindow* getRenderWindow()const;
+	inline RenderSystem* getRenderSystem()const;
 };
 
