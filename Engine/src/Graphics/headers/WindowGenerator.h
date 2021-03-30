@@ -10,6 +10,10 @@ using namespace Ogre;
 class WindowGenerator : public FrameListener
 {
 private:
+	//Singleton
+	static WindowGenerator* instance_;
+	WindowGenerator() {};
+
 
 	RenderWindow* renderWindow_;
 	Root* mRoot_;
@@ -19,7 +23,10 @@ private:
 	void createRoot();
 
 public:
-	WindowGenerator();
+	//Singleton, init y get separados
+	static WindowGenerator* getInstance();
+	static WindowGenerator* initInstance();
+
 	virtual ~WindowGenerator();
 
 	//Getters

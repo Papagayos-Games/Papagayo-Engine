@@ -50,6 +50,23 @@ WindowGenerator::WindowGenerator()
 	initWindow();
 }
 
+WindowGenerator* WindowGenerator::getInstance()
+{
+	if (instance_ == 0)
+	{
+		return nullptr;
+	}
+
+	return instance_;
+}
+
+WindowGenerator* WindowGenerator::initInstance()
+{
+	instance_ = new WindowGenerator();
+
+	return instance_;
+}
+
 WindowGenerator::~WindowGenerator()
 {
 	if (renderWindow_ != nullptr) {
