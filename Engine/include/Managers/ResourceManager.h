@@ -17,6 +17,7 @@ public:
 	json getSceneFile(const std::string& sceneName);
 	json getPrefabs();
 
+	static std::string PATH_;
 private:
 	ResourceManager(const std::string& path);
 	void loadPrefabs(const std::string& prefabName);

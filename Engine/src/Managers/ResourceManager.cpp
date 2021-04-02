@@ -4,6 +4,7 @@
 #include <fstream>
 
 ResourceManager* ResourceManager::instance_ = nullptr;
+std::string ResourceManager::PATH_ = "assets/";
 
 ResourceManager::ResourceManager(const std::string& path) :path_(path)
 {
@@ -16,7 +17,8 @@ ResourceManager::~ResourceManager()
 ResourceManager* ResourceManager::getInstance()
 {
 	if (instance_ == nullptr)
-		return nullptr;
+		if (!setupInstance(ResourceManager::PATH_))
+			throw "ERROR: ResourceManager couldn't be created\n";
 
 	return instance_;
 }

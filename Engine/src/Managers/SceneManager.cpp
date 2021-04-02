@@ -2,11 +2,15 @@
 #include "Scene/Scene.h"
 #include "Managers/ResourceManager.h"
 
+#include "PapagayoEngine.h"
+#include "Ogre.h"
+#include "OgreRoot.h"
+
 SceneManager* SceneManager::instance_ = nullptr;
+Scene* SceneManager::currentScene_ = nullptr;
 
 SceneManager::~SceneManager()
 {
-
 }
 
 SceneManager* SceneManager::getInstance()
@@ -29,34 +33,30 @@ bool SceneManager::setupInstance()
 
 void SceneManager::clean()
 {
+	cleanupScene();
 	delete instance_;
 }
 
 void SceneManager::loadScene(const std::string& sceneName)
 {
-	json j = ResourceManager::getInstance()->getSceneFile(sceneName);
-
+	//crea escena vacia
 	currentScene_ = new Scene();
+
+	//la llena de objetos
+	json j = ResourceManager::getInstance()->getSceneFile(sceneName);
 	currentScene_->load(j);
 }
 
 void SceneManager::cleanupScene()
 {
-	delete currentScene_; currentScene_ = nullptr;
-
 	//decir a ogre que limpie la escena
-}
-
-void SceneManager::start()
-{
-	currentScene_->start();
-}
-
-void SceneManager::update()
-{
-	currentScene_->update();
+	
+	if(currentScene_){
+		delete currentScene_; 
+		currentScene_ = nullptr;
+	}
 }
 
 SceneManager::SceneManager() {
-
+	//ogreRoot_ = PapagayoEngine::getInstance()->getOgreRoot();
 }

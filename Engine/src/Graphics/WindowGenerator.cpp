@@ -9,9 +9,20 @@
 #include <OgreRenderSystem.h>
 #include <OgreFileSystemLayer.h>
 
+WindowGenerator* WindowGenerator::instance_ = 0;
+
+using namespace Ogre;
+
 void WindowGenerator::initWindow()
 {
-	createRoot();
+	const Ogre::RenderSystemList& lRenderSystemList = mRoot_->getAvailableRenderers();
+	if (lRenderSystemList.size() == 0) {
+		throw std::exception("No se encuentra sistema de render disponible");
+	}
+	else {
+		renderSystem_ = lRenderSystemList[0];
+		mRoot_->setRenderSystem(renderSystem_);
+	}
 
 	//TEST: Configuracion inicial de la ventana 
 	renderWindow_ = mRoot_->initialise(true, "Papagayos_Engine");
@@ -21,38 +32,14 @@ void WindowGenerator::initWindow()
 	mRoot_->addFrameListener(this);
 }
 
-void WindowGenerator::createRoot()
-{
-
-#ifdef _DEBUG
-	mRoot_ = new Root("OgreD/plugins.cfg");
-#else
-	mRoot_ = new Root("Ogre/plugins.cfg");
-#endif
-
-	if (mRoot_ == nullptr) {
-		throw std::exception("No se ha podido crear el mRoot");
-	}
-	else {
-		const Ogre::RenderSystemList& lRenderSystemList = mRoot_->getAvailableRenderers();
-		if (lRenderSystemList.size() == 0) {
-			throw std::exception("No se encuentra sistema de render disponible");
-		}
-		else {
-			renderSystem_ = lRenderSystemList[0];
-			mRoot_->setRenderSystem(renderSystem_);
-		}
-	}
-}
-
-WindowGenerator::WindowGenerator()
+WindowGenerator::WindowGenerator(Root* root) : mRoot_(root)
 {
 	initWindow();
 }
 
 WindowGenerator* WindowGenerator::getInstance()
 {
-	if (instance_ == 0)
+	if (instance_ == nullptr)
 	{
 		return nullptr;
 	}
@@ -60,11 +47,15 @@ WindowGenerator* WindowGenerator::getInstance()
 	return instance_;
 }
 
-WindowGenerator* WindowGenerator::initInstance()
+bool WindowGenerator::setupInstance(Root* root)
 {
-	instance_ = new WindowGenerator();
+	if (instance_ == 0)
+	{
+		instance_ = new WindowGenerator(root);
+		return true;
+	}
 
-	return instance_;
+	return false;
 }
 
 WindowGenerator::~WindowGenerator()
@@ -76,11 +67,6 @@ WindowGenerator::~WindowGenerator()
 
 	delete mRoot_;
 	mRoot_ = nullptr;
-}
-
-inline Root* WindowGenerator::getOgreRoot()const
-{
-	return mRoot_;
 }
 
 inline RenderWindow* WindowGenerator::getRenderWindow()const

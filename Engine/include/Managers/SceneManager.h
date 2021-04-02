@@ -1,6 +1,11 @@
 #pragma once
 #include <string>
 
+namespace Ogre {
+	class Root;
+}
+
+class Entity;
 class Scene;
 
 class SceneManager {
@@ -12,14 +17,17 @@ public:
 	static void clean();
 
 	void loadScene(const std::string& sceneName);
-	void cleanupScene();
+	static void cleanupScene();
 
-	void start();
-	void update();
+	// Añade entidades y componentes a esas entidades al iniciar la escena y al instanciar gameObjects durante ejecuccion
+	void addEntity() {};
+	void addComponentTo(const std::string& entName) {};
+	void addComponentTo(const Entity *ent){};
 
 private:
 	SceneManager();
 	static SceneManager* instance_;
+	static Scene* currentScene_;
 
-	Scene* currentScene_ = nullptr;
+	Ogre::Root* ogreRoot_;
 };

@@ -3,6 +3,9 @@
 #include <string>
 
 // resto de includes graphics, physics, etc.
+namespace Ogre {
+	class Root;
+}
 
 class PapagayoEngine {
 public:
@@ -11,13 +14,23 @@ public:
 	static bool setupInstance(const std::string& appName);
 	static void clean();
 
+	void run();
+
+	inline Ogre::Root* getOgreRoot() const;
+private:
+	static PapagayoEngine* instance_;
+	std::string appName_;
+	
+	bool running_ = true;
+
+	// nos guardamos el root para poder crear las escenas a partir de ogre
+	Ogre::Root *ogreRoot_ = nullptr;
+
+	PapagayoEngine(const std::string& appName);
 	void init();
+	void createRoot();
 	void initTestScene();
 	void update();
-private:
-	PapagayoEngine(const std::string& appName);
 
-	std::string appName_;
 
-	static PapagayoEngine* instance_;
 };
