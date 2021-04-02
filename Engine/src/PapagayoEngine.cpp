@@ -5,7 +5,6 @@
 #include <iostream>
 
 #include "Ogre.h"
-#include "OgreRoot.h"
 
 #include "Graphics/WindowGenerator.h"
 #include "Managers/SceneManager.h"
@@ -46,7 +45,8 @@ void PapagayoEngine::clean()
 {
 	// se borrarian todos los managers del motor
 	
-
+	SceneManager::getInstance()->clean();
+	ResourceManager::getInstance()->clean();
 	//WindowGenerator::getInstance()->clean();
 
 	delete instance_;
@@ -69,7 +69,7 @@ void PapagayoEngine::init()
 		throw std::runtime_error("SceneManager init fail \n" + (std::string)e.what() + "\n");
 	}
 
-	try { WindowGenerator::setupInstance(getOgreRoot()); }
+	try { WindowGenerator::setupInstance(getOgreRoot(), appName_); }
 	catch (const std::exception& e)
 	{
 		throw std::runtime_error("WindowGenerator init fail \n" + (std::string)e.what() + "\n");
@@ -96,7 +96,7 @@ void PapagayoEngine::initTestScene()
 
 void PapagayoEngine::update()
 {
-	
+	std::cout << "Updating\n";
 }
 
 inline Ogre::Root* PapagayoEngine::getOgreRoot() const

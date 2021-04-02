@@ -1,4 +1,4 @@
-#include "WindowGenerator.h"
+#include "Graphics/WindowGenerator.h"
 
 //Includes generales
 #include <exception>
@@ -13,7 +13,7 @@ WindowGenerator* WindowGenerator::instance_ = 0;
 
 using namespace Ogre;
 
-void WindowGenerator::initWindow()
+void WindowGenerator::initWindow(std::string name)
 {
 	const Ogre::RenderSystemList& lRenderSystemList = mRoot_->getAvailableRenderers();
 	if (lRenderSystemList.size() == 0) {
@@ -25,16 +25,16 @@ void WindowGenerator::initWindow()
 	}
 
 	//TEST: Configuracion inicial de la ventana 
-	renderWindow_ = mRoot_->initialise(true, "Papagayos_Engine");
+	renderWindow_ = mRoot_->initialise(true, name);
 	renderWindow_->resize(800, 600);
 	renderWindow_->windowMovedOrResized();
 
 	mRoot_->addFrameListener(this);
 }
 
-WindowGenerator::WindowGenerator(Root* root) : mRoot_(root)
+WindowGenerator::WindowGenerator(Root* root, std::string name) : mRoot_(root)
 {
-	initWindow();
+	initWindow(name);
 }
 
 WindowGenerator* WindowGenerator::getInstance()
@@ -47,11 +47,11 @@ WindowGenerator* WindowGenerator::getInstance()
 	return instance_;
 }
 
-bool WindowGenerator::setupInstance(Root* root)
+bool WindowGenerator::setupInstance(Root* root, std::string name)
 {
 	if (instance_ == 0)
 	{
-		instance_ = new WindowGenerator(root);
+		instance_ = new WindowGenerator(root, name);
 		return true;
 	}
 

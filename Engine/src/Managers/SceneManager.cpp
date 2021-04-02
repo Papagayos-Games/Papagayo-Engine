@@ -3,7 +3,6 @@
 #include "Managers/ResourceManager.h"
 
 #include "PapagayoEngine.h"
-#include "Ogre.h"
 #include "OgreRoot.h"
 
 SceneManager* SceneManager::instance_ = nullptr;
@@ -58,5 +57,5 @@ void SceneManager::cleanupScene()
 }
 
 SceneManager::SceneManager() {
-	//ogreRoot_ = PapagayoEngine::getInstance()->getOgreRoot();
+	ogreRoot_ = PapagayoEngine::getInstance()->getOgreRoot();
 }

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Graphics\WindowGenerator.h" />
     <ClInclude Include="..\..\include\Managers\InputManager.h" />
     <ClInclude Include="..\..\include\Managers\ResourceManager.h" />
     <ClInclude Include="..\..\include\Managers\SceneManager.h" />
@@ -26,6 +27,7 @@
     <ClInclude Include="..\..\include\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\Graphics\WindowGenerator.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\Managers\ResourceManager.cpp" />
     <ClCompile Include="..\..\src\Managers\SceneManager.cpp" />
