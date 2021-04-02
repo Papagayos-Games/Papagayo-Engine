@@ -141,23 +141,25 @@ public:
 		btScalar m_additionalAngularDampingThresholdSqr;
 		btScalar m_additionalAngularDampingFactor;
 
-		btRigidBodyConstructionInfo(btScalar mass, btMotionState* motionState, btCollisionShape* collisionShape, const btVector3& localInertia = btVector3(0, 0, 0)) : m_mass(mass),
-																																									   m_motionState(motionState),
-																																									   m_collisionShape(collisionShape),
-																																									   m_localInertia(localInertia),
-																																									   m_linearDamping(btScalar(0.)),
-																																									   m_angularDamping(btScalar(0.)),
-																																									   m_friction(btScalar(0.5)),
-																																									   m_rollingFriction(btScalar(0)),
-																																									   m_spinningFriction(btScalar(0)),
-																																									   m_restitution(btScalar(0.)),
-																																									   m_linearSleepingThreshold(btScalar(0.8)),
-																																									   m_angularSleepingThreshold(btScalar(1.f)),
-																																									   m_additionalDamping(false),
-																																									   m_additionalDampingFactor(btScalar(0.005)),
-																																									   m_additionalLinearDampingThresholdSqr(btScalar(0.01)),
-																																									   m_additionalAngularDampingThresholdSqr(btScalar(0.01)),
-																																									   m_additionalAngularDampingFactor(btScalar(0.01))
+		btRigidBodyConstructionInfo(btScalar mass, btMotionState* motionState, btCollisionShape* collisionShape,
+			const btVector3& localInertia = btVector3(0, 0, 0)) :
+				m_mass(mass),
+				m_motionState(motionState),
+				m_collisionShape(collisionShape),
+				m_localInertia(localInertia),
+				m_linearDamping(btScalar(0.)),
+				m_angularDamping(btScalar(0.)),
+				m_friction(btScalar(0.5)),
+				m_rollingFriction(btScalar(0)),
+				m_spinningFriction(btScalar(0)),
+				m_restitution(btScalar(0.)),
+				m_linearSleepingThreshold(btScalar(0.8)),
+				m_angularSleepingThreshold(btScalar(1.f)),
+				m_additionalDamping(false),
+				m_additionalDampingFactor(btScalar(0.005)),
+				m_additionalLinearDampingThresholdSqr(btScalar(0.01)),
+				m_additionalAngularDampingThresholdSqr(btScalar(0.01)),
+				m_additionalAngularDampingFactor(btScalar(0.01))
 		{
 			m_startWorldTransform.setIdentity();
 		}
