@@ -95,7 +95,7 @@ void ResourceManager::loadFromResourceFile()
 #else
 	configurationPath = "Ogre/resources.cfg"
 #endif
-	mFSLayer->setHomePath("./bin"/*+ configurationPath*/);
+	mFSLayer->setHomePath("./bin");
 	Ogre::String resourcesPath = mFSLayer->getConfigFilePath(configurationPath);
 
 	if (Ogre::FileSystemLayer::fileExists(resourcesPath))
