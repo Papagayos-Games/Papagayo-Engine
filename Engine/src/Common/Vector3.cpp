@@ -1,4 +1,5 @@
 #include "Vector3.h"
+#include "../../dependencies/Bullet/src/LinearMath/btVector3.h"
 
 void Vector3::invert()
 {

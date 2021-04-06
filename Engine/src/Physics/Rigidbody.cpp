@@ -15,30 +15,30 @@ void Rigidbody::init()
 	btRigidBody::btRigidBodyConstructionInfo info(mass, new btDefaultMotionState(), shapeColl);
 	rb = new btRigidBody(info);
 	//seteamos la gravedad por defecto TODO: ESTO VA A IR EN EL PHYSICS MANAGER
-	rb->setGravity(GRAVITY); 
+	rb->setGravity(GRAVITY);
 
 	//rb = PhysicsManager::getinstance->createRB(this);
 };
 
-void Rigidbody::activateGravity()
+void Rigidbody::setActiveGravtiy(const bool active)
 {
-	rb->applyGravity();
-};
-
-void Rigidbody::deactivateGravity()
-{
-	rb->clearGravity();
+	if (active) {
+		rb->applyGravity();
+	}
+	else {
+		rb->clearGravity();
+	}
 }
 
 Vector3 Rigidbody::getLinearVelocity() const
 {
-    if (active) {
-        btVector3 vel = rb->getLinearVelocity();
-        return Vector3(vel.x(), vel.y(), vel.z());
-    }
-    else {
-        return Vector3(0, 0, 0);
-    }
+	if (active) {
+		btVector3 vel = rb->getLinearVelocity();
+		return Vector3(vel.x(), vel.y(), vel.z());
+	}
+	else {
+		return Vector3(0, 0, 0);
+	}
 }
 
 bool Rigidbody::isTrigger()
@@ -57,92 +57,114 @@ bool Rigidbody::isStatic()
 }
 
 void Rigidbody::setTrigger(const bool trigger_) {
-    if (trigger) {
-        rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
-    }
-    else {
-        rb->setCollisionFlags(rb->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
-    }
+	if (trigger) {
+		rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+	}
+	else {
+		rb->setCollisionFlags(rb->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
+	}
 
-    trigger = trigger_;
+	trigger = trigger_;
 }
 
 void Rigidbody::setKinematic(const bool kinematic_) {
 
-    if (kinematic) {
-        rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
-    }
-    else {
-        rb->setCollisionFlags(rb->getCollisionFlags() & ~btCollisionObject::CF_KINEMATIC_OBJECT);
-    }
+	if (kinematic) {
+		rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+	}
+	else {
+		rb->setCollisionFlags(rb->getCollisionFlags() & ~btCollisionObject::CF_KINEMATIC_OBJECT);
+	}
 
-    kinematic = kinematic_;
+	kinematic = kinematic_;
 }
 
 void Rigidbody::setStatic(const bool _static) {
-    if (_static) {
-        rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
-    }
-    else {
-        rb->setCollisionFlags(rb->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
-    }
+	if (_static) {
+		rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+	}
+	else {
+		rb->setCollisionFlags(rb->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
+	}
 
-    static_ = _static;
+	static_ = _static;
 }
 
 void Rigidbody::setRestitution(float restitution)
 {
-    if (active) {
-        //restricciones
-        if (restitution < 0) {
-            restitution = 0;
-        }
-        else if (restitution > 1) {
-            restitution = 1;
-        }
+	if (active) {
+		//restricciones
+		if (restitution < 0) {
+			restitution = 0;
+		}
+		else if (restitution > 1) {
+			restitution = 1;
+		}
 
-        rb->setRestitution(restitution);
-    }
+		rb->setRestitution(restitution);
+	}
 }
 
 void Rigidbody::setLinearVelocity(Vector3 vel)
 {
-    if (active) {
-        btVector3 v = btVector3(vel.x, vel.y, vel.z);
-        rb->setLinearVelocity(v);
-    }
+	if (active) {
+		btVector3 v = btVector3(vel.x, vel.y, vel.z);
+		rb->setLinearVelocity(v);
+	}
 }
 
 void Rigidbody::setFriction(float friction)
 {
-    if (active) {
-        rb->setFriction(friction);
-    }
+	if (active) {
+		rb->setFriction(friction);
+	}
 }
 
 void Rigidbody::setPosition(Vector3 newPos)
 {
-    if (active) {
-        btTransform tr;
-        btVector3 vec = btVector3(newPos.x, newPos.y, newPos.z);
-        tr.setOrigin(vec);
-        tr.setRotation(rb->getOrientation());
+	if (active) {
+		btTransform tr;
+		btVector3 vec = btVector3(newPos.x, newPos.y, newPos.z);
+		tr.setOrigin(vec);
+		tr.setRotation(rb->getOrientation());
 
-        rb->setWorldTransform(tr);
-    }
+		rb->setWorldTransform(tr);
+	}
 }
 
-void Rigidbody::addForce(Vector3 force, Vector3 relativePos)
+void Rigidbody::addForce(Vector3 force, Vector3 relativePos, Forces type)
 {
-    if (active) {
-        if (relativePos == Vector3(0.0f, 0.0f, 0.0f))
-            rb->applyCentralForce((btVector3(btScalar(force.x), btScalar(force.y), btScalar(force.z))));
-        else
-            rb->applyForce(
-                (btVector3(btScalar(force.x), btScalar(force.y),
-                    btScalar(force.z))),
-                (btVector3(btScalar(relativePos.x), btScalar(relativePos.y),
-                    btScalar(relativePos.z))));
-    }
+	if (active) {
+		if (relativePos == Vector3(0.0f, 0.0f, 0.0f)) {
+			if (type == Forces::NORMAL)
+				rb->applyCentralForce(btVector3(btScalar(force.x), btScalar(force.y), btScalar(force.z)));
+			else if (type == Forces::IMPULSE)
+				rb->applyCentralImpulse(btVector3(btScalar(force.x), btScalar(force.y), btScalar(force.z)));
+		}
+		else {
+			if (type == Forces::NORMAL)
+				rb->applyForce(
+					(btVector3(btScalar(force.x), btScalar(force.y),
+						btScalar(force.z))),
+					(btVector3(btScalar(relativePos.x), btScalar(relativePos.y),
+						btScalar(relativePos.z))));
+			else if (type == Forces::IMPULSE)
+				rb->applyImpulse(
+					(btVector3(btScalar(force.x), btScalar(force.y),
+						btScalar(force.z))),
+					(btVector3(btScalar(relativePos.x), btScalar(relativePos.y),
+						btScalar(relativePos.z))));
+		}
+	}
+}
+
+void Rigidbody::addTorque(Vector3 torque, Forces type)
+{
+	if (active) {
+		if (type == Forces::NORMAL)
+			rb->applyTorque(btVector3(torque.x, torque.y, torque.z));
+		else if (type == Forces::IMPULSE)
+			rb->applyTorqueImpulse(btVector3(torque.x, torque.y, torque.z));
+	}
 }
 

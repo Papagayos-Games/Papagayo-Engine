@@ -11,6 +11,11 @@ enum class Shapes
 	BOX = 0, SPHERE = 1, TRIANGLE = 2
 };
 
+enum class Forces {
+	NORMAL = 0,
+	IMPULSE = 1
+};
+
 class Rigidbody : public Component
 {
 private:
@@ -37,22 +42,9 @@ public:
 	virtual void init();
 	virtual void update() {};
 
-	void activateGravity();
-	void deactivateGravity();
-
-	btCollisionShape* getShape() { return shapeColl; };
-
-	//metodo que devuelve la velocidad lineal del rb
-	Vector3 getLinearVelocity() const;
-
-	//metodo que nos dice si el rigidbody es trigger o no
-	bool isTrigger();
-
-	//metodo que nos dice si el rigidbody es kinematic
-	bool isKinematic();
-
-	//metodo que nos dice si el rigidbody es estatico
-	bool isStatic();
+#pragma region Setters
+	//Activa/Desactiva la gravedad
+	void setActiveGravtiy(const bool active);
 
 	//metodo que si recibe true hara que el rigidbody active sus flags de colision para que estos actuen como trigger,
 	//si es false desactivara sus flags de colision para que este deje de ser un trigger.
@@ -80,13 +72,37 @@ public:
 
 	//metodo que setea la posicion del rb
 	void setPosition(Vector3 newPos);
+#pragma endregion
 
-	//Aplica fuerza al rigidbody
-	void addForce(Vector3 force, Vector3 relativePos);
+#pragma region Getters
+	//metodo que devuelve la velocidad lineal del rb
+	Vector3 getLinearVelocity() const;
 
+	//metodo que nos dice si el rigidbody es trigger o no
+	bool isTrigger();
+
+	//metodo que nos dice si el rigidbody es kinematic
+	bool isKinematic();
+
+	//metodo que nos dice si el rigidbody es estatico
+	bool isStatic();
+#pragma endregion
+
+#pragma region Adders
+	//Aplica fuerza al rigidbody de tipo Forces
+	//a una posicion relativa del objeto, es decir,
+	//la parte del cuerpo donde se aplica la fuerza
+	void addForce(Vector3 force, Vector3 relativePos, Forces type = Forces::NORMAL);
+
+	//Aplica una fuerza de giro al objeto de tipo Forces
+	void addTorque(Vector3 torque, Forces type = Forces::NORMAL);
+#pragma endregion
+
+#pragma region Colisiones
 	//metodo que comprueba 
 	bool collidesWith(std::string id) const;
 
 	Entity* collidesWithTag(std::string tag) const;
+#pragma endregion
 };
 
