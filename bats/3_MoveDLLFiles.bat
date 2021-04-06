@@ -9,6 +9,10 @@ echo moviendo OGRE
 copy ..\Engine\dependencies\Ogre\build\bin\debug\OgreMain_d.dll ..\Engine\bin
 copy ..\Engine\dependencies\Ogre\build\bin\release\OgreMain.dll ..\Engine\bin
 
+echo moviendo OgreRTShaderSystem
+copy ..\Engine\dependencies\Ogre\build\bin\debug\OgreRTShaderSystem_d.dll ..\Engine\bin
+copy ..\Engine\dependencies\Ogre\build\bin\release\OgreRTShaderSystem.dll ..\Engine\bin
+
 ::zlib
 echo moviendo zlib
 copy ..\Engine\dependencies\Ogre\build\bin\debug\zlib.dll ..\Engine\bin

@@ -9,6 +9,12 @@
 #include "OgreRenderWindow.h"
 #include "OgreViewport.h"
 
+//#include "OgreShaderGenerator.h"
+//#include "OgreOverlayPrerequisites.h"
+//#include "OgreRenderQueueListener.h"
+//#include "OgreRenderSystem.h"
+
+
 SceneManager* SceneManager::instance_ = nullptr;
 Scene* SceneManager::currentScene_ = nullptr;
 
@@ -70,11 +76,30 @@ void SceneManager::createStartScene() {
 	mSM_ = ogreRoot_->createSceneManager();
 	mSM_->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
 	
+	//try {
+	//	if (Ogre::RTShader::ShaderGenerator::initialize())
+	//	{
+	//		mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
+	//		mShaderGenerator->addSceneManager(mSM_);
+	//		Ogre::OverlaySystem* mOverlaySystem = new Ogre::OverlaySystem();  // Overlay system
+	//		mSM_->addRenderQueueListener(mOverlaySystem);
+	//	}
+	//}
+	//catch (const std::exception& e)
+	//{
+	//	throw std::runtime_error("Fallo de RTShader\n" + (std::string)e.what() + "\n");
+	//}
+
 	addCamera();
 }
 
 Ogre::Camera* SceneManager::getCamera(){
 	return mCamera_;
+}
+
+Ogre::SceneManager* SceneManager::getOgreSceneManager()
+{
+	return mSM_;
 }
 
 void SceneManager::addCamera() {

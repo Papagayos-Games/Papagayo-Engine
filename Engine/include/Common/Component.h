@@ -7,6 +7,8 @@ class Component {
 protected:
 
 	ecs::CmpId id;   // identificador del tipo de componente
+
+	virtual void init() = 0;
 public:
 	//constructor
 	Component(ecs::CmpId id);
@@ -21,7 +23,6 @@ public:
 		return id;
 	}
 
-	virtual void init() = 0;
 	virtual void update() = 0;
 
 

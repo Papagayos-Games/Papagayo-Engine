@@ -13,6 +13,7 @@
 #include "Graphics/WindowGenerator.h"
 #include "Managers/SceneManager.h"
 #include "Managers/ResourceManager.h"
+#include "Graphics/MeshComponent.h"
 
 
 
@@ -60,6 +61,8 @@ void PapagayoEngine::init()
 {
 	createRoot();
 
+
+
 	// iniciar resto de singletons/managers
 	try { ResourceManager::setupInstance("assets/"); }
 	catch (const std::exception& e)
@@ -76,6 +79,9 @@ void PapagayoEngine::init()
 	{
 		throw std::runtime_error("SceneManager init fail \n" + (std::string)e.what() + "\n");
 	}
+
+	//Prueba de pintado XD
+	MeshComponent* funcaPlz = new MeshComponent();
 }
 
 void PapagayoEngine::createRoot()
@@ -89,13 +95,20 @@ void PapagayoEngine::createRoot()
 	if (ogreRoot_ == nullptr) {
 		throw std::exception("No se ha podido crear el mRoot");
 	}
+
 }
 
 
 void PapagayoEngine::update()
 {
-	//std::cout << "Updating\n";
-	ogreRoot_->renderOneFrame();
+	try {
+		//std::cout << "Updating\n";
+		ogreRoot_->renderOneFrame();
+	}
+	catch (const std::exception& e)
+	{
+		throw std::runtime_error("Fallo de renderizado \n" + (std::string)e.what() + "\n");
+	}
 	
 }
 

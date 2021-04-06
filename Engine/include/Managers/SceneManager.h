@@ -6,6 +6,10 @@ namespace Ogre {
 	class SceneManager;
 	class Camera;
 	class SceneNode;
+	class OverlaySystem;
+	namespace RTShader {
+		class ShaderGenerator;
+	}
 }
 
 
@@ -29,6 +33,8 @@ public:
 	void addComponentTo(const Entity *ent){};
 	// Devuelve la main cámara
 	inline Ogre::Camera* getCamera();
+	//Devuelve mSM_
+	Ogre::SceneManager* getOgreSceneManager();
 
 private:
 	SceneManager();
@@ -40,6 +46,7 @@ private:
 	Ogre::SceneManager* mSM_ = nullptr;
 	Ogre::SceneNode* mainCamNode_ = nullptr;
 	Ogre::Camera* mCamera_ = nullptr;
+	Ogre::RTShader::ShaderGenerator* mShaderGenerator; // The Shader generator instance.
 	//	Agrega una cámara a la escena
 	void addCamera();
 
