@@ -27,7 +27,7 @@ private:
 	const btVector3 GRAVITY = btVector3(0,-9.8,0); // TODO: ESTO VA A IR EN EL PHYSICS MANAGER
 	//Transform fisico del rigidbody
 	btTransform* tr = nullptr;
-
+	//Forma de la malla del rigidbody
 	btCollisionShape* shapeColl = nullptr;
 
 	bool trigger = false;
@@ -35,6 +35,7 @@ private:
 	bool static_ = false;
 	bool collision = false;
 
+	bool collidesWithEntity(Entity* other) const;
 public:
 	Rigidbody(ecs::CmpId id);
 	~Rigidbody() {};
@@ -86,6 +87,8 @@ public:
 
 	//metodo que nos dice si el rigidbody es estatico
 	bool isStatic();
+
+	btCollisionShape* getShape();
 #pragma endregion
 
 #pragma region Adders
@@ -99,9 +102,11 @@ public:
 #pragma endregion
 
 #pragma region Colisiones
-	//metodo que comprueba 
-	bool collidesWith(std::string id) const;
+	//Comprueba la colision con otro objeto de la escena
+	bool onCollisionEnter(std::string id) const;
 
+	//Comprueba la colisiones con otros objetos con un tag
+	//dentro de la escena especifica
 	Entity* collidesWithTag(std::string tag) const;
 #pragma endregion
 };
