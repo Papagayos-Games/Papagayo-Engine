@@ -69,7 +69,7 @@ WindowGenerator::~WindowGenerator()
 	mRoot_ = nullptr;
 }
 
-inline RenderWindow* WindowGenerator::getRenderWindow()const
+RenderWindow* WindowGenerator::getRenderWindow()const
 {
 	return renderWindow_;
 }

@@ -1,9 +1,13 @@
 #include "Managers/SceneManager.h"
 #include "Scene/Scene.h"
 #include "Managers/ResourceManager.h"
+#include "Graphics/WindowGenerator.h"
+
 
 #include "PapagayoEngine.h"
 #include "OgreRoot.h"
+#include "OgreRenderWindow.h"
+#include "OgreViewport.h"
 
 SceneManager* SceneManager::instance_ = nullptr;
 Scene* SceneManager::currentScene_ = nullptr;
@@ -58,4 +62,35 @@ void SceneManager::cleanupScene()
 
 SceneManager::SceneManager() {
 	ogreRoot_ = PapagayoEngine::getInstance()->getOgreRoot();
+	createStartScene();
+}
+
+
+void SceneManager::createStartScene() {
+	mSM_ = ogreRoot_->createSceneManager();
+	mSM_->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
+	
+	addCamera();
+}
+
+Ogre::Camera* SceneManager::getCamera(){
+	return mCamera_;
+}
+
+void SceneManager::addCamera() {
+	mCamera_ = mSM_->createCamera("MainCamera");
+	mCamera_->setNearClipDistance(1);
+	mCamera_->setFarClipDistance(10000);
+	//mCamera_->lookAt(0, 0, -1);
+	mCamera_->setAutoAspectRatio(true);
+	//cam->setPolygonMode(Ogre::PM_WIREFRAME); 
+
+	mainCamNode_ = mSM_->getRootSceneNode()->createChildSceneNode("mCam");//->getRootSceneNode()->createChildSceneNode("nCam");
+	mainCamNode_->attachObject(mCamera_);
+
+	mainCamNode_->setPosition(0, 0, 1000);
+	mainCamNode_->lookAt(Ogre::Vector3(0, 0, 0), Ogre::Node::TS_WORLD);
+
+	Ogre::Viewport* vp = WindowGenerator::getInstance()->getRenderWindow()->addViewport(mCamera_);
+	vp->setBackgroundColour(Ogre::ColourValue(0.0, 1.0, 0.0, 1.0));//cambia el color del fondo
 }

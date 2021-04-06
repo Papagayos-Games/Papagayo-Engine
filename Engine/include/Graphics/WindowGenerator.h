@@ -31,7 +31,7 @@ public:
 	virtual ~WindowGenerator();
 
 	//Getters
-	inline Ogre::RenderWindow* getRenderWindow()const;
+	Ogre::RenderWindow* getRenderWindow()const;
 	inline Ogre::RenderSystem* getRenderSystem()const;
 };
 

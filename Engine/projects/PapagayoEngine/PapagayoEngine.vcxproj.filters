@@ -51,6 +51,9 @@
     <ClCompile Include="..\..\src\Graphics\WindowGenerator.cpp">
       <Filter>Archivos de origen\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Managers\RenderManager.cpp">
+      <Filter>Archivos de origen\Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Scene\Scene.h">
@@ -70,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Graphics\WindowGenerator.h">
       <Filter>Archivos de encabezado\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Managers\RenderManager.h">
+      <Filter>Archivos de encabezado\Managers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

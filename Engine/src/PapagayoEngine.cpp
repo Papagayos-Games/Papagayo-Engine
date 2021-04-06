@@ -5,6 +5,10 @@
 #include <iostream>
 
 #include "Ogre.h"
+//#include <OgreWindowEventUtilities.h>
+//#include <OgreRenderWindow.h>
+
+//#include "OgreViewport.h"
 
 #include "Graphics/WindowGenerator.h"
 #include "Managers/SceneManager.h"
@@ -62,17 +66,15 @@ void PapagayoEngine::init()
 	{
 		throw std::runtime_error("ResourceManager init fail \n" + (std::string)e.what() + "\n");
 	}
-
-	try { SceneManager::setupInstance(); }
-	catch (const std::exception& e)
-	{
-		throw std::runtime_error("SceneManager init fail \n" + (std::string)e.what() + "\n");
-	}
-
 	try { WindowGenerator::setupInstance(getOgreRoot(), appName_); }
 	catch (const std::exception& e)
 	{
 		throw std::runtime_error("WindowGenerator init fail \n" + (std::string)e.what() + "\n");
+	}
+	try { SceneManager::setupInstance(); }
+	catch (const std::exception & e)
+	{
+		throw std::runtime_error("SceneManager init fail \n" + (std::string)e.what() + "\n");
 	}
 }
 
@@ -89,14 +91,12 @@ void PapagayoEngine::createRoot()
 	}
 }
 
-void PapagayoEngine::initTestScene()
-{
-	SceneManager::getInstance()->loadScene("test");
-}
 
 void PapagayoEngine::update()
 {
-	std::cout << "Updating\n";
+	//std::cout << "Updating\n";
+	ogreRoot_->renderOneFrame();
+	
 }
 
 inline Ogre::Root* PapagayoEngine::getOgreRoot() const
@@ -106,10 +106,8 @@ inline Ogre::Root* PapagayoEngine::getOgreRoot() const
 
 void PapagayoEngine::run() {
 	init();
-	//initTestScene();
-
 	// ciclo principal de juego
 	while(running_){
-		update();
+		update();	
 	}
 }
