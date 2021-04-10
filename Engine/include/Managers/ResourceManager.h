@@ -2,6 +2,11 @@
 
 #include "json.hpp"
 
+namespace Ogre {
+	class Root;
+	class FileSystemLayer;
+}
+
 using json = nlohmann::json;
 
 class ResourceManager {
@@ -21,9 +26,12 @@ public:
 private:
 	ResourceManager(const std::string& path);
 	void loadPrefabs(const std::string& prefabName);
+	void loadFromResourceFile();
 
 	std::string path_;
 	json prefabs_;
 
 	static ResourceManager* instance_;
+	Ogre::Root* ogreRoot_;
+	Ogre::FileSystemLayer* mFSLayer;
 };

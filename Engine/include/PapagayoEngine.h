@@ -5,6 +5,13 @@
 // resto de includes graphics, physics, etc.
 namespace Ogre {
 	class Root;
+	class SceneManager;
+	class Camera;
+	class SceneNode;
+	namespace RTShader {
+		class ShaderGenerator;
+	}
+	//class RenderWindow;
 }
 
 class PapagayoEngine {
@@ -25,12 +32,14 @@ private:
 
 	// nos guardamos el root para poder crear las escenas a partir de ogre
 	Ogre::Root *ogreRoot_ = nullptr;
+	Ogre::RTShader::ShaderGenerator* mShaderGenerator;
+
 
 	PapagayoEngine(const std::string& appName);
 	void init();
 	void createRoot();
-	void initTestScene();
 	void update();
+	void setupRTShaderGenerator();
 
 
 };
