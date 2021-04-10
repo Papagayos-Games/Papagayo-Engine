@@ -1,4 +1,5 @@
 #include "Vector3.h"
+#include "../../dependencies/Bullet/src/LinearMath/btVector3.h"
 
 void Vector3::invert()
 {
@@ -69,6 +70,11 @@ void Vector3::operator-=(const Vector3& other)
 	x -= other.x;
 	y -= other.y;
 	z -= other.z;
+}
+
+bool Vector3::operator==(const Vector3& other)
+{
+	return x == other.x && y == other.y && z == other.z;
 }
 
 Vector3 Vector3::operator%(const Vector3& v)

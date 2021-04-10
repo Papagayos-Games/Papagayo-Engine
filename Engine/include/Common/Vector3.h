@@ -49,6 +49,9 @@ public:
 	//restar a tu vector otro
 	void operator-=(const Vector3& other);
 
+	//comparar dos vectores
+	bool operator==(const Vector3& other);
+
 	//producto vectorial
 	Vector3 operator%(const Vector3& v);
 

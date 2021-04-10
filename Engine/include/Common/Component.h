@@ -1,12 +1,11 @@
-
+#pragma once
 #include <math.h>
 #include "ecs.h"
 
-
 class Component {
 protected:
-
 	ecs::CmpId id;   // identificador del tipo de componente
+	bool active;
 
 	virtual void init() = 0;
 public:
@@ -25,5 +24,6 @@ public:
 
 	virtual void update() = 0;
 
-
+	bool isActive();
+	void setActive(bool act);
 };
