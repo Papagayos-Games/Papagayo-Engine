@@ -1,4 +1,4 @@
-#include "MeshComponent.h"
+#include "Graphics/MeshComponent.h"
 #include "Managers/SceneManager.h"
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>

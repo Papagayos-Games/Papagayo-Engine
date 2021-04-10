@@ -93,7 +93,7 @@ void ResourceManager::loadFromResourceFile()
 #ifdef _DEBUG
 	configurationPath = "OgreD/resources.cfg";
 #else
-	configurationPath = "Ogre/resources.cfg"
+	configurationPath = "Ogre/resources.cfg";
 #endif
 	mFSLayer->setHomePath("./bin");
 	Ogre::String resourcesPath = mFSLayer->getConfigFilePath(configurationPath);
