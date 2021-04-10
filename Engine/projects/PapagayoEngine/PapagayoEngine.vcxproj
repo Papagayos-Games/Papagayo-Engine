@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Graphics\MeshComponent.h" />
+    <ClInclude Include="..\..\include\Graphics\OgreContext.h" />
     <ClInclude Include="..\..\include\Graphics\RTShaderTecnhiqueResolveListener.h" />
     <ClInclude Include="..\..\include\Graphics\WindowGenerator.h" />
     <ClInclude Include="..\..\include\Managers\InputManager.h" />
@@ -31,6 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Graphics\MeshComponent.cpp" />
+    <ClCompile Include="..\..\src\Graphics\OgreContext.cpp" />
     <ClCompile Include="..\..\src\Graphics\RTShaderTecnhiqueResolveListener.cpp" />
     <ClCompile Include="..\..\src\Graphics\WindowGenerator.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />

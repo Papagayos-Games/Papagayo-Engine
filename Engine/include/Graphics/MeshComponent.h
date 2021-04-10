@@ -1,31 +1,37 @@
 #pragma once
 #include "Component.h"
+#include <string>
+#include <list>
 
 class SceneManager;
+
+
 
 namespace Ogre {
 	class SceneNode;
 	class Entity;
+	
 }
 
 class MeshComponent: public Component
 {
 private:
-	SceneManager* sceneInstance_;
-	Ogre::SceneNode* mNode_ = nullptr;
-	//Nodo padre del que parte mNode -> si es un solo MeshComponent del que no cuelga ninguna otra maya otro es Root
-	//Si no, es el nodo que creó esa nueva maya
-	Ogre::SceneNode* parentNode_ = nullptr;
-	Ogre::Entity* ent_ = nullptr;
 
+	Ogre::SceneNode* mNode_ = nullptr;
+	Ogre::SceneNode* parentNode_ = nullptr;
+	Ogre::Entity* ogreEnt_ = nullptr;
+	
 protected:
-	virtual void init();
+	virtual void init()override {}
 
 public:
 	MeshComponent();
-	MeshComponent(Ogre::SceneNode* parentNode);
+	MeshComponent(Ogre::SceneNode* parentNode,const std::string meshName);
+	MeshComponent(const std::string meshName);
 
+	//virtual void setActive( const bool act) override;
+	
 	virtual ~MeshComponent();
-	virtual void update();
+	virtual void update() override;
 };
 

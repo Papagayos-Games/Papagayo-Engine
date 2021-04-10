@@ -1,5 +1,6 @@
 #include "Managers/RenderManager.h"
 #include "PapagayoEngine.h"
+#include "Graphics/OgreContext.h"
 
 #include "OgreRoot.h"
 
@@ -7,7 +8,7 @@ RenderManager* RenderManager::instance_ = nullptr;
 
 RenderManager::RenderManager()
 {
-	ogreRoot_ = PapagayoEngine::getInstance()->getOgreRoot();
+	ogreRoot_ = OgreContext::getInstance()->getOgreRoot();
 }
 
 RenderManager::~RenderManager()

@@ -3,31 +3,50 @@
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 #include <OgreEntity.h>
+#include "Transform.h"
+#include "Graphics/OgreContext.h"
 
 
-void MeshComponent::init()
-{
-	sceneInstance_ = SceneManager::getInstance();
-}
+
+
 
 MeshComponent::MeshComponent():Component(ecs::Mesh)
 {
-	init();
-	mNode_ = sceneInstance_->getOgreSceneManager()->getRootSceneNode()->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
-	ent_ = sceneInstance_->getOgreSceneManager()->createEntity("cube.mesh"); //TO DO: NO HACERLO A PELO XDDD
-	auto aux = ent_->getMesh();
-	auto aux2 = ent_->getName();
-	mNode_->attachObject(ent_);
+	
+	mNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
+	ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity("cube.mesh"); //TO DO: NO HACERLO A PELO XDDD
+	mNode_->attachObject(ogreEnt_);
 }
 
-MeshComponent::MeshComponent(Ogre::SceneNode* parentNode): Component(ecs::Mesh)
+MeshComponent::MeshComponent(std::string meshName):Component(ecs::Mesh)
 {
+	
+	mNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
+	ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity(meshName + ".mesh");
+	mNode_->attachObject(ogreEnt_);
+}
+
+//void MeshComponent::setActive(const bool act)
+//{
+//	active = act;
+//	mNode_->setVisible(active);
+//}
+
+MeshComponent::MeshComponent(Ogre::SceneNode* parentNode, std::string meshName): Component(ecs::Mesh)
+{
+	
+	mNode_ = parentNode->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
+	ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity(meshName + ".mesh");
+	mNode_->attachObject(ogreEnt_);
 }
 
 MeshComponent::~MeshComponent()
 {
+	if (ogreEnt_ != nullptr) OgreContext::getInstance()->getSceneManager()->destroyEntity(ogreEnt_);
+	if (mNode_ != nullptr) OgreContext::getInstance()->getSceneManager()->destroySceneNode(mNode_);
 }
 
 void MeshComponent::update()
 {
+	
 }

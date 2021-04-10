@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "PapagayoEngine.h"
+#include "Graphics/OgreContext.h"
 #include <Ogre.h>
 #include <OgreFileSystemLayer.h>
 #include <OgreEntity.h>
@@ -13,7 +13,7 @@ std::string ResourceManager::PATH_ = "assets/";
 
 ResourceManager::ResourceManager(const std::string& path) :path_(path)
 {
-	ogreRoot_ = PapagayoEngine::getInstance()->getOgreRoot();
+	ogreRoot_ = OgreContext::getInstance()->getOgreRoot();
 	mFSLayer = new Ogre::FileSystemLayer("PapagayoEngine");
 	loadFromResourceFile();
 }

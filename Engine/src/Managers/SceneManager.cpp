@@ -2,6 +2,7 @@
 #include "Scene/Scene.h"
 #include "Managers/ResourceManager.h"
 #include "Graphics/WindowGenerator.h"
+#include "Graphics/OgreContext.h"
 
 
 #include "PapagayoEngine.h"
@@ -63,14 +64,13 @@ void SceneManager::cleanupScene()
 }
 
 SceneManager::SceneManager() {
-	ogreRoot_ = PapagayoEngine::getInstance()->getOgreRoot();
+
 	createStartScene();
 }
 
 
 void SceneManager::createStartScene() {
-	mSM_ = ogreRoot_->createSceneManager();
-	mSM_->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
+
 	addCamera();
 }
 
@@ -78,20 +78,17 @@ Ogre::Camera* SceneManager::getCamera(){
 	return mCamera_;
 }
 
-Ogre::SceneManager* SceneManager::getOgreSceneManager()
-{
-	return mSM_;
-}
+
 
 void SceneManager::addCamera() {
-	mCamera_ = mSM_->createCamera("MainCamera");
+	mCamera_ = OgreContext::getInstance()->getSceneManager()->createCamera("MainCamera");
 	mCamera_->setNearClipDistance(1);
 	mCamera_->setFarClipDistance(10000);
 	//mCamera_->lookAt(0, 0, -1);
 	mCamera_->setAutoAspectRatio(true);
 	//cam->setPolygonMode(Ogre::PM_WIREFRAME); 
 
-	mainCamNode_ = mSM_->getRootSceneNode()->createChildSceneNode("mCam");//->getRootSceneNode()->createChildSceneNode("nCam");
+	mainCamNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode("mCam");//->getRootSceneNode()->createChildSceneNode("nCam");
 	mainCamNode_->attachObject(mCamera_);
 
 	mainCamNode_->setPosition(0, 0, 1000);
