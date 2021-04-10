@@ -20,11 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Physics\Collider.cpp" />
+    <ClCompile Include="..\..\src\Physics\PhysicsManager.cpp" />
     <ClCompile Include="..\..\src\Physics\Rigidbody.cpp" />
     <ClCompile Include="..\..\src\Physics\Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Physics\Collider.h" />
+    <ClInclude Include="..\..\include\Physics\PhysicsManager.h" />
     <ClInclude Include="..\..\include\Physics\Rigidbody.h" />
     <ClInclude Include="..\..\include\Physics\Test.h" />
   </ItemGroup>

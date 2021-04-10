@@ -12,7 +12,7 @@ Rigidbody::Rigidbody(ecs::CmpId id) : Component(id)
 void Rigidbody::init()
 {
 	//Informacion interna del rigidbody
-	btRigidBody::btRigidBodyConstructionInfo info(mass, new btDefaultMotionState(), shapeColl);
+	btRigidBody::btRigidBodyConstructionInfo info(mass, new btDefaultMotionState(), nullptr);
 	rb = new btRigidBody(info);
 	//seteamos la gravedad por defecto TODO: ESTO VA A IR EN EL PHYSICS MANAGER
 	rb->setGravity(GRAVITY);

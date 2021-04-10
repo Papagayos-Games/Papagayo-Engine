@@ -4,6 +4,7 @@
 
 namespace ecs {
 
+	
 	using CmpIdType = std::size_t;
 
 	enum CmpId : CmpIdType {
@@ -20,12 +21,10 @@ namespace ecs {
 		Text,
 		AudioComponent,
 	
-
 		//
 		// Este ultimo tipo es para identificar el numero maximo de componentes
 		LastCmptId
 	};
-
 	constexpr std::size_t maxComponents = LastCmptId;
 
 	// these two should be used to get a component via the field
