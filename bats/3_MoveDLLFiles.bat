@@ -30,8 +30,8 @@ copy ..\Engine\dependencies\Ogre\build\bin\release\Codec_STBI.dll ..\Engine\bin\
 
 ::Para cargar sonidos
 echo moviendo FMOD
-copy ..\Engine\dependencies\fmod\build\lib\fmod.dll ..\Engine\bin
-copy ..\Engine\dependencies\fmod\build\lib\fmodL.dll ..\Engine\bin
+copy ..\Engine\dependencies\fmod\lib\fmod.dll ..\Engine\bin
+copy ..\Engine\dependencies\fmod\lib\fmodL.dll ..\Engine\bin
 
 
 echo ---------------------------------------------------
