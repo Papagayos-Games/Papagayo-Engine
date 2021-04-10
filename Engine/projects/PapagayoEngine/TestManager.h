@@ -12,9 +12,10 @@ private:
 	static TestManager* _instance;
 
 	TestManager* getInstance();
-
+	TestManager();
+	~TestManager();
 public:
-	void addComponent(Entity* ent, int id);
+	void addComponent(Entity* ent, int compId);
 	// TestManager::getInstance()->addComponent(...);
 	void start();
 	void update();

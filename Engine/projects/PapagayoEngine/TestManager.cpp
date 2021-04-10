@@ -2,6 +2,14 @@
 
 TestManager* TestManager::_instance = nullptr;
 
+TestManager::TestManager() : Manager(0) {
+
+}
+
+TestManager::~TestManager() {
+
+}
+
 TestManager* TestManager::getInstance() {
 	if (!_instance)
 		_instance = new TestManager();
@@ -9,13 +17,13 @@ TestManager* TestManager::getInstance() {
 }
 
 void TestManager::start() {
-	_instance->getComponents();
+
 }
 
 void TestManager::update() {
 
 }
 
-void TestManager::addComponent(Entity* ent, int id) {
+void TestManager::addComponent(Entity* ent, int compId) {
 
 }

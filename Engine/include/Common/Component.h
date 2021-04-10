@@ -1,5 +1,8 @@
 #pragma once
-#include "ecs.h"
+
+#ifndef _COMMON_COMPONENT_H
+#define _COMMON_COMPONENT_H
+
 #include <string>
 
 class Entity;
@@ -7,8 +10,7 @@ class Manager;
 
 class Component {
 protected:
-	ecs::CmpId _id;   // identificador del tipo de componente
-	std::string _name;
+	int _id;   // identificador del tipo de componente
 	bool _active;
 
 	Entity* _entity;
@@ -17,7 +19,7 @@ protected:
 	virtual void init() = 0;
 public:
 	//constructor
-	Component(ecs::CmpId id, Manager* man);
+	Component(int id, Manager* man);
 	virtual ~Component();
 
 	virtual void update() = 0;
@@ -25,11 +27,13 @@ public:
 	bool isActive();
 	void setActive(bool act);
 
-	void setId(ecs::CmpId id);
-	ecs::CmpId getId() const;
+	void setId(int);
+	int getId() const;
 
 	Entity* getEntity();
 	void setEntity(Entity* e);
 	
 	Manager* getManager();
 };
+
+#endif

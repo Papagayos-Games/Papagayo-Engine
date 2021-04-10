@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef _COMMON_MANAGER_H
+#define _COMMON_MANAGER_H
+
 #include <List>
 
 class Entity;
@@ -6,16 +10,21 @@ class Component;
 
 class Manager {
 protected:
-	std::list<Component*> compsList;
+	std::list<Component*> _compsList;
+	int _manId;
 public:
-	Manager();
+	Manager(int id);
 	virtual ~Manager();
 
-	virtual void addComponent(Entity* ent, int id) = 0;
+	virtual void addComponent(Entity* ent, int compId) = 0;
 	virtual void start() = 0;
 	virtual void update() = 0;
 
-	virtual std::list<Component*> getComponents();
-	virtual void destroyAllComponents();
-	virtual bool destroyComponent(Entity* ent, int compId);
+	std::list<Component*> getComponents();
+	void destroyAllComponents();
+	bool destroyComponent(Entity* ent, int compId);
+
+	int getId();
 };
+
+#endif

@@ -2,19 +2,19 @@
 #include "Entity.h"
 #include "Manager.h"
 
-Component::Component(ecs::CmpId id, Manager* man) : _id(id), _manager(man) {
+Component::Component(int id, Manager* man) : _id(id), _manager(man) {
 
 }
 
 Component::~Component() {
-	_entity->removeComponent(_id);
+	_entity->removeComponent(_manager->getId(), _id);
 }
 
-void Component::setId(ecs::CmpId id) {
-	id = id;
+void Component::setId(int id) {
+	_id = id;
 }
 
-ecs::CmpId Component::getId() const {
+int Component::getId() const {
 	return _id;
 }
 

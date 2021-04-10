@@ -2,7 +2,7 @@
 #include "Component.h"
 #include "Entity.h"
 
-Manager::Manager() {
+Manager::Manager(int id) : _manId(id) {
 
 }
 
@@ -11,26 +11,29 @@ Manager::~Manager() {
 }
 
 std::list<Component*> Manager::getComponents() {
-	return compsList;
+	return _compsList;
 }
 
 void Manager::destroyAllComponents() {
-	for (auto it = compsList.begin(); it != compsList.end(); )
+	for (auto it = _compsList.begin(); it != _compsList.end(); )
 	{
-		compsList.erase(it);
+		_compsList.erase(it);
 		delete* it;
 	}
 }
 
 bool Manager::destroyComponent(Entity* ent, int compId) {
-	//auto it = compsList.find(compId);
-	auto it = compsList.begin();
-	for (; it != compsList.end(); it++) {
+	auto it = _compsList.begin();
+	for (; it != _compsList.end(); it++) {
 		if ((*it)->getEntity() == ent) {
 			delete *it;
-			compsList.erase(it);
+			_compsList.erase(it);
 			return true;
 		}
 	}
 	return false;
+}
+
+int Manager::getId() {
+	return _manId;
 }
