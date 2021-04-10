@@ -54,8 +54,11 @@
     <ClCompile Include="..\..\src\Managers\RenderManager.cpp">
       <Filter>Archivos de origen\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Graphics\RTShaderTecnhiqueResolveListener.cpp">
+      <Filter>Archivos de origen\Graphics</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\Graphics\MeshComponent.cpp">
-      <Filter>Archivos de origen</Filter>
+      <Filter>Archivos de origen\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -80,8 +83,11 @@
     <ClInclude Include="..\..\include\Managers\RenderManager.h">
       <Filter>Archivos de encabezado\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Graphics\MeshComponent.h">
-      <Filter>Archivos de encabezado</Filter>
+    <ClInclude Include="..\..\include\Graphics\MeshComponent.h">
+      <Filter>Archivos de encabezado\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Graphics\RTShaderTecnhiqueResolveListener.h">
+      <Filter>Archivos de encabezado\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
