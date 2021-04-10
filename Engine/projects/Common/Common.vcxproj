@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\Common\Component.cpp" />
     <ClCompile Include="..\..\src\Common\Entity.cpp" />
+    <ClCompile Include="..\..\src\Common\Manager.cpp" />
     <ClCompile Include="..\..\src\Common\Transform.cpp" />
     <ClCompile Include="..\..\src\Common\Vector3.cpp" />
   </ItemGroup>
@@ -28,6 +29,7 @@
     <ClInclude Include="..\..\include\Common\Component.h" />
     <ClInclude Include="..\..\include\Common\ecs.h" />
     <ClInclude Include="..\..\include\Common\Entity.h" />
+    <ClInclude Include="..\..\include\Common\Manager.h" />
     <ClInclude Include="..\..\include\Common\Transform.h" />
     <ClInclude Include="..\..\include\Common\Vector3.h" />
   </ItemGroup>
