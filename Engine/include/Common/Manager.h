@@ -10,7 +10,9 @@ class Component;
 
 enum class ManID
 {
-	Physics = 0
+	Common = 0,
+	Physics,
+	LastManId
 };
 
 class Manager {

@@ -42,7 +42,7 @@ bool Rigidbody::collidesWithEntity(Entity* other) const
 	return collPoint.m_hasResult && collPoint.m_distance <= 0;
 }
 
-Rigidbody::Rigidbody() : Component(0, PhysicsManager::getInstance())
+Rigidbody::Rigidbody() : Component(PhysicsManager::getInstance(), (int)PhysicsManager::PhysicsCmpId::Rb)
 {
 	init();
 }

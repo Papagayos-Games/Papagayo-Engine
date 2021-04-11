@@ -60,9 +60,6 @@
     <ClCompile Include="..\..\src\Graphics\MeshComponent.cpp">
       <Filter>Archivos de origen\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="TestManager.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Scene\Scene.h">
@@ -91,9 +88,6 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Graphics\RTShaderTecnhiqueResolveListener.h">
       <Filter>Archivos de encabezado\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="TestManager.h">
-      <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

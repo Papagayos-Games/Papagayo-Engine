@@ -3,8 +3,6 @@
 #ifndef _COMMON_COMPONENT_H
 #define _COMMON_COMPONENT_H
 
-#include <string>
-
 class Entity;
 class Manager;
 
@@ -19,7 +17,7 @@ protected:
 	virtual void init() = 0;
 public:
 	//constructor
-	Component(int id, Manager* man);
+	Component(Manager* man, int id);
 	virtual ~Component();
 
 	virtual void update() = 0;

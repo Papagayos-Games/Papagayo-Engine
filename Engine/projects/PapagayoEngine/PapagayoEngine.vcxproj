@@ -28,7 +28,6 @@
     <ClInclude Include="..\..\include\Managers\SceneManager.h" />
     <ClInclude Include="..\..\include\PapagayoEngine.h" />
     <ClInclude Include="..\..\include\Scene\Scene.h" />
-    <ClInclude Include="TestManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Graphics\MeshComponent.cpp" />
@@ -40,7 +39,6 @@
     <ClCompile Include="..\..\src\Managers\SceneManager.cpp" />
     <ClCompile Include="..\..\src\PapagayoEngine.cpp" />
     <ClCompile Include="..\..\src\Scene\Scene.cpp" />
-    <ClCompile Include="TestManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">

@@ -10,8 +10,6 @@ class Component;
 class Entity
 {
 private:
-	//std::map<ecs::CmpId, Component*> componentMap;
-
 	std::map<int, std::map<int, Component*>> _componentMap;
 
 public:

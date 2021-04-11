@@ -1,5 +1,7 @@
-#include <iostream>
-#include <math.h>
+#pragma once
+
+#ifndef _COMMON_VECTOR3_H
+#define _COMMON_VECTOR3_H
 
 class Vector3
 {
@@ -8,11 +10,10 @@ public:
 	 float y; //Guarda el valor en el eje X
 	 float z; //Guarda el valor en el eje X
 
-public:
 	//Constructor por defecto(todos los valores a cero
-	Vector3() : x(0.0f), y(0.0f), z(0.0f) {}
+	Vector3();
 	//Constructor
-	Vector3(const float x1, const float y1, const float z1): x(x1),y(y1),z(z1){}
+	Vector3(const float x1, const float y1, const float z1);
 
 	//Invertir todos los valores del vector
 	void invert();
@@ -60,7 +61,6 @@ public:
 	void setX(float n);
 	void setY(float n);
 	void setZ(float n);
-
-
-
 };
+
+#endif
