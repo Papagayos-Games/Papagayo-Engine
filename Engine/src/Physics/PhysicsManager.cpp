@@ -59,22 +59,43 @@ void PhysicsManager::destroyWorld()
     delete instance; instance = nullptr;
 }
 
+//este metodo sera el metodo virtual "destroyAllComponents" heredado de Manager
 void PhysicsManager::destroyWorldContent()
 {
-    //se destruirian los vectores que hay comentados
+    auto i = rbs.size() - 1;
+    while (i != 0) {
+        dynamicsWorld->removeCollisionObject(rbs[i]);
+
+        delete rbs[i];
+        rbs.pop_back();
+        --i;
+    }
+    //si deja basura poner aqui abajo la eliminacion de los shapes y motionstates
 }
 
 void PhysicsManager::destroyRigidBody(btRigidBody* body)
 {
-    //buscaria en el vector de rigidbodies y lo destruiria, tambien desde el mundo dinamico
+    //busca en el vector de rigidbodies y lo destruye, tambien desde el mundo dinamico
+    auto it = rbs.begin();
+    bool erased = false;
+    while (it != rbs.end() && !erased) {
+        if (*it == body) {
+            dynamicsWorld->removeCollisionObject(*it);
+            delete* it;
+            erased = true;
+        }
+        else
+            ++it;
+    }
+    rbs.erase(it);
 }
 
 void PhysicsManager::updatePhys()
 {
     dynamicsWorld->stepSimulation(1.f / 60.f, 10);
-#ifdef _DEBUG
-    dynamicsWorld->debugDrawWorld();
-#endif
+//#ifdef _DEBUG
+//    dynamicsWorld->debugDrawWorld();
+//#endif
 }
 
 btDiscreteDynamicsWorld* PhysicsManager::getWorld() const
@@ -84,5 +105,22 @@ btDiscreteDynamicsWorld* PhysicsManager::getWorld() const
 
 btRigidBody* PhysicsManager::createRB(Vector3 pos, Vector3 shape, float mass)
 {
-    return nullptr;
+    btTransform transform;
+    transform.setIdentity();
+    transform.setOrigin(btVector3(pos.x, pos.y, pos.z));
+
+    btBoxShape* box = new btBoxShape(btVector3(shape.x, shape.y, shape.z));
+
+    btMotionState* motion = new btDefaultMotionState(transform);
+
+    btRigidBody::btRigidBodyConstructionInfo info(mass, motion, box);
+    btRigidBody* rb = new btRigidBody(info);
+    rb->forceActivationState(DISABLE_DEACTIVATION);
+
+    dynamicsWorld->addRigidBody(rb);
+    rbs.push_back(rb);
+    /*shapes_.push_back(box);
+    states_.push_back(motion);*/
+
+    return rb;
 }

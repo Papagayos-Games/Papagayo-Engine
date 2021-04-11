@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 class btDefaultCollisionConfiguration;
 class btCollisionDispatcher;
@@ -28,11 +29,14 @@ private:
 	//Variable de bullet a la que se le pasa todas las variables anteriores como configuracion de la fisica
 	btDiscreteDynamicsWorld* dynamicsWorld;
 
-	//estoy hay que hablarlo no lo tengo muy claro
-	/*OgreDebugDrawer* mDebugDrawer_ = nullptr;
+	//estoy seria para dibujar los colliders en un modo debug, lo queremos?
+	//OgreDebugDrawer* mDebugDrawer_ = nullptr;
 
-	std::vector<btRigidBody*> ribs_;
-	std::vector<btBoxShape*> shapes_;
+	std::vector<btRigidBody*> rbs;
+
+	//esto hay que ver si al eliminar el vector de rigidbodies deja basura y si es asi entonces es porque hay que eliminar
+	//por partes el shape y el motionstate
+	/*std::vector<btBoxShape*> shapes_;
 	std::vector<btMotionState*> states_;*/
 
 	PhysicsManager();
@@ -54,6 +58,7 @@ public:
 	//destruye el mundo fisico
 	void destroyWorldContent();
 
+	//destruye un rigidbody en concreto
 	void destroyRigidBody(btRigidBody* body);
 
 	//actualiza la simulacion fisica
@@ -63,6 +68,5 @@ public:
 
 	//hay que hablar esto
 	btRigidBody* createRB(Vector3 pos, Vector3 shape, float mass);
-
 };
 
