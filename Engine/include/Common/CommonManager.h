@@ -20,7 +20,6 @@ public:
 	static CommonManager* getInstance();
 
 	void addComponent(Entity* ent, int compId);
-	// CommonManager::getInstance()->addComponent(...);
 	void start();
 	void update();
 };

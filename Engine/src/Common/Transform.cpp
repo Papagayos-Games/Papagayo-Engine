@@ -1,6 +1,6 @@
 #include "Vector3.h"
-#include "Transform.h"
 #include "CommonManager.h"
+#include "Transform.h"
 
 Transform::Transform() : 
 	Component(CommonManager::getInstance(), (int)CommonManager::CommonCmpId::TransId),
@@ -21,6 +21,14 @@ Transform::Transform(Vector3 pos, Vector3 vel,Vector3 dim, double rotation = 0.0
 }
 
 Transform::~Transform() {
+}
+
+void Transform::init() {
+
+}
+
+void Transform::update() {
+
 }
 
 const Vector3& Transform::getPos() const

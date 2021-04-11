@@ -14,12 +14,12 @@ protected:
 	Entity* _entity;
 	Manager* _manager;
 
-	virtual void init() = 0;
 public:
 	//constructor
 	Component(Manager* man, int id);
 	virtual ~Component();
 
+	virtual void init() = 0;
 	virtual void update() = 0;
 
 	bool isActive();

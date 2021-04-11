@@ -4,8 +4,9 @@
 #define _COMMON_TRANSFORM_H
 
 #include "Component.h"
+#include "Vector3.h"
 
-class Vector3;
+//class Vector3;
 class CommonManager;
 
 class Transform : public Component {
@@ -18,6 +19,9 @@ public:
 	Transform();
 	Transform(Vector3 pos, Vector3 vel, Vector3 dim, double rotation);
 	virtual ~Transform();
+
+	virtual void init();
+	virtual void update();
 
 	// position
 	const Vector3& getPos() const;
