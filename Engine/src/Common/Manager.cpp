@@ -2,7 +2,7 @@
 #include "Component.h"
 #include "Entity.h"
 
-Manager::Manager(int id) : _manId(id) {
+Manager::Manager(ManID id) : _manId(id) {
 
 }
 
@@ -35,5 +35,5 @@ bool Manager::destroyComponent(Entity* ent, int compId) {
 }
 
 int Manager::getId() {
-	return _manId;
+	return (int)_manId;
 }

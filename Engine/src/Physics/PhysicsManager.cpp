@@ -2,125 +2,143 @@
 #include "Vector3.h"
 #include <btBulletCollisionCommon.h>
 #include <btBulletDynamicsCommon.h>
+#include "Rigidbody.h"
 
-
-PhysicsManager* PhysicsManager::instance = nullptr;
-
-void PhysicsManager::init() { 
-	instance = new PhysicsManager(); 
-}
+static PhysicsManager* instance_ = nullptr;
 
 PhysicsManager* PhysicsManager::getInstance()
 {
-	return instance;
+	if (instance_ == nullptr)
+		if (!setUpInstance())
+			throw "ERROR: PhysicsManager couldn't be created\n";
+	return instance_;
 }
 
-PhysicsManager::PhysicsManager() {};
+bool PhysicsManager::setUpInstance()
+{
+	if (instance_ == nullptr) {
+		instance_ = new PhysicsManager();
+		return true;
+	}
+
+	return false;
+}
+
+PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {};
 
 PhysicsManager::~PhysicsManager() {};
 
 void PhysicsManager::init(const Vector3 gravity) {
 
-    collConfig = new btDefaultCollisionConfiguration();
+	collConfig = new btDefaultCollisionConfiguration();
 
-    collDispatcher = new btCollisionDispatcher(collConfig);
+	collDispatcher = new btCollisionDispatcher(collConfig);
 
-    broadPhaseInterface = new btDbvtBroadphase();
+	broadPhaseInterface = new btDbvtBroadphase();
 
-    constraintSolver = new btSequentialImpulseConstraintSolver();
+	constraintSolver = new btSequentialImpulseConstraintSolver();
 
-    dynamicsWorld = new btDiscreteDynamicsWorld(collDispatcher, broadPhaseInterface,
-                                                constraintSolver, collConfig);
+	dynamicsWorld = new btDiscreteDynamicsWorld(collDispatcher, broadPhaseInterface,
+		constraintSolver, collConfig);
 
-    dynamicsWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
+	dynamicsWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
 
-   /* mDebugDrawer_ =
-        new OgreDebugDrawer(OgreSDLContext::getInstance()->getSceneManager());
-    mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-    discreteDynamicsWorld_->setDebugDrawer(mDebugDrawer_);*/
+	/* mDebugDrawer_ =
+		 new OgreDebugDrawer(OgreSDLContext::getInstance()->getSceneManager());
+	 mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+	 discreteDynamicsWorld_->setDebugDrawer(mDebugDrawer_);*/
 }
 
 void PhysicsManager::destroyWorld()
 {
-    destroyWorldContent();
+	delete dynamicsWorld; dynamicsWorld = nullptr;
 
-    delete dynamicsWorld; dynamicsWorld = nullptr;
+	delete collConfig; collConfig = nullptr;
 
-    delete collConfig; collConfig = nullptr;
+	delete collDispatcher; collDispatcher = nullptr;
 
-    delete collDispatcher; collDispatcher = nullptr;
+	delete broadPhaseInterface; broadPhaseInterface = nullptr;
 
-    delete broadPhaseInterface; broadPhaseInterface = nullptr;
+	delete constraintSolver; constraintSolver = nullptr;
 
-    delete constraintSolver; constraintSolver = nullptr;
-
-    //delete mDebugDrawer_; mDebugDrawer_ = nullptr;
-
-    delete instance; instance = nullptr;
-}
-
-//este metodo sera el metodo virtual "destroyAllComponents" heredado de Manager
-void PhysicsManager::destroyWorldContent()
-{
-    auto i = rbs.size() - 1;
-    while (i != 0) {
-        dynamicsWorld->removeCollisionObject(rbs[i]);
-
-        delete rbs[i];
-        rbs.pop_back();
-        --i;
-    }
-    //si deja basura poner aqui abajo la eliminacion de los shapes y motionstates
+	//delete mDebugDrawer_; mDebugDrawer_ = nullptr;
 }
 
 void PhysicsManager::destroyRigidBody(btRigidBody* body)
 {
-    //busca en el vector de rigidbodies y lo destruye, tambien desde el mundo dinamico
-    auto it = rbs.begin();
-    bool erased = false;
-    while (it != rbs.end() && !erased) {
-        if (*it == body) {
-            dynamicsWorld->removeCollisionObject(*it);
-            delete* it;
-            erased = true;
-        }
-        else
-            ++it;
-    }
-    rbs.erase(it);
+	dynamicsWorld->removeCollisionObject(body);
+	delete body;
 }
 
-void PhysicsManager::updatePhys()
-{
-    dynamicsWorld->stepSimulation(1.f / 60.f, 10);
-//#ifdef _DEBUG
-//    dynamicsWorld->debugDrawWorld();
-//#endif
-}
 
 btDiscreteDynamicsWorld* PhysicsManager::getWorld() const
 {
-    return dynamicsWorld;
+	return dynamicsWorld;
 }
 
 btRigidBody* PhysicsManager::createRB(Vector3 pos, Vector3 shape, float mass)
 {
-    btTransform transform;
-    transform.setIdentity();
-    transform.setOrigin(btVector3(pos.x, pos.y, pos.z));
+	btTransform transform;
+	transform.setIdentity();
+	transform.setOrigin(btVector3(pos.x, pos.y, pos.z));
 
-    btBoxShape* box = new btBoxShape(btVector3(shape.x, shape.y, shape.z));
+	btBoxShape* box = new btBoxShape(btVector3(shape.x, shape.y, shape.z));
 
-    btMotionState* motion = new btDefaultMotionState(transform);
+	btMotionState* motion = new btDefaultMotionState(transform);
 
-    btRigidBody::btRigidBodyConstructionInfo info(mass, motion, box);
-    btRigidBody* rb = new btRigidBody(info);
-    rb->forceActivationState(DISABLE_DEACTIVATION);
+	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, box);
+	btRigidBody* rb = new btRigidBody(info);
+	rb->forceActivationState(DISABLE_DEACTIVATION);
 
-    dynamicsWorld->addRigidBody(rb);
-    rbs.push_back(rb);
-    /*shapes_.push_back(box);
-    states_.push_back(motion);*/
+	dynamicsWorld->addRigidBody(rb);
+	//rbs.push_back(rb);
+	/*shapes_.push_back(box);
+	states_.push_back(motion);*/
 
-    return rb;
+	return rb;
+}
+
+void PhysicsManager::addComponent(Entity* ent, int compId)
+{
+
+}
+
+void PhysicsManager::start()
+{
+	//TODO: ESTO ES INUTIL BRUH
+}
+
+void PhysicsManager::update()
+{
+	dynamicsWorld->stepSimulation(1.f / 60.f, 10);
+	//#ifdef _DEBUG
+	//    dynamicsWorld->debugDrawWorld();
+	//#endif
+}
+
+void PhysicsManager::destroyAllComponents()
+{
+	auto i = _compsList.begin();
+	while (i != _compsList.end()) {
+		destroyRigidBody(static_cast<Rigidbody*>((*i))->getBtRb());
+		_compsList.remove((*i));
+	}
+	destroyWorld();
+}
+
+bool PhysicsManager::destroyComponent(Entity* ent, int compId)
+{
+	auto i = _compsList.begin();
+	while (i != _compsList.end()) {
+		if (ent == (*i)->getEntity()) {
+			destroyRigidBody(static_cast<Rigidbody*>((*i))->getBtRb());
+			_compsList.remove((*i));
+			return true;
+		}
+		else {
+			++i;
+		}
+	}
+
+	return false;
 }

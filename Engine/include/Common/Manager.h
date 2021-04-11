@@ -8,12 +8,17 @@
 class Entity;
 class Component;
 
+enum class ManID
+{
+	Physics = 0
+};
+
 class Manager {
 protected:
 	std::list<Component*> _compsList;
-	int _manId;
+	ManID _manId;
 public:
-	Manager(int id);
+	Manager(ManID id);
 	virtual ~Manager();
 
 	virtual void addComponent(Entity* ent, int compId) = 0;
@@ -21,8 +26,8 @@ public:
 	virtual void update() = 0;
 
 	std::list<Component*> getComponents();
-	void destroyAllComponents();
-	bool destroyComponent(Entity* ent, int compId);
+	virtual void destroyAllComponents();
+	virtual bool destroyComponent(Entity* ent, int compId);
 
 	int getId();
 };

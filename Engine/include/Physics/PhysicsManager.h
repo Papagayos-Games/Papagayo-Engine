@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "Manager.h"
 
 class btDefaultCollisionConfiguration;
 class btCollisionDispatcher;
@@ -9,10 +10,13 @@ class btDiscreteDynamicsWorld;
 class btRigidBody;
 class Vector3;
 
-class PhysicsManager
+
+class PhysicsManager : public Manager
 {
 private:
-	static PhysicsManager* instance;
+	static PhysicsManager* instance_;
+
+	static bool setUpInstance();
 
 	//Configuracion sobre la gestion de colisiones con bullet, nosotros usaremos la configuracion por defecto
 	btDefaultCollisionConfiguration* collConfig;
@@ -32,20 +36,17 @@ private:
 	//estoy seria para dibujar los colliders en un modo debug, lo queremos?
 	//OgreDebugDrawer* mDebugDrawer_ = nullptr;
 
-	std::vector<btRigidBody*> rbs;
-
 	//esto hay que ver si al eliminar el vector de rigidbodies deja basura y si es asi entonces es porque hay que eliminar
 	//por partes el shape y el motionstate
 	/*std::vector<btBoxShape*> shapes_;
 	std::vector<btMotionState*> states_;*/
 
+
+
 	PhysicsManager();
 	~PhysicsManager();
 
 public:
-	//metodo static de init para inicializar la instancia del PhysicsManager
-	static void init();
-
 	//nos devuelve la instancia
 	static PhysicsManager* getInstance();
 
@@ -55,18 +56,19 @@ public:
 	//destruye todas las variables relacionadas con la fisica
 	void destroyWorld();
 
-	//destruye el mundo fisico
-	void destroyWorldContent();
-
 	//destruye un rigidbody en concreto
 	void destroyRigidBody(btRigidBody* body);
-
-	//actualiza la simulacion fisica
-	void updatePhys();
 
 	btDiscreteDynamicsWorld* getWorld() const;
 
 	//hay que hablar esto
 	btRigidBody* createRB(Vector3 pos, Vector3 shape, float mass);
+
+	virtual void addComponent(Entity* ent, int compId);
+	virtual void start();
+	virtual void update();
+
+	virtual void destroyAllComponents();
+	virtual bool destroyComponent(Entity* ent, int compId);
 };
 
