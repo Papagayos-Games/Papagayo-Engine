@@ -1,6 +1,9 @@
 #pragma once
 
 #include <string>
+#ifdef _DEBUG
+#include "checkML.h"
+#endif
 
 // resto de includes graphics, physics, etc.
 namespace Ogre {
@@ -11,7 +14,6 @@ namespace Ogre {
 	namespace RTShader {
 		class ShaderGenerator;
 	}
-	//class RenderWindow;
 }
 
 class PapagayoEngine {

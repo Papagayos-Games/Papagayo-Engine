@@ -1,8 +1,12 @@
 #include "Graphics/OgreContext.h"
-#include "OgreShaderGenerator.h"
 #include "Graphics/RTShaderTecnhiqueResolveListener.h"
-#include "Ogre.h"
 #include "Graphics/WindowGenerator.h"
+
+#include <Ogre.h>
+#include <OgreFileSystemLayer.h>
+#include <OgreEntity.h>
+#include <OgreShaderGenerator.h>
+
 
 OgreContext* OgreContext::instance_ = nullptr;
 
@@ -11,7 +15,9 @@ OgreContext::OgreContext(std::string appName) {
 	createRoot();
 	init();
 	createSceneManager();
+	loadFromResourceFile();
  }
+
 OgreContext* OgreContext::getInstance()
 {
 	if (instance_ == nullptr)
@@ -57,11 +63,11 @@ void OgreContext::setupRTShaderGenerator()
 		if (Ogre::RTShader::ShaderGenerator::initialize())
 		{
 			//Cogemos la instancia
-			Ogre::RTShader::ShaderGenerator* mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
-			mShaderGenerator->addSceneManager(ogreSceneManager_);
+			mShaderGenerator_ = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
+			mShaderGenerator_->addSceneManager(ogreSceneManager_);
 
 			//Resolutor de mallas 
-			RTShaderTecnhiqueResolveListener* mMaterialListener_ = new RTShaderTecnhiqueResolveListener(mShaderGenerator);
+			mMaterialListener_ = new RTShaderTecnhiqueResolveListener(mShaderGenerator_);
 			Ogre::MaterialManager::getSingleton().addListener(mMaterialListener_);
 
 		}
@@ -73,6 +79,11 @@ void OgreContext::setupRTShaderGenerator()
 	}
 }
 
+void OgreContext::clean()
+{
+	delete instance_;
+}
+
 void OgreContext::init()
 {
 	try { WindowGenerator::setupInstance(getOgreRoot(), appName_); }
@@ -82,7 +93,80 @@ void OgreContext::init()
 	}
 }
 
- Ogre::Root* OgreContext::getOgreRoot() const
+void OgreContext::loadFromResourceFile()
+{
+	mFSLayer_ = new Ogre::FileSystemLayer("OgreContext");
+
+	Ogre::ConfigFile configFile;
+	std::string configurationPath;
+
+#ifdef _DEBUG
+	configurationPath = "OgreD/resources.cfg";
+#else
+	configurationPath = "Ogre/resources.cfg";
+#endif
+	mFSLayer_->setHomePath("./bin");
+	Ogre::String resourcesPath = mFSLayer_->getConfigFilePath(configurationPath);
+
+	if (Ogre::FileSystemLayer::fileExists(resourcesPath))
+		configFile.load(resourcesPath);
+	else
+	{
+		throw std::exception("No se ha encontrado el archivo de recursos de Ogre");
+	}
+
+	Ogre::String sec, type, arch;
+
+	// go through all specified resource groups
+	Ogre::ConfigFile::SettingsBySection_::const_iterator seci;
+	for (seci = configFile.getSettingsBySection().begin(); seci != configFile.getSettingsBySection().end(); ++seci) {
+		sec = seci->first;
+		const Ogre::ConfigFile::SettingsMultiMap& settings = seci->second;
+		Ogre::ConfigFile::SettingsMultiMap::const_iterator i;
+
+		// go through all resource paths
+		for (i = settings.begin(); i != settings.end(); i++)
+		{
+			type = i->first;
+			arch = Ogre::FileSystemLayer::resolveBundlePath(i->second);
+			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch, type, sec);
+		}
+	}
+
+	sec = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
+	const Ogre::ResourceGroupManager::LocationList genLocs = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(sec);
+
+	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+}
+
+OgreContext::~OgreContext()
+{
+	mShaderGenerator_->removeSceneManager(ogreSceneManager_);
+
+	// destroy RTShader system.
+	if (mShaderGenerator_ != nullptr) {
+		Ogre::RTShader::ShaderGenerator::getSingleton().destroy();
+		mShaderGenerator_ = nullptr;
+	}
+
+	//Destruir ventana
+	WindowGenerator::getInstance()->clean();
+
+	//Destruir FileSystemLayer
+	delete mFSLayer_;	
+
+	//Destruir SceneManager
+	if (ogreRoot_ != nullptr)ogreRoot_->destroySceneManager(ogreSceneManager_);
+
+	//Destruir root
+	if (ogreRoot_ != nullptr)delete ogreRoot_;
+	ogreRoot_ = nullptr;
+
+	//Destruir RTShaderSystem;
+	delete  mMaterialListener_;
+}
+
+Ogre::Root* OgreContext::getOgreRoot() const
 {
 	return ogreRoot_;
 }

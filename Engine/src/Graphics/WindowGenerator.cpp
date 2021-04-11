@@ -58,15 +58,17 @@ bool WindowGenerator::setupInstance(Root* root, std::string name)
 	return false;
 }
 
+void WindowGenerator::clean()
+{
+	delete instance_;
+}
+
 WindowGenerator::~WindowGenerator()
 {
 	if (renderWindow_ != nullptr) {
 		mRoot_->destroyRenderTarget(renderWindow_);
 		renderWindow_ = nullptr;
 	}
-
-	delete mRoot_;
-	mRoot_ = nullptr;
 }
 
 RenderWindow* WindowGenerator::getRenderWindow()const

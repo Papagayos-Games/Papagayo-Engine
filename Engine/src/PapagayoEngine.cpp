@@ -48,6 +48,7 @@ void PapagayoEngine::clean()
 
 	SceneManager::getInstance()->clean();
 	ResourceManager::getInstance()->clean();
+	OgreContext::getInstance()->clean();
 	//WindowGenerator::getInstance()->clean();
 
 	delete instance_;
@@ -102,7 +103,7 @@ void PapagayoEngine::update()
 void PapagayoEngine::run() {
 	init();
 	// ciclo principal de juego
-	while (running_) {
+	/*while (running_) {*/
 		update();
-	}
+	/*}*/
 }
