@@ -8,6 +8,10 @@ using json = nlohmann::json;
 
 using namespace std;
 
+class Entity;
+
+class Component;
+
 class Scene
 {
 public:
@@ -15,14 +19,13 @@ public:
 	~Scene();
 
 	bool load(json& j);
-	void start();
-	void update();
 
 	string getName() const;
-	//Entity* getEntity(const string& name);
+	Entity* getEntity(const string& name);
 
 private:
-	//map<string, Entity*> entities;
+	map<int, Component*> components_;
+	map<string, Entity*> entities_;
 	string name;
 };
 

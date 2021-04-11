@@ -29,12 +29,12 @@ namespace ecs {
 
 	// these two should be used to get a component via the field
 	// entity
-#define GETCMP2(id,type)  GETCMP3(entity,id,type)
-#define GETCMP1(type)     GETCMP3(entity_,ecs::type,type)
+//#define GETCMP2(id,type)  GETCMP3(entity,id,type)
+//#define GETCMP1(type)     GETCMP3(entity_,ecs::type,type)
 
 // these two should be used to get a component via an
 // entity e provided as a parameter
-#define GETCMP2(e,type) GETCMP3(e,ecs::type,type)
-#define GETCMP3(e,id,type) e->getComponent<type>(id)
+//#define GETCMP2(e,type) GETCMP3(e,ecs::type,type)
+//#define GETCMP3(e,id,type) e->getComponent<type>(id)
 
 }

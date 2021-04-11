@@ -1,37 +1,37 @@
 #pragma once
 #include "OgreFrameListener.h"
 
-class OgreRenderWindow;
-class OgreRoot;
-class OgreRenderSystem;
+namespace Ogre {
+	class OgreRenderWindow;
+	class OgreRenderSystem;
+	class Root;
+}
 
-using namespace Ogre;
 
-class WindowGenerator : public FrameListener
+
+class WindowGenerator : public Ogre::FrameListener
 {
 private:
 	//Singleton
 	static WindowGenerator* instance_;
-	WindowGenerator();
+	WindowGenerator(Ogre::Root* root, std::string name);
 
 
-	RenderWindow* renderWindow_;
-	Root* mRoot_;
-	RenderSystem* renderSystem_;
+	Ogre::RenderWindow* renderWindow_;
+	Ogre::Root* mRoot_;
+	Ogre::RenderSystem* renderSystem_;
 
-	void initWindow();
-	void createRoot();
+	void initWindow(std::string name);
 
 public:
 	//Singleton, init y get separados
 	static WindowGenerator* getInstance();
-	static WindowGenerator* initInstance();
+	static bool setupInstance(Ogre::Root* root, std::string name);
 
 	virtual ~WindowGenerator();
 
 	//Getters
-	inline Root* getOgreRoot()const;
-	inline RenderWindow* getRenderWindow()const;
-	inline RenderSystem* getRenderSystem()const;
+	Ogre::RenderWindow* getRenderWindow()const;
+	inline Ogre::RenderSystem* getRenderSystem()const;
 };
 

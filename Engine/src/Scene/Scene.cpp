@@ -1,4 +1,5 @@
 #include "Scene/Scene.h"
+#include "Common/Entity.h"
 
 Scene::Scene()
 {
@@ -19,7 +20,7 @@ bool Scene::load(json& j)
 
 		for (json e : ents) {
 			// Se recorre el array de entities del json
-			// Se crea la entidad correspondiente y se añade al mapa de entidades
+			// Se crea la entidad correspondiente y se aï¿½ade al mapa de entidades
 			// entities[e["name"]]= cargar entidad
 		}
 	}
@@ -27,28 +28,15 @@ bool Scene::load(json& j)
 	return true;
 }
 
-void Scene::start()
-{
-	
-}
-
-void Scene::update()
-{
-	// recorrer lista de entidades/componentes
-	/*for (pair<string, Entity*> e : entities) {
-		// update de la entidad/componente
-	}*/
-}
-
 string Scene::getName() const
 {
 	return name;
 }
 
-/*Entity* Scene::getEntity(const string& name) {
-	map<string, Entity*>::iterator entity = entities.find(name);
-	if (entity == entities.end())
+Entity* Scene::getEntity(const string& name) {
+	map<string, Entity*>::iterator entity = entities_.find(name);
+	if (entity == entities_.end())
 		return nullptr;
 	else
 		return entity->second;
-}*/
+}

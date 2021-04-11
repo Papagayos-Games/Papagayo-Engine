@@ -22,7 +22,6 @@
     <ClInclude Include="..\..\include\Graphics\WindowGenerator.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\Graphics\main.cpp" />
     <ClCompile Include="..\..\src\Graphics\WindowGenerator.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
