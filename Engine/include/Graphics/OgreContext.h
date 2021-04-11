@@ -32,9 +32,9 @@ private:
 	std::string appName_;
 
 
+	OgreContext(std::string appName);
 	void createRoot();
 	void createSceneManager();
-	OgreContext(std::string appName);
 	void init();
 	void loadFromResourceFile();
 public:

@@ -1,17 +1,16 @@
 #include "PapagayoEngine.h"
 
 #include <stdexcept>
-
 #include <iostream>
-
 
 #include "Managers/SceneManager.h"
 #include "Managers/ResourceManager.h"
+
 #include "Graphics/MeshComponent.h"
+#include "Graphics/Camera.h"
 #include "Graphics/OgreContext.h"
+
 #include "OgreRoot.h"
-
-
 
 
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
@@ -45,11 +44,9 @@ bool PapagayoEngine::setupInstance(const std::string& appName)
 void PapagayoEngine::clean()
 {
 	// se borrarian todos los managers del motor
-
 	SceneManager::getInstance()->clean();
 	ResourceManager::getInstance()->clean();
 	OgreContext::getInstance()->clean();
-	//WindowGenerator::getInstance()->clean();
 
 	delete instance_;
 }
@@ -76,8 +73,8 @@ void PapagayoEngine::init()
 		throw std::runtime_error("SceneManager init fail \n" + (std::string)e.what() + "\n");
 	}
 
-	OgreContext::getInstance()->setupRTShaderGenerator();
-
+	//Camara
+	Camera* camara = new Camera();
 	//Prueba de pintado XD
 	MeshComponent* funcaPlz = new MeshComponent();
 }
@@ -103,7 +100,7 @@ void PapagayoEngine::update()
 void PapagayoEngine::run() {
 	init();
 	// ciclo principal de juego
-	/*while (running_) {*/
+	while (running_) {
 		update();
-	/*}*/
+	}
 }

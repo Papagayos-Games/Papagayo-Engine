@@ -74,26 +74,6 @@ void SceneManager::createStartScene() {
 	addCamera();
 }
 
-Ogre::Camera* SceneManager::getCamera(){
-	return mCamera_;
-}
-
-
-
 void SceneManager::addCamera() {
-	mCamera_ = OgreContext::getInstance()->getSceneManager()->createCamera("MainCamera");
-	mCamera_->setNearClipDistance(1);
-	mCamera_->setFarClipDistance(10000);
-	//mCamera_->lookAt(0, 0, -1);
-	mCamera_->setAutoAspectRatio(true);
-	//cam->setPolygonMode(Ogre::PM_WIREFRAME); 
-
-	mainCamNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode("mCam");//->getRootSceneNode()->createChildSceneNode("nCam");
-	mainCamNode_->attachObject(mCamera_);
-
-	mainCamNode_->setPosition(0, 0, 1000);
-	mainCamNode_->lookAt(Ogre::Vector3(0, 0, 0), Ogre::Node::TS_WORLD);
-
-	Ogre::Viewport* vp = WindowGenerator::getInstance()->getRenderWindow()->addViewport(mCamera_);
-	vp->setBackgroundColour(Ogre::ColourValue(0.0, 1.0, 0.0, 1.0));//cambia el color del fondo
+	
 }

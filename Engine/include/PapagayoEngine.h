@@ -29,7 +29,6 @@ public:
 private:
 	static PapagayoEngine* instance_;
 	std::string appName_;
-	
 	bool running_ = true;
 
 	// nos guardamos el root para poder crear las escenas a partir de ogre

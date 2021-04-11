@@ -12,17 +12,14 @@ OgreContext* OgreContext::instance_ = nullptr;
 
 OgreContext::OgreContext(std::string appName) {
 	appName_ = appName;
-	createRoot();
 	init();
-	createSceneManager();
-	loadFromResourceFile();
  }
 
 OgreContext* OgreContext::getInstance()
 {
 	if (instance_ == nullptr)
 		if (!setupInstance("PAPAGAYO ENGINE"))
-			throw "ERROR: PapagayoEngine couldn't be created\n";
+			throw "ERROR: OgreContext couldn't be created\n";
 	return instance_;
 }
 
@@ -86,11 +83,17 @@ void OgreContext::clean()
 
 void OgreContext::init()
 {
+	createRoot();
+
 	try { WindowGenerator::setupInstance(getOgreRoot(), appName_); }
 	catch (const std::exception & e)
 	{
 		throw std::runtime_error("WindowGenerator init fail \n" + (std::string)e.what() + "\n");
 	}
+
+	createSceneManager();
+	loadFromResourceFile();
+	setupRTShaderGenerator();
 }
 
 void OgreContext::loadFromResourceFile()

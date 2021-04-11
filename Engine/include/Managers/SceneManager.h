@@ -31,9 +31,6 @@ public:
 	void addEntity() {};
 	void addComponentTo(const std::string& entName) {};
 	void addComponentTo(const Entity *ent){};
-	// Devuelve la main cámara
-	inline Ogre::Camera* getCamera();
-	//Devuelve mSM_
 
 
 private:
@@ -41,8 +38,7 @@ private:
 	static SceneManager* instance_;
 	static Scene* currentScene_;
 
-	Ogre::SceneNode* mainCamNode_ = nullptr;
-	Ogre::Camera* mCamera_ = nullptr;
+	
 	void addCamera();
 
 	// Crea la escena por defecto
