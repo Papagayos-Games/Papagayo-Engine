@@ -25,13 +25,14 @@ RenderManager* RenderManager::getInstance()
 
 void RenderManager::addComponent(Entity* ent, int compId)
 {
-	/*
+	
 	RenderCmpId id = (RenderCmpId)compId;
-	Component* cmp;
+	Component* cmp = nullptr;
 	switch (id)
 	{
 	case RenderCmpId::Mesh:
-		cmp = new MeshComponent()
+		cmp = new MeshComponent();
+		cmp->setEntity(ent);
 		break;
 	case RenderCmpId::Camera:
 		break;
@@ -44,7 +45,7 @@ void RenderManager::addComponent(Entity* ent, int compId)
 		throw ("ERROR: Common Manager couldn't create a component with an Id: ", compId, "\n");
 	_compsList.push_back(cmp);
 	ent->addComponent(cmp);
-	*/
+	
 }
 
 void RenderManager::start()

@@ -6,15 +6,17 @@
 #include "Managers/SceneManager.h"
 #include "Managers/ResourceManager.h"
 
-#include "Graphics/MeshComponent.h"
-#include "Graphics/Camera.h"
 #include "Graphics/OgreContext.h"
 
 //pruebas
+#include "Graphics/Camera.h"
+#include "Graphics/MeshComponent.h"
 #include "OgreRoot.h"
 #include "Entity.h"
 #include "Transform.h"
 #include "CommonManager.h"
+#include "Managers/RenderManager.h"
+#include "Vector3.h"
 
 
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
@@ -78,16 +80,19 @@ void PapagayoEngine::init()
 	}
 
 	Entity* ent = new Entity();
-	Transform* transform = new Transform();
+
 
 	//Camara
 	Camera* camara = new Camera();
 	//Prueba de pintado XD
-	MeshComponent* funcaPlz = new MeshComponent();
-	/*ent->addComponent(transform);
-	ent->addComponent(funcaPlz);
-	transform->setPosX(50);
-	funcaPlz->update();*/
+	//MeshComponent* funcaPlz = new MeshComponent();
+	CommonManager::getInstance()->addComponent(ent,(int)CommonManager::CommonCmpId::TransId);
+	RenderManager::getInstance()->addComponent(ent, (int)RenderManager::RenderCmpId::Mesh);
+	Transform* transform_ = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
+	MeshComponent* funcaPlz = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
+	transform_->setPosX(100);
+	transform_->setDimensions(Vector3(1, 1, 1));
+	funcaPlz->update();
 }
 
 

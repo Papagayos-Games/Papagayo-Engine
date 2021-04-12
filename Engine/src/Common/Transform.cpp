@@ -31,7 +31,7 @@ void Transform::update() {
 
 }
 
-const Vector3& Transform::getPos() const
+ Vector3 Transform::getPos() 
 {
 	return _position;
 }

@@ -24,7 +24,7 @@ public:
 	virtual void update();
 
 	// position
-	const Vector3& getPos() const;
+	Vector3 getPos() ;
 	void setPos(const Vector3& pos);
 	void setPosX(double x);
 	void setPosY(double y);
