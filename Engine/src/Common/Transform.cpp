@@ -11,7 +11,7 @@ Transform::Transform() :
 {
 }
 
-Transform::Transform(Vector3 pos, Vector3 vel,Vector3 dim, double rotation = 0.0) :
+Transform::Transform(Vector3 pos, Vector3 vel,Vector3 dim, Vector3 rotation) :
 	Component(CommonManager::getInstance(), (int)CommonManager::CommonCmpId::TransId),
 	_position(pos), //
 	_velocity(vel), //
@@ -56,14 +56,29 @@ void Transform::setPosZ(double z)
 	_position.setZ(z);
 }
 
-double Transform::getRot() const
+Vector3 Transform::getRot() const
 {
 	return _rotation;
 }
 
-void Transform::setRot(double angle)
+void Transform::setRot(Vector3 angle)
 {
 	_rotation = angle;
+}
+
+void Transform::setRotX(double x)
+{
+	_rotation.setX(x);
+}
+
+void Transform::setRotY(double y)
+{
+	_rotation.setY(y);
+}
+
+void Transform::setRotZ(double z)
+{
+	_rotation.setZ(z);
 }
 
 const Vector3& Transform::getVel() const

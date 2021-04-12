@@ -23,7 +23,7 @@ public:
 	virtual void update() = 0;
 
 	bool isActive();
-	void setActive(bool act);
+	virtual void setActive(bool act);
 
 	void setId(int);
 	int getId() const;

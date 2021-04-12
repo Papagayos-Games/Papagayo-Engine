@@ -10,7 +10,11 @@
 #include "Graphics/Camera.h"
 #include "Graphics/OgreContext.h"
 
+//pruebas
 #include "OgreRoot.h"
+#include "Entity.h"
+#include "Transform.h"
+#include "CommonManager.h"
 
 
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
@@ -73,10 +77,17 @@ void PapagayoEngine::init()
 		throw std::runtime_error("SceneManager init fail \n" + (std::string)e.what() + "\n");
 	}
 
+	Entity* ent = new Entity();
+	Transform* transform = new Transform();
+
 	//Camara
 	Camera* camara = new Camera();
 	//Prueba de pintado XD
 	MeshComponent* funcaPlz = new MeshComponent();
+	/*ent->addComponent(transform);
+	ent->addComponent(funcaPlz);
+	transform->setPosX(50);
+	funcaPlz->update();*/
 }
 
 
