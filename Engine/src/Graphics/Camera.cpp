@@ -26,13 +26,13 @@ void Camera::init()
 	vp_->setBackgroundColour(Ogre::ColourValue(0.0, 1.0, 0.0, 1.0));//cambia el color del fondo
 }
 
-Camera::Camera(): Component(nullptr, (int)RenderManager::RenderCmpId::Camera)
+Camera::Camera(): Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Camera)
 {
 	init();
 
 }
 
-Camera::Camera(std::string cameraName) : Component(nullptr, (int)RenderManager::RenderCmpId::Camera),name(cameraName)
+Camera::Camera(std::string cameraName) : Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Camera),name(cameraName)
 {
 	init();
 }

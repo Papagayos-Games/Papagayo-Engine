@@ -1,31 +1,32 @@
 #pragma once
+#include "Manager.h"
 
 namespace Ogre {
 	class Root;
 	class Camera;
 }
 
-class RenderManager
+class RenderManager : public Manager
 {
+private:
+	static RenderManager* instance_;
+
+	Ogre::Root* ogreRoot_;
+
+	RenderManager();
+	~RenderManager();
 public:
 	enum class RenderCmpId : int {
 		Mesh = 0,
 		Camera,
 
-		LastCommonCmpId
+		LastRenderCmpId
 	};
-	~RenderManager();
+
 	static RenderManager* getInstance();
-	static bool setupInstance();
-	static void clean();
 
-	void update();
-
-private:
-	RenderManager();
-	static RenderManager* instance_;
-	Ogre::Root* ogreRoot_;
-	Ogre::Camera* camera_;
-
+	virtual void addComponent(Entity* ent, int compId);
+	virtual void start();
+	virtual void update();
 };
 

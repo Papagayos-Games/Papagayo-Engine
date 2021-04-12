@@ -11,7 +11,7 @@
 
 
 
-MeshComponent::MeshComponent():Component(nullptr, (int)RenderManager::RenderCmpId::Mesh)
+MeshComponent::MeshComponent():Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Mesh)
 {
 	
 	mNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
@@ -19,7 +19,7 @@ MeshComponent::MeshComponent():Component(nullptr, (int)RenderManager::RenderCmpI
 	mNode_->attachObject(ogreEnt_);
 }
 
-MeshComponent::MeshComponent(std::string meshName):Component(nullptr, (int)RenderManager::RenderCmpId::Mesh)
+MeshComponent::MeshComponent(std::string meshName):Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Mesh)
 {
 	
 	mNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
