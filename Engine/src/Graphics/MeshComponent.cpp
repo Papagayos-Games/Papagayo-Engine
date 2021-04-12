@@ -6,6 +6,9 @@
 #include <OgreEntity.h>
 #include "Transform.h"
 #include "Graphics/OgreContext.h"
+#include "Entity.h"
+#include "CommonManager.h"
+#include "Transform.h"
 
 
 
@@ -27,11 +30,11 @@ MeshComponent::MeshComponent(std::string meshName):Component(RenderManager::getI
 	mNode_->attachObject(ogreEnt_);
 }
 
-//void MeshComponent::setActive(const bool act)
-//{
-//	active = act;
-//	mNode_->setVisible(active);
-//}
+void MeshComponent::setActive(bool act)
+{
+	_active = act;
+	mNode_->setVisible(_active);
+}
 
 MeshComponent::MeshComponent(Ogre::SceneNode* parentNode, std::string meshName): Component(nullptr, (int)RenderManager::RenderCmpId::Mesh)
 {
@@ -49,5 +52,23 @@ MeshComponent::~MeshComponent()
 
 void MeshComponent::update()
 {
+	//posicion
+	Transform* transform_=static_cast<Transform*>(_entity->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
+	Vector3 pos = transform_->getPos();
+	mNode_->setPosition(Ogre::Vector3(pos.x, pos.y, pos.z));
+	Vector3 rot = transform_->getRot();
+	//rotaciones //TO DO: revisar
+	mNode_->resetOrientation();
+	mNode_->yaw(Ogre::Degree(rot.y),Ogre::Node::TS_WORLD);//ejeY
+	mNode_->pitch(Ogre::Degree(rot.x),Ogre::Node::TS_WORLD);//ejex
+	mNode_->roll(Ogre::Degree(rot.z),Ogre::Node::TS_WORLD);//ejez
+	//escala
+	Vector3 scale = transform_->getDimensieons();
+	mNode_->scale(Ogre::Vector3(scale.x, scale.y, scale.z));
 	
+}
+
+void MeshComponent::setMaterial(std::string matName)
+{
+	ogreEnt_->setMaterialName(matName);
 }
