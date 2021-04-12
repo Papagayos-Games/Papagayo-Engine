@@ -21,7 +21,7 @@
     <ClCompile Include="..\..\src\Physics\Rigidbody.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Physics\Collider.cpp">
+    <ClCompile Include="..\..\src\Physics\PhysicsManager.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,7 +32,7 @@
     <ClInclude Include="..\..\include\Physics\Rigidbody.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Physics\Collider.h">
+    <ClInclude Include="..\..\include\Physics\PhysicsManager.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

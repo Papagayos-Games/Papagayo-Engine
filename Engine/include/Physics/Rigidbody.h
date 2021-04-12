@@ -38,7 +38,7 @@ private:
 
 	bool collidesWithEntity(Entity* other) const;
 public:
-	Rigidbody(ecs::CmpId id);
+	Rigidbody();
 	~Rigidbody() {};
 
 	virtual void init();
@@ -90,6 +90,8 @@ public:
 	bool isStatic();
 
 	btCollisionShape* getShape();
+
+	btRigidBody* getBtRb();
 #pragma endregion
 
 #pragma region Adders
