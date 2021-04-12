@@ -25,6 +25,7 @@
     <ClCompile Include="..\..\src\Common\Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Common\checkML.h" />
     <ClInclude Include="..\..\include\Common\Component.h" />
     <ClInclude Include="..\..\include\Common\ecs.h" />
     <ClInclude Include="..\..\include\Common\Entity.h" />

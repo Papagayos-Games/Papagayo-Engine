@@ -60,6 +60,12 @@
     <ClCompile Include="..\..\src\Graphics\MeshComponent.cpp">
       <Filter>Archivos de origen\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Graphics\OgreContext.cpp">
+      <Filter>Archivos de origen\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Graphics\Camera.cpp">
+      <Filter>Archivos de origen\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Scene\Scene.h">
@@ -87,6 +93,12 @@
       <Filter>Archivos de encabezado\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Graphics\RTShaderTecnhiqueResolveListener.h">
+      <Filter>Archivos de encabezado\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Graphics\OgreContext.h">
+      <Filter>Archivos de encabezado\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Graphics\Camera.h">
       <Filter>Archivos de encabezado\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
