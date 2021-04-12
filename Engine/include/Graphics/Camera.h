@@ -7,7 +7,7 @@ class Vector3;
 namespace Ogre {
 	class Camera;
 	class SceneNode;
-	
+	class Viewport;
 }
 
 class Camera : public Component

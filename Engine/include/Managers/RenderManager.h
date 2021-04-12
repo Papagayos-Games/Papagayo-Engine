@@ -8,6 +8,12 @@ namespace Ogre {
 class RenderManager
 {
 public:
+	enum class RenderCmpId : int {
+		Mesh = 0,
+		Camera,
+
+		LastCommonCmpId
+	};
 	~RenderManager();
 	static RenderManager* getInstance();
 	static bool setupInstance();

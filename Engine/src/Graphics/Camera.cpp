@@ -1,5 +1,6 @@
 #include "Graphics/Camera.h"
 #include <OgreCamera.h>
+#include "Managers/RenderManager.h"
 #include "Graphics/OgreContext.h"
 #include "Graphics/WindowGenerator.h"
 #include "Ogre.h"
@@ -25,13 +26,13 @@ void Camera::init()
 	vp_->setBackgroundColour(Ogre::ColourValue(0.0, 1.0, 0.0, 1.0));//cambia el color del fondo
 }
 
-Camera::Camera(): Component(ecs::CmpId::Camera)
+Camera::Camera(): Component(nullptr, (int)RenderManager::RenderCmpId::Camera)
 {
 	init();
 
 }
 
-Camera::Camera(std::string cameraName) : Component(ecs::CmpId::Camera),name(cameraName)
+Camera::Camera(std::string cameraName) : Component(nullptr, (int)RenderManager::RenderCmpId::Camera),name(cameraName)
 {
 	init();
 }

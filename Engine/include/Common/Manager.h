@@ -12,6 +12,7 @@ enum class ManID
 {
 	Common = 0,
 	Physics,
+	Render,
 	LastManId
 };
 

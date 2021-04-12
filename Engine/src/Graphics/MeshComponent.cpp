@@ -1,5 +1,6 @@
 #include "Graphics/MeshComponent.h"
 #include "Managers/SceneManager.h"
+#include "Managers/RenderManager.h"
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 #include <OgreEntity.h>
@@ -10,7 +11,7 @@
 
 
 
-MeshComponent::MeshComponent():Component(ecs::Mesh)
+MeshComponent::MeshComponent():Component(nullptr, (int)RenderManager::RenderCmpId::Mesh)
 {
 	
 	mNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
@@ -18,7 +19,7 @@ MeshComponent::MeshComponent():Component(ecs::Mesh)
 	mNode_->attachObject(ogreEnt_);
 }
 
-MeshComponent::MeshComponent(std::string meshName):Component(ecs::Mesh)
+MeshComponent::MeshComponent(std::string meshName):Component(nullptr, (int)RenderManager::RenderCmpId::Mesh)
 {
 	
 	mNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
@@ -32,7 +33,7 @@ MeshComponent::MeshComponent(std::string meshName):Component(ecs::Mesh)
 //	mNode_->setVisible(active);
 //}
 
-MeshComponent::MeshComponent(Ogre::SceneNode* parentNode, std::string meshName): Component(ecs::Mesh)
+MeshComponent::MeshComponent(Ogre::SceneNode* parentNode, std::string meshName): Component(nullptr, (int)RenderManager::RenderCmpId::Mesh)
 {
 	
 	mNode_ = parentNode->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
