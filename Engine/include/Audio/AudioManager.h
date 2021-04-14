@@ -1,52 +1,91 @@
 #pragma once
-
 #include <string>
 #include <map>
+#include <vector>
+#include <math.h>
+#include <iostream>
+#include <chrono>
+#include <thread>
+#include <fmod.hpp>
+#include <fmod_errors.h>
+struct AudioManager {
 
-namespace FMOD {
-	class ChannelGroup;
-	class Channel;
-	class Sound;
-	class System;
-	//
+    AudioManager();
+
+    ~AudioManager();
+    static AudioManager* getInstance();
+    static bool setupInstance();
+    static void clean();
+    void Update();
+
+    FMOD::System* mpSystem;
+
+    int mnNextChannelId = 0;
+
     typedef std::map<std::string, FMOD::Sound*> SoundMap;
     typedef std::map<int, FMOD::Channel*> ChannelMap;
-	//
-}
+    typedef std::map<const char*, FMOD::ChannelGroup*> ChannelGroupMap;
 
+    SoundMap mSounds;
+    ChannelMap mChannels;
+    ChannelGroupMap mGroup;
+    static AudioManager* instance_;
 
+};
 
-class AudioManager {
+struct Vector3 {
+    float x;
+    float y;
+    float z;
+};
+
+class AudioEngine {
 public:
-	~AudioManager();
-	static AudioManager* getInstance();
-	static bool setupInstance();
-	static void clean();
-	//
+    static void Init();
+    static void Update();
+    static void Shutdown();
     static int ErrorCheck(FMOD_RESULT result);
-	//
-	    void Loadsound(const std::string& strSoundName);
-		void UnLoadSound(const std::string& strSoundName);
-		void PlaySound(const std::string& strSoundName, float volume, float pitch, bool loop);
-		void StopChannel(int nChannelId);
-		void StopAllChannels();
-		bool IsPlaying(int nChannelId) const;
-		void SetChannelvolume(int nChannelId, float fVolumedB);
-		float dbToVolume(float db);
-        float VolumeTodb(float volume);
 
-		void Update();
-
-private:
-	static AudioManager* instance_;
-	std::map<std::string, FMOD::Sound*> sounds_;
-    FMOD::System* system_ = nullptr;
-	//
-	int mnNextChannelId;
-	FMOD::SoundMap mSounds;
-    FMOD::ChannelMap mChannels;
-	//
-
+    void LoadSound(const std::string& strSoundName, bool b3d = true, bool bLooping = false, bool bStream = false);
+    void UnLoadSound(const std::string& strSoundName);
+    void Set3dListenerAndOrientation(const Vector3& vPos = Vector3{ 0, 0, 0 }, float fVolumedB = 0.0f);
+    int  PlaySound(const std::string& strSoundName, const char* groupName = nullptr, const Vector3& vPos = Vector3{ 0, 0, 0 }, float fVolumedB = 0.0f);
+    void StopChannel(int nChannelId);
+    void StopAllChannels();
+    void SetChannel3dPosition(int nChannelId, const Vector3& vPosition);
+    void SetChannelvolume(int nChannelId, float fVolumedB);
+    bool IsPlaying(int nChannelId) const;
+    void Pause_Resume_Channel(int nChannelId);
+    float dbToVolume(float db);
+    float VolumeTodb(float volume);
+    FMOD_VECTOR VectorToFmod(const Vector3& vPosition);
+    FMOD::ChannelGroup* createChannelGroup(const char* name);
+    void muteChannelGroup(const char* name);
+    void mute();
 
 
 };
+
+
+
+
+
+
+int main(int argc, char* argv[])
+{
+
+    AudioEngine aEngine = AudioEngine();
+    aEngine.Init();
+    aEngine.PlaySound("swish.wav", nullptr, { 0,0,0 }, 10);
+
+    bool isPlaying = false;
+    do {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        isPlaying = aEngine.IsPlaying(0);
+        aEngine.Update();
+    } while (isPlaying);
+
+    aEngine.Shutdown();
+
+    return 0;
+}
