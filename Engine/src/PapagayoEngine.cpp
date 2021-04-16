@@ -20,6 +20,7 @@
 #include "Vector3.h"
 #include "OgrePlane.h"
 #include "PlaneComponent.h"
+#include "AudioSystem.h"
 
 
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
@@ -110,6 +111,11 @@ void PapagayoEngine::init()
 	l->setLightPower(0.1);
 	//LightComponent* l = new LightComponent(Vector3(0, 0, 500), "LI", LIGHT_TYPE::POINT);
 #pragma endregion
+	//Audio de bad bunny metido 
+	AudioEngine* au = new AudioEngine();
+	au->Init();
+	au->PlaySound("Assets/badbunny.mp3", {0,0,0});
+
 
 	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
 	// dejar al final

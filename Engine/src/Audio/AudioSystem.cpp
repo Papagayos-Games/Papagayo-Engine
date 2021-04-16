@@ -1,5 +1,10 @@
 #include "AudioSystem.h"
-
+#include <vector>
+#include <iostream>
+#include "Vector3.h"
+#include <math.h>
+#include <chrono>
+#include <thread>
 AudioSystem* AudioSystem::instance_ = nullptr;
 
 AudioSystem* AudioSystem::getInstance()
@@ -108,11 +113,11 @@ void AudioEngine::UnLoadSound(const std::string& strSoundName)
     AudioSystem::getInstance()->mSounds.erase(encontrado);
 }
 
-void AudioEngine::Set3dListenerAndOrientation(const Vector3& vPos, float fVolumedB)
-{
+void AudioEngine::Set3dListenerAndOrientation(const Vector3& vPos = Vector3{ 0, 0, 0 }, float fVolumedB)
+{   
 }
 
-int AudioEngine::PlaySound(const std::string& strSoundName, const char* groupName, const Vector3& vPos, float fVolumedB)
+int AudioEngine::PlaySound(const std::string& strSoundName, const Vector3& vPos = Vector3{ 0, 0, 0 }, const char* groupName,  float fVolumedB)
 {
     int nChannelId = AudioSystem::getInstance()->mnNextChannelId++;
     auto encontrado = AudioSystem::getInstance()->mSounds.find(strSoundName);

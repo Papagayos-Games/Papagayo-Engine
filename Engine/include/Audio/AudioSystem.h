@@ -1,13 +1,12 @@
 #pragma once
-#include <string>
+
 #include <map>
-#include <vector>
-#include <math.h>
-#include <iostream>
-#include <chrono>
-#include <thread>
-#include <fmod.hpp>
-#include <fmod_errors.h>
+#include <string>
+class Vector3;
+class vector;
+
+#include "fmod.hpp"
+#include "fmod_errors.h"
 struct AudioSystem {
 
     AudioSystem();
@@ -33,11 +32,6 @@ struct AudioSystem {
 
 };
 
-struct Vector3 {
-    float x;
-    float y;
-    float z;
-};
 
 class AudioEngine {
 public:
@@ -48,8 +42,8 @@ public:
 
     void LoadSound(const std::string& strSoundName, bool b3d = true, bool bLooping = false, bool bStream = false);
     void UnLoadSound(const std::string& strSoundName);
-    void Set3dListenerAndOrientation(const Vector3& vPos = Vector3{ 0, 0, 0 }, float fVolumedB = 0.0f);
-    int  PlaySound(const std::string& strSoundName, const char* groupName = nullptr, const Vector3& vPos = Vector3{ 0, 0, 0 }, float fVolumedB = 0.0f);
+    void Set3dListenerAndOrientation(const Vector3& vPos, float fVolumedB = 0.0f);
+    int  PlaySound(const std::string& strSoundName, const Vector3& vPos ,const char* groupName = nullptr, float fVolumedB = 0.0f);
     void StopChannel(int nChannelId);
     void StopAllChannels();
     void SetChannel3dPosition(int nChannelId, const Vector3& vPosition);
@@ -71,12 +65,12 @@ public:
 
 
 
-int main(int argc, char* argv[])
+/*int main(int argc, char* argv[])
 {
 
-    AudioEngine aEngine = AudioEngine();
+  /*  AudioEngine aEngine = AudioEngine();
     aEngine.Init();
-    aEngine.PlaySound("swish.wav", nullptr, { 0,0,0 }, 10);
+    aEngine.PlaySound("swish.wav", Vector3( 0,0,0 ), nullptr, 10);
 
     bool isPlaying = false;
     do {
@@ -88,4 +82,4 @@ int main(int argc, char* argv[])
     aEngine.Shutdown();
 
     return 0;
-}
+}*/
