@@ -101,14 +101,14 @@
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>$(SolutionDir)include;$(IncludePath);$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src</IncludePath>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)dependencies\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
-    <IncludePath>$(SolutionDir)include;$(IncludePath);$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src</IncludePath>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)dependencies\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -116,14 +116,14 @@
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>$(SolutionDir)include;$(IncludePath);$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src</IncludePath>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
-    <IncludePath>$(SolutionDir)include;$(IncludePath);$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src</IncludePath>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -132,13 +132,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)include\Physics;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OgreMain_d.lib;OgreRTShaderSystem_d.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;LinearMath_Debug.lib;Physics_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OgreMain_d.lib;OgreRTShaderSystem_d.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;LinearMath_Debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)bin;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -150,7 +150,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)include\Physics;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -158,7 +158,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OgreMain.lib;OgreRTShaderSystem.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OgreMain.lib;OgreRTShaderSystem.lib;BulletDynamics.lib;LinearMath.lib;BulletCollision.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)bin;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -168,13 +168,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)include\Graphics</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)include\Physics;$(SolutionDir)include\Graphics</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OgreMain_d.lib;OgreRTShaderSystem_d.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;LinearMath_Debug.lib;Physics_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OgreMain_d.lib;OgreRTShaderSystem_d.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;LinearMath_Debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)bin;$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -186,7 +186,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)include\Graphics</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)include\Physics;$(SolutionDir)include\Graphics</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -194,7 +194,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OgreMain.lib;OgreRTShaderSystem.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OgreMain.lib;OgreRTShaderSystem.lib;BulletDynamics.lib;LinearMath.lib;BulletCollision.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)bin;$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

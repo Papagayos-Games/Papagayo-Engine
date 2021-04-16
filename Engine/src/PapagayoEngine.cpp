@@ -98,12 +98,7 @@ void PapagayoEngine::init()
 	transform_->setPosX(100);
 	transform_->setDimensions(Vector3(1, 1, 1));
 	funcaPlz->update();
-
-
 }
-
-
-
 
 void PapagayoEngine::update()
 {
