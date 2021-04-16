@@ -1,4 +1,4 @@
-#include "Graphics/WindowGenerator.h"
+#include "WindowGenerator.h"
 
 //Includes generales
 #include <exception>

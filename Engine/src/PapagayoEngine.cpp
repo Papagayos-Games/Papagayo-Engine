@@ -6,16 +6,16 @@
 #include "Managers/SceneManager.h"
 #include "Managers/ResourceManager.h"
 
-#include "Graphics/OgreContext.h"
+#include "OgreContext.h"
 
 //pruebas
-#include "Graphics/Camera.h"
-#include "Graphics/MeshComponent.h"
+#include "Camera.h"
+#include "MeshComponent.h"
 #include "OgreRoot.h"
 #include "Entity.h"
 #include "Transform.h"
 #include "CommonManager.h"
-#include "Managers/RenderManager.h"
+#include "RenderManager.h"
 #include "Vector3.h"
 
 

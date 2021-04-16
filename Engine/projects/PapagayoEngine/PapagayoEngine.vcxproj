@@ -19,26 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\Graphics\Camera.h" />
-    <ClInclude Include="..\..\include\Graphics\MeshComponent.h" />
-    <ClInclude Include="..\..\include\Graphics\OgreContext.h" />
-    <ClInclude Include="..\..\include\Graphics\RTShaderTecnhiqueResolveListener.h" />
-    <ClInclude Include="..\..\include\Graphics\WindowGenerator.h" />
     <ClInclude Include="..\..\include\Managers\InputManager.h" />
-    <ClInclude Include="..\..\include\Managers\RenderManager.h" />
     <ClInclude Include="..\..\include\Managers\ResourceManager.h" />
     <ClInclude Include="..\..\include\Managers\SceneManager.h" />
     <ClInclude Include="..\..\include\PapagayoEngine.h" />
     <ClInclude Include="..\..\include\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\Graphics\Camera.cpp" />
-    <ClCompile Include="..\..\src\Graphics\MeshComponent.cpp" />
-    <ClCompile Include="..\..\src\Graphics\OgreContext.cpp" />
-    <ClCompile Include="..\..\src\Graphics\RTShaderTecnhiqueResolveListener.cpp" />
-    <ClCompile Include="..\..\src\Graphics\WindowGenerator.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
-    <ClCompile Include="..\..\src\Managers\RenderManager.cpp" />
     <ClCompile Include="..\..\src\Managers\ResourceManager.cpp" />
     <ClCompile Include="..\..\src\Managers\SceneManager.cpp" />
     <ClCompile Include="..\..\src\PapagayoEngine.cpp" />
@@ -48,6 +36,9 @@
     <ProjectReference Include="..\Common\Common.vcxproj">
       <Project>{a01f7af5-4e1e-4311-878a-c76475434688}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\Graphics\Graphics.vcxproj">
+      <Project>{01362587-2c6a-4830-bd0b-49415725530b}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -55,6 +46,7 @@
     <ProjectGuid>{72f7cf54-9057-44dc-91eb-b0208ef7214a}</ProjectGuid>
     <RootNamespace>PapagayoEngine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>PapagayoEngine</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -171,7 +163,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)include\Graphics</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -189,7 +181,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)include\Graphics</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>

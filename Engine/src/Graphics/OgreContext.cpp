@@ -1,6 +1,6 @@
-#include "Graphics/OgreContext.h"
-#include "Graphics/RTShaderTecnhiqueResolveListener.h"
-#include "Graphics/WindowGenerator.h"
+#include "OgreContext.h"
+#include "RTShaderTecnhiqueResolveListener.h"
+#include "WindowGenerator.h"
 
 #include <Ogre.h>
 #include <OgreFileSystemLayer.h>
