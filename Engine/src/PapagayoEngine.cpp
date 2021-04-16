@@ -11,12 +11,14 @@
 //pruebas
 #include "Camera.h"
 #include "MeshComponent.h"
+#include "LightComponent.h"
 #include "OgreRoot.h"
 #include "Entity.h"
 #include "Transform.h"
 #include "CommonManager.h"
 #include "RenderManager.h"
 #include "Vector3.h"
+#include "OgrePlane.h"
 
 
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
@@ -79,6 +81,9 @@ void PapagayoEngine::init()
 		throw std::runtime_error("SceneManager init fail \n" + (std::string)e.what() + "\n");
 	}
 
+#pragma region TESTEO
+
+
 	Entity* ent = new Entity();
 
 
@@ -90,9 +95,25 @@ void PapagayoEngine::init()
 	RenderManager::getInstance()->addComponent(ent, (int)RenderManager::RenderCmpId::Mesh);
 	Transform* transform_ = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
 	MeshComponent* funcaPlz = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
-	transform_->setPosX(100);
-	transform_->setDimensions(Vector3(1, 1, 1));
+	funcaPlz->setMaterial("Practica1_Azulejo");
+	//transform_->setPosX(100);
+	transform_->setDimensions(Vector3(10, 10, 10));
+	
+
+	//Pruebas de luz
+	//Entity* luz = new Entity();
+	//CommonManager::getInstance()->addComponent(luz, (int)CommonManager::CommonCmpId::TransId);
+	LightComponent* l = new LightComponent(Vector3(0, 0, 500), Vector3(0, 0, -1), "LI");
+	l->setLightPower(0.1);
+	//LightComponent* l = new LightComponent(Vector3(0, 0, 500), "LI", LIGHT_TYPE::POINT);
+#pragma endregion
+
+	//OgreContext::getInstance()->setSkyPlane("Practica1_Rojo", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
+	// dejar al final
+	RenderManager::getInstance()->start();
+	//Test
 	funcaPlz->update();
+	//camara->update();
 }
 
 

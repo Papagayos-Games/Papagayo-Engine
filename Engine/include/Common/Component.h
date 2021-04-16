@@ -21,6 +21,7 @@ public:
 
 	virtual void init() = 0;
 	virtual void update() = 0;
+	virtual void setUp();
 
 	bool isActive();
 	virtual void setActive(bool act);

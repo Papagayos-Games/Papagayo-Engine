@@ -45,12 +45,14 @@ void RenderManager::addComponent(Entity* ent, int compId)
 	_compsList.push_back(cmp);
 	cmp->setEntity(ent);
 	ent->addComponent(cmp);
-	
 }
 
 void RenderManager::start()
 {
-
+	for (Component* cmp : _compsList)
+	{
+		cmp->setUp();
+	}
 }
 
 void RenderManager::update()

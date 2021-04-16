@@ -19,6 +19,7 @@ public:
 	enum class RenderCmpId : int {
 		Mesh = 0,
 		Camera,
+		Light,
 
 		LastRenderCmpId
 	};

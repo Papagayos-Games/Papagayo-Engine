@@ -1,0 +1,305 @@
+﻿material Practica1_Agua {
+	technique { // first, preferred technique
+		pass { // first pass
+			//diffuse 0.5 0.5 0.5
+			//ambient 0.1 0.2 0.3
+			//specular 0.8 0.8 0.8 68
+			texture_unit {
+				texture Water02.jpg
+				//colour_op add
+				scroll_anim -0.1 0.0
+			}
+		}
+	}
+}
+
+material Practica1_Panel {
+	technique{
+		pass{
+			lighting off
+				texture_unit{
+					texture 10points.png
+					tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material Practica1_Piedra {
+	technique { // first, preferred technique
+		pass { // first pass
+			//diffuse 0.5 0.5 0.5
+			//ambient 0.1 0.2 0.3
+			//specular 0.8 0.8 0.8 68
+			texture_unit {
+				texture floor_diffuse.jpg
+			}
+		}
+	}
+}
+
+material Practica1_PiedraSuelo {
+	technique { // first, preferred technique
+		pass { // first pass
+			//diffuse 0.5 0.5 0.5
+			//ambient 0.1 0.2 0.3
+			//specular 0.8 0.8 0.8 68
+			texture_unit {
+				texture BeachStones.jpg
+			}
+		}
+	}
+}
+
+material Practica1_Azulejo {
+	technique { // first, preferred technique
+		pass { // first pass
+			//diffuse 0.5 0.5 0.5
+			//ambient 0.1 0.2 0.3
+			//specular 0.8 0.8 0.8 68
+			texture_unit {
+				texture checker.png
+			}
+		}
+	}
+}
+material IG2/spaceGLSL{	
+	technique {
+		pass {
+			texture_unit 
+			{ // Texture unit 0
+				texture lightMap.jpg
+				colour_op modulate
+				tex_coord_set 0
+			}
+			texture_unit 
+			{ // Texture unit 1
+				texture numbers.jpg
+				colour_op add
+				tex_coord_set 0
+			}
+		}
+	} 
+}
+
+material Practica1_Metal {
+	technique { // first, preferred technique
+		pass { // first pass
+			//diffuse 0.5 0.5 0.5
+			//ambient 0.1 0.2 0.3
+			//specular 0.8 0.8 0.8 68
+			texture_unit {
+				texture BumpyMetal.jpg
+				//tex_address_mode wrap	por defecto
+				scale 0.5	0.5
+
+			}
+		}
+	}
+}
+
+material Practica1_Cara {
+	technique { // first, preferred technique
+		pass { // first pass
+			//diffuse 0.5 0.5 0.5
+			//ambient 0.1 0.2 0.3
+			//specular 0.8 0.8 0.8 68
+			texture_unit {
+				texture spotlight_image.jpg
+				env_map spherical
+			}
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+material IG2App/Smoke_Material {
+	technique {
+		pass {
+			lighting off
+			scene_blend alpha_blend
+			depth_write off
+			diffuse vertexcolour
+			texture_unit {
+			texture smoke.png
+			tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material IG2App/Smoke_LinealMaterial {
+	technique {
+		pass {
+			lighting off
+			scene_blend alpha_blend
+			depth_write off
+			diffuse vertexcolour
+			texture_unit {
+			texture smokecolors.png
+			tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material SkyPlaneMat{
+	technique {
+		pass {
+			texture_unit { // Texture unit 0
+			texture SkyPlane.jpg
+			colour_op modulate
+			tex_coord_set 0
+		}
+	} 
+}
+
+material IG2App/space {
+    technique {
+        pass{
+            diffuse 1.0 1.0 1.0 
+            texture_unit {
+                texture spaceSky.jpg
+        rotate_anim 0.01
+                color_op modulate
+            }
+            texture_unit{
+                texture lightMap.jpg
+                colour_op modulate 
+            }
+        } 
+    }
+}
+
+
+material IG2App/reflejo{
+	technique {
+		pass {
+			texture_unit { // Texture unit 0
+				texture BeachStones.jpg
+				tex_coord_set 0
+			}
+			texture_unit { // Texture unit 1
+				texture Water02.jpg
+				scroll_anim -0.1 0.0
+				tex_coord_set 0
+			}
+		}
+	}
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
+
+material Practica1_Rojo {
+	technique { // first, preferred technique
+		pass { // first pass
+			diffuse 1.0 0.0 0.0		//El color 
+			ambient 0.1 0.2 0.3
+			specular 0.8 0.8 0.8 68
+		}
+	}
+}
+
+material Practica1_Amarillo {
+	technique { // first, preferred technique
+		pass { // first pass
+			diffuse 0.99 1.0 0.43
+			ambient 0.1 0.2 0.3
+			specular 0.8 0.8 0.8 68
+		}
+	}
+}
+
+material Practica1_Marron {
+	technique { // first, preferred technique
+		pass { // first pass
+			diffuse 0.64 0.44 0.07
+			ambient 0.1 0.2 0.3
+			specular 0.8 0.8 0.8 68
+		}
+	}
+}
+
+material Practica1_Azul {
+	technique { // first, preferred technique
+		pass { // first pass
+			diffuse 0.01 0.96 0.91
+			ambient 0.1 0.2 0.3
+			specular 0.8 0.8 0.8 68
+		}
+	}
+}
+
+material Practica1_Naranja {
+	technique { // first, preferred technique
+		pass { // first pass
+			diffuse 0.97 0.76 0.0
+			ambient 0.1 0.2 0.3
+			specular 0.8 0.8 0.8 68
+		}
+	}
+}
+/////////////////////////////////////////////////////
+
+
+
+
+
+//para que el material pueda llamar al vertex Shader
+vertex_program SpaceVS glsl            //nombre para el shader
+{
+    source SpaceVS.glsl                // nombre del archivo del código
+    //parametros que el material le pasa al shader
+    default_params                        // valores para las variable uniform
+    {
+        param_named_auto modelViewProjMat worldviewproj_matrix
+        param_named FZ float 0.5
+        param_named_auto SinTiempo sintime_0_2pi 32 
+    }
+}
+
+//para que el material pueda llamar al Ftragmen Shader
+fragment_program SpaceFS glsl        //nombre para el shader
+{
+    source SpaceFS.glsl                // nombre del archivo del código
+    //parametros para pasar al shader
+    default_params                        // valores para las variable uniform
+    {
+        param_named texturaL int 0        //    1º unidad de textura ‐> *
+        param_named texturaM int 1        //    2º unidad de textura ‐> *
+        param_named BF float 0.5        //    blending factor
+        //param_named_auto BF time_0_1 10
+        param_named intLuzAmb float 1.0
+
+    }
+}
+
+material IG2/ejemplo2GLSL {
+    technique {
+        pass {
+            vertex_program_ref SpaceVS
+            { 
+                //params ‐> default_params
+            }
+            fragment_program_ref SpaceFS
+            { 
+                //params ‐> default_params
+            }
+            texture_unit 
+            { // * ‐> int 0
+                texture lightMap.jpg 2d                // archivo
+                tex_address_mode clamp                // sólo configuración
+                filtering bilinear                    // de acceso al texel
+            }
+            texture_unit 
+            { // * ‐> int 1
+                texture spaceSky.jpg 2d                // archivo
+                tex_address_mode wrap                // sólo configuración
+            }                                        // de acceso al texel
+        } 
+    }
+}

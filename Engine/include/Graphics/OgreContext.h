@@ -12,6 +12,7 @@ namespace Ogre {
 	class Camera;
 	class SceneNode;
 	class FileSystemLayer;
+	class Plane;
 
 	namespace RTShader {
 		class ShaderGenerator;
@@ -45,5 +46,7 @@ public:
 	static bool setupInstance(std::string appName);
 	void setupRTShaderGenerator();
 	static void clean();
+	//TODO no rulosky
+	void setSkyPlane(std::string materialName, Ogre::Plane plane, int width, int height, float bow);
 };
 

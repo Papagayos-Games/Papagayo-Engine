@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Graphics\Camera.h" />
+    <ClInclude Include="..\..\include\Graphics\LightComponent.h" />
     <ClInclude Include="..\..\include\Graphics\MeshComponent.h" />
     <ClInclude Include="..\..\include\Graphics\OgreContext.h" />
     <ClInclude Include="..\..\include\Graphics\RenderManager.h" />
@@ -28,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Graphics\Camera.cpp" />
+    <ClCompile Include="..\..\src\Graphics\LightComponent.cpp" />
     <ClCompile Include="..\..\src\Graphics\MeshComponent.cpp" />
     <ClCompile Include="..\..\src\Graphics\OgreContext.cpp" />
     <ClCompile Include="..\..\src\Graphics\RenderManager.cpp" />

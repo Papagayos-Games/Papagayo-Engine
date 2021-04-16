@@ -37,3 +37,7 @@ void Component::setEntity(Entity* e) {
 Manager* Component::getManager() {
 	return _manager;
 }
+
+void Component::setUp() {
+
+}
