@@ -1,10 +1,12 @@
 #pragma once
 
+#include <map>
 #include <string>
 #ifdef _DEBUG
 #include "checkML.h"
 #endif
 
+class Manager;
 // resto de includes graphics, physics, etc.
 namespace Ogre {
 	class Root;
@@ -24,11 +26,12 @@ public:
 	static void clean();
 
 	void run();
-
+	std::map<std::string, Manager*> getManagers();
 	
 private:
 	static PapagayoEngine* instance_;
 	std::string appName_;
+	std::map<std::string, Manager*> manRegistry_;
 	bool running_ = true;
 
 	// nos guardamos el root para poder crear las escenas a partir de ogre

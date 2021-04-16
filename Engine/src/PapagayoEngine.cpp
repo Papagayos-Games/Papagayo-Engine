@@ -17,6 +17,7 @@
 #include "CommonManager.h"
 #include "Managers/RenderManager.h"
 #include "Vector3.h"
+#include "LoaderSystem.h"
 
 
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
@@ -81,12 +82,23 @@ void PapagayoEngine::init()
 
 	Entity* ent = new Entity();
 
+	manRegistry_["Common"] = CommonManager::getInstance();
+	manRegistry_["Render"] = RenderManager::getInstance();
 
+	LoaderSystem loader;
+	loader.loadEntities("Scenes/testScene.json");
+
+	//manRegistry_.insert("Common", CommonManager::getInstance());
+
+
+	
+	//Component* comp = manRegistry_["Common"]->create("Transform");
+	//ent->addComponent(comp);
 	//Camara
 	Camera* camara = new Camera();
 	//Prueba de pintado XD
 	//MeshComponent* funcaPlz = new MeshComponent();
-	CommonManager::getInstance()->addComponent(ent,(int)CommonManager::CommonCmpId::TransId);
+	//CommonManager::getInstance()->addComponent(ent,(int)CommonManager::CommonCmpId::TransId);
 	RenderManager::getInstance()->addComponent(ent, (int)RenderManager::RenderCmpId::Mesh);
 	Transform* transform_ = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
 	MeshComponent* funcaPlz = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
@@ -119,4 +131,9 @@ void PapagayoEngine::run() {
 	while (running_) {
 		update();
 	}
+}
+
+std::map<std::string, Manager*> PapagayoEngine::getManagers()
+{
+	return manRegistry_;
 }

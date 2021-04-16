@@ -20,6 +20,27 @@ Transform::Transform(Vector3 pos, Vector3 vel,Vector3 dim, Vector3 rotation) :
 {
 }
 
+Transform::Transform(std::map<std::string, std::string> params) : Component(CommonManager::getInstance(), (int)CommonManager::CommonCmpId::TransId)
+{
+	auto it = params.find("position");
+	if (it != params.end())
+		_position = Vector3(it->second);
+	else
+		_position = Vector3();
+	if ((it = params.find("velocity")) != params.end())
+		_velocity = Vector3(it->second);
+	else
+		_velocity = Vector3();
+	if ((it = params.find("dimensions")) != params.end())
+		_dimensions = Vector3(it->second);
+	else
+		_dimensions = Vector3(1,1,1);
+	if ((it = params.find("rotation")) != params.end())
+		_rotation = Vector3(it->second);
+	else
+		_rotation = Vector3();
+}
+
 Transform::~Transform() {
 }
 

@@ -20,12 +20,14 @@ public:
 
 	bool load(json& j);
 
+	void addEntity(Entity* ent);
 	string getName() const;
 	Entity* getEntity(const string& name);
 
 private:
 	map<int, Component*> components_;
 	map<string, Entity*> entities_;
+	list<Entity*> entityList_;
 	string name;
 };
 

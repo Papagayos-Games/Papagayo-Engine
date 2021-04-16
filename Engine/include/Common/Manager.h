@@ -4,9 +4,18 @@
 #define _COMMON_MANAGER_H
 
 #include <List>
+#include <memory>
+#include <functional>
+#include <string>
+#include <map>
 
 class Entity;
 class Component;
+
+
+class Registrator {
+
+};
 
 enum class ManID
 {
@@ -19,6 +28,7 @@ enum class ManID
 
 class Manager {
 protected:
+	std::map <std::string, std::function<Component* (std::map<std::string, std::string> params)>> compsRegistry_;
 	std::list<Component*> _compsList;
 	ManID _manId;
 public:
@@ -33,6 +43,11 @@ public:
 	virtual void destroyAllComponents();
 	virtual bool destroyComponent(Entity* ent, int compId);
 
+
+	//-- Factory --//
+	void registerComponent(std::string name, std::function<Component * (std::map<std::string, std::string> params)>compConst);
+	Component* create(std::string name, std::map<std::string, std::string> params, Entity* ent);	//esto puede ser un puntero inteligente
+	//-------------//
 	int getId();
 };
 

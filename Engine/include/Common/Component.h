@@ -19,6 +19,7 @@ public:
 	Component(Manager* man, int id);
 	virtual ~Component();
 
+
 	virtual void init() = 0;
 	virtual void update() = 0;
 
@@ -27,6 +28,7 @@ public:
 
 	void setId(int);
 	int getId() const;
+
 
 	Entity* getEntity();
 	void setEntity(Entity* e);

@@ -5,7 +5,8 @@
 
 #include "Component.h"
 #include "Vector3.h"
-
+#include <map>
+#include <string>
 //class Vector3;
 class CommonManager;
 
@@ -18,6 +19,7 @@ private:
 public:
 	Transform();
 	Transform(Vector3 pos, Vector3 vel, Vector3 dim, Vector3 rotation);
+	Transform(std::map < std::string, std::string> params);
 	virtual ~Transform();
 
 	virtual void init();

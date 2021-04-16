@@ -7,7 +7,8 @@ Component::Component(Manager* man, int id) : _manager(man), _id(id) {
 }
 
 Component::~Component() {
-	_entity->removeComponent(_manager->getId(), _id);
+	if(_entity)
+		_entity->removeComponent(_manager->getId(), _id);	//TO DO: componente necesita la entidad como parametro
 }
 
 void Component::setId(int id) {

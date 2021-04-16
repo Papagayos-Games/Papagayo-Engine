@@ -12,7 +12,6 @@ private:
 	static RenderManager* instance_;
 
 	Ogre::Root* ogreRoot_;
-
 	RenderManager();
 	~RenderManager();
 public:
