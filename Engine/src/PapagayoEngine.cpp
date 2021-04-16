@@ -19,6 +19,7 @@
 #include "RenderManager.h"
 #include "Vector3.h"
 #include "OgrePlane.h"
+#include "PlaneComponent.h"
 
 
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
@@ -84,22 +85,26 @@ void PapagayoEngine::init()
 #pragma region TESTEO
 
 
-	Entity* ent = new Entity();
+	//Entity* ent = new Entity();
+	
 
 
 	//Camara
 	Camera* camara = new Camera();
+	//camara->setCameraPosition(Vector3(500,0,0));
+	//camara->setCameraDir(Vector3(-1, 0, 0));
 	//Prueba de pintado XD
 	//MeshComponent* funcaPlz = new MeshComponent();
-	CommonManager::getInstance()->addComponent(ent,(int)CommonManager::CommonCmpId::TransId);
-	RenderManager::getInstance()->addComponent(ent, (int)RenderManager::RenderCmpId::Mesh);
-	Transform* transform_ = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
-	MeshComponent* funcaPlz = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
-	funcaPlz->setMaterial("Practica1_Azulejo");
-	//transform_->setPosX(100);
-	transform_->setDimensions(Vector3(10, 10, 10));
-	
+	//CommonManager::getInstance()->addComponent(ent,(int)CommonManager::CommonCmpId::TransId);
+	//RenderManager::getInstance()->addComponent(ent, (int)RenderManager::RenderCmpId::Mesh);
+	//Transform* transform_ = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
+	//MeshComponent* funcaPlz = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
+	//funcaPlz->setMaterial("Practica1_Azulejo");
+	////transform_->setPosX(100);
+	//transform_->setDimensions(Vector3(10, 10, 10));
 
+	PlaneComponent* plane = new PlaneComponent("PLN", "Practica1_Azulejo", 100, 50, PLANE_DIR::PLANE_X);
+	
 	//Pruebas de luz
 	//Entity* luz = new Entity();
 	//CommonManager::getInstance()->addComponent(luz, (int)CommonManager::CommonCmpId::TransId);
@@ -112,7 +117,7 @@ void PapagayoEngine::init()
 	// dejar al final
 	RenderManager::getInstance()->start();
 	//Test
-	funcaPlz->update();
+	//funcaPlz->update();
 	//camara->update();
 }
 
