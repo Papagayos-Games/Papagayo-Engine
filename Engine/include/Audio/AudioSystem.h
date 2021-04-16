@@ -8,12 +8,12 @@
 #include <thread>
 #include <fmod.hpp>
 #include <fmod_errors.h>
-struct AudioManager {
+struct AudioSystem {
 
-    AudioManager();
+    AudioSystem();
 
-    ~AudioManager();
-    static AudioManager* getInstance();
+    ~AudioSystem();
+    static AudioSystem* getInstance();
     static bool setupInstance();
     static void clean();
     void Update();
@@ -29,7 +29,7 @@ struct AudioManager {
     SoundMap mSounds;
     ChannelMap mChannels;
     ChannelGroupMap mGroup;
-    static AudioManager* instance_;
+    static AudioSystem* instance_;
 
 };
 

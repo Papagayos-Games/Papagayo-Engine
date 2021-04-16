@@ -1,8 +1,8 @@
-#include "AudioManager.h"
+#include "AudioSystem.h"
 
-AudioManager* AudioManager::instance_ = nullptr;
+AudioSystem* AudioSystem::instance_ = nullptr;
 
-AudioManager* AudioManager::getInstance()
+AudioSystem* AudioSystem::getInstance()
 {
     if (instance_ == nullptr)
         return nullptr;
@@ -10,10 +10,10 @@ AudioManager* AudioManager::getInstance()
     return instance_;
 }
 
-bool AudioManager::setupInstance()
+bool AudioSystem::setupInstance()
 {
     if (instance_ == nullptr) {
-        instance_ = new AudioManager();
+        instance_ = new AudioSystem();
         return true;
     }
 
@@ -22,27 +22,27 @@ bool AudioManager::setupInstance()
 
 
 
-void AudioManager::clean()
+void AudioSystem::clean()
 {
     delete instance_;
 }
 
 
 
-AudioManager::AudioManager()
+AudioSystem::AudioSystem()
 {
     mpSystem = NULL;
     AudioEngine::ErrorCheck(FMOD::System_Create(&mpSystem));
     AudioEngine::ErrorCheck(mpSystem->init(512, FMOD_INIT_NORMAL, nullptr));
 }
 
-AudioManager::~AudioManager()
+AudioSystem::~AudioSystem()
 {
     AudioEngine::ErrorCheck(mpSystem->close());
     AudioEngine::ErrorCheck(mpSystem->release());
 }
 
-void AudioManager::Update() {
+void AudioSystem::Update() {
     std::vector<ChannelMap::iterator> pStoppedChannels;
     for (auto it = mChannels.begin(), itEnd = mChannels.end(); it != itEnd; ++it)
     {
@@ -62,11 +62,11 @@ void AudioManager::Update() {
 }
 
 void AudioEngine::Init() {
-    AudioManager::setupInstance();
+    AudioSystem::setupInstance();
 }
 
 void AudioEngine::Update() {
-    AudioManager::getInstance()->Update();
+    AudioSystem::getInstance()->Update();
 }
 
 
@@ -81,8 +81,8 @@ int AudioEngine::ErrorCheck(FMOD_RESULT result)
 
 void AudioEngine::LoadSound(const std::string& strSoundName, bool b3d, bool bLooping, bool bStream)
 {
-    auto encontrado = AudioManager::getInstance()->mSounds.find(strSoundName);
-    if (encontrado != AudioManager::getInstance()->mSounds.end())
+    auto encontrado = AudioSystem::getInstance()->mSounds.find(strSoundName);
+    if (encontrado != AudioSystem::getInstance()->mSounds.end())
         return;
 
 
@@ -92,20 +92,20 @@ void AudioEngine::LoadSound(const std::string& strSoundName, bool b3d, bool bLoo
     eMode |= bStream ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE;
 
     FMOD::Sound* pSound = nullptr;
-    AudioEngine::ErrorCheck(AudioManager::getInstance()->mpSystem->createSound(strSoundName.c_str(), eMode, nullptr, &pSound));
+    AudioEngine::ErrorCheck(AudioSystem::getInstance()->mpSystem->createSound(strSoundName.c_str(), eMode, nullptr, &pSound));
     if (pSound) {
-        AudioManager::getInstance()->mSounds[strSoundName] = pSound;
+        AudioSystem::getInstance()->mSounds[strSoundName] = pSound;
     }
 
 }
 
 void AudioEngine::UnLoadSound(const std::string& strSoundName)
 {
-    auto encontrado = AudioManager::getInstance()->mSounds.find(strSoundName);
-    if (encontrado == AudioManager::getInstance()->mSounds.end())
+    auto encontrado = AudioSystem::getInstance()->mSounds.find(strSoundName);
+    if (encontrado == AudioSystem::getInstance()->mSounds.end())
         return;
     AudioEngine::ErrorCheck(encontrado->second->release());
-    AudioManager::getInstance()->mSounds.erase(encontrado);
+    AudioSystem::getInstance()->mSounds.erase(encontrado);
 }
 
 void AudioEngine::Set3dListenerAndOrientation(const Vector3& vPos, float fVolumedB)
@@ -114,24 +114,24 @@ void AudioEngine::Set3dListenerAndOrientation(const Vector3& vPos, float fVolume
 
 int AudioEngine::PlaySound(const std::string& strSoundName, const char* groupName, const Vector3& vPos, float fVolumedB)
 {
-    int nChannelId = AudioManager::getInstance()->mnNextChannelId++;
-    auto encontrado = AudioManager::getInstance()->mSounds.find(strSoundName);
-    if (encontrado == AudioManager::getInstance()->mSounds.end())
+    int nChannelId = AudioSystem::getInstance()->mnNextChannelId++;
+    auto encontrado = AudioSystem::getInstance()->mSounds.find(strSoundName);
+    if (encontrado == AudioSystem::getInstance()->mSounds.end())
     {
         LoadSound(strSoundName);
-        encontrado = AudioManager::getInstance()->mSounds.find(strSoundName);
-        if (encontrado == AudioManager::getInstance()->mSounds.end())
+        encontrado = AudioSystem::getInstance()->mSounds.find(strSoundName);
+        if (encontrado == AudioSystem::getInstance()->mSounds.end())
         {
             return nChannelId;
         }
     }
     FMOD::Channel* pChannel = nullptr;
     FMOD::ChannelGroup* pGruoup = nullptr;
-    if (AudioManager::getInstance()->mGroup.count(groupName) == 0 && groupName != nullptr)
+    if (AudioSystem::getInstance()->mGroup.count(groupName) == 0 && groupName != nullptr)
     {
         pGruoup = createChannelGroup(groupName);
     }
-    AudioEngine::ErrorCheck(AudioManager::getInstance()->mpSystem->playSound(encontrado->second
+    AudioEngine::ErrorCheck(AudioSystem::getInstance()->mpSystem->playSound(encontrado->second
         , pGruoup, true, &pChannel));
     if (pChannel)
     {
@@ -143,7 +143,7 @@ int AudioEngine::PlaySound(const std::string& strSoundName, const char* groupNam
         }
         AudioEngine::ErrorCheck(pChannel->setVolume(dbToVolume(fVolumedB)));
         AudioEngine::ErrorCheck(pChannel->setPaused(false));
-        AudioManager::getInstance()->mChannels[nChannelId] = pChannel;
+        AudioSystem::getInstance()->mChannels[nChannelId] = pChannel;
     }
     return nChannelId;
 
@@ -152,8 +152,8 @@ int AudioEngine::PlaySound(const std::string& strSoundName, const char* groupNam
 void AudioEngine::StopChannel(int nChannelId)
 {
 
-    auto encontrado = AudioManager::getInstance()->mChannels.find(nChannelId);
-    if (encontrado == AudioManager::getInstance()->mChannels.end())
+    auto encontrado = AudioSystem::getInstance()->mChannels.find(nChannelId);
+    if (encontrado == AudioSystem::getInstance()->mChannels.end())
         return;
     AudioEngine::ErrorCheck(encontrado->second->stop());
 }
@@ -161,14 +161,14 @@ void AudioEngine::StopChannel(int nChannelId)
 void AudioEngine::StopAllChannels()
 {
 
-    for (auto x : AudioManager::getInstance()->mChannels)
+    for (auto x : AudioSystem::getInstance()->mChannels)
         AudioEngine::ErrorCheck(x.second->stop());
 }
 
 void AudioEngine::SetChannel3dPosition(int nChannelId, const Vector3& vPosition)
 {
-    auto encontrado = AudioManager::getInstance()->mChannels.find(nChannelId);
-    if (encontrado == AudioManager::getInstance()->mChannels.end())
+    auto encontrado = AudioSystem::getInstance()->mChannels.find(nChannelId);
+    if (encontrado == AudioSystem::getInstance()->mChannels.end())
         return;
 
     FMOD_VECTOR position = VectorToFmod(vPosition);
@@ -179,22 +179,22 @@ void AudioEngine::SetChannel3dPosition(int nChannelId, const Vector3& vPosition)
 
 bool AudioEngine::IsPlaying(int nChannelId) const
 {
-    auto encontrado = AudioManager::getInstance()->mChannels.find(nChannelId);
-    if (encontrado == AudioManager::getInstance()->mChannels.end())
+    auto encontrado = AudioSystem::getInstance()->mChannels.find(nChannelId);
+    if (encontrado == AudioSystem::getInstance()->mChannels.end())
         return false;
     bool isplay = false;
-    AudioEngine::ErrorCheck(AudioManager::getInstance()->mChannels.at(nChannelId)->isPlaying(&isplay));
+    AudioEngine::ErrorCheck(AudioSystem::getInstance()->mChannels.at(nChannelId)->isPlaying(&isplay));
     return isplay;
 }
 
 void AudioEngine::Pause_Resume_Channel(int nChannelId)
 {
-    auto encontrado = AudioManager::getInstance()->mChannels.find(nChannelId);
-    if (encontrado == AudioManager::getInstance()->mChannels.end())
+    auto encontrado = AudioSystem::getInstance()->mChannels.find(nChannelId);
+    if (encontrado == AudioSystem::getInstance()->mChannels.end())
         return;
     bool ch = false;
-    AudioEngine::ErrorCheck(AudioManager::getInstance()->mChannels.at(nChannelId)->getPaused(&ch));
-    AudioEngine::ErrorCheck(AudioManager::getInstance()->mChannels.at(nChannelId)->setPaused(!ch));
+    AudioEngine::ErrorCheck(AudioSystem::getInstance()->mChannels.at(nChannelId)->getPaused(&ch));
+    AudioEngine::ErrorCheck(AudioSystem::getInstance()->mChannels.at(nChannelId)->setPaused(!ch));
 
 }
 
@@ -210,16 +210,16 @@ FMOD_VECTOR AudioEngine::VectorToFmod(const Vector3& vPosition)
 FMOD::ChannelGroup* AudioEngine::createChannelGroup(const char* name)
 {
     FMOD::ChannelGroup* channelGroup = nullptr;
-    AudioEngine::ErrorCheck(AudioManager::getInstance()->mpSystem->createChannelGroup(name, &channelGroup));
-    AudioManager::getInstance()->mGroup[name] = channelGroup;
+    AudioEngine::ErrorCheck(AudioSystem::getInstance()->mpSystem->createChannelGroup(name, &channelGroup));
+    AudioSystem::getInstance()->mGroup[name] = channelGroup;
     return channelGroup;
 }
 
 void AudioEngine::muteChannelGroup(const char* name)
 {
     bool mute = false;
-    AudioEngine::ErrorCheck(AudioManager::getInstance()->mGroup[name]->getMute(&mute));
-    AudioEngine::ErrorCheck(AudioManager::getInstance()->mGroup[name]->setMute(!mute));
+    AudioEngine::ErrorCheck(AudioSystem::getInstance()->mGroup[name]->getMute(&mute));
+    AudioEngine::ErrorCheck(AudioSystem::getInstance()->mGroup[name]->setMute(!mute));
 
 }
 
@@ -240,14 +240,14 @@ float  AudioEngine::VolumeTodb(float volume)
 }
 
 void AudioEngine::Shutdown() {
-    AudioManager::getInstance()->clean();
+    AudioSystem::getInstance()->clean();
 
 }
 
 void AudioEngine::SetChannelvolume(int nChannelId, float fVolumedB)
 {
-    auto encontrado = AudioManager::getInstance()->mChannels.find(nChannelId);
-    if (encontrado == AudioManager::getInstance()->mChannels.end())
+    auto encontrado = AudioSystem::getInstance()->mChannels.find(nChannelId);
+    if (encontrado == AudioSystem::getInstance()->mChannels.end())
         return;
 
     AudioEngine::ErrorCheck(encontrado->second->setVolume(dbToVolume(fVolumedB)));
