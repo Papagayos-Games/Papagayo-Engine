@@ -39,7 +39,7 @@ private:
 	void init();
 
 	void update();
-	
+	void pollEvents();
 
 
 };

@@ -7,6 +7,7 @@
 #include "Managers/ResourceManager.h"
 
 #include "Graphics/OgreContext.h"
+#include "Managers/InputSystem.h"
 
 //pruebas
 #include "Graphics/Camera.h"
@@ -17,6 +18,7 @@
 #include "CommonManager.h"
 #include "Managers/RenderManager.h"
 #include "Vector3.h"
+#include "SDL.h"
 
 
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
@@ -53,6 +55,7 @@ void PapagayoEngine::clean()
 	SceneManager::getInstance()->clean();
 	ResourceManager::getInstance()->clean();
 	OgreContext::getInstance()->clean();
+	InputSystem::getInstance()->clean();
 
 	delete instance_;
 }
@@ -103,12 +106,22 @@ void PapagayoEngine::update()
 	try {
 		//std::cout << "Updating\n";
 		OgreContext::getInstance()->getOgreRoot()->renderOneFrame();
+		pollEvents();
 	}
 	catch (const std::exception& e)
 	{
 		throw std::runtime_error("Fallo de renderizado \n" + (std::string)e.what() + "\n");
 	}
 
+}
+
+void PapagayoEngine::pollEvents()
+{
+	SDL_Event e;
+	while (SDL_PollEvent(&e))
+	{
+		InputSystem::getInstance()->handleInput(e);
+	}
 }
 
 
