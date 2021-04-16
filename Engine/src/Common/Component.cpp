@@ -2,7 +2,7 @@
 #include "Entity.h"
 #include "Manager.h"
 
-Component::Component(int id, Manager* man) : _id(id), _manager(man) {
+Component::Component(Manager* man, int id) : _manager(man), _id(id) {
 
 }
 

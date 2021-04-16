@@ -7,7 +7,7 @@ Manager::Manager(ManID id) : _manId(id) {
 }
 
 Manager::~Manager() {
-
+	destroyAllComponents();
 }
 
 std::list<Component*> Manager::getComponents() {

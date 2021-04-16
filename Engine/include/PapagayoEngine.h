@@ -1,6 +1,9 @@
 #pragma once
 
 #include <string>
+#ifdef _DEBUG
+#include "checkML.h"
+#endif
 
 // resto de includes graphics, physics, etc.
 namespace Ogre {
@@ -11,7 +14,6 @@ namespace Ogre {
 	namespace RTShader {
 		class ShaderGenerator;
 	}
-	//class RenderWindow;
 }
 
 class PapagayoEngine {
@@ -23,23 +25,21 @@ public:
 
 	void run();
 
-	inline Ogre::Root* getOgreRoot() const;
+	
 private:
 	static PapagayoEngine* instance_;
 	std::string appName_;
-	
 	bool running_ = true;
 
 	// nos guardamos el root para poder crear las escenas a partir de ogre
-	Ogre::Root *ogreRoot_ = nullptr;
-	Ogre::RTShader::ShaderGenerator* mShaderGenerator;
+	
 
 
 	PapagayoEngine(const std::string& appName);
 	void init();
-	void createRoot();
+
 	void update();
-	void setupRTShaderGenerator();
+	
 
 
 };

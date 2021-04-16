@@ -47,6 +47,10 @@ private:
 	~PhysicsManager();
 
 public:
+	enum class PhysicsCmpId : int {
+		Rb = 0,
+		LastPhysicsCmpId
+	};
 	//nos devuelve la instancia
 	static PhysicsManager* getInstance();
 
