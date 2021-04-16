@@ -85,14 +85,7 @@ void OgreContext::clean()
 
 void OgreContext::setSkyPlane(std::string materialName, Ogre::Plane plane, int width, int height, float bow)
 {
-	try
-	{
-		ogreSceneManager_->setSkyPlane(true, plane, materialName, (Ogre::Real)1, (Ogre::Real)1, true, (Ogre::Real)bow, width, height);
-	}
-	catch (const std::exception& e)
-	{
-		throw std::runtime_error("Error loading skyplane \n" + (std::string)e.what() + "\n");
-	}
+		ogreSceneManager_->setSkyPlane(true,plane, materialName, 1, 1, true, bow, width, height);	
 }
 
 void OgreContext::init()

@@ -108,7 +108,7 @@ void PapagayoEngine::init()
 	//LightComponent* l = new LightComponent(Vector3(0, 0, 500), "LI", LIGHT_TYPE::POINT);
 #pragma endregion
 
-	//OgreContext::getInstance()->setSkyPlane("Practica1_Rojo", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
+	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
 	// dejar al final
 	RenderManager::getInstance()->start();
 	//Test

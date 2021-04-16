@@ -147,11 +147,14 @@ material IG2App/Smoke_LinealMaterial {
 material SkyPlaneMat{
 	technique {
 		pass {
-			texture_unit { // Texture unit 0
+			lighting off
+			texture_unit 
+			{ // Texture unit 0
 			texture SkyPlane.jpg
 			colour_op modulate
 			tex_coord_set 0
-		}
+		     }
+		 }
 	} 
 }
 

@@ -46,7 +46,7 @@ public:
 	static bool setupInstance(std::string appName);
 	void setupRTShaderGenerator();
 	static void clean();
-	//TODO no rulosky
+	//Hay que poner en el material un lighting off
 	void setSkyPlane(std::string materialName, Ogre::Plane plane, int width, int height, float bow);
 };
 
