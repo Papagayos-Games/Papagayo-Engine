@@ -1,8 +1,8 @@
-#include "Graphics/Camera.h"
+#include "Camera.h"
 #include <OgreCamera.h>
-#include "Managers/RenderManager.h"
-#include "Graphics/OgreContext.h"
-#include "Graphics/WindowGenerator.h"
+#include "RenderManager.h"
+#include "OgreContext.h"
+#include "WindowGenerator.h"
 #include "Ogre.h"
 #include "OgreSceneNode.h"
 #include "Vector3.h"

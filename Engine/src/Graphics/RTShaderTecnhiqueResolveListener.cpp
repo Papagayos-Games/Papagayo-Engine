@@ -1,4 +1,4 @@
-#include "Graphics/RTShaderTecnhiqueResolveListener.h"
+#include "RTShaderTecnhiqueResolveListener.h"
 #include <OgreShaderGenerator.h>
 #include <OgreMaterial.h>
 #include <OgreTechnique.h>

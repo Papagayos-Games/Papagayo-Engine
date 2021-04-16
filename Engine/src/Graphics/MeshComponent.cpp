@@ -1,17 +1,13 @@
-#include "Graphics/MeshComponent.h"
-#include "Managers/SceneManager.h"
-#include "Managers/RenderManager.h"
+#include "MeshComponent.h"
+#include "RenderManager.h"
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 #include <OgreEntity.h>
 #include "Transform.h"
-#include "Graphics/OgreContext.h"
+#include "OgreContext.h"
 #include "Entity.h"
 #include "CommonManager.h"
 #include "Transform.h"
-
-
-
 
 
 MeshComponent::MeshComponent():Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Mesh)
