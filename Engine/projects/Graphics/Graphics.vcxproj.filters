@@ -18,22 +18,25 @@
     <ClInclude Include="..\..\include\Graphics\WindowGenerator.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Graphics\Camera.h">
-      <Filter>Archivos de origen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Graphics\MeshComponent.h">
-      <Filter>Archivos de origen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Graphics\OgreContext.h">
-      <Filter>Archivos de origen</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Graphics\RTShaderTecnhiqueResolveListener.h">
       <Filter>Archivos de origen</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Graphics\RenderManager.h">
-      <Filter>Archivos de origen</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Graphics\LightComponent.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Graphics\OgreContext.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Graphics\Camera.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Graphics\RenderManager.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Graphics\MeshComponent.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Graphics\PlaneComponent.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
@@ -57,6 +60,9 @@
       <Filter>Archivos de recursos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Graphics\LightComponent.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Graphics\PlaneComponent.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>

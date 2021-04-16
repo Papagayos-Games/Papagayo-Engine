@@ -20,6 +20,7 @@ public:
 		Mesh = 0,
 		Camera,
 		Light,
+		Plane,
 
 		LastRenderCmpId
 	};

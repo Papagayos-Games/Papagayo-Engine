@@ -151,6 +151,7 @@ material SkyPlaneMat{
 			texture SkyPlane.jpg
 			colour_op modulate
 			tex_coord_set 0
+			}
 		}
 	} 
 }
