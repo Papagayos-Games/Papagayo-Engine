@@ -17,7 +17,7 @@
 #include "CommonManager.h"
 #include "Managers/RenderManager.h"
 #include "Vector3.h"
-
+#include "PhysicsManager.h"
 
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
 
@@ -88,11 +88,18 @@ void PapagayoEngine::init()
 	//MeshComponent* funcaPlz = new MeshComponent();
 	CommonManager::getInstance()->addComponent(ent,(int)CommonManager::CommonCmpId::TransId);
 	RenderManager::getInstance()->addComponent(ent, (int)RenderManager::RenderCmpId::Mesh);
+	PhysicsManager* phMan = PhysicsManager::getInstance();
+	phMan->init(Vector3(0.0f, -9.8f, 0.0f));
+	phMan->addComponent(ent, (int)PhysicsManager::PhysicsCmpId::RbBox);
+
 	Transform* transform_ = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
+	
 	MeshComponent* funcaPlz = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
 	transform_->setPosX(100);
 	transform_->setDimensions(Vector3(1, 1, 1));
 	funcaPlz->update();
+
+
 }
 
 
@@ -110,8 +117,6 @@ void PapagayoEngine::update()
 	}
 
 }
-
-
 
 void PapagayoEngine::run() {
 	init();

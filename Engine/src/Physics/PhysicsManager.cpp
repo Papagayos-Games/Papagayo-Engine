@@ -3,8 +3,9 @@
 #include <btBulletCollisionCommon.h>
 #include <btBulletDynamicsCommon.h>
 #include "Rigidbody.h"
+#include "Entity.h"
 
-static PhysicsManager* instance_ = nullptr;
+PhysicsManager* PhysicsManager::instance_ = nullptr;
 
 PhysicsManager* PhysicsManager::getInstance()
 {
@@ -70,23 +71,43 @@ void PhysicsManager::destroyRigidBody(btRigidBody* body)
 	delete body;
 }
 
-
 btDiscreteDynamicsWorld* PhysicsManager::getWorld() const
 {
 	return dynamicsWorld;
 }
 
-btRigidBody* PhysicsManager::createRB(Vector3 pos, Vector3 shape, float mass)
+btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass, PhysicsCmpId id)
 {
 	btTransform transform;
 	transform.setIdentity();
 	transform.setOrigin(btVector3(pos.x, pos.y, pos.z));
 
-	btBoxShape* box = new btBoxShape(btVector3(shape.x, shape.y, shape.z));
+	btCollisionShape* shapeColl = nullptr;
+
+	switch (id)
+	{
+	case PhysicsManager::PhysicsCmpId::RbBox:
+		shapeColl = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
+		break;
+	case PhysicsManager::PhysicsCmpId::RbSphere:
+		shapeColl = new btSphereShape(1.0f);
+		break;
+	case PhysicsManager::PhysicsCmpId::RbCylinder:
+		shapeColl = new btCylinderShape(btVector3(1.0f, 1.0f, 1.0f));
+		break;
+	case PhysicsManager::PhysicsCmpId::RbCone:
+		shapeColl = new btConeShape(1.0f, 1.0f);
+		break;
+	case PhysicsManager::PhysicsCmpId::RbCapsule:
+		shapeColl = new btCapsuleShape(1.0f, 1.0f);
+		break;
+	default:
+		break;
+	}
 
 	btMotionState* motion = new btDefaultMotionState(transform);
 
-	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, box);
+	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, shapeColl);
 	btRigidBody* rb = new btRigidBody(info);
 	rb->forceActivationState(DISABLE_DEACTIVATION);
 
@@ -100,7 +121,21 @@ btRigidBody* PhysicsManager::createRB(Vector3 pos, Vector3 shape, float mass)
 
 void PhysicsManager::addComponent(Entity* ent, int compId)
 {
+	Component* comp;
+	//PhysicsCmpId id = (PhysicsCmpId)compId;
+	try {
+		comp = new Rigidbody(compId);
+	}
+	catch (std::string msg) {
+		throw "ERROR: Tried to add a non existant Physics Component\n";
+	}
 
+	if (!comp)
+		throw ("ERROR: Physics Manager couldn't create a component with an Id: ", compId, "\n");
+
+	comp->setEntity(ent);
+	_compsList.push_back(comp);
+	ent->addComponent(comp);
 }
 
 void PhysicsManager::start()

@@ -9,6 +9,7 @@
 #include "Vector3.h"
 #include "Entity.h"
 #include "PhysicsManager.h"
+#include "Transform.h"
 
 bool Rigidbody::collidesWithEntity(Entity* other) const
 {
@@ -42,20 +43,19 @@ bool Rigidbody::collidesWithEntity(Entity* other) const
 	return collPoint.m_hasResult && collPoint.m_distance <= 0;
 }
 
-Rigidbody::Rigidbody() : Component(PhysicsManager::getInstance(), (int)PhysicsManager::PhysicsCmpId::Rb)
+Rigidbody::Rigidbody(int shape) :
+	Component(PhysicsManager::getInstance(),
+		shape)
 {
 	init();
 }
 
 void Rigidbody::init()
 {
-	//Informacion interna del rigidbody
-	btRigidBody::btRigidBodyConstructionInfo info(mass, new btDefaultMotionState(), nullptr);
-	rb = new btRigidBody(info);
-	//seteamos la gravedad por defecto TODO: ESTO VA A IR EN EL PHYSICS MANAGER
-	rb->setGravity(GRAVITY);
+	rb = PhysicsManager::getInstance()->createRB(Vector3(0, 0, 0), mass, (PhysicsManager::PhysicsCmpId)_id);
 
-	//rb = PhysicsManager::getinstance->createRB(this);
+	//seteamos la gravedad por defecto TODO: ESTO VA A IR EN EL PHYSICS MANAGER
+	//rb->setGravity(GRAVITY);
 };
 
 void Rigidbody::setActiveGravtiy(const bool active)

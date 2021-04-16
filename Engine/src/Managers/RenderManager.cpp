@@ -45,7 +45,6 @@ void RenderManager::addComponent(Entity* ent, int compId)
 		throw ("ERROR: Common Manager couldn't create a component with an Id: ", compId, "\n");
 	_compsList.push_back(cmp);
 	ent->addComponent(cmp);
-	
 }
 
 void RenderManager::start()

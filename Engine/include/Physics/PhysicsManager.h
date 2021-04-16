@@ -10,7 +10,6 @@ class btDiscreteDynamicsWorld;
 class btRigidBody;
 class Vector3;
 
-
 class PhysicsManager : public Manager
 {
 private:
@@ -19,19 +18,19 @@ private:
 	static bool setUpInstance();
 
 	//Configuracion sobre la gestion de colisiones con bullet, nosotros usaremos la configuracion por defecto
-	btDefaultCollisionConfiguration* collConfig;
+	btDefaultCollisionConfiguration* collConfig = nullptr;
 
 	//Variable de bullet que hace de "pasador" de colisiones
-	btCollisionDispatcher* collDispatcher;
+	btCollisionDispatcher* collDispatcher = nullptr;
 
 	//Variable de bullet que se usa para hacer calculos de manera eficiente para generar posibles colisiones
-	btBroadphaseInterface* broadPhaseInterface;
+	btBroadphaseInterface* broadPhaseInterface = nullptr;
 
 	//Variable de bullet que hace de solucionador de restricciones 
-	btSequentialImpulseConstraintSolver* constraintSolver;
+	btSequentialImpulseConstraintSolver* constraintSolver = nullptr;
 
 	//Variable de bullet a la que se le pasa todas las variables anteriores como configuracion de la fisica
-	btDiscreteDynamicsWorld* dynamicsWorld;
+	btDiscreteDynamicsWorld* dynamicsWorld = nullptr;
 
 	//estoy seria para dibujar los colliders en un modo debug, lo queremos?
 	//OgreDebugDrawer* mDebugDrawer_ = nullptr;
@@ -41,14 +40,17 @@ private:
 	/*std::vector<btBoxShape*> shapes_;
 	std::vector<btMotionState*> states_;*/
 
-
-
 	PhysicsManager();
 	~PhysicsManager();
 
 public:
 	enum class PhysicsCmpId : int {
-		Rb = 0,
+		RbBox = 0,
+		RbSphere,
+		RbCylinder,
+		RbCone,
+		RbCapsule,
+
 		LastPhysicsCmpId
 	};
 	//nos devuelve la instancia
@@ -65,8 +67,9 @@ public:
 
 	btDiscreteDynamicsWorld* getWorld() const;
 
-	//hay que hablar esto
-	btRigidBody* createRB(Vector3 pos, Vector3 shape, float mass);
+	//Crea el componente Rigidbody a partir de los siguientes parametros:
+	//Posicion, masa e identificador (el cual determina la forma del collider)
+	btRigidBody* createRB(Vector3 pos, float mass, PhysicsCmpId id);
 
 	virtual void addComponent(Entity* ent, int compId);
 	virtual void start();

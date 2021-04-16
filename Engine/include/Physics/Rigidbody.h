@@ -25,7 +25,7 @@ private:
 	//Rigidbody principal
 	btRigidBody* rb = nullptr;
 	//gravedad que afecta al objeto
-	const btVector3 GRAVITY = btVector3(0,-9.8,0); // TODO: ESTO VA A IR EN EL PHYSICS MANAGER
+	//const btVector3 GRAVITY = btVector3(0,-9.8,0); // TODO: ESTO VA A IR EN EL PHYSICS MANAGER
 	//Transform fisico del rigidbody
 	btTransform* tr = nullptr;
 	//Forma de la malla del rigidbody
@@ -38,7 +38,14 @@ private:
 
 	bool collidesWithEntity(Entity* other) const;
 public:
-	Rigidbody();
+	/// <summary>
+	/// Constructora del rigidbody en funcion de su forma
+	/// </summary>
+	/// <param name="shape">
+	/// Para saber que shape hay que pasarle, primero consultar
+	/// los id disponibles en PhysicsManager.
+	/// </param>
+	Rigidbody(int shape);
 	~Rigidbody() {};
 
 	virtual void init();
