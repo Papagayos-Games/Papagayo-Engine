@@ -19,9 +19,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Graphics\Camera.h" />
+    <ClInclude Include="..\..\include\Graphics\LightComponent.h" />
+    <ClInclude Include="..\..\include\Graphics\MeshComponent.h" />
+    <ClInclude Include="..\..\include\Graphics\OgreContext.h" />
+    <ClInclude Include="..\..\include\Graphics\PlaneComponent.h" />
+    <ClInclude Include="..\..\include\Graphics\RenderManager.h" />
+    <ClInclude Include="..\..\include\Graphics\RTShaderTecnhiqueResolveListener.h" />
     <ClInclude Include="..\..\include\Graphics\WindowGenerator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\Graphics\Camera.cpp" />
+    <ClCompile Include="..\..\src\Graphics\LightComponent.cpp" />
+    <ClCompile Include="..\..\src\Graphics\MeshComponent.cpp" />
+    <ClCompile Include="..\..\src\Graphics\OgreContext.cpp" />
+    <ClCompile Include="..\..\src\Graphics\PlaneComponent.cpp" />
+    <ClCompile Include="..\..\src\Graphics\RenderManager.cpp" />
+    <ClCompile Include="..\..\src\Graphics\RTShaderTecnhiqueResolveListener.cpp" />
     <ClCompile Include="..\..\src\Graphics\WindowGenerator.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -108,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -125,7 +139,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,7 +156,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,6 +164,10 @@
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>OgreMain_d.lib</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OgreMain_d.lib;OgreRTShaderSystem_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -159,7 +177,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -169,6 +187,10 @@
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>OgreMain.lib</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OgreMain.lib;OgreRTShaderSystem.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

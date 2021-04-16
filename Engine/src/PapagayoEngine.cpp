@@ -1,22 +1,25 @@
 #include "PapagayoEngine.h"
 
 #include <stdexcept>
-
 #include <iostream>
 
-#include "Ogre.h"
-//#include <OgreWindowEventUtilities.h>
-//#include <OgreRenderWindow.h>
-
-//#include "OgreViewport.h"
-
-#include "Graphics/WindowGenerator.h"
 #include "Managers/SceneManager.h"
 #include "Managers/ResourceManager.h"
-#include "Graphics/MeshComponent.h"
 
-#include "OgreShaderGenerator.h"
-#include "Graphics/RTShaderTecnhiqueResolveListener.h"
+#include "OgreContext.h"
+
+//pruebas
+#include "Camera.h"
+#include "MeshComponent.h"
+#include "LightComponent.h"
+#include "OgreRoot.h"
+#include "Entity.h"
+#include "Transform.h"
+#include "CommonManager.h"
+#include "RenderManager.h"
+#include "Vector3.h"
+#include "OgrePlane.h"
+#include "PlaneComponent.h"
 
 
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
@@ -50,17 +53,20 @@ bool PapagayoEngine::setupInstance(const std::string& appName)
 void PapagayoEngine::clean()
 {
 	// se borrarian todos los managers del motor
-
 	SceneManager::getInstance()->clean();
 	ResourceManager::getInstance()->clean();
-	//WindowGenerator::getInstance()->clean();
+	OgreContext::getInstance()->clean();
 
 	delete instance_;
 }
 
 void PapagayoEngine::init()
 {
-	createRoot();
+	try { OgreContext::setupInstance("PAPAGAYO ENGINE"); }
+	catch (const std::exception & e)
+	{
+		throw std::runtime_error("OgreContext init fail \n" + (std::string)e.what() + "\n");
+	}
 
 	// iniciar resto de singletons/managers
 
@@ -69,43 +75,60 @@ void PapagayoEngine::init()
 	{
 		throw std::runtime_error("ResourceManager init fail \n" + (std::string)e.what() + "\n");
 	}
-	try { WindowGenerator::setupInstance(getOgreRoot(), appName_); }
-	catch (const std::exception& e)
-	{
-		throw std::runtime_error("WindowGenerator init fail \n" + (std::string)e.what() + "\n");
-	}
+	
 	try { SceneManager::setupInstance(); }
 	catch (const std::exception& e)
 	{
 		throw std::runtime_error("SceneManager init fail \n" + (std::string)e.what() + "\n");
 	}
 
-	setupRTShaderGenerator();
+#pragma region TESTEO
 
+
+	//Entity* ent = new Entity();
+	
+
+
+	//Camara
+	Camera* camara = new Camera();
+	//camara->setCameraPosition(Vector3(500,0,0));
+	//camara->setCameraDir(Vector3(-1, 0, 0));
 	//Prueba de pintado XD
-	MeshComponent* funcaPlz = new MeshComponent();
+	//MeshComponent* funcaPlz = new MeshComponent();
+	//CommonManager::getInstance()->addComponent(ent,(int)CommonManager::CommonCmpId::TransId);
+	//RenderManager::getInstance()->addComponent(ent, (int)RenderManager::RenderCmpId::Mesh);
+	//Transform* transform_ = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
+	//MeshComponent* funcaPlz = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
+	//funcaPlz->setMaterial("Practica1_Azulejo");
+	////transform_->setPosX(100);
+	//transform_->setDimensions(Vector3(10, 10, 10));
+
+	PlaneComponent* plane = new PlaneComponent("PLN", "Practica1_Azulejo", 100, 50, PLANE_DIR::PLANE_X);
+	
+	//Pruebas de luz
+	//Entity* luz = new Entity();
+	//CommonManager::getInstance()->addComponent(luz, (int)CommonManager::CommonCmpId::TransId);
+	LightComponent* l = new LightComponent(Vector3(0, 0, 500), Vector3(0, 0, -1), "LI");
+	l->setLightPower(0.1);
+	//LightComponent* l = new LightComponent(Vector3(0, 0, 500), "LI", LIGHT_TYPE::POINT);
+#pragma endregion
+
+	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
+	// dejar al final
+	RenderManager::getInstance()->start();
+	//Test
+	//funcaPlz->update();
+	//camara->update();
 }
 
-void PapagayoEngine::createRoot()
-{
-#ifdef _DEBUG
-	ogreRoot_ = new Ogre::Root("OgreD/plugins.cfg");
-#else
-	ogreRoot_ = new Ogre::Root("Ogre/plugins.cfg");
-#endif
 
-	if (ogreRoot_ == nullptr) {
-		throw std::exception("No se ha podido crear el mRoot");
-	}
-
-}
 
 
 void PapagayoEngine::update()
 {
 	try {
 		//std::cout << "Updating\n";
-		ogreRoot_->renderOneFrame();
+		OgreContext::getInstance()->getOgreRoot()->renderOneFrame();
 	}
 	catch (const std::exception& e)
 	{
@@ -114,32 +137,7 @@ void PapagayoEngine::update()
 
 }
 
-void PapagayoEngine::setupRTShaderGenerator()
-{
-	try {
-		if (Ogre::RTShader::ShaderGenerator::initialize())
-		{
-			//Cogemos la instancia
-			Ogre::RTShader::ShaderGenerator* mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
-			mShaderGenerator->addSceneManager(SceneManager::getInstance()->getOgreSceneManager());
 
-			//Resolutor de mallas 
-			RTShaderTecnhiqueResolveListener* mMaterialListener_ = new RTShaderTecnhiqueResolveListener(mShaderGenerator);
-			Ogre::MaterialManager::getSingleton().addListener(mMaterialListener_);
-
-		}
-		else throw std::runtime_error("RTShader has not been initialized\n");
-	}
-	catch (const std::exception& e)
-	{
-		throw std::runtime_error("Fallo al inicializar el RTShader\n" + (std::string)e.what() + "\n");
-	}
-}
-
-inline Ogre::Root* PapagayoEngine::getOgreRoot() const
-{
-	return ogreRoot_;
-}
 
 void PapagayoEngine::run() {
 	init();

@@ -1,36 +1,35 @@
+#pragma once
 
-#include "Component.h"
+#ifndef _COMMON_ENTITY_H
+#define _COMMON_ENTITY_H
+
 #include <map>
 
-
-using namespace std;
+class Component;
 
 class Entity
 {
 private:
-
-	map<ecs::CmpId, Component*> componentMap;
+	std::map<int, std::map<int, Component*>> _componentMap;
 
 public:
 	//constructor
-	Entity() {};
+	Entity();
 	//destructor
-	~Entity() {}; //TODO: decidir si los componentes se borran desde entity o desde los managers
+	~Entity();
 
-	//añade un componente
+	// añade un componente
 	void addComponent(Component* comp);
 
-	//devuelve el compenente asociado a esa id
-	Component* getComponent(ecs::CmpId id);
+	// devuelve el compenente asociado a esa id
+	Component* getComponent(int managerId, int compI);
 		
-   //comprueba si la entidad tiene el componente id
-	bool hasComponent(ecs::CmpId id);
+    // comprueba si la entidad tiene el componente id
+	bool hasComponent(int managerId, int compId);
 
-
-
-
+	// Este metodo solo elimina el componente de la lista de componentes de la entidad
+	// Para destruirlo se debe llamar a Manager::destroyComponent(Entity* ent);
+	bool removeComponent(int managerId, int compId);
 };
 
-
-
-
+#endif

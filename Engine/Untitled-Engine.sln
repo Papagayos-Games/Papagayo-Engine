@@ -17,6 +17,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PapagayoEngine", "projects\
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Audio", "projects\Audio\Audio.vcxproj", "{561C0C24-E2A5-473B-BEB8-D1D72FCCD0A2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Graphics", "projects\Graphics\Graphics.vcxproj", "{01362587-2C6A-4830-BD0B-49415725530B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +59,14 @@ Global
 		{561C0C24-E2A5-473B-BEB8-D1D72FCCD0A2}.Release|x64.Build.0 = Release|x64
 		{561C0C24-E2A5-473B-BEB8-D1D72FCCD0A2}.Release|x86.ActiveCfg = Release|Win32
 		{561C0C24-E2A5-473B-BEB8-D1D72FCCD0A2}.Release|x86.Build.0 = Release|Win32
+		{01362587-2C6A-4830-BD0B-49415725530B}.Debug|x64.ActiveCfg = Debug|x64
+		{01362587-2C6A-4830-BD0B-49415725530B}.Debug|x64.Build.0 = Debug|x64
+		{01362587-2C6A-4830-BD0B-49415725530B}.Debug|x86.ActiveCfg = Debug|Win32
+		{01362587-2C6A-4830-BD0B-49415725530B}.Debug|x86.Build.0 = Debug|Win32
+		{01362587-2C6A-4830-BD0B-49415725530B}.Release|x64.ActiveCfg = Release|x64
+		{01362587-2C6A-4830-BD0B-49415725530B}.Release|x64.Build.0 = Release|x64
+		{01362587-2C6A-4830-BD0B-49415725530B}.Release|x86.ActiveCfg = Release|Win32
+		{01362587-2C6A-4830-BD0B-49415725530B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

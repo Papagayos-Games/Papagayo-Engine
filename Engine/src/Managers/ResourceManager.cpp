@@ -3,19 +3,12 @@
 #include <iostream>
 #include <fstream>
 
-#include "PapagayoEngine.h"
-#include <Ogre.h>
-#include <OgreFileSystemLayer.h>
-#include <OgreEntity.h>
 
 ResourceManager* ResourceManager::instance_ = nullptr;
 std::string ResourceManager::PATH_ = "assets/";
 
 ResourceManager::ResourceManager(const std::string& path) :path_(path)
 {
-	ogreRoot_ = PapagayoEngine::getInstance()->getOgreRoot();
-	mFSLayer = new Ogre::FileSystemLayer("PapagayoEngine");
-	loadFromResourceFile();
 }
 
 ResourceManager::~ResourceManager()
@@ -85,49 +78,6 @@ void ResourceManager::loadPrefabs(const std::string& prefabName)
 	}
 }
 
-void ResourceManager::loadFromResourceFile()
-{
-	Ogre::ConfigFile configFile;
-	std::string configurationPath;
-
-#ifdef _DEBUG
-	configurationPath = "OgreD/resources.cfg";
-#else
-	configurationPath = "Ogre/resources.cfg";
-#endif
-	mFSLayer->setHomePath("./bin");
-	Ogre::String resourcesPath = mFSLayer->getConfigFilePath(configurationPath);
-
-	if (Ogre::FileSystemLayer::fileExists(resourcesPath))
-		configFile.load(resourcesPath);
-	else
-	{
-		throw std::exception("No se ha encontrado el archivo de recursos de Ogre");
-	}
-
-	Ogre::String sec, type, arch;
-
-	// go through all specified resource groups
-	Ogre::ConfigFile::SettingsBySection_::const_iterator seci;
-	for (seci = configFile.getSettingsBySection().begin(); seci != configFile.getSettingsBySection().end(); ++seci) {
-		sec = seci->first;
-		const Ogre::ConfigFile::SettingsMultiMap& settings = seci->second;
-		Ogre::ConfigFile::SettingsMultiMap::const_iterator i;
-
-		// go through all resource paths
-		for (i = settings.begin(); i != settings.end(); i++)
-		{
-			type = i->first;
-			arch = Ogre::FileSystemLayer::resolveBundlePath(i->second);
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch, type, sec);
-		}
-	}
-
-	sec = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
-	const Ogre::ResourceGroupManager::LocationList genLocs = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(sec);
-
-	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-}
 
 json ResourceManager::getPrefabs()
 {

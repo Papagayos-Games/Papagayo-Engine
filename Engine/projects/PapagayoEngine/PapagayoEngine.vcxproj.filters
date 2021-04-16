@@ -25,12 +25,6 @@
     <Filter Include="Archivos de encabezado\Managers">
       <UniqueIdentifier>{0796ee31-b969-4e62-a855-f1322c454ab4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Archivos de encabezado\Graphics">
-      <UniqueIdentifier>{2045d6f6-6587-47bd-84c7-abf397a0de05}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Archivos de origen\Graphics">
-      <UniqueIdentifier>{501a88a7-56a5-42d8-b1b2-ce3d000ede81}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Scene\Scene.cpp">
@@ -48,18 +42,6 @@
     <ClCompile Include="..\..\src\main.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Graphics\WindowGenerator.cpp">
-      <Filter>Archivos de origen\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Managers\RenderManager.cpp">
-      <Filter>Archivos de origen\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Graphics\RTShaderTecnhiqueResolveListener.cpp">
-      <Filter>Archivos de origen\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Graphics\MeshComponent.cpp">
-      <Filter>Archivos de origen\Graphics</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Scene\Scene.h">
@@ -76,18 +58,6 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Managers\InputManager.h">
       <Filter>Archivos de encabezado\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Graphics\WindowGenerator.h">
-      <Filter>Archivos de encabezado\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Managers\RenderManager.h">
-      <Filter>Archivos de encabezado\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Graphics\MeshComponent.h">
-      <Filter>Archivos de encabezado\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Graphics\RTShaderTecnhiqueResolveListener.h">
-      <Filter>Archivos de encabezado\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
