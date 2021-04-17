@@ -58,8 +58,8 @@ void MeshComponent::update()
 	mNode_->pitch(Ogre::Degree(rot.x),Ogre::Node::TS_WORLD);//ejex
 	mNode_->roll(Ogre::Degree(rot.z),Ogre::Node::TS_WORLD);//ejez
 	//escala
-	Vector3 scale = tr_->getDimensieons();
-	mNode_->scale(Ogre::Vector3(scale.x, scale.y, scale.z));
+	Vector3 scale = transform_->getDimensieons();
+	mNode_->setScale(Ogre::Vector3(scale.x, scale.y, scale.z));
 	
 }
 

@@ -21,6 +21,7 @@
 #include "OgrePlane.h"
 #include "PlaneComponent.h"
 
+#include "PhysicsManager.h"
 
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
 
@@ -121,9 +122,6 @@ void PapagayoEngine::init()
 	//camara->update();
 }
 
-
-
-
 void PapagayoEngine::update()
 {
 	try {
@@ -136,8 +134,6 @@ void PapagayoEngine::update()
 	}
 
 }
-
-
 
 void PapagayoEngine::run() {
 	init();

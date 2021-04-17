@@ -1,4 +1,6 @@
 #include "Rigidbody.h"
+
+//bullet includes
 #include "LinearMath/btDefaultMotionState.h"
 #include "BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.h"
 #include "BulletCollision/NarrowPhaseCollision/btPointCollector.h"
@@ -6,9 +8,15 @@
 #include "BulletCollision/CollisionShapes/btConvexShape.h"
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
+#include "BulletDynamics/Dynamics/btRigidBody.h"
+
+//includes de nuestro proyecto
 #include "Vector3.h"
 #include "Entity.h"
 #include "PhysicsManager.h"
+#include "Transform.h"
+#include "CommonManager.h"
+
 
 bool Rigidbody::collidesWithEntity(Entity* other) const
 {
@@ -42,21 +50,30 @@ bool Rigidbody::collidesWithEntity(Entity* other) const
 	return collPoint.m_hasResult && collPoint.m_distance <= 0;
 }
 
-Rigidbody::Rigidbody() : Component(PhysicsManager::getInstance(), (int)PhysicsManager::PhysicsCmpId::Rb)
+Rigidbody::Rigidbody(int shape) :
+	Component(PhysicsManager::getInstance(),
+		shape)
 {
 	init();
 }
 
 void Rigidbody::init()
 {
-	//Informacion interna del rigidbody
-	btRigidBody::btRigidBodyConstructionInfo info(mass, new btDefaultMotionState(), nullptr);
-	rb = new btRigidBody(info);
-	//seteamos la gravedad por defecto TODO: ESTO VA A IR EN EL PHYSICS MANAGER
-	rb->setGravity(GRAVITY);
+	rb = PhysicsManager::getInstance()->createRB(Vector3(0, 0, 0), mass, (PhysicsManager::PhysicsCmpId)_id);
+}
 
-	//rb = PhysicsManager::getinstance->createRB(this);
-};
+void Rigidbody::update()
+{
+	//actualizacion del transform a partir del btRigidbody
+	CommonManager* instance = CommonManager::getInstance();
+	auto* transform = reinterpret_cast<Transform*>(
+		_entity->getComponent(instance->getId(), (int)CommonManager::CommonCmpId::TransId));
+
+	const auto worldTransform = rb->getWorldTransform();
+	const auto origin = worldTransform.getOrigin();
+	
+	transform->setPos(Vector3(origin.x(), origin.y(), origin.z()));
+}
 
 void Rigidbody::setActiveGravtiy(const bool active)
 {
