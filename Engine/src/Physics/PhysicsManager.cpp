@@ -149,6 +149,10 @@ void PhysicsManager::update()
 	//#ifdef _DEBUG
 	//    dynamicsWorld->debugDrawWorld();
 	//#endif
+	for (auto it = _compsList.begin(); it != _compsList.end(); ++it) {
+		(*it)->update();
+	}
+	
 }
 
 void PhysicsManager::destroyAllComponents()

@@ -1,16 +1,12 @@
 #pragma once
 #include "Component.h"
-#include "BulletDynamics/Dynamics/btRigidBody.h"
+//#include "BulletDynamics/Dynamics/btRigidBody.h"
 #include <iostream>
 
 class btCollisionShape;
 class Vector3;
 class Entity;
-
-enum class Shapes
-{
-	BOX = 0, SPHERE = 1, TRIANGLE = 2
-};
+class btRigidBody;
 
 enum class Forces {
 	NORMAL = 0,
@@ -21,13 +17,9 @@ class Rigidbody : public Component
 {
 private:
 	//Masa del Rigidbody
-	btScalar mass = 1.0f;
+	float mass = 1.0f;
 	//Rigidbody principal
 	btRigidBody* rb = nullptr;
-	//gravedad que afecta al objeto
-	//const btVector3 GRAVITY = btVector3(0,-9.8,0); // TODO: ESTO VA A IR EN EL PHYSICS MANAGER
-	//Transform fisico del rigidbody
-	btTransform* tr = nullptr;
 	//Forma de la malla del rigidbody
 	btCollisionShape* shapeColl = nullptr;
 
@@ -49,7 +41,7 @@ public:
 	~Rigidbody() {};
 
 	virtual void init();
-	virtual void update() {};
+	virtual void update();
 
 #pragma region Setters
 	//Activa/Desactiva la gravedad

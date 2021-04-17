@@ -9,7 +9,7 @@ class Manager;
 class Component {
 protected:
 	int _id;   // identificador del tipo de componente
-	bool _active;
+	bool _active = true;
 
 	Entity* _entity;
 	Manager* _manager;
