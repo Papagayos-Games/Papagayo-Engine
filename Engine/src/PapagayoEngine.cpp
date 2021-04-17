@@ -20,7 +20,6 @@
 #include "Vector3.h"
 #include "OgrePlane.h"
 #include "PlaneComponent.h"
-
 #include "PhysicsManager.h"
 
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;

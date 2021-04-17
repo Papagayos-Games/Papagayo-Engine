@@ -74,7 +74,7 @@ void Camera::update()
 	camNode_->pitch(Ogre::Degree(rot.x), Ogre::Node::TS_WORLD);//ejex
 	camNode_->roll(Ogre::Degree(rot.z), Ogre::Node::TS_WORLD);//ejez
 	//escala
-	Vector3 scale = tr_->getDimensieons();
+	Vector3 scale = tr_->getDimensions();
 	camNode_->scale(Ogre::Vector3(scale.x, scale.y, scale.z));
 }
 
