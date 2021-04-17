@@ -1,29 +1,38 @@
 #pragma once
-#include <math.h>
-#include "ecs.h"
+
+#ifndef _COMMON_COMPONENT_H
+#define _COMMON_COMPONENT_H
+
+class Entity;
+class Manager;
 
 class Component {
 protected:
-	ecs::CmpId id;   // identificador del tipo de componente
-	bool active;
+	int _id;   // identificador del tipo de componente
+	bool _active = true;
 
-	virtual void init() = 0;
+	Entity* _entity;
+	Manager* _manager;
+
 public:
 	//constructor
-	Component(ecs::CmpId id);
+	Component(Manager* man, int id);
 	virtual ~Component();
 
-
-	void setId(ecs::CmpId id) {
-		id = id;
-	}
-
-	ecs::CmpId getId() const {
-		return id;
-	}
-
+	virtual void init() = 0;
 	virtual void update() = 0;
+	virtual void setUp();
 
 	bool isActive();
-	void setActive(bool act);
+	virtual void setActive(bool act);
+
+	void setId(int);
+	int getId() const;
+
+	Entity* getEntity();
+	void setEntity(Entity* e);
+	
+	Manager* getManager();
 };
+
+#endif

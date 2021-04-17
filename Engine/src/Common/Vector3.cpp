@@ -1,5 +1,16 @@
 #include "Vector3.h"
-#include "../../dependencies/Bullet/src/LinearMath/btVector3.h"
+
+#include <iostream>
+#include <math.h>
+
+Vector3::Vector3() : x(0.0f), y(0.0f), z(0.0f) 
+{
+}
+
+Vector3::Vector3(const float x1, const float y1, const float z1) :
+	x(x1), y(y1), z(z1)
+{
+}
 
 void Vector3::invert()
 {
@@ -103,7 +114,3 @@ void Vector3::setZ(float n)
 {
 	z = n;
 }
-
-
-
-

@@ -8,6 +8,7 @@ echo ---------------------------------------------------
 echo moviendo OGRE
 copy ..\Engine\dependencies\Ogre\build\bin\debug\OgreMain_d.dll ..\Engine\bin
 copy ..\Engine\dependencies\Ogre\build\bin\release\OgreMain.dll ..\Engine\bin
+::for /R "..\Engine\dependencies\Ogre\build\bin\debug" %%G in (*.dll) do copy "%%G" "..\Engine\bin"
 
 echo moviendo OgreRTShaderSystem
 copy ..\Engine\dependencies\Ogre\build\bin\debug\OgreRTShaderSystem_d.dll ..\Engine\bin

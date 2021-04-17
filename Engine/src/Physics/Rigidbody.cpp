@@ -1,4 +1,6 @@
 #include "Rigidbody.h"
+
+//bullet includes
 #include "LinearMath/btDefaultMotionState.h"
 #include "BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.h"
 #include "BulletCollision/NarrowPhaseCollision/btPointCollector.h"
@@ -6,15 +8,22 @@
 #include "BulletCollision/CollisionShapes/btConvexShape.h"
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
+#include "BulletDynamics/Dynamics/btRigidBody.h"
+
+//includes de nuestro proyecto
 #include "Vector3.h"
 #include "Entity.h"
+#include "PhysicsManager.h"
+#include "Transform.h"
+#include "CommonManager.h"
+
 
 bool Rigidbody::collidesWithEntity(Entity* other) const
 {
 	if (other == nullptr) return false;
 
 	//Se obtiene el rb de la otra entidad
-	auto* otherRigidBody = reinterpret_cast<Rigidbody*>(other->getComponent(ecs::CmpId::Rigidbody));
+	auto* otherRigidBody = reinterpret_cast<Rigidbody*>(other->getComponent((int)ManID::Physics, 0));
 	
 	if (!otherRigidBody->isActive())
 		return false;
@@ -41,21 +50,30 @@ bool Rigidbody::collidesWithEntity(Entity* other) const
 	return collPoint.m_hasResult && collPoint.m_distance <= 0;
 }
 
-Rigidbody::Rigidbody(ecs::CmpId id) : Component(id)
+Rigidbody::Rigidbody(int shape) :
+	Component(PhysicsManager::getInstance(),
+		shape)
 {
 	init();
 }
 
 void Rigidbody::init()
 {
-	//Informacion interna del rigidbody
-	btRigidBody::btRigidBodyConstructionInfo info(mass, new btDefaultMotionState(), shapeColl);
-	rb = new btRigidBody(info);
-	//seteamos la gravedad por defecto TODO: ESTO VA A IR EN EL PHYSICS MANAGER
-	rb->setGravity(GRAVITY);
+	rb = PhysicsManager::getInstance()->createRB(Vector3(0, 0, 0), mass, (PhysicsManager::PhysicsCmpId)_id);
+}
 
-	//rb = PhysicsManager::getinstance->createRB(this);
-};
+void Rigidbody::update()
+{
+	//actualizacion del transform a partir del btRigidbody
+	CommonManager* instance = CommonManager::getInstance();
+	auto* transform = reinterpret_cast<Transform*>(
+		_entity->getComponent(instance->getId(), (int)CommonManager::CommonCmpId::TransId));
+
+	const auto worldTransform = rb->getWorldTransform();
+	const auto origin = worldTransform.getOrigin();
+	
+	transform->setPos(Vector3(origin.x(), origin.y(), origin.z()));
+}
 
 void Rigidbody::setActiveGravtiy(const bool active)
 {
@@ -69,7 +87,7 @@ void Rigidbody::setActiveGravtiy(const bool active)
 
 Vector3 Rigidbody::getLinearVelocity() const
 {
-	if (active) {
+	if (_active) {
 		btVector3 vel = rb->getLinearVelocity();
 		return Vector3(vel.x(), vel.y(), vel.z());
 	}
@@ -96,6 +114,11 @@ bool Rigidbody::isStatic()
 btCollisionShape* Rigidbody::getShape()
 {
 	return shapeColl;
+}
+
+btRigidBody* Rigidbody::getBtRb()
+{
+	return rb;
 }
 
 void Rigidbody::setTrigger(const bool trigger_) {
@@ -134,7 +157,7 @@ void Rigidbody::setStatic(const bool _static) {
 
 void Rigidbody::setRestitution(float restitution)
 {
-	if (active) {
+	if (_active) {
 		//restricciones
 		if (restitution < 0) {
 			restitution = 0;
@@ -149,7 +172,7 @@ void Rigidbody::setRestitution(float restitution)
 
 void Rigidbody::setLinearVelocity(Vector3 vel)
 {
-	if (active) {
+	if (_active) {
 		btVector3 v = btVector3(vel.x, vel.y, vel.z);
 		rb->setLinearVelocity(v);
 	}
@@ -157,14 +180,14 @@ void Rigidbody::setLinearVelocity(Vector3 vel)
 
 void Rigidbody::setFriction(float friction)
 {
-	if (active) {
+	if (_active) {
 		rb->setFriction(friction);
 	}
 }
 
 void Rigidbody::setPosition(Vector3 newPos)
 {
-	if (active) {
+	if (_active) {
 		btTransform tr;
 		btVector3 vec = btVector3(newPos.x, newPos.y, newPos.z);
 		tr.setOrigin(vec);
@@ -176,7 +199,7 @@ void Rigidbody::setPosition(Vector3 newPos)
 
 void Rigidbody::addForce(Vector3 force, Vector3 relativePos, Forces type)
 {
-	if (active) {
+	if (_active) {
 		if (relativePos == Vector3(0.0f, 0.0f, 0.0f)) {
 			if (type == Forces::NORMAL)
 				rb->applyCentralForce(btVector3(btScalar(force.x), btScalar(force.y), btScalar(force.z)));
@@ -202,7 +225,7 @@ void Rigidbody::addForce(Vector3 force, Vector3 relativePos, Forces type)
 
 void Rigidbody::addTorque(Vector3 torque, Forces type)
 {
-	if (active) {
+	if (_active) {
 		if (type == Forces::NORMAL)
 			rb->applyTorque(btVector3(torque.x, torque.y, torque.z));
 		else if (type == Forces::IMPULSE)
@@ -213,7 +236,7 @@ void Rigidbody::addTorque(Vector3 torque, Forces type)
 bool Rigidbody::onCollisionEnter(std::string id) const
 {
 	// Recieves an id of an entity and checks if our father is colliding with it
-	if (active) {
+	if (_active) {
 		//Se obtiene la entidad de la escena y se comprueba la colision
 		//Entity* other = scene_->getEntityById(id);
 		//return collidesWithEntity(other);

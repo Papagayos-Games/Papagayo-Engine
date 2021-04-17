@@ -21,13 +21,18 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\Common\Component.cpp" />
     <ClCompile Include="..\..\src\Common\Entity.cpp" />
+    <ClCompile Include="..\..\src\Common\Manager.cpp" />
+    <ClCompile Include="..\..\src\Common\CommonManager.cpp" />
     <ClCompile Include="..\..\src\Common\Transform.cpp" />
     <ClCompile Include="..\..\src\Common\Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Common\checkML.h" />
     <ClInclude Include="..\..\include\Common\Component.h" />
     <ClInclude Include="..\..\include\Common\ecs.h" />
     <ClInclude Include="..\..\include\Common\Entity.h" />
+    <ClInclude Include="..\..\include\Common\Manager.h" />
+    <ClInclude Include="..\..\include\Common\CommonManager.h" />
     <ClInclude Include="..\..\include\Common\Transform.h" />
     <ClInclude Include="..\..\include\Common\Vector3.h" />
   </ItemGroup>

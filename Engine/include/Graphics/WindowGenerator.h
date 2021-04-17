@@ -1,5 +1,8 @@
 #pragma once
 #include "OgreFrameListener.h"
+#ifdef _DEBUG
+#include "checkML.h"
+#endif
 
 namespace Ogre {
 	class OgreRenderWindow;
@@ -27,6 +30,7 @@ public:
 	//Singleton, init y get separados
 	static WindowGenerator* getInstance();
 	static bool setupInstance(Ogre::Root* root, std::string name);
+	static void clean();
 
 	virtual ~WindowGenerator();
 
