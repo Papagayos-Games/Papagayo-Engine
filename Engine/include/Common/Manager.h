@@ -13,10 +13,6 @@ class Entity;
 class Component;
 
 
-class Registrator {
-
-};
-
 enum class ManID
 {
 	Common = 0,
@@ -28,7 +24,7 @@ enum class ManID
 
 class Manager {
 protected:
-	std::map <std::string, std::function<Component* (std::map<std::string, std::string> params)>> compsRegistry_;
+	std::map <std::string, std::function<Component* ()>> compsRegistry_;
 	std::list<Component*> _compsList;
 	ManID _manId;
 public:
@@ -45,8 +41,8 @@ public:
 
 
 	//-- Factory --//
-	void registerComponent(std::string name, std::function<Component * (std::map<std::string, std::string> params)>compConst);
-	Component* create(std::string name, std::map<std::string, std::string> params, Entity* ent);	//esto puede ser un puntero inteligente
+	void registerComponent(std::string name, std::function<Component * ()>compConst);
+	Component* create(std::string name, Entity* ent);	//esto puede ser un puntero inteligente
 	//-------------//
 	int getId();
 };

@@ -10,6 +10,7 @@
 //class Vector3;
 class CommonManager;
 
+
 class Transform : public Component {
 private:
 	Vector3 _position;
@@ -19,10 +20,10 @@ private:
 public:
 	Transform();
 	Transform(Vector3 pos, Vector3 vel, Vector3 dim, Vector3 rotation);
-	Transform(std::map < std::string, std::string> params);
 	virtual ~Transform();
 
 	virtual void init();
+	virtual void load(nlohmann::json params);
 	virtual void update();
 
 	// position

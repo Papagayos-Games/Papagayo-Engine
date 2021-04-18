@@ -38,17 +38,17 @@ int Manager::getId() {
 	return (int)_manId;
 }
 
-void Manager::registerComponent(std::string name, std::function<Component * (std::map<std::string, std::string> params)> compConst)
+void Manager::registerComponent(std::string name, std::function<Component * ()> compConst)
 {
 	compsRegistry_[name] = compConst;
 }
 
-Component* Manager::create(std::string name, std::map<std::string, std::string> params, Entity* ent)
+Component* Manager::create(std::string name, Entity* ent)
 {
 	Component* comp = nullptr;
 	auto it = compsRegistry_.find(name);
 	if (it != compsRegistry_.end())
-		comp = it->second(params);
+		comp = it->second();
 	if (comp != nullptr) {
 		_compsList.push_back(comp);
 		comp->setEntity(ent);

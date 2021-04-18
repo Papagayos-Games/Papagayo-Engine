@@ -98,7 +98,7 @@ void PapagayoEngine::init()
 	Camera* camara = new Camera();
 	//Prueba de pintado XD
 	//MeshComponent* funcaPlz = new MeshComponent();
-	//CommonManager::getInstance()->addComponent(ent,(int)CommonManager::CommonCmpId::TransId);
+	CommonManager::getInstance()->addComponent(ent,(int)CommonManager::CommonCmpId::TransId);
 	RenderManager::getInstance()->addComponent(ent, (int)RenderManager::RenderCmpId::Mesh);
 	Transform* transform_ = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
 	MeshComponent* funcaPlz = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));

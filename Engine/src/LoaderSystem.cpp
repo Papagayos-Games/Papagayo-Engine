@@ -1,14 +1,21 @@
+
+
 #include "LoaderSystem.h"
 
 #include "Scene/Scene.h"
 #include "Entity.h"
+#include "Component.h"
 #include "PapagayoEngine.h"
 #include "Manager.h"
 
 #include <fstream>
 #include <string>
 #include <exception>
+#include <iostream>
 //#include "Scene.h"
+
+// nlohmann::json;
+
 void LoaderSystem::loadScenes(std::string fileName)
 {
 }
@@ -21,10 +28,10 @@ void LoaderSystem::loadEntities(std::string fileName/*, Scene* scene*/)
 	if (!i.is_open()) {
 		throw "ERROR: Loading scene " + fileName + " failed, file missing\n";
 	}
-	json j;
+	nlohmann::json j;
 	i >> j;
 	// -- -- //
-	json entities = j["Entities"];
+	nlohmann::json entities = j["Entities"];
 	if (entities.is_null() || !entities.is_array())
 		throw std::exception("ERROR: Entities not found\n");
 
@@ -37,25 +44,45 @@ void LoaderSystem::loadEntities(std::string fileName/*, Scene* scene*/)
 	
 }
 
-void LoaderSystem::loadComponents(json comps, Entity* entity)
+void LoaderSystem::loadComponents(nlohmann::json comps, Entity* entity)
 {
 	if (comps.is_null() || !comps.is_array())
 		throw std::exception("ERROR: Components not found\n");
 	int compSize = comps.size();
 	
 	auto mans = PapagayoEngine::getInstance()->getManagers();
-	json params;
+	nlohmann::json type;
+	nlohmann::json component;
+	nlohmann::json params;
 	for (int i = 0; i < compSize; i++) {
-		params = comps[i]["Parameters"];
-		if (params.is_null() || !params.is_object())
-			throw std::exception("ERROR: Component parameters not found\n");
+		//std::map<std::string, std::string> p;
+		//readParameters(comps[i]["Parameters"].dump(), p);
+		type = comps[i]["Type"];
+		if(type.is_null() || !type.is_string())
+			throw std::exception("ERROR: Component type not found\n");
 
-		std::map<std::string, std::string> p;
-		readParameters(comps[i]["Parameters"].dump(), p);
+		component = comps[i]["Component"];
+		if (component.is_null() || !component.is_string())
+			throw std::exception("ERROR: Component name not found\n");
 
-		Component* c = mans[comps[i]["Type"]]->create(comps[i]["Component"], p, entity);
+		Component* c = mans[type]->create(component, entity);
 		if (c == nullptr)
 			throw std::exception("ERROR: Component couldn't be created, it is not registered\n");
+
+		// Si hay parametros, se cargan; si no, se crea el componente por defecto
+		
+		params = comps[i]["Parameters"];
+		if (!params.is_null() && params.is_object()) {
+			
+			try { c->load(params); }
+			catch(std::exception e){
+				//resetear los valores del componente si hay algun parametro con un formato erroneo
+				std::cout << "WARNING: Component " + component.get<std::string>() + " parameters are wrong, reseting to default\n";
+				c->init();
+				//throw std::exception("WARNING: Component parametrs are wrong\n");
+			}
+		}
+		
 		entity->addComponent(c);
 	}
 }

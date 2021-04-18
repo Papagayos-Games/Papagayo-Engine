@@ -3,7 +3,7 @@
 #ifndef _COMMON_VECTOR3_H
 #define _COMMON_VECTOR3_H
 
-#include <string>
+#include <vector>
 
 class Vector3
 {
@@ -16,7 +16,8 @@ public:
 	Vector3();
 	//Constructor
 	Vector3(const float x1, const float y1, const float z1);
-	Vector3(std::string s);
+	Vector3(std::vector<float> pos);
+	//Vector3(std::string s);
 	//Invertir todos los valores del vector
 	void invert();
 	// Optener la magnitud del vector

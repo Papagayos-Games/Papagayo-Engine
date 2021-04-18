@@ -1,12 +1,12 @@
 {
     "Entities": [
         {
-            "Componnts": [
+            "Components": [
                 {
                     "Component" : "Transform",
                     "Type" : "Common",
                     "Parameters" : {
-                        "position" : [0.2, 0.895473, 0.5],
+                        "position" : [true, 0.895473, "buenas"],
                         "velocity" : [0, 0, 0],
                         "dimensions" : [1, 1, 1],
                         "rotation" : [0, 0, 0]
@@ -20,7 +20,7 @@
                     "Component" : "Transform",
                     "Type" : "Common",
                     "Parameters" : {
-                        "position" : [0, 0, 0],
+                        "position" : [0.2684, 10.054, 9.357],
                         "velocity" : [0, 0, 0],
                         "dimensions" : [1, 1, 1],
                         "rotation" : [0, 0, 0]

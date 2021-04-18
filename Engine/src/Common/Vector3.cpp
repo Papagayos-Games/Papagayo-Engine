@@ -13,8 +13,18 @@ Vector3::Vector3(const float x1, const float y1, const float z1) :
 {
 }
 
+// Se puede tratar la excepcion en el load, si no se trata aqui
+Vector3::Vector3(std::vector<float> pos)
+{
+	if (pos.size() >= 3) {
+		x = pos[0]; y = pos[1]; z = pos[2];
+	}
+	else 
+		x = y = z = 0.0f;
+}
+
 // string format"[0.0, 0.0, 0.0]"
-Vector3::Vector3(std::string s)
+/*Vector3::Vector3(std::string s)
 {
 	std::string delimiter = ",";
 	size_t pos = 0;
@@ -41,7 +51,7 @@ Vector3::Vector3(std::string s)
 	x = values[0];
 	y = values[1];
 	z = std::stof(s);
-}
+}*/
 
 void Vector3::invert()
 {

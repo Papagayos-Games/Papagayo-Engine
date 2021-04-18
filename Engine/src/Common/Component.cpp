@@ -19,6 +19,10 @@ int Component::getId() const {
 	return _id;
 }
 
+void Component::load(nlohmann::json params)
+{
+}
+
 bool Component::isActive() {
 	return _active;
 }

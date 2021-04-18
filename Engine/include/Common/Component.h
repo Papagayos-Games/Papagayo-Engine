@@ -2,9 +2,10 @@
 
 #ifndef _COMMON_COMPONENT_H
 #define _COMMON_COMPONENT_H
-
+#include <json.hpp>	//provisional en el .h
 class Entity;
 class Manager;
+
 
 class Component {
 protected:
@@ -21,6 +22,7 @@ public:
 
 
 	virtual void init() = 0;
+	virtual void load(nlohmann::json params);	// por ahora no abstracto para probar
 	virtual void update() = 0;
 
 	bool isActive();

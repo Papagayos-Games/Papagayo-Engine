@@ -20,9 +20,18 @@ Transform::Transform(Vector3 pos, Vector3 vel,Vector3 dim, Vector3 rotation) :
 {
 }
 
-Transform::Transform(std::map<std::string, std::string> params) : Component(CommonManager::getInstance(), (int)CommonManager::CommonCmpId::TransId)
+/*Transform::Transform(nlohmann::json params) : Component(CommonManager::getInstance(), (int)CommonManager::CommonCmpId::TransId)
 {
-	auto it = params.find("position");
+	nlohmann::json param;
+	param = params["position"];
+	try {
+		float x = param.get<std::vector<float>>()[0];
+	}
+	catch (std::exception e) {
+		throw "Buenas";
+	}
+	/*auto it = params.find("position");
+	
 	if (it != params.end())
 		_position = Vector3(it->second);
 	else
@@ -39,14 +48,41 @@ Transform::Transform(std::map<std::string, std::string> params) : Component(Comm
 		_rotation = Vector3(it->second);
 	else
 		_rotation = Vector3();
-}
+}*/
 
+// Si algun parametro no se especifica, se mantendra por defecto
+void Transform::load(nlohmann::json params)
+{
+	auto it = params.find("position");
+	if (it != params.end()) {
+		std::vector<float> pos = it->get<std::vector<float>>();
+		_position = Vector3(pos[0], pos[1], pos[2]);
+	}
+	it = params.find("velocity");
+	if (it != params.end()) {
+		std::vector<float> pos = it->get<std::vector<float>>();
+		_velocity= Vector3(pos[0], pos[1], pos[2]);
+	}
+	it = params.find("dimensions");
+	if (it != params.end()) {
+		std::vector<float> pos = it->get<std::vector<float>>();
+		_dimensions = Vector3(pos[0], pos[1], pos[2]);
+	}
+	it = params.find("rotation");
+	if (it != params.end()) {
+		std::vector<float> pos = it->get<std::vector<float>>();
+		_rotation = Vector3(pos[0], pos[1], pos[2]);
+	}
+}
 Transform::~Transform() {
 }
 
 void Transform::init() {
-
+	_position = _velocity = _rotation = Vector3();
+	_dimensions = Vector3(1.0f, 1.0f, 1.0f);
 }
+
+
 
 void Transform::update() {
 

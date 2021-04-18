@@ -91,23 +91,23 @@
     <OutDir>$(SolutionDir)bin</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>$(SolutionDir)include\$(ProjectName);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include\$(ProjectName);$(SolutionDir)dependencies\JSONforModernC++;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
-    <IncludePath>$(SolutionDir)include\$(ProjectName);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include\$(ProjectName);$(SolutionDir)dependencies\JSONforModernC++;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)bin</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>$(SolutionDir)include\$(ProjectName);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include\$(ProjectName);$(SolutionDir)dependencies\JSONforModernC++;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)bin</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
-    <IncludePath>$(SolutionDir)include\$(ProjectName);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include\$(ProjectName);$(SolutionDir)dependencies\JSONforModernC++;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
