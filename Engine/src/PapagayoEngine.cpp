@@ -83,14 +83,13 @@ void PapagayoEngine::init()
 
 	LoaderSystem loader;
 #pragma region TOERASE
-	Camera* camara = new Camera();
 	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
 #pragma endregion
 
 	PhysicsManager::getInstance()->init(Vector3(0.0, -9.8, 0.0));
 	loader.loadEntities("Scenes/testScene.json");
-	RenderManager::getInstance()->start();
 	// dejar al final
+	RenderManager::getInstance()->start();
 }
 
 void PapagayoEngine::update()

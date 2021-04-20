@@ -39,6 +39,7 @@ public:
 	void setLightPower(float intensity);
 	//	Activa las sombras
 	void setCastShadow(bool status);
+
 	virtual void init()override;
 	virtual void update()override;
 	virtual void setActive(bool status)override;
