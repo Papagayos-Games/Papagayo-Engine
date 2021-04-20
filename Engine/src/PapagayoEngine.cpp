@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include "Managers/SceneManager.h"
-#include "Managers/ResourceManager.h"
 
 #include "Managers/InputSystem.h"
 #include "Graphics/OgreContext.h"
@@ -58,7 +57,6 @@ void PapagayoEngine::clean()
 {
 	// se borrarian todos los managers del motor
 	SceneManager::getInstance()->clean();
-	ResourceManager::getInstance()->clean();
 	OgreContext::getInstance()->clean();
 	InputSystem::getInstance()->clean();
 
@@ -71,14 +69,6 @@ void PapagayoEngine::init()
 	catch (const std::exception & e)
 	{
 		throw std::runtime_error("OgreContext init fail \n" + (std::string)e.what() + "\n");
-	}
-
-	// iniciar resto de singletons/managers
-
-	try { ResourceManager::setupInstance("assets/"); }
-	catch (const std::exception& e)
-	{
-		throw std::runtime_error("ResourceManager init fail \n" + (std::string)e.what() + "\n");
 	}
 	
 	try { SceneManager::setupInstance(); }
@@ -102,7 +92,7 @@ void PapagayoEngine::init()
 	//manRegistry_.insert("Common", CommonManager::getInstance());
 
 
-	
+
 	//Component* comp = manRegistry_["Common"]->create("Transform");
 	//ent->addComponent(comp);
 	//Camara

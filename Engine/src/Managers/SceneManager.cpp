@@ -1,6 +1,5 @@
 #include "Managers/SceneManager.h"
 #include "Scene/Scene.h"
-#include "Managers/ResourceManager.h"
 #include "Graphics/WindowGenerator.h"
 #include "Graphics/OgreContext.h"
 
@@ -49,8 +48,8 @@ void SceneManager::loadScene(const std::string& sceneName)
 	currentScene_ = new Scene();
 
 	//la llena de objetos
-	json j = ResourceManager::getInstance()->getSceneFile(sceneName);
-	currentScene_->load(j);
+	//json j = ResourceManager::getInstance()->getSceneFile(sceneName);
+	//currentScene_->load(j);
 }
 
 void SceneManager::cleanupScene()

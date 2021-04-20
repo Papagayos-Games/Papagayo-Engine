@@ -17,49 +17,20 @@
 #include "Transform.h"
 #include "CommonManager.h"
 
-
-bool Rigidbody::collidesWithEntity(Entity* other) const
-{
-	if (other == nullptr) return false;
-
-	//Se obtiene el rb de la otra entidad
-	auto* otherRigidBody = reinterpret_cast<Rigidbody*>(other->getComponent((int)ManID::Physics, 0));
-	
-	if (!otherRigidBody->isActive())
-		return false;
-
-	//Declaracion del algoritmo de Vorono
-	btVoronoiSimplexSolver simplexSolver;
-	btGjkEpaPenetrationDepthSolver epaPenSolver;
-	btPointCollector collPoint;
-
-	//Detector de colisiones
-	btGjkPairDetector convexConvex(
-		static_cast<btConvexShape*>(shapeColl),
-		static_cast<btConvexShape*>(otherRigidBody->getShape()),
-		&simplexSolver, &epaPenSolver);
-
-	//Mediante un input que guarda referencia de los dos objetos,
-	//se genera un output (collPoint), de manera que, posteriormente, se puede
-	//comprobar si se ha producido una colision.
-	btGjkPairDetector::ClosestPointInput input;
-	input.m_transformA = rb->getWorldTransform();
-	input.m_transformB = otherRigidBody->rb->getWorldTransform();
-	convexConvex.getClosestPoints(input, collPoint, nullptr);
-
-	return collPoint.m_hasResult && collPoint.m_distance <= 0;
-}
-
-Rigidbody::Rigidbody(int shape) :
-	Component(PhysicsManager::getInstance(),
-		shape)
+Rigidbody::Rigidbody() : Component(PhysicsManager::getInstance(), 0)
 {
 	init();
 }
 
+Rigidbody::~Rigidbody()
+{
+}
+
+#pragma region Generales
+
 void Rigidbody::init()
 {
-	rb = PhysicsManager::getInstance()->createRB(Vector3(0, 0, 0), mass, (PhysicsManager::PhysicsCmpId)_id);
+	rb = PhysicsManager::getInstance()->createRB(Vector3(0, 0, 0), mass);
 }
 
 void Rigidbody::update()
@@ -75,7 +46,110 @@ void Rigidbody::update()
 	transform->setPos(Vector3(origin.x(), origin.y(), origin.z()));
 }
 
-void Rigidbody::setActiveGravtiy(const bool active)
+void Rigidbody::load(nlohmann::json params)
+{
+	//Posicion
+	auto it = params.find("position");
+	if (it != params.end()) {
+		std::vector<float> pos = it->get<std::vector<float>>();
+		setPosition(Vector3(pos[0], pos[1], pos[2]));
+	}
+
+	//Gravedad
+	it = params.find("isGravity");
+	if (it != params.end()) {
+		bool isGravity = it->get<bool>();
+		setActiveGravity(isGravity);
+	}
+
+	//Trigger
+	it = params.find("isTrigger");
+	if (it != params.end()) {
+		bool isTrigger = it->get<bool>();
+		setTrigger(isTrigger);
+	}
+
+	//Cinematico
+	it = params.find("isKinematic");
+	if (it != params.end()) {
+		bool isKinematic = it->get<bool>();
+		setActiveGravity(isKinematic);
+	}
+
+	//Estatico
+	it = params.find("isStatic");
+	if (it != params.end()) {
+		bool isStatic = it->get<bool>();
+		setStatic(isStatic);
+	}
+
+	//Restitucion
+	it = params.find("restitution");
+	if (it != params.end()) {
+		float rest = it->get<float>();
+		setRestitution(rest);
+	}
+
+	//Velocidad Lineal
+	it = params.find("linealVel");
+	if (it != params.end()) {
+		std::vector<float> vel = it->get<std::vector<float>>();
+		setLinearVelocity(vel);
+	}
+
+	//Friccion
+	it = params.find("friccion");
+	if (it != params.end()) {
+		float friction = it->get<float>();
+		setFriction(friction);
+	}
+
+	//Formas de la colision
+	it = params.find("shape");
+	if (it != params.end()) {
+		int shapeName= it->get<int> ();
+		btCollisionShape* shapeColl = nullptr;
+		switch (shapeName)
+		{
+		case (int)RbCmpId::RbBox:
+			shapeColl = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
+			break;
+		case (int)RbCmpId::RbSphere:
+			shapeColl = new btSphereShape(1.0f);
+			break;
+		case (int)RbCmpId::RbCylinder:
+			shapeColl = new btCylinderShape(btVector3(1.0f, 1.0f, 1.0f));
+			break;
+		case (int)RbCmpId::RbCone:
+			shapeColl = new btConeShape(1.0f, 1.0f);
+			break;
+		case (int)RbCmpId::RbCapsule:
+			shapeColl = new btCapsuleShape(1.0f, 1.0f);
+			break;
+		default:
+			break;
+		}
+
+		setCollisionShape(shapeColl);
+	}
+}
+
+#pragma endregion
+
+#pragma region Setters
+void Rigidbody::setPosition(Vector3 newPos)
+{
+	if (_active) {
+		btTransform tr;
+		btVector3 vec = btVector3(newPos.x, newPos.y, newPos.z);
+		tr.setOrigin(vec);
+		tr.setRotation(rb->getOrientation());
+
+		rb->setWorldTransform(tr);
+	}
+}
+
+void Rigidbody::setActiveGravity(const bool active)
 {
 	if (active) {
 		rb->applyGravity();
@@ -83,42 +157,6 @@ void Rigidbody::setActiveGravtiy(const bool active)
 	else {
 		rb->clearGravity();
 	}
-}
-
-Vector3 Rigidbody::getLinearVelocity() const
-{
-	if (_active) {
-		btVector3 vel = rb->getLinearVelocity();
-		return Vector3(vel.x(), vel.y(), vel.z());
-	}
-	else {
-		return Vector3(0, 0, 0);
-	}
-}
-
-bool Rigidbody::isTrigger()
-{
-	return trigger;
-}
-
-bool Rigidbody::isKinematic()
-{
-	return kinematic;
-}
-
-bool Rigidbody::isStatic()
-{
-	return static_;
-}
-
-btCollisionShape* Rigidbody::getShape()
-{
-	return shapeColl;
-}
-
-btRigidBody* Rigidbody::getBtRb()
-{
-	return rb;
 }
 
 void Rigidbody::setTrigger(const bool trigger_) {
@@ -185,17 +223,53 @@ void Rigidbody::setFriction(float friction)
 	}
 }
 
-void Rigidbody::setPosition(Vector3 newPos)
+void Rigidbody::setCollisionShape(btCollisionShape* newShape)
+{
+	rb->setCollisionShape(newShape);
+}
+#pragma endregion
+
+#pragma region Getters
+
+Vector3 Rigidbody::getLinearVelocity() const
 {
 	if (_active) {
-		btTransform tr;
-		btVector3 vec = btVector3(newPos.x, newPos.y, newPos.z);
-		tr.setOrigin(vec);
-		tr.setRotation(rb->getOrientation());
-
-		rb->setWorldTransform(tr);
+		btVector3 vel = rb->getLinearVelocity();
+		return Vector3(vel.x(), vel.y(), vel.z());
+	}
+	else {
+		return Vector3(0, 0, 0);
 	}
 }
+
+bool Rigidbody::isTrigger()
+{
+	return trigger;
+}
+
+bool Rigidbody::isKinematic()
+{
+	return kinematic;
+}
+
+bool Rigidbody::isStatic()
+{
+	return static_;
+}
+
+btCollisionShape* Rigidbody::getShape()
+{
+	return rb->getCollisionShape();
+}
+
+btRigidBody* Rigidbody::getBtRb()
+{
+	return rb;
+}
+
+#pragma endregion
+
+#pragma region Adders
 
 void Rigidbody::addForce(Vector3 force, Vector3 relativePos, Forces type)
 {
@@ -233,6 +307,42 @@ void Rigidbody::addTorque(Vector3 torque, Forces type)
 	}
 }
 
+#pragma endregion
+
+#pragma region Colisiones
+
+bool Rigidbody::collidesWithEntity(Entity* other) const
+{
+	if (other == nullptr) return false;
+
+	//Se obtiene el rb de la otra entidad
+	auto* otherRigidBody = reinterpret_cast<Rigidbody*>(other->getComponent((int)ManID::Physics, 0));
+	
+	if (!otherRigidBody->isActive())
+		return false;
+
+	//Declaracion del algoritmo de Vorono
+	btVoronoiSimplexSolver simplexSolver;
+	btGjkEpaPenetrationDepthSolver epaPenSolver;
+	btPointCollector collPoint;
+
+	//Detector de colisiones
+	btGjkPairDetector convexConvex(
+		static_cast<btConvexShape*>(rb->getCollisionShape()),
+		static_cast<btConvexShape*>(otherRigidBody->getShape()),
+		&simplexSolver, &epaPenSolver);
+
+	//Mediante un input que guarda referencia de los dos objetos,
+	//se genera un output (collPoint), de manera que, posteriormente, se puede
+	//comprobar si se ha producido una colision.
+	btGjkPairDetector::ClosestPointInput input;
+	input.m_transformA = rb->getWorldTransform();
+	input.m_transformB = otherRigidBody->rb->getWorldTransform();
+	convexConvex.getClosestPoints(input, collPoint, nullptr);
+
+	return collPoint.m_hasResult && collPoint.m_distance <= 0;
+}
+
 bool Rigidbody::onCollisionEnter(std::string id) const
 {
 	// Recieves an id of an entity and checks if our father is colliding with it
@@ -259,3 +369,4 @@ Entity* Rigidbody::collidesWithTag(std::string tag) const
 	return nullptr;
 }
 
+#pragma endregion

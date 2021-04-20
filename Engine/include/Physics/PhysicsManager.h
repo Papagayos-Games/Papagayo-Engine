@@ -44,15 +44,7 @@ private:
 	~PhysicsManager();
 
 public:
-	enum class PhysicsCmpId : int {
-		RbBox = 0,
-		RbSphere,
-		RbCylinder,
-		RbCone,
-		RbCapsule,
-
-		LastPhysicsCmpId
-	};
+	
 	//nos devuelve la instancia
 	static PhysicsManager* getInstance();
 
@@ -69,7 +61,7 @@ public:
 
 	//Crea el componente Rigidbody a partir de los siguientes parametros:
 	//Posicion, masa e identificador (el cual determina la forma del collider)
-	btRigidBody* createRB(Vector3 pos, float mass, PhysicsCmpId id);
+	btRigidBody* createRB(Vector3 pos, float mass);
 
 	virtual void addComponent(Entity* ent, int compId);
 	virtual void start();

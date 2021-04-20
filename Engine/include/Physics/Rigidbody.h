@@ -16,12 +16,20 @@ enum class Forces {
 class Rigidbody : public Component
 {
 private:
+	enum class RbCmpId : int {
+		RbBox = 0,
+		RbSphere,
+		RbCylinder,
+		RbCone,
+		RbCapsule,
+	
+		LastPhysicsCmpId
+	};
+
 	//Masa del Rigidbody
 	float mass = 1.0f;
 	//Rigidbody principal
 	btRigidBody* rb = nullptr;
-	//Forma de la malla del rigidbody
-	btCollisionShape* shapeColl = nullptr;
 
 	bool trigger = false;
 	bool kinematic = false;
@@ -31,21 +39,24 @@ private:
 	bool collidesWithEntity(Entity* other) const;
 public:
 	/// <summary>
-	/// Constructora del rigidbody en funcion de su forma
+	/// Constructora por defecto Rigibody
 	/// </summary>
-	/// <param name="shape">
-	/// Para saber que shape hay que pasarle, primero consultar
-	/// los id disponibles en PhysicsManager.
-	/// </param>
-	Rigidbody(int shape);
-	~Rigidbody() {};
+	Rigidbody();
+	~Rigidbody();
 
 	virtual void init();
 	virtual void update();
-
+	/// <summary>
+	/// Carga datos a partir de un json
+	/// </summary>
+	virtual void load(nlohmann::json params);
 #pragma region Setters
+
+	//metodo que setea la posicion del rb
+	void setPosition(Vector3 newPos);
+
 	//Activa/Desactiva la gravedad
-	void setActiveGravtiy(const bool active);
+	void setActiveGravity(const bool active);
 
 	//metodo que si recibe true hara que el rigidbody active sus flags de colision para que estos actuen como trigger,
 	//si es false desactivara sus flags de colision para que este deje de ser un trigger.
@@ -71,8 +82,8 @@ public:
 	//metodo que setea el rozamiento del rb
 	void setFriction(float friction);
 
-	//metodo que setea la posicion del rb
-	void setPosition(Vector3 newPos);
+	//Cambia el la forma del rigidbody (ShapeCollision)
+	void setCollisionShape(btCollisionShape* newShape);
 #pragma endregion
 
 #pragma region Getters

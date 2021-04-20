@@ -25,7 +25,9 @@ bool PhysicsManager::setUpInstance()
 	return false;
 }
 
-PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {};
+PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {
+	registerComponent("RigidBody", []() -> Rigidbody* { return new Rigidbody(); });
+};
 
 PhysicsManager::~PhysicsManager() {};
 
@@ -76,39 +78,20 @@ btDiscreteDynamicsWorld* PhysicsManager::getWorld() const
 	return dynamicsWorld;
 }
 
-btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass, PhysicsCmpId id)
+btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass)
 {
 	btTransform transform;
 	transform.setIdentity();
 	transform.setOrigin(btVector3(pos.x, pos.y, pos.z));
 
 	btCollisionShape* shapeColl = nullptr;
-
-	switch (id)
-	{
-	case PhysicsManager::PhysicsCmpId::RbBox:
-		shapeColl = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
-		break;
-	case PhysicsManager::PhysicsCmpId::RbSphere:
-		shapeColl = new btSphereShape(1.0f);
-		break;
-	case PhysicsManager::PhysicsCmpId::RbCylinder:
-		shapeColl = new btCylinderShape(btVector3(1.0f, 1.0f, 1.0f));
-		break;
-	case PhysicsManager::PhysicsCmpId::RbCone:
-		shapeColl = new btConeShape(1.0f, 1.0f);
-		break;
-	case PhysicsManager::PhysicsCmpId::RbCapsule:
-		shapeColl = new btCapsuleShape(1.0f, 1.0f);
-		break;
-	default:
-		break;
-	}
+	shapeColl = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
 
 	btMotionState* motion = new btDefaultMotionState(transform);
 
 	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, shapeColl);
 	btRigidBody* rb = new btRigidBody(info);
+
 	rb->forceActivationState(DISABLE_DEACTIVATION);
 
 	dynamicsWorld->addRigidBody(rb);
@@ -121,21 +104,21 @@ btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass, PhysicsCmpId id)
 
 void PhysicsManager::addComponent(Entity* ent, int compId)
 {
-	Component* comp;
-	//PhysicsCmpId id = (PhysicsCmpId)compId;
-	try {
-		comp = new Rigidbody(compId);
-	}
-	catch (std::string msg) {
-		throw "ERROR: Tried to add a non existant Physics Component\n";
-	}
-
-	if (!comp)
-		throw ("ERROR: Physics Manager couldn't create a component with an Id: ", compId, "\n");
-
-	comp->setEntity(ent);
-	_compsList.push_back(comp);
-	ent->addComponent(comp);
+	//Component* comp;
+	////PhysicsCmpId id = (PhysicsCmpId)compId;
+	//try {
+	//	comp = new Rigidbody(compId);
+	//}
+	//catch (std::string msg) {
+	//	throw "ERROR: Tried to add a non existant Physics Component\n";
+	//}
+	//
+	//if (!comp)
+	//	throw ("ERROR: Physics Manager couldn't create a component with an Id: ", compId, "\n");
+	//
+	//comp->setEntity(ent);
+	//_compsList.push_back(comp);
+	//ent->addComponent(comp);
 }
 
 void PhysicsManager::start()
@@ -152,7 +135,7 @@ void PhysicsManager::update()
 	for (auto it = _compsList.begin(); it != _compsList.end(); ++it) {
 		(*it)->update();
 	}
-	
+
 }
 
 void PhysicsManager::destroyAllComponents()
