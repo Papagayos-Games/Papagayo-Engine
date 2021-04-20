@@ -29,6 +29,10 @@ echo moviendo CODEC
 copy ..\Engine\dependencies\Ogre\build\bin\debug\Codec_STBI_d.dll ..\Engine\bin\OgreD
 copy ..\Engine\dependencies\Ogre\build\bin\release\Codec_STBI.dll ..\Engine\bin\Ogre
 
+echo moviendo SDL
+copy ..\Engine\dependencies\Ogre\build\bin\debug\SDL2.dll ..\Engine\bin
+copy ..\Engine\dependencies\Ogre\build\bin\release\SDL2.dll ..\Engine\bin
+
 ::Para cargar sonidos
 echo moviendo FMOD
 copy ..\Engine\dependencies\fmod\build\lib\fmod.dll ..\Engine\bin

@@ -19,7 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\Managers\InputManager.h" />
+    <ClInclude Include="..\..\include\Graphics\Camera.h" />
+    <ClInclude Include="..\..\include\Graphics\MeshComponent.h" />
+    <ClInclude Include="..\..\include\Graphics\OgreContext.h" />
+    <ClInclude Include="..\..\include\Graphics\RTShaderTecnhiqueResolveListener.h" />
+    <ClInclude Include="..\..\include\Graphics\WindowGenerator.h" />
+    <ClInclude Include="..\..\include\Managers\InputSystem.h" />
+    <ClInclude Include="..\..\include\Managers\RenderManager.h" />
     <ClInclude Include="..\..\include\Managers\ResourceManager.h" />
     <ClInclude Include="..\..\include\Managers\SceneManager.h" />
     <ClInclude Include="..\..\include\PapagayoEngine.h" />
@@ -27,6 +33,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\Managers\InputSystem.cpp" />
+    <ClCompile Include="..\..\src\Managers\RenderManager.cpp" />
     <ClCompile Include="..\..\src\Managers\ResourceManager.cpp" />
     <ClCompile Include="..\..\src\Managers\SceneManager.cpp" />
     <ClCompile Include="..\..\src\PapagayoEngine.cpp" />
@@ -168,14 +176,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)include\Physics;$(SolutionDir)include\Graphics</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OgreMain_d.lib;OgreRTShaderSystem_d.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;LinearMath_Debug.lib;BulletInverseDynamics_Debug.lib;BulletSoftBody_Debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)bin;$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OgreMain_d.lib;OgreRTShaderSystem_d.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration)\;$(SolutionDir)dependencies\Ogre\build\SDL2-build\RelWithDebInfo</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

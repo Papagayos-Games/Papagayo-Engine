@@ -6,6 +6,7 @@
 #include "Managers/SceneManager.h"
 #include "Managers/ResourceManager.h"
 
+#include "Managers/InputSystem.h"
 #include "OgreContext.h"
 
 //pruebas
@@ -21,6 +22,7 @@
 #include "OgrePlane.h"
 #include "PlaneComponent.h"
 #include "PhysicsManager.h"
+#include "SDL.h"
 
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
 
@@ -56,6 +58,7 @@ void PapagayoEngine::clean()
 	SceneManager::getInstance()->clean();
 	ResourceManager::getInstance()->clean();
 	OgreContext::getInstance()->clean();
+	InputSystem::getInstance()->clean();
 
 	delete instance_;
 }
@@ -126,6 +129,7 @@ void PapagayoEngine::update()
 	try {
 		//std::cout << "Updating\n";
 		OgreContext::getInstance()->getOgreRoot()->renderOneFrame();
+		pollEvents();
 	}
 	catch (const std::exception& e)
 	{
@@ -133,6 +137,17 @@ void PapagayoEngine::update()
 	}
 
 }
+
+void PapagayoEngine::pollEvents()
+{
+	SDL_Event e;
+	while (SDL_PollEvent(&e))
+	{
+		InputSystem::getInstance()->handleInput(e);
+	}
+}
+
+
 
 void PapagayoEngine::run() {
 	init();

@@ -21,4 +21,7 @@ private:
 	PapagayoEngine(const std::string& appName);
 	void init();
 	void update();
+	void pollEvents();
+
+
 };
