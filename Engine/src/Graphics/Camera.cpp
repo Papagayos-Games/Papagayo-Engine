@@ -12,15 +12,16 @@
 
 void Camera::init()
 {
-	mCamera_ = OgreContext::getInstance()->getSceneManager()->createCamera(name);
+	camNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+	mCamera_ = OgreContext::getInstance()->getSceneManager()->createCamera(name_);
+	camNode_->attachObject(mCamera_);
+
 	mCamera_->setNearClipDistance(1);
 	mCamera_->setFarClipDistance(10000);
 	//mCamera_->lookAt(0, 0, -1);
 	mCamera_->setAutoAspectRatio(true);
 	//cam->setPolygonMode(Ogre::PM_WIREFRAME); 
 
-	camNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode(name+"Node");
-	camNode_->attachObject(mCamera_);
 
 	camNode_->setPosition(0, 0, 1000);
 	camNode_->lookAt(Ogre::Vector3(0, 0, 0), Ogre::Node::TS_WORLD);
@@ -34,21 +35,21 @@ Camera::Camera(): Component(RenderManager::getInstance(), (int)RenderManager::Re
 
 }
 
-Camera::Camera(std::string cameraName) : Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Camera),name(cameraName)
+Camera::Camera(std::string cameraName) : Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Camera),name_(cameraName)
 {
 	init();
 }
 
-Camera::Camera(Ogre::SceneNode* parentNode,std::string cameraName) : Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Camera), name(cameraName)
+Camera::Camera(Ogre::SceneNode* parentNode,std::string cameraName) : Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Camera), name_(cameraName)
 {
-	mCamera_ = OgreContext::getInstance()->getSceneManager()->createCamera(name);
+	mCamera_ = OgreContext::getInstance()->getSceneManager()->createCamera(name_);
 	mCamera_->setNearClipDistance(1);
 	mCamera_->setFarClipDistance(10000);
 	//mCamera_->lookAt(0, 0, -1);
 	mCamera_->setAutoAspectRatio(true);
 	//cam->setPolygonMode(Ogre::PM_WIREFRAME); 
 
-	camNode_ = parentNode->createChildSceneNode(name + "Node");
+	camNode_ = parentNode->createChildSceneNode(name_ + "Node");
 	camNode_->attachObject(mCamera_);
 
 	camNode_->setPosition(0, 0, 1000);
@@ -81,6 +82,18 @@ void Camera::update()
 void Camera::setUp()
 {
 	tr_ = static_cast<Transform*>(_entity->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
+}
+
+void Camera::load(nlohmann::json params)
+{
+	auto it = params.find("camName");
+
+	if (it != params.end()) {
+		name_ = it->get<std::string>();
+		mCamera_ = OgreContext::getInstance()->getSceneManager()->createCamera(name_);
+		camNode_->attachObject(mCamera_);
+	}
+
 }
 
 void Camera::setCameraPosition(Vector3 newPos)

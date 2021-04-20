@@ -18,7 +18,7 @@ protected:
 	Ogre::SceneNode* camNode_ = nullptr;
 	Ogre::Camera* mCamera_ = nullptr;
 	Ogre::Viewport* vp_ = nullptr;
-	std::string name = "MainCamera";
+	std::string name_ = "";
 	Transform* tr_ = nullptr;
 	virtual void init()override;
 public:
@@ -32,6 +32,7 @@ public:
 
 	virtual void update()override;
 	virtual void setUp()override;
+	virtual void load(nlohmann::json params)override;
 
 	void setCameraPosition(Vector3 newPos);
 	void setCameraDir(Vector3 newDir);
