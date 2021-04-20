@@ -5,8 +5,9 @@
 
 #include "Managers/SceneManager.h"
 
-#include "Managers/InputSystem.h"
 #include "Graphics/OgreContext.h"
+
+#include "Input/InputSystem.h"
 
 //pruebas
 #include "Graphics/Camera.h"
@@ -23,7 +24,6 @@
 #include "OgrePlane.h"
 #include "Graphics/PlaneComponent.h"
 #include "Physics/PhysicsManager.h"
-#include "SDL.h"
 
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
 
@@ -135,7 +135,7 @@ void PapagayoEngine::update()
 		//std::cout << "Updating\n";
 		PhysicsManager::getInstance()->update();
 		RenderManager::getInstance()->update();
-		pollEvents();
+		InputSystem::getInstance()->handleInput();
 	}
 	catch (const std::exception& e)
 	{
@@ -143,17 +143,6 @@ void PapagayoEngine::update()
 	}
 
 }
-
-void PapagayoEngine::pollEvents()
-{
-	SDL_Event e;
-	while (SDL_PollEvent(&e))
-	{
-		InputSystem::getInstance()->handleInput(e);
-	}
-}
-
-
 
 void PapagayoEngine::run() {
 	init();

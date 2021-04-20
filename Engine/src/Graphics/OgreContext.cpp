@@ -9,6 +9,8 @@
 #include <OgreShaderGenerator.h>
 #include <OgreLight.h>		//TOERASE
 
+#include "SDL.h"
+
 
 OgreContext* OgreContext::instance_ = nullptr;
 
@@ -39,15 +41,17 @@ bool OgreContext::setupInstance(std::string appName)
 void OgreContext::createRoot()
 {
 #ifdef _DEBUG
-	ogreRoot_ = new Ogre::Root("OgreD/plugins.cfg");
+	ogreRoot_ = new Ogre::Root("OgreD/plugins.cfg", "OgreD/ogre.cfg");
 #else
-	ogreRoot_ = new Ogre::Root("Ogre/plugins.cfg");
+	ogreRoot_ = new Ogre::Root("Ogre/plugins.cfg", "Ogre/ogre.cfg");
 #endif
 
 	if (ogreRoot_ == nullptr) {
 		throw std::exception("No se ha podido crear el mRoot");
 	}
 
+	ogreRoot_->restoreConfig();
+	ogreRoot_->initialise(false);
 }
 
 void OgreContext::createSceneManager()
@@ -91,6 +95,8 @@ void OgreContext::setSkyPlane(std::string materialName, Ogre::Plane plane, int w
 void OgreContext::init()
 {
 	createRoot();
+
+	SDL_Init(SDL_INIT_EVERYTHING);
 
 	try { WindowGenerator::setupInstance(getOgreRoot(), appName_); }
 	catch (const std::exception & e)

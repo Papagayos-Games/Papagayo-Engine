@@ -42,9 +42,6 @@
     <ClCompile Include="..\..\src\LoaderSystem.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Managers\InputSystem.cpp">
-      <Filter>Archivos de origen\Managers</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Scene\Scene.h">

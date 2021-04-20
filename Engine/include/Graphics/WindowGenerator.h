@@ -10,7 +10,7 @@ namespace Ogre {
 	class Root;
 }
 
-
+class SDL_Window;
 
 class WindowGenerator : public Ogre::FrameListener
 {
@@ -22,7 +22,9 @@ private:
 
 	Ogre::RenderWindow* renderWindow_;
 	Ogre::Root* mRoot_;
-	Ogre::RenderSystem* renderSystem_;
+	//Ogre::RenderSystem* renderSystem_;
+
+	SDL_Window* sdlWindow_;
 
 	void initWindow(std::string name);
 
@@ -37,5 +39,6 @@ public:
 	//Getters
 	Ogre::RenderWindow* getRenderWindow()const;
 	inline Ogre::RenderSystem* getRenderSystem()const;
+	SDL_Window* getSDLWindow()const;
 };
 
