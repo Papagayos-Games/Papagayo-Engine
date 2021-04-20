@@ -1,9 +1,9 @@
-#include "Managers/RenderManager.h"
-#include "Graphics/OgreContext.h"
+#include "RenderManager.h"
+#include "OgreContext.h"
 #include "OgreRoot.h"
 
 #include "Entity.h"
-#include "Graphics/MeshComponent.h"
+#include "MeshComponent.h"
 
 RenderManager* RenderManager::instance_ = nullptr;
 
@@ -32,7 +32,6 @@ void RenderManager::addComponent(Entity* ent, int compId)
 	{
 	case RenderCmpId::Mesh:
 		cmp = new MeshComponent();
-		cmp->setEntity(ent);
 		break;
 	case RenderCmpId::Camera:
 		break;
@@ -44,12 +43,16 @@ void RenderManager::addComponent(Entity* ent, int compId)
 	if (!cmp)
 		throw ("ERROR: Common Manager couldn't create a component with an Id: ", compId, "\n");
 	_compsList.push_back(cmp);
+	cmp->setEntity(ent);
 	ent->addComponent(cmp);
-	
 }
 
 void RenderManager::start()
 {
+	for (Component* cmp : _compsList)
+	{
+		cmp->setUp();
+	}
 }
 
 void RenderManager::update()

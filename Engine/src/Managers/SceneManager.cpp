@@ -71,9 +71,4 @@ SceneManager::SceneManager() {
 
 void SceneManager::createStartScene() {
 
-	addCamera();
-}
-
-void SceneManager::addCamera() {
-	
 }

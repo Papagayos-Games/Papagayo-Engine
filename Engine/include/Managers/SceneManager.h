@@ -1,18 +1,6 @@
 #pragma once
 #include <string>
 
-namespace Ogre {
-	class Root;
-	class SceneManager;
-	class Camera;
-	class SceneNode;
-	class OverlaySystem;
-	/*namespace RTShader {
-		class ShaderGenerator;
-	}*/
-}
-
-
 class Entity;
 class Scene;
 
@@ -32,14 +20,10 @@ public:
 	void addComponentTo(const std::string& entName) {};
 	void addComponentTo(const Entity *ent){};
 
-
 private:
 	SceneManager();
 	static SceneManager* instance_;
 	static Scene* currentScene_;
-
-	
-	void addCamera();
 
 	// Crea la escena por defecto
 	void createStartScene();

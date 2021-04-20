@@ -10,7 +10,7 @@ class Manager;
 class Component {
 protected:
 	int _id;   // identificador del tipo de componente
-	bool _active;
+	bool _active = true;
 
 	Entity* _entity;
 	Manager* _manager;
@@ -24,6 +24,7 @@ public:
 	virtual void init() = 0;
 	virtual void load(nlohmann::json params);	// por ahora no abstracto para probar
 	virtual void update() = 0;
+	virtual void setUp();
 
 	bool isActive();
 	virtual void setActive(bool act);

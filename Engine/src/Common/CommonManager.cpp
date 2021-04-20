@@ -33,7 +33,6 @@ void CommonManager::addComponent(Entity* ent, int compId) {
 	{
 	case CommonCmpId::TransId:
 		comp = new Transform();
-		comp->setEntity(ent);
 		break;
 	default:
 		throw "ERROR: Tried to add a non existant Common Component\n";
@@ -41,5 +40,6 @@ void CommonManager::addComponent(Entity* ent, int compId) {
 	if (!comp)
 		throw ("ERROR: Common Manager couldn't create a component with an Id: ", compId, "\n");
 	_compsList.push_back(comp);
+	comp->setEntity(ent);
 	ent->addComponent(comp);
 }

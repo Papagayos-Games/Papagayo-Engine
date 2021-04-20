@@ -163,7 +163,7 @@ void Transform::setVelZ(double z)
 	_velocity.setZ(z);
 }
 
-Vector3 Transform::getDimensieons()
+Vector3 Transform::getDimensions()
 {
 	return _dimensions;
 }

@@ -1,9 +1,9 @@
 #pragma once
 #include "Component.h"
 #include <string>
-#include <list>
 
 class SceneManager;
+class Transform;
 
 namespace Ogre {
 	class SceneNode;
@@ -18,6 +18,7 @@ private:
 	Ogre::SceneNode* mNode_ = nullptr;		
 	Ogre::SceneNode* parentNode_ = nullptr; 
 	Ogre::Entity* ogreEnt_ = nullptr;
+	Transform* tr_;
 	
 protected:
 	//metodo que crea e inicia la camara co los valores por defacto
@@ -37,6 +38,7 @@ public:
 
 	virtual ~MeshComponent();
 	virtual void update() override;
+	virtual void setUp() override;
 
 	//metodo para asignar un material nuevo a la entidad
 	void setMaterial(std::string matName);

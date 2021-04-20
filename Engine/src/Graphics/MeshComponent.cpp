@@ -1,24 +1,20 @@
-#include "Graphics/MeshComponent.h"
-#include "Managers/SceneManager.h"
-#include "Managers/RenderManager.h"
+#include "MeshComponent.h"
+#include "RenderManager.h"
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 #include <OgreEntity.h>
 #include "Transform.h"
-#include "Graphics/OgreContext.h"
+#include "OgreContext.h"
 #include "Entity.h"
 #include "CommonManager.h"
 #include "Transform.h"
-
-
-
 
 
 MeshComponent::MeshComponent():Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Mesh)
 {
 	
 	mNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
-	ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity("cube.mesh"); //TO DO: NO HACERLO A PELO XDDD
+	ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity("penguin.mesh"); //TO DO: NO HACERLO A PELO XDDD
 	mNode_->attachObject(ogreEnt_);
 }
 
@@ -53,19 +49,23 @@ MeshComponent::~MeshComponent()
 void MeshComponent::update()
 {
 	//posicion
-	Transform* transform_=static_cast<Transform*>(_entity->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
-	Vector3 pos = transform_->getPos();
+	Vector3 pos = tr_->getPos();
 	mNode_->setPosition(Ogre::Vector3(pos.x, pos.y, pos.z));
-	Vector3 rot = transform_->getRot();
+	Vector3 rot = tr_->getRot();
 	//rotaciones //TO DO: revisar
 	mNode_->resetOrientation();
 	mNode_->yaw(Ogre::Degree(rot.y),Ogre::Node::TS_WORLD);//ejeY
 	mNode_->pitch(Ogre::Degree(rot.x),Ogre::Node::TS_WORLD);//ejex
 	mNode_->roll(Ogre::Degree(rot.z),Ogre::Node::TS_WORLD);//ejez
 	//escala
-	Vector3 scale = transform_->getDimensieons();
-	mNode_->scale(Ogre::Vector3(scale.x, scale.y, scale.z));
+	Vector3 scale = tr_->getDimensions();
+	mNode_->setScale(Ogre::Vector3(scale.x, scale.y, scale.z));
 	
+}
+
+void MeshComponent::setUp()
+{
+	tr_ = static_cast<Transform*>(_entity->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
 }
 
 void MeshComponent::setMaterial(std::string matName)

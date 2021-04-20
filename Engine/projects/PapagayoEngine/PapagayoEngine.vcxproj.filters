@@ -25,12 +25,6 @@
     <Filter Include="Archivos de encabezado\Managers">
       <UniqueIdentifier>{0796ee31-b969-4e62-a855-f1322c454ab4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Archivos de encabezado\Graphics">
-      <UniqueIdentifier>{2045d6f6-6587-47bd-84c7-abf397a0de05}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Archivos de origen\Graphics">
-      <UniqueIdentifier>{501a88a7-56a5-42d8-b1b2-ce3d000ede81}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Scene\Scene.cpp">
@@ -69,6 +63,9 @@
     <ClCompile Include="..\..\src\LoaderSystem.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Managers\InputSystem.cpp">
+      <Filter>Archivos de origen\Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Scene\Scene.h">
@@ -83,7 +80,7 @@
     <ClInclude Include="..\..\include\Managers\ResourceManager.h">
       <Filter>Archivos de encabezado\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Managers\InputManager.h">
+    <ClInclude Include="..\..\include\Managers\InputSystem.h">
       <Filter>Archivos de encabezado\Managers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Graphics\WindowGenerator.h">

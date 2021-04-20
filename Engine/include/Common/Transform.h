@@ -48,7 +48,7 @@ public:
 	void setVelZ(double z);
 
 	//Dimensions
-	Vector3 getDimensieons();
+	Vector3 getDimensions();
 	void setDimensions(const Vector3 dim);
 	void setDimX(double x);
 	void setDimY(double y);

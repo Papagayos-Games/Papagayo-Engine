@@ -1,11 +1,13 @@
-#include "Graphics/OgreContext.h"
-#include "Graphics/RTShaderTecnhiqueResolveListener.h"
-#include "Graphics/WindowGenerator.h"
+#include "OgreContext.h"
+#include "RTShaderTecnhiqueResolveListener.h"
+#include "WindowGenerator.h"
+#include "OgrePlane.h"
 
 #include <Ogre.h>
 #include <OgreFileSystemLayer.h>
 #include <OgreEntity.h>
 #include <OgreShaderGenerator.h>
+#include <OgreLight.h>		//TOERASE
 
 
 OgreContext* OgreContext::instance_ = nullptr;
@@ -79,6 +81,11 @@ void OgreContext::setupRTShaderGenerator()
 void OgreContext::clean()
 {
 	delete instance_;
+}
+
+void OgreContext::setSkyPlane(std::string materialName, Ogre::Plane plane, int width, int height, float bow)
+{
+		ogreSceneManager_->setSkyPlane(true,plane, materialName, 1, 1, true, bow, width, height);	
 }
 
 void OgreContext::init()
