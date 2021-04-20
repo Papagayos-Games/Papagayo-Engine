@@ -1,7 +1,8 @@
-#include <Managers/InputSystem.h>
+#include "InputSystem.h"
 
 #include <iostream>
 
+#include "SDL.h"
 #include "SDL_joystick.h"
 #include "SDL_keyboard.h"
 #include <SDL_gamecontroller.h>
@@ -77,17 +78,28 @@ void InputSystem::clean()
 	delete instance_;
 }
 
-void InputSystem::handleInput(SDL_Event e)
+void InputSystem::handleInput()
 {
-	switch (e.type)
+	SDL_Event e;
+	while (SDL_PollEvent(&e))
 	{
-	case SDL_KEYDOWN:
-		std::cout << "Tecla pulsada perro\n";
-		break;
-	case SDL_KEYUP:
-		break;
-	default:
-		break;
+		switch (e.type)
+		{
+		case SDL_KEYDOWN:
+			std::cout << "Tecla pulsada perro\n";
+			break;
+		case SDL_KEYUP:
+			break;
+		case SDL_MOUSEMOTION:
+
+			break;
+		case SDL_QUIT:
+			//mandar mensaje a papagayo
+			std::cout << "Cerrate\n";
+			break;
+		default:
+			break;
+		}
 	}
 }
 

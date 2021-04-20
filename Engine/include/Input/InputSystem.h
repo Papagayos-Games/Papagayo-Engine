@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef _INPUTMANAGER_H
-#define _INPUTMANAGER_H
+#ifndef _INPUTSYSTEM_H
+#define _INPUTSYSTEM_H
 
 #include "SDL_keycode.h"
 
@@ -20,7 +20,7 @@ public:
 	static InputSystem* getInstance();
 	static void clean();
 
-	void handleInput(SDL_Event e);
+	void handleInput();
 	bool isKeyDown(SDL_Keycode key);
 	bool isKeyUp(SDL_Keycode key);
 	
@@ -36,4 +36,4 @@ private:
 	bool read = false;
 };
 
-#endif // !_INPUTMANAGER_H
+#endif // !_INPUTSYSTEM_H

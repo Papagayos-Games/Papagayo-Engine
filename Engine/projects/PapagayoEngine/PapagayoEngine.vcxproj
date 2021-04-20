@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\LoaderSystem.h" />
-    <ClInclude Include="..\..\include\Managers\InputSystem.h" />
     <ClInclude Include="..\..\include\Managers\RenderManager.h" />
     <ClInclude Include="..\..\include\Managers\ResourceManager.h" />
     <ClInclude Include="..\..\include\Managers\SceneManager.h" />
@@ -30,7 +29,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\LoaderSystem.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
-    <ClCompile Include="..\..\src\Managers\InputSystem.cpp" />
     <ClCompile Include="..\..\src\Managers\ResourceManager.cpp" />
     <ClCompile Include="..\..\src\Managers\SceneManager.cpp" />
     <ClCompile Include="..\..\src\PapagayoEngine.cpp" />
@@ -39,6 +37,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">
       <Project>{a01f7af5-4e1e-4311-878a-c76475434688}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Input\Input.vcxproj">
+      <Project>{749d77f5-ef31-4a74-abce-09db88ef4c00}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Physics\Physics.vcxproj">
       <Project>{9d96a3f7-e843-4086-9be5-e4e25ca690d3}</Project>
@@ -172,14 +173,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)dependencies\JSONforModernC++</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)dependencies\JSONforModernC++;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>OgreMain_d.lib;OgreRTShaderSystem_d.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration)\;$(SolutionDir)dependencies\Ogre\build\SDL2-build\RelWithDebInfo</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration)\;$(SolutionDir)bin;$(SolutionDir)dependencies\Ogre\build\SDL2-build\RelWithDebInfo</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -190,7 +191,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)include\Physics;$(SolutionDir)include\Graphics;$(SolutionDir)dependencies\JSONforModernC++</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)include\Physics;$(SolutionDir)include\Graphics;$(SolutionDir)dependencies\JSONforModernC++;dependencies\Ogre\build\SDL2-2.0.10\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -198,8 +199,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OgreMain.lib;OgreRTShaderSystem.lib;BulletDynamics.lib;LinearMath.lib;BulletCollision.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)bin;$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OgreMain.lib;OgreRTShaderSystem.lib;BulletDynamics.lib;LinearMath.lib;BulletCollision.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)bin;$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration)\;$(SolutionDir)dependencies\Ogre\build\SDL2-build\RelWithDebInfo</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
