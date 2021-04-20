@@ -5,7 +5,7 @@
 #ifdef _DEBUG
 #include "checkML.h"
 #endif
-
+class Manager;
 
 class PapagayoEngine {
 public:

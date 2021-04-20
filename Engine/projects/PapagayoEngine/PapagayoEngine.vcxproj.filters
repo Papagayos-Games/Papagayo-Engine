@@ -42,24 +42,6 @@
     <ClCompile Include="..\..\src\main.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Graphics\WindowGenerator.cpp">
-      <Filter>Archivos de origen\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Managers\RenderManager.cpp">
-      <Filter>Archivos de origen\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Graphics\RTShaderTecnhiqueResolveListener.cpp">
-      <Filter>Archivos de origen\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Graphics\MeshComponent.cpp">
-      <Filter>Archivos de origen\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Graphics\OgreContext.cpp">
-      <Filter>Archivos de origen\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Graphics\Camera.cpp">
-      <Filter>Archivos de origen\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\LoaderSystem.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
@@ -83,28 +65,10 @@
     <ClInclude Include="..\..\include\Managers\InputSystem.h">
       <Filter>Archivos de encabezado\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Graphics\WindowGenerator.h">
-      <Filter>Archivos de encabezado\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Managers\RenderManager.h">
       <Filter>Archivos de encabezado\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Graphics\MeshComponent.h">
-      <Filter>Archivos de encabezado\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Graphics\RTShaderTecnhiqueResolveListener.h">
-      <Filter>Archivos de encabezado\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Graphics\OgreContext.h">
-      <Filter>Archivos de encabezado\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Graphics\Camera.h">
-      <Filter>Archivos de encabezado\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\LoaderSystem.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
