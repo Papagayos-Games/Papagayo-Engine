@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\LoaderSystem.h" />
     <ClInclude Include="..\..\include\Managers\InputSystem.h" />
-    <ClInclude Include="..\..\include\Managers\RenderManager.h" />
     <ClInclude Include="..\..\include\Managers\ResourceManager.h" />
     <ClInclude Include="..\..\include\Managers\SceneManager.h" />
     <ClInclude Include="..\..\include\PapagayoEngine.h" />

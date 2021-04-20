@@ -65,9 +65,6 @@
     <ClInclude Include="..\..\include\Managers\InputSystem.h">
       <Filter>Archivos de encabezado\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Managers\RenderManager.h">
-      <Filter>Archivos de encabezado\Managers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\LoaderSystem.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>

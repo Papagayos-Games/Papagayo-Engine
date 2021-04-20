@@ -25,6 +25,14 @@
                         "dimensions" : [1, 1, 1],
                         "rotation" : [0, 0, 0]
                     }
+                },
+                {
+                    "Component" : "MeshComponent",
+                    "Type" : "Render",
+                    "Parameters" : {
+                        "meshName" : "penguin",
+                        "meshMaterial" : "Practica1_Azulejo"
+                    }
                 }
             ]
         }

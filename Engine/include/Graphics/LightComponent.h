@@ -26,7 +26,7 @@ private:
 
 public:
 	//	Constructora para las luces de tipo point y direcional
-	LightComponent(Vector3 pos, std::string name, LIGHT_TYPE type = LIGHT_TYPE::POINT);
+	LightComponent(Vector3 pos, std::string name = "defaultLight", LIGHT_TYPE type = LIGHT_TYPE::POINT);
 	//	Constructora para la luz de tipo spotlight
 	LightComponent(Vector3 pos, Vector3 dir, std::string name);
 	//	Enciende la luz

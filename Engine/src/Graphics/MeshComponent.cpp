@@ -12,19 +12,9 @@
 
 MeshComponent::MeshComponent():Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Mesh)
 {
-	
-	mNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
-	ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity("penguin.mesh"); //TO DO: NO HACERLO A PELO XDDD
-	mNode_->attachObject(ogreEnt_);
+	mNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode();
 }
 
-MeshComponent::MeshComponent(std::string meshName):Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Mesh)
-{
-	
-	mNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
-	ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity(meshName + ".mesh");
-	mNode_->attachObject(ogreEnt_);
-}
 
 void MeshComponent::setActive(bool act)
 {
@@ -32,13 +22,12 @@ void MeshComponent::setActive(bool act)
 	mNode_->setVisible(_active);
 }
 
-MeshComponent::MeshComponent(Ogre::SceneNode* parentNode, std::string meshName): Component(nullptr, (int)RenderManager::RenderCmpId::Mesh)
-{
-	
-	mNode_ = parentNode->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
-	ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity(meshName + ".mesh");
-	mNode_->attachObject(ogreEnt_);
-}
+//MeshComponent::MeshComponent(Ogre::SceneNode* parentNode, std::string meshName): Component(nullptr, (int)RenderManager::RenderCmpId::Mesh)
+//{
+//	mNode_ = parentNode->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
+//	ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity(meshName + ".mesh");
+//	mNode_->attachObject(ogreEnt_);
+//}
 
 MeshComponent::~MeshComponent()
 {
@@ -66,6 +55,31 @@ void MeshComponent::update()
 void MeshComponent::setUp()
 {
 	tr_ = static_cast<Transform*>(_entity->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
+}
+
+void MeshComponent::load(nlohmann::json params)
+{
+	auto it = params.find("meshName");
+	//OBLIGATORIO CAMPO MESHNAME
+	if (it != params.end()) {
+		std::string meshName = it->get<std::string>();
+		ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity(meshName + ".mesh");
+		mNode_->attachObject(ogreEnt_);
+	}
+	else {
+		throw std::runtime_error("Invalid format: component mesh requires a meshName, did you forget to include it?\n");
+	}
+
+	it = params.find("meshMaterial");
+	if (it != params.end()) {
+		std::string meshMat = it->get<std::string>();
+		setMaterial(meshMat);
+	}
+
+}
+
+void MeshComponent::init()
+{
 }
 
 void MeshComponent::setMaterial(std::string matName)
