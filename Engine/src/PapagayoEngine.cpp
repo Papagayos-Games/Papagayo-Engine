@@ -77,56 +77,20 @@ void PapagayoEngine::init()
 		throw std::runtime_error("SceneManager init fail \n" + (std::string)e.what() + "\n");
 	}
 
-#pragma region TESTEO
-
-
-	Entity* ent = new Entity();
-	
-
 	manRegistry_["Common"] = CommonManager::getInstance();
 	manRegistry_["Render"] = RenderManager::getInstance();
 	manRegistry_["Physics"] = PhysicsManager::getInstance();
-	PhysicsManager::getInstance()->init(Vector3(0.0, -9.8, 0.0));
 
 	LoaderSystem loader;
-	loader.loadEntities("Scenes/testScene.json");
-
-	//manRegistry_.insert("Common", CommonManager::getInstance());
-
-
-
-	//Component* comp = manRegistry_["Common"]->create("Transform");
-	//ent->addComponent(comp);
-	//Camara
+#pragma region TOERASE
 	Camera* camara = new Camera();
-	//camara->setCameraPosition(Vector3(500,0,0));
-	//camara->setCameraDir(Vector3(-1, 0, 0));
-	////Prueba de pintado XD
-	////MeshComponent* funcaPlz = new MeshComponent();
-	//CommonManager::getInstance()->addComponent(ent,(int)CommonManager::CommonCmpId::TransId);
-	//RenderManager::getInstance()->addComponent(ent, (int)RenderManager::RenderCmpId::Mesh);
-	//Transform* transform_ = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
-	//MeshComponent* funcaPlz = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
-	//funcaPlz->setMaterial("Practica1_Azulejo");
-	////transform_->setPosX(100);
-	//transform_->setDimensions(Vector3(10, 10, 10));
-
-	//PlaneComponent* plane = new PlaneComponent("PLN", "Practica1_Azulejo", 100, 50, PLANE_DIR::PLANE_X);
-	
-	//Pruebas de luz
-	//Entity* luz = new Entity();
-	//CommonManager::getInstance()->addComponent(luz, (int)CommonManager::CommonCmpId::TransId);
-	LightComponent* l = new LightComponent(Vector3(0, 0, 500), Vector3(0, 0, -1), "LI");
-	l->setLightPower(0.1);
-	//LightComponent* l = new LightComponent(Vector3(0, 0, 500), "LI", LIGHT_TYPE::POINT);
+	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
 #pragma endregion
 
-	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
-	// dejar al final
+	PhysicsManager::getInstance()->init(Vector3(0.0, -9.8, 0.0));
+	loader.loadEntities("Scenes/testScene.json");
 	RenderManager::getInstance()->start();
-	//Test
-	//funcaPlz->update();
-	//camara->update();
+	// dejar al final
 }
 
 void PapagayoEngine::update()
