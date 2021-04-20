@@ -85,6 +85,8 @@ void PapagayoEngine::init()
 
 	manRegistry_["Common"] = CommonManager::getInstance();
 	manRegistry_["Render"] = RenderManager::getInstance();
+	manRegistry_["Physics"] = PhysicsManager::getInstance();
+	PhysicsManager::getInstance()->init(Vector3(0.0, -9.8, 0.0));
 
 	LoaderSystem loader;
 	loader.loadEntities("Scenes/testScene.json");
@@ -97,19 +99,19 @@ void PapagayoEngine::init()
 	//ent->addComponent(comp);
 	//Camara
 	Camera* camara = new Camera();
-	camara->setCameraPosition(Vector3(500,0,0));
-	camara->setCameraDir(Vector3(-1, 0, 0));
-	//Prueba de pintado XD
-	//MeshComponent* funcaPlz = new MeshComponent();
-	CommonManager::getInstance()->addComponent(ent,(int)CommonManager::CommonCmpId::TransId);
-	RenderManager::getInstance()->addComponent(ent, (int)RenderManager::RenderCmpId::Mesh);
-	Transform* transform_ = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
-	MeshComponent* funcaPlz = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
-	funcaPlz->setMaterial("Practica1_Azulejo");
-	//transform_->setPosX(100);
-	transform_->setDimensions(Vector3(10, 10, 10));
+	//camara->setCameraPosition(Vector3(500,0,0));
+	//camara->setCameraDir(Vector3(-1, 0, 0));
+	////Prueba de pintado XD
+	////MeshComponent* funcaPlz = new MeshComponent();
+	//CommonManager::getInstance()->addComponent(ent,(int)CommonManager::CommonCmpId::TransId);
+	//RenderManager::getInstance()->addComponent(ent, (int)RenderManager::RenderCmpId::Mesh);
+	//Transform* transform_ = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
+	//MeshComponent* funcaPlz = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
+	//funcaPlz->setMaterial("Practica1_Azulejo");
+	////transform_->setPosX(100);
+	//transform_->setDimensions(Vector3(10, 10, 10));
 
-	PlaneComponent* plane = new PlaneComponent("PLN", "Practica1_Azulejo", 100, 50, PLANE_DIR::PLANE_X);
+	//PlaneComponent* plane = new PlaneComponent("PLN", "Practica1_Azulejo", 100, 50, PLANE_DIR::PLANE_X);
 	
 	//Pruebas de luz
 	//Entity* luz = new Entity();
@@ -131,7 +133,8 @@ void PapagayoEngine::update()
 {
 	try {
 		//std::cout << "Updating\n";
-		OgreContext::getInstance()->getOgreRoot()->renderOneFrame();
+		PhysicsManager::getInstance()->update();
+		RenderManager::getInstance()->update();
 		pollEvents();
 	}
 	catch (const std::exception& e)

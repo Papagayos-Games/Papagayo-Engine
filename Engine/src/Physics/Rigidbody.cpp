@@ -42,7 +42,7 @@ void Rigidbody::update()
 
 	const auto worldTransform = rb->getWorldTransform();
 	const auto origin = worldTransform.getOrigin();
-	
+
 	transform->setPos(Vector3(origin.x(), origin.y(), origin.z()));
 }
 
@@ -98,7 +98,7 @@ void Rigidbody::load(nlohmann::json params)
 	}
 
 	//Friccion
-	it = params.find("friccion");
+	it = params.find("friction");
 	if (it != params.end()) {
 		float friction = it->get<float>();
 		setFriction(friction);
@@ -106,31 +106,40 @@ void Rigidbody::load(nlohmann::json params)
 
 	//Formas de la colision
 	it = params.find("shape");
-	if (it != params.end()) {
-		int shapeName= it->get<int> ();
-		btCollisionShape* shapeColl = nullptr;
-		switch (shapeName)
-		{
-		case (int)RbCmpId::RbBox:
-			shapeColl = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
-			break;
-		case (int)RbCmpId::RbSphere:
-			shapeColl = new btSphereShape(1.0f);
-			break;
-		case (int)RbCmpId::RbCylinder:
-			shapeColl = new btCylinderShape(btVector3(1.0f, 1.0f, 1.0f));
-			break;
-		case (int)RbCmpId::RbCone:
-			shapeColl = new btConeShape(1.0f, 1.0f);
-			break;
-		case (int)RbCmpId::RbCapsule:
-			shapeColl = new btCapsuleShape(1.0f, 1.0f);
-			break;
-		default:
-			break;
-		}
+	if (it != params.end() && it->is_object()) {
+		auto shape = it->find("id");
+		if (shape != it->end()) {
+			int shapeName = shape->get<int>();
+			btCollisionShape* shapeColl = nullptr;
+			switch (shapeName)
+			{
+			case (int)RbCmpId::RbBox: {
+				auto size = it->find("size");
+				if (size != it->end()) {
+					std::vector<float> size = it->get<std::vector<float>>();
+					shapeColl = new btBoxShape(btVector3(size[0], size[1], size[2]));
+				}
 
-		setCollisionShape(shapeColl);
+				break;
+			}
+			case (int)RbCmpId::RbSphere:
+				shapeColl = new btSphereShape(1.0f);
+				break;
+			case (int)RbCmpId::RbCylinder:
+				shapeColl = new btCylinderShape(btVector3(1.0f, 1.0f, 1.0f));
+				break;
+			case (int)RbCmpId::RbCone:
+				shapeColl = new btConeShape(1.0f, 1.0f);
+				break;
+			case (int)RbCmpId::RbCapsule:
+				shapeColl = new btCapsuleShape(1.0f, 1.0f);
+				break;
+			default:
+				break;
+			}
+
+			setCollisionShape(shapeColl);
+		}
 	}
 }
 
@@ -317,7 +326,7 @@ bool Rigidbody::collidesWithEntity(Entity* other) const
 
 	//Se obtiene el rb de la otra entidad
 	auto* otherRigidBody = reinterpret_cast<Rigidbody*>(other->getComponent((int)ManID::Physics, 0));
-	
+
 	if (!otherRigidBody->isActive())
 		return false;
 
