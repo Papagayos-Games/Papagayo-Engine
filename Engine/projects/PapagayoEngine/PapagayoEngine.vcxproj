@@ -28,7 +28,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\LoaderSystem.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
-    <ClCompile Include="..\..\src\Managers\InputSystem.cpp" />
     <ClCompile Include="..\..\src\Managers\SceneManager.cpp" />
     <ClCompile Include="..\..\src\PapagayoEngine.cpp" />
     <ClCompile Include="..\..\src\Scene\Scene.cpp" />
