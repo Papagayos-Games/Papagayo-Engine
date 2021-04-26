@@ -1,4 +1,6 @@
 #pragma once
+
+#ifdef _DEBUG
 #include <vector>
 #include "Manager.h"
 
@@ -70,8 +72,11 @@ public:
 	virtual void addComponent(Entity* ent, int compId);
 	virtual void start();
 	virtual void update();
+	
+	static void clean();
 
 	virtual void destroyAllComponents();
 	virtual bool destroyComponent(Entity* ent, int compId);
 };
 
+#endif

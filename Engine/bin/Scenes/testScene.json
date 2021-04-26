@@ -38,11 +38,10 @@
                     "Component" : "RigidBody",
                     "Type" : "Physics",
                   "Parameters": {
-                    "mass": 1.0,
-                    "dampingLin": 0.2,
+                    "dampingLin": "Hola",
                     "dampingAng": 0.2,
                     "position": [ 0.2684, 10.054, 9.357 ],
-                    "isGravity": true,
+                    "isGravity": false,
                     "isTrigger": true,
                     "isKinematic": false,
                     "isStatic": false,

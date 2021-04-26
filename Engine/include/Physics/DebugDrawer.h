@@ -23,16 +23,21 @@ protected:
 public:
     OgreDebugDrawer(Ogre::SceneManager* scm);
     ~OgreDebugDrawer();
-    void drawLine(const btVector3& from, const btVector3& to,
-        const btVector3& color) override;
-    void drawTriangle(const btVector3& v0, const btVector3& v1,
-        const btVector3& v2, const btVector3& color,
-        btScalar) override;
+
+    //Dibuja lineas
+    void drawLine(const btVector3& from, const btVector3& to, const btVector3& color) override;
+    //Dibuja triangulos
+    void drawTriangle(const btVector3& v0, const btVector3& v1, 
+        const btVector3& v2, const btVector3& color, btScalar alpha) override;
+    //Dibuja puntos de contacto
     void drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB,
-        btScalar distance, int lifeTime,
-        const btVector3& color) override;
+        btScalar distance, int lifeTime, const btVector3& color) override;
+    //Reporta errores
     void reportErrorWarning(const char* warningString) override;
+    //Dibuja texto en 3D
     void draw3dText(const btVector3& location, const char* textString) override;
+    //Asignar modo debug
     void setDebugMode(int debugMode) override;
+    //Obtener modo debug
     int getDebugMode() const override;
 };

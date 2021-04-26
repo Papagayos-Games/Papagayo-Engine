@@ -1,9 +1,8 @@
 #pragma once
-#include <string>
 
 #ifdef _DEBUG
-#include "checkML.h"
-#endif
+#include <string>
+#include <checkML.h>
 class RTShaderTecnhiqueResolveListener;
 
 namespace Ogre {
@@ -18,8 +17,6 @@ namespace Ogre {
 		class ShaderGenerator;
 	}
 }
-
-
 
 class OgreContext
 {
@@ -50,3 +47,5 @@ public:
 	void setSkyPlane(std::string materialName, Ogre::Plane plane, int width, int height, float bow);
 };
 
+
+#endif

@@ -2,6 +2,8 @@
 #include "Vector3.h"
 #include <btBulletCollisionCommon.h>
 #include <btBulletDynamicsCommon.h>
+//#include "OgreContext.h"
+#include "DebugDrawer.h"
 #include "Rigidbody.h"
 #include "Entity.h"
 
@@ -29,7 +31,9 @@ PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {
 	registerComponent("RigidBody", []() -> Rigidbody* { return new Rigidbody(); });
 };
 
-PhysicsManager::~PhysicsManager() {};
+PhysicsManager::~PhysicsManager() {
+	destroyAllComponents();
+};
 
 void PhysicsManager::init(const Vector3 gravity) {
 
@@ -38,7 +42,6 @@ void PhysicsManager::init(const Vector3 gravity) {
 	collDispatcher = new btCollisionDispatcher(collConfig);
 
 	broadPhaseInterface = new btDbvtBroadphase();
-
 	constraintSolver = new btSequentialImpulseConstraintSolver();
 
 	dynamicsWorld = new btDiscreteDynamicsWorld(collDispatcher, broadPhaseInterface,
@@ -46,8 +49,7 @@ void PhysicsManager::init(const Vector3 gravity) {
 
 	dynamicsWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
 
-	//mDebugDrawer_ =
-	//	 new OgreDebugDrawer(OgreSDLContext::getInstance()->getSceneManager());
+	//mDebugDrawer_ = new OgreDebugDrawer(OgreContext::getInstance()->getSceneManager());
 	// mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
 	// dynamicsWorld->setDebugDrawer(mDebugDrawer_);
 }
@@ -142,10 +144,15 @@ void PhysicsManager::update()
 	}
 }
 
+void PhysicsManager::clean()
+{
+	delete instance_;
+}
+
 void PhysicsManager::destroyAllComponents()
 {
 	auto i = _compsList.begin();
-	while (i != _compsList.end()) {
+	while (!_compsList.empty()) {
 		destroyRigidBody(static_cast<Rigidbody*>((*i))->getBtRb());
 		_compsList.remove((*i));
 	}

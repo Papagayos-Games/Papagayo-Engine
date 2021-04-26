@@ -171,7 +171,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)dependencies\JSONforModernC++;$(SolutionDir)dependencies\Bullet\src\$(Configuration)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Graphics;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src\$(Configuration);$(SolutionDir)dependencies\JSONforModernC++;$(SolutionDir)dependencies\Ogre\src\RTShaderSystem\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Bullet\src</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -189,7 +189,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)include\Physics;$(SolutionDir)include\Graphics;$(SolutionDir)dependencies\JSONforModernC++;$(SolutionDir)dependencies\Bullet\src\$(Configuration)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Graphics;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src\$(Configuration);$(SolutionDir)dependencies\JSONforModernC++;$(SolutionDir)dependencies\Ogre\src\RTShaderSystem\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Bullet\src</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>

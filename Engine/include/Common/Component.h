@@ -6,7 +6,6 @@
 class Entity;
 class Manager;
 
-
 class Component {
 protected:
 	int _id;   // identificador del tipo de componente

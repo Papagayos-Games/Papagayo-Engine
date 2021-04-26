@@ -58,6 +58,8 @@ void PapagayoEngine::clean()
 	// se borrarian todos los managers del motor
 	SceneManager::getInstance()->clean();
 	OgreContext::getInstance()->clean();
+	PhysicsManager::getInstance()->clean();
+	//RenderManager::getInstance()->clean();
 	InputSystem::getInstance()->clean();
 
 	delete instance_;
@@ -87,7 +89,7 @@ void PapagayoEngine::init()
 	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
 #pragma endregion
 
-	PhysicsManager::getInstance()->init(Vector3(0.0, 0.0, 0.0));
+	PhysicsManager::getInstance()->init(Vector3(0.0, -9.8, 0.0));
 	loader.loadEntities("Scenes/testScene.json");
 	RenderManager::getInstance()->start();
 	// dejar al final
@@ -96,7 +98,6 @@ void PapagayoEngine::init()
 void PapagayoEngine::update()
 {
 	try {
-		//std::cout << "Updating\n";
 		PhysicsManager::getInstance()->update();
 		RenderManager::getInstance()->update();
 		InputSystem::getInstance()->handleInput();
@@ -110,6 +111,7 @@ void PapagayoEngine::update()
 
 void PapagayoEngine::run() {
 	init();
+	//running_ = false;
 	// ciclo principal de juego
 	while (running_) {
 		update();

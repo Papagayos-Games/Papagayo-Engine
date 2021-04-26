@@ -25,6 +25,7 @@ Rigidbody::Rigidbody() : Component(PhysicsManager::getInstance(), 0)
 
 Rigidbody::~Rigidbody()
 {
+	delete rb;
 }
 
 #pragma region Generales
@@ -32,9 +33,8 @@ Rigidbody::~Rigidbody()
 void Rigidbody::init()
 {
 	rb = PhysicsManager::getInstance()->createRB(Vector3(0, 0, 0), mass);
-	rb->setMassProps(mass, btVector3(1.0, 1.0, 1.0));
-	rb->setDamping(1.0f, 0.5f);
-	std::cout << "DAMP: " << rb->getAngularDamping() << "\n";
+	rb->setMassProps(1.0f, btVector3(1.0, 1.0, 1.0));
+	rb->setDamping(0.5, 0.5);
 }
 
 void Rigidbody::update()
@@ -232,6 +232,7 @@ void Rigidbody::setActiveGravity(const bool active)
 		rb->applyGravity();
 	}
 	else {
+		rb->setGravity(btVector3(0, 0, 0));
 		rb->clearGravity();
 	}
 }
