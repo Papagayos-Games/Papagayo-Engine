@@ -11,24 +11,21 @@ PhysicsManager* PhysicsManager::instance_ = nullptr;
 
 PhysicsManager* PhysicsManager::getInstance()
 {
-	if (instance_ == nullptr)
-		if (!setUpInstance())
+	if (instance_ == nullptr) {
+		try {
+			instance_ = new PhysicsManager();
+			instance_->init(Vector3(0.0, -9.8, 0.0));
+		}
+		catch (std::string msg) {
 			throw "ERROR: PhysicsManager couldn't be created\n";
+		}
+	}
+	
 	return instance_;
 }
 
-bool PhysicsManager::setUpInstance()
-{
-	if (instance_ == nullptr) {
-		instance_ = new PhysicsManager();
-		return true;
-	}
-
-	return false;
-}
-
 PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {
-	registerComponent("RigidBody", []() -> Rigidbody* { return new Rigidbody(); });
+	registerComponent("RigidBody", []() -> RigidBody* { return new RigidBody(); });
 };
 
 PhysicsManager::~PhysicsManager() {
@@ -66,7 +63,7 @@ void PhysicsManager::destroyWorld()
 
 	delete constraintSolver; constraintSolver = nullptr;
 
-	//delete mDebugDrawer_; mDebugDrawer_ = nullptr;
+	delete mDebugDrawer_; mDebugDrawer_ = nullptr;
 }
 
 void PhysicsManager::destroyRigidBody(btRigidBody* body)
@@ -125,7 +122,10 @@ void PhysicsManager::addComponent(Entity* ent, int compId)
 
 void PhysicsManager::start()
 {
-	//TODO: ESTO ES INUTIL BRUH
+	for (Component* cmp : _compsList)
+	{
+		cmp->setUp();
+	}
 }
 
 void PhysicsManager::update()
@@ -137,9 +137,9 @@ void PhysicsManager::update()
 	for (auto it = _compsList.begin(); it != _compsList.end(); ++it) {
 		if (applyTorque) {
 			applyTorque = false;
-			static_cast<Rigidbody*>(*it)->addTorque(Vector3(0.0f, 0.0, -2.0), Forces::IMPULSE);
+			static_cast<RigidBody*>(*it)->addTorque(Vector3(0.0f, 0.0, -5.0), Forces::IMPULSE);
+			//static_cast<Rigidbody*>(*it)->addForce(Vector3(0.0f, 1, 0.0f), Vector3(1.0f, 0.0, 1.0), Forces::IMPULSE);
 		}
-		//static_cast<Rigidbody*>(*it)->addForce(Vector3(10.0f, 0.0f, 0.0f), Vector3(0, 0, 0), Forces::NORMAL);
 		(*it)->update();
 	}
 }
@@ -153,7 +153,7 @@ void PhysicsManager::destroyAllComponents()
 {
 	auto i = _compsList.begin();
 	while (!_compsList.empty()) {
-		destroyRigidBody(static_cast<Rigidbody*>((*i))->getBtRb());
+		destroyRigidBody(static_cast<RigidBody*>((*i))->getBtRb());
 		_compsList.remove((*i));
 	}
 	destroyWorld();
@@ -164,7 +164,7 @@ bool PhysicsManager::destroyComponent(Entity* ent, int compId)
 	auto i = _compsList.begin();
 	while (i != _compsList.end()) {
 		if (ent == (*i)->getEntity()) {
-			destroyRigidBody(static_cast<Rigidbody*>((*i))->getBtRb());
+			destroyRigidBody(static_cast<RigidBody*>((*i))->getBtRb());
 			_compsList.remove((*i));
 			return true;
 		}

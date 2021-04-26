@@ -42,7 +42,6 @@ PapagayoEngine* PapagayoEngine::getInstance()
 	return instance_;
 }
 
-
 bool PapagayoEngine::setupInstance(const std::string& appName)
 {
 	if (instance_ == nullptr) {
@@ -56,9 +55,9 @@ bool PapagayoEngine::setupInstance(const std::string& appName)
 void PapagayoEngine::clean()
 {
 	// se borrarian todos los managers del motor
+	PhysicsManager::getInstance()->clean();
 	SceneManager::getInstance()->clean();
 	OgreContext::getInstance()->clean();
-	PhysicsManager::getInstance()->clean();
 	//RenderManager::getInstance()->clean();
 	InputSystem::getInstance()->clean();
 
@@ -89,9 +88,9 @@ void PapagayoEngine::init()
 	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
 #pragma endregion
 
-	PhysicsManager::getInstance()->init(Vector3(0.0, -9.8, 0.0));
 	loader.loadEntities("Scenes/testScene.json");
 	RenderManager::getInstance()->start();
+	PhysicsManager::getInstance()->start();
 	// dejar al final
 }
 

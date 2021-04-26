@@ -134,6 +134,11 @@ Vector3 Vector3::operator%(const Vector3& v)
 	return Vector3(y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x);
 }
 
+bool Vector3::isZero() const
+{
+	return x == 0 && y == 0 && z == 0;
+}
+
 void Vector3::set(Vector3 v)
 {
 	x = v.x;

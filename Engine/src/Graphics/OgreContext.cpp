@@ -27,7 +27,6 @@ OgreContext* OgreContext::getInstance()
 	return instance_;
 }
 
-
 bool OgreContext::setupInstance(std::string appName)
 {
 	if (instance_ == nullptr) {

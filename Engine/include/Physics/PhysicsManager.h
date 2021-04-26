@@ -18,8 +18,6 @@ class PhysicsManager : public Manager
 private:
 	static PhysicsManager* instance_;
 
-	static bool setUpInstance();
-
 	//Configuracion sobre la gestion de colisiones con bullet, nosotros usaremos la configuracion por defecto
 	btDefaultCollisionConfiguration* collConfig = nullptr;
 

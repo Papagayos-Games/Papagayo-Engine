@@ -59,6 +59,9 @@ public:
 	//producto vectorial
 	Vector3 operator%(const Vector3& v);
 
+	//Para saber si el vector es 0
+	bool isZero() const;
+
 	//setter 
 	void set(Vector3 pos);
 	void setX(float n);
