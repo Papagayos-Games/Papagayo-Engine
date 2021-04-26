@@ -1,4 +1,5 @@
 #include "Rigidbody.h"
+#include <cmath>
 
 //bullet includes
 #include "LinearMath/btDefaultMotionState.h"
@@ -31,6 +32,9 @@ Rigidbody::~Rigidbody()
 void Rigidbody::init()
 {
 	rb = PhysicsManager::getInstance()->createRB(Vector3(0, 0, 0), mass);
+	rb->setMassProps(mass, btVector3(1.0, 1.0, 1.0));
+	rb->setDamping(1.0f, 0.5f);
+	std::cout << "DAMP: " << rb->getAngularDamping() << "\n";
 }
 
 void Rigidbody::update()
@@ -43,13 +47,36 @@ void Rigidbody::update()
 	const auto worldTransform = rb->getWorldTransform();
 	const auto origin = worldTransform.getOrigin();
 
+	btScalar roll;	//X
+	btScalar pitch;	//Y
+	btScalar yaw;	//Z
+	auto rot = worldTransform.getRotation();
+	rot.getEulerZYX(yaw, pitch, roll);
 	transform->setPos(Vector3(origin.x(), origin.y(), origin.z()));
+	transform->setRot(Vector3(roll, pitch, yaw));
 }
 
 void Rigidbody::load(nlohmann::json params)
 {
+
+	//Masa
+	auto it = params.find("mass");
+	if (it != params.end()) {
+		float m = it->get<float>();
+		rb->setMassProps(m, btVector3(1.0, 1.0, 1.0));
+	}
+
+	//Damping
+	it = params.find("dampingLin");
+	auto aux = params.find("dampingAng");
+	if (it != params.end() && aux != params.end()) {
+		float dL = it->get<float>();
+		float dA = it->get<float>();
+		rb->setDamping(dL, dA);
+	}
+
 	//Posicion
-	auto it = params.find("position");
+	it = params.find("position");
 	if (it != params.end()) {
 		std::vector<float> pos = it->get<std::vector<float>>();
 		setPosition(Vector3(pos[0], pos[1], pos[2]));
@@ -73,7 +100,7 @@ void Rigidbody::load(nlohmann::json params)
 	it = params.find("isKinematic");
 	if (it != params.end()) {
 		bool isKinematic = it->get<bool>();
-		setActiveGravity(isKinematic);
+		setKinematic(isKinematic);
 	}
 
 	//Estatico
@@ -116,24 +143,65 @@ void Rigidbody::load(nlohmann::json params)
 			case (int)RbCmpId::RbBox: {
 				auto size = it->find("size");
 				if (size != it->end()) {
-					std::vector<float> size = it->get<std::vector<float>>();
-					shapeColl = new btBoxShape(btVector3(size[0], size[1], size[2]));
+					std::vector<float> s = size->get<std::vector<float>>();
+					shapeColl = new btBoxShape(btVector3(s[0], s[1], s[2]));
+				}
+				else {
+					shapeColl = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
 				}
 
 				break;
 			}
-			case (int)RbCmpId::RbSphere:
-				shapeColl = new btSphereShape(1.0f);
+			case (int)RbCmpId::RbSphere: {
+				auto radius = it->find("radius");
+				if (radius != it->end()) {
+					float r = it->get<float>();
+					shapeColl = new btSphereShape(r);
+				}
+				else {
+					shapeColl = new btSphereShape(1.0f);
+				}
 				break;
-			case (int)RbCmpId::RbCylinder:
-				shapeColl = new btCylinderShape(btVector3(1.0f, 1.0f, 1.0f));
+			}
+			case (int)RbCmpId::RbCylinder: {
+				auto size = it->find("size");
+				if (size != it->end()) {
+					std::vector<float> s = size->get<std::vector<float>>();
+					shapeColl = new btCylinderShape(btVector3(s[0], s[1], s[2]));
+				}
+				else {
+					shapeColl = new btCylinderShape(btVector3(1.0f, 1.0f, 1.0f));
+				}
 				break;
-			case (int)RbCmpId::RbCone:
-				shapeColl = new btConeShape(1.0f, 1.0f);
+			}
+			case (int)RbCmpId::RbCone: {
+				auto radius = it->find("radius");
+				auto height = it->find("height");
+
+				if (radius != it->end() && height != it->end()) {
+					float r = it->get<float>();
+					float h = it->get<float>();
+					shapeColl = new btConeShape(r, h);
+				}
+				else {
+					shapeColl = new btConeShape(1.0f, 1.0f);
+				}
 				break;
-			case (int)RbCmpId::RbCapsule:
-				shapeColl = new btCapsuleShape(1.0f, 1.0f);
+			}
+			case (int)RbCmpId::RbCapsule: {
+				auto radius = it->find("radius");
+				auto height = it->find("height");
+				if (radius != it->end() && height != it->end()) {
+					float r = it->get<float>();
+					float h = it->get<float>();
+					shapeColl = new btCapsuleShape(r, h);
+				}
+				else {
+					shapeColl = new btCapsuleShape(1.0f, 1.0f);
+				}
 				break;
+			}
+
 			default:
 				break;
 			}
@@ -169,37 +237,33 @@ void Rigidbody::setActiveGravity(const bool active)
 }
 
 void Rigidbody::setTrigger(const bool trigger_) {
+	trigger = trigger_;
 	if (trigger) {
 		rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
 	else {
 		rb->setCollisionFlags(rb->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
-
-	trigger = trigger_;
 }
 
 void Rigidbody::setKinematic(const bool kinematic_) {
 
-	if (kinematic) {
+	if (kinematic_) {
 		rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
 	}
 	else {
 		rb->setCollisionFlags(rb->getCollisionFlags() & ~btCollisionObject::CF_KINEMATIC_OBJECT);
 	}
-
-	kinematic = kinematic_;
 }
 
 void Rigidbody::setStatic(const bool _static) {
+
 	if (_static) {
 		rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
 	}
 	else {
 		rb->setCollisionFlags(rb->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
 	}
-
-	static_ = _static;
 }
 
 void Rigidbody::setRestitution(float restitution)
@@ -258,12 +322,12 @@ bool Rigidbody::isTrigger()
 
 bool Rigidbody::isKinematic()
 {
-	return kinematic;
+	return rb->isKinematicObject();
 }
 
 bool Rigidbody::isStatic()
 {
-	return static_;
+	return rb->isStaticObject();
 }
 
 btCollisionShape* Rigidbody::getShape()
@@ -354,7 +418,7 @@ bool Rigidbody::collidesWithEntity(Entity* other) const
 
 bool Rigidbody::onCollisionEnter(std::string id) const
 {
-	// Recieves an id of an entity and checks if our father is colliding with it
+	//Devuelve true en caso de existir colision
 	if (_active) {
 		//Se obtiene la entidad de la escena y se comprueba la colision
 		//Entity* other = scene_->getEntityById(id);

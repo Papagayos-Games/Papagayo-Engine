@@ -32,9 +32,6 @@ private:
 	btRigidBody* rb = nullptr;
 
 	bool trigger = false;
-	bool kinematic = false;
-	bool static_ = false;
-	bool collision = false;
 
 	bool collidesWithEntity(Entity* other) const;
 public:

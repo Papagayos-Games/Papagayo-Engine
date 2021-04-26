@@ -37,20 +37,23 @@
 				        {
                     "Component" : "RigidBody",
                     "Type" : "Physics",
-                    "Parameters": {
-                      "position" : [ 0.2684, 10.054, 9.357 ],
-                      "isGravity" : true,
-                      "isTrigger" : false,
-                      "isKinematic" : true,
-                      "isStatic" : true,
-                      "restitution" : 0.5,
-                      "linealVel" : [ 0.0, 0.0, 0.0 ],
-                      "friction" : 0.5,
-                      "shape" : {
-                        "id" : 0,
-                        "size" : [ 2.0, 1.0, 1.5]
-                      }
+                  "Parameters": {
+                    "mass": 1.0,
+                    "dampingLin": 0.2,
+                    "dampingAng": 0.2,
+                    "position": [ 0.2684, 10.054, 9.357 ],
+                    "isGravity": true,
+                    "isTrigger": true,
+                    "isKinematic": false,
+                    "isStatic": false,
+                    "restitution": 0.5,
+                    "linealVel": [ 0.0, 0.0, 0.0 ],
+                    "friction": 0.5,
+                    "shape": {
+                      "id": 0,
+                      "size": [ 2.0, 1.0, 1.5 ]
                     }
+                  }
                 }
             ]
         }

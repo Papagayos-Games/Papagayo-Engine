@@ -8,6 +8,7 @@ class btBroadphaseInterface;
 class btSequentialImpulseConstraintSolver;
 class btDiscreteDynamicsWorld;
 class btRigidBody;
+class OgreDebugDrawer;
 class Vector3;
 
 class PhysicsManager : public Manager
@@ -33,7 +34,7 @@ private:
 	btDiscreteDynamicsWorld* dynamicsWorld = nullptr;
 
 	//estoy seria para dibujar los colliders en un modo debug, lo queremos?
-	//OgreDebugDrawer* mDebugDrawer_ = nullptr;
+	OgreDebugDrawer* mDebugDrawer_ = nullptr;
 
 	//esto hay que ver si al eliminar el vector de rigidbodies deja basura y si es asi entonces es porque hay que eliminar
 	//por partes el shape y el motionstate
@@ -42,6 +43,9 @@ private:
 
 	PhysicsManager();
 	~PhysicsManager();
+
+	//TO ERASE
+	bool applyTorque = true;
 
 public:
 	

@@ -9,6 +9,7 @@
 #include "CommonManager.h"
 #include "Transform.h"
 
+#include <iostream>
 
 MeshComponent::MeshComponent() :Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Mesh)
 {
@@ -43,9 +44,10 @@ void MeshComponent::update()
 	Vector3 rot = tr_->getRot();
 	//rotaciones //TO DO: revisar
 	mNode_->resetOrientation();
-	mNode_->yaw(Ogre::Degree(rot.y), Ogre::Node::TS_WORLD);//ejeY
-	mNode_->pitch(Ogre::Degree(rot.x), Ogre::Node::TS_WORLD);//ejex
-	mNode_->roll(Ogre::Degree(rot.z), Ogre::Node::TS_WORLD);//ejez
+	mNode_->yaw(Ogre::Radian(rot.z), Ogre::Node::TS_WORLD);//ejeY
+	mNode_->pitch(Ogre::Radian(rot.y), Ogre::Node::TS_WORLD);//ejex
+	mNode_->roll(Ogre::Radian(rot.x), Ogre::Node::TS_WORLD);//ejez
+
 	//escala
 	Vector3 scale = tr_->getDimensions();
 	mNode_->setScale(Ogre::Vector3(scale.x, scale.y, scale.z));

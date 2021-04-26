@@ -39,6 +39,11 @@
     <ClCompile Include="..\..\src\Graphics\SkyPlaneComponent.cpp" />
     <ClCompile Include="..\..\src\Graphics\WindowGenerator.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.vcxproj">
+      <Project>{a01f7af5-4e1e-4311-878a-c76475434688}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

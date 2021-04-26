@@ -20,6 +20,7 @@ subject to the following restrictions:
 #include "LinearMath/btTransform.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h"
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
+#include <iostream>
 
 class btCollisionShape;
 class btMotionState;
@@ -307,6 +308,9 @@ public:
 	void applyTorque(const btVector3& torque)
 	{
 		m_totalTorque += torque * m_angularFactor;
+		//std::cout << "ANGULAR X: " << m_angularFactor.x() << " Y: " << m_angularFactor.y() << " Z: " << m_angularFactor.z() << "\n";
+		//std::cout << "TORQUE X: " << m_totalTorque.x() << " Y: " << m_totalTorque.y() << " Z: " << m_totalTorque.z() 
+		//	<< "\n";
 		#if defined(BT_CLAMP_VELOCITY_TO) && BT_CLAMP_VELOCITY_TO > 0
 		clampVelocity(m_totalTorque);
 		#endif
@@ -329,6 +333,11 @@ public:
 	void applyTorqueImpulse(const btVector3& torque)
 	{
 		m_angularVelocity += m_invInertiaTensorWorld * torque * m_angularFactor;
+		//std::cout << "ANGULAR X: " << m_angularFactor.x() << " Y: " << m_angularFactor.y() << " Z: " << m_angularFactor.z() << "\n";
+		//std::cout << "TORQUE X: " << m_totalTorque.x() << " Y: " << m_totalTorque.y() << " Z: " << m_totalTorque.z()
+		//<< "\n";
+		//std::cout << "ANG X: " << m_angularVelocity.getX() << " ANG Y: " << m_angularVelocity.getY()
+		//		  << " ANG Z: " << m_angularVelocity.getZ() << "\n";
 		#if defined(BT_CLAMP_VELOCITY_TO) && BT_CLAMP_VELOCITY_TO > 0
 		clampVelocity(m_angularVelocity);
 		#endif

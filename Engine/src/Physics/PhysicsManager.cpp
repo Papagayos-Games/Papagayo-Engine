@@ -46,10 +46,10 @@ void PhysicsManager::init(const Vector3 gravity) {
 
 	dynamicsWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
 
-	/* mDebugDrawer_ =
-		 new OgreDebugDrawer(OgreSDLContext::getInstance()->getSceneManager());
-	 mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	 discreteDynamicsWorld_->setDebugDrawer(mDebugDrawer_);*/
+	//mDebugDrawer_ =
+	//	 new OgreDebugDrawer(OgreSDLContext::getInstance()->getSceneManager());
+	// mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+	// dynamicsWorld->setDebugDrawer(mDebugDrawer_);
 }
 
 void PhysicsManager::destroyWorld()
@@ -133,9 +133,13 @@ void PhysicsManager::update()
 	//    dynamicsWorld->debugDrawWorld();
 	//#endif
 	for (auto it = _compsList.begin(); it != _compsList.end(); ++it) {
+		if (applyTorque) {
+			applyTorque = false;
+			static_cast<Rigidbody*>(*it)->addTorque(Vector3(0.0f, 0.0, -2.0), Forces::IMPULSE);
+		}
+		//static_cast<Rigidbody*>(*it)->addForce(Vector3(10.0f, 0.0f, 0.0f), Vector3(0, 0, 0), Forces::NORMAL);
 		(*it)->update();
 	}
-
 }
 
 void PhysicsManager::destroyAllComponents()
