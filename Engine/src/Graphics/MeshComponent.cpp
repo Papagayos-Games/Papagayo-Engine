@@ -5,6 +5,7 @@
 #include <OgreEntity.h>
 #include "Transform.h"
 #include "OgreContext.h"
+#include <checkML.h>
 #include "Entity.h"
 #include "CommonManager.h"
 #include "Transform.h"

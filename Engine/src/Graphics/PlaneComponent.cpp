@@ -4,6 +4,7 @@
 #include "Vector3.h"
 #include "OgreSceneNode.h"
 #include "OgreContext.h"
+#include <checkML.h>
 #include "OgreEntity.h"
 #include "OgreSceneManager.h"
 

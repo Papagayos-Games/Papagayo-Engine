@@ -2,6 +2,7 @@
 #include "..\..\include\Graphics\LightComponent.h"
 #include "LightComponent.h"
 #include "OgreContext.h"
+#include <checkML.h>
 #include "OgreLight.h"
 #include "OgreSceneNode.h"
 #include "OgreSceneManager.h"

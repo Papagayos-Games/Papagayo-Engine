@@ -2,6 +2,7 @@
 #include <OgreCamera.h>
 #include "RenderManager.h"
 #include "OgreContext.h"
+#include <checkML.h>
 #include "WindowGenerator.h"
 #include "Ogre.h"
 #include "OgreSceneNode.h"
