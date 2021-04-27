@@ -1,8 +1,8 @@
 #pragma once
 
 #include <string>
-#ifdef _DEBUG/*
-#include <checkML.h>*/
+#ifdef _DEBUG
+//#include <checkML.h>
 #endif
 class RTShaderTecnhiqueResolveListener;
 

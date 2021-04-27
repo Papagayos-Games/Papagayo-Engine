@@ -139,7 +139,7 @@ void RigidBody::load(nlohmann::json params)
 			setStatic(true);
 		}
 		else {
-			std::cout << "RIGIDBODY:JSON_READING_STATE: " << state << " //FALLO AL LEER EL ESTADO. SE DEJARÁ POR DEFECTO\n";
+			std::cout << "RIGIDBODY:JSON_READING_STATE: " << state << " //FALLO AL LEER EL ESTADO. SE DEJARA POR DEFECTO\n";
 		}
 	}
 
