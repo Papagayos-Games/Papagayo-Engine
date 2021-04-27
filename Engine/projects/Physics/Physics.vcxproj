@@ -19,11 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\Physics\DebugDrawer.cpp" />
     <ClCompile Include="..\..\src\Physics\PhysicsManager.cpp" />
     <ClCompile Include="..\..\src\Physics\Rigidbody.cpp" />
     <ClCompile Include="..\..\src\Physics\Test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Physics\DebugDrawer.h" />
     <ClInclude Include="..\..\include\Physics\PhysicsManager.h" />
     <ClInclude Include="..\..\include\Physics\Rigidbody.h" />
     <ClInclude Include="..\..\include\Physics\Test.h" />
@@ -31,6 +33,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">
       <Project>{a01f7af5-4e1e-4311-878a-c76475434688}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Graphics\Graphics.vcxproj">
+      <Project>{01362587-2c6a-4830-bd0b-49415725530b}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -118,7 +123,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\Physics;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\JSONforModernC++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Physics;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\JSONforModernC++;%(AdditionalIncludeDirectories);$(SolutionDir)include\Graphics</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,7 +133,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\bullet3-3.09\build_cmake\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)bin;$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin;$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -154,7 +159,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\Physics;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\JSONforModernC++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Physics;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\JSONforModernC++;%(AdditionalIncludeDirectories);$(SolutionDir)include\Graphics</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -162,7 +167,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\bullet3-3.09\build_cmake\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)bin;$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin;$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

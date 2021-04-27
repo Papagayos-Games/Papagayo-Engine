@@ -7,43 +7,33 @@ class btCollisionShape;
 class Vector3;
 class Entity;
 class btRigidBody;
+class Transform;
 
 enum class Forces {
 	NORMAL = 0,
 	IMPULSE = 1
 };
 
-class Rigidbody : public Component
+class RigidBody : public Component
 {
 private:
-	enum class RbCmpId : int {
-		RbBox = 0,
-		RbSphere,
-		RbCylinder,
-		RbCone,
-		RbCapsule,
-	
-		LastPhysicsCmpId
-	};
-
 	//Masa del Rigidbody
 	float mass = 1.0f;
 	//Rigidbody principal
 	btRigidBody* rb = nullptr;
-
+	Transform* tr_ = nullptr;
 	bool trigger = false;
-	bool kinematic = false;
-	bool static_ = false;
-	bool collision = false;
 
 	bool collidesWithEntity(Entity* other) const;
 public:
 	/// <summary>
 	/// Constructora por defecto Rigibody
 	/// </summary>
-	Rigidbody();
-	~Rigidbody();
+	RigidBody();
+	~RigidBody();
 
+
+	virtual void setUp();
 	virtual void init();
 	virtual void update();
 	/// <summary>
@@ -55,8 +45,8 @@ public:
 	//metodo que setea la posicion del rb
 	void setPosition(Vector3 newPos);
 
-	//Activa/Desactiva la gravedad
-	void setActiveGravity(const bool active);
+	//Asigna una nueva gravedad al componente
+	void setGravity(const Vector3 newGrav);
 
 	//metodo que si recibe true hara que el rigidbody active sus flags de colision para que estos actuen como trigger,
 	//si es false desactivara sus flags de colision para que este deje de ser un trigger.

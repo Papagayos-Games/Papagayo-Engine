@@ -42,7 +42,6 @@ PapagayoEngine* PapagayoEngine::getInstance()
 	return instance_;
 }
 
-
 bool PapagayoEngine::setupInstance(const std::string& appName)
 {
 	if (instance_ == nullptr) {
@@ -56,8 +55,10 @@ bool PapagayoEngine::setupInstance(const std::string& appName)
 void PapagayoEngine::clean()
 {
 	// se borrarian todos los managers del motor
+	PhysicsManager::getInstance()->clean();
 	SceneManager::getInstance()->clean();
 	OgreContext::getInstance()->clean();
+	//RenderManager::getInstance()->clean();
 	InputSystem::getInstance()->clean();
 
 	delete instance_;
@@ -77,26 +78,23 @@ void PapagayoEngine::init()
 		throw std::runtime_error("SceneManager init fail \n" + (std::string)e.what() + "\n");
 	}
 
+	manRegistry_["Physics"] = PhysicsManager::getInstance();
 	manRegistry_["Common"] = CommonManager::getInstance();
 	manRegistry_["Render"] = RenderManager::getInstance();
-	manRegistry_["Physics"] = PhysicsManager::getInstance();
 
 	LoaderSystem loader;
 #pragma region TOERASE
-	Camera* camara = new Camera();
 	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
 #pragma endregion
 
 	PhysicsManager::getInstance()->init(Vector3(0.0, -9.8, 0.0));
-
 	RenderManager::getInstance()->start();
-	// dejar al final
+	PhysicsManager::getInstance()->start();
 }
 
 void PapagayoEngine::update()
 {
 	try {
-		//std::cout << "Updating\n";
 		PhysicsManager::getInstance()->update();
 		RenderManager::getInstance()->update();
 		InputSystem::getInstance()->handleInput();
@@ -110,6 +108,7 @@ void PapagayoEngine::update()
 
 void PapagayoEngine::run() {
 	init();
+	//running_ = false;
 	// ciclo principal de juego
 	while (running_) {
 		update();

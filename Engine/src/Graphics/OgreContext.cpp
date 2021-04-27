@@ -1,7 +1,9 @@
 #include "OgreContext.h"
+#include <checkML.h>
 #include "RTShaderTecnhiqueResolveListener.h"
 #include "WindowGenerator.h"
 #include "OgrePlane.h"
+#include <checkML.h>
 
 #include <Ogre.h>
 #include <OgreFileSystemLayer.h>
@@ -26,7 +28,6 @@ OgreContext* OgreContext::getInstance()
 			throw "ERROR: OgreContext couldn't be created\n";
 	return instance_;
 }
-
 
 bool OgreContext::setupInstance(std::string appName)
 {

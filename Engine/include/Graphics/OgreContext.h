@@ -1,8 +1,7 @@
 #pragma once
-#include <string>
 
+#include <string>
 #ifdef _DEBUG
-#include "checkML.h"
 #endif
 class RTShaderTecnhiqueResolveListener;
 
@@ -18,8 +17,6 @@ namespace Ogre {
 		class ShaderGenerator;
 	}
 }
-
-
 
 class OgreContext
 {
