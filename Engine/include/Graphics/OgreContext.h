@@ -39,6 +39,7 @@ public:
 	~OgreContext();
 	Ogre::Root* getOgreRoot() const;
 	Ogre::SceneManager* getSceneManager() const;
+	
 	static OgreContext* getInstance();
 	static bool setupInstance(std::string appName);
 	void setupRTShaderGenerator();

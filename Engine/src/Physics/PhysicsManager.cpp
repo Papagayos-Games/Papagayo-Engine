@@ -72,6 +72,7 @@ void PhysicsManager::destroyRigidBody(btRigidBody* body)
 {
 	dynamicsWorld->removeCollisionObject(body);
 	delete body;
+	body = nullptr;
 }
 
 btDiscreteDynamicsWorld* PhysicsManager::getWorld() const
@@ -158,7 +159,8 @@ bool PhysicsManager::destroyComponent(Entity* ent, int compId)
 	while (i != _compsList.end()) {
 		if (ent == (*i)->getEntity()) {
 			destroyRigidBody(static_cast<RigidBody*>((*i))->getBtRb());
-			_compsList.remove((*i));
+			delete *i;
+			_compsList.erase(i);
 			return true;
 		}
 		else {

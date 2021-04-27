@@ -33,7 +33,7 @@ RigidBody::RigidBody() : Component(PhysicsManager::getInstance(), 0)
 
 RigidBody::~RigidBody()
 {
-	delete rb;
+	//delete rb;
 }
 
 #pragma region Generales

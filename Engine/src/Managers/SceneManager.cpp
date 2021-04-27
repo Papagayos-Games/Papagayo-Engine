@@ -5,11 +5,9 @@
 #include "LoaderSystem.h"
 
 #include "PapagayoEngine.h"
-#include "OgreRoot.h"
+#include "OgreContext.h"
+#include "WindowGenerator.h"
 #include "OgreRenderWindow.h"
-#include "OgreViewport.h"
-
-
 
 SceneManager* SceneManager::instance_= nullptr;
 Scene* SceneManager::currentScene_ = nullptr;
@@ -39,7 +37,7 @@ bool SceneManager::setupInstance()
 
 void SceneManager::clean()
 {
-	cleanupScene();
+	instance_->cleanupScene();
 	delete instance_->loader_;
 	delete instance_;
 }
@@ -48,7 +46,7 @@ void SceneManager::loadScene(const std::string& sceneName)
 {
 	//crea escena vacia
 	currentScene_ = new Scene();
-	currentScene_.
+	currentScene_->setName(sceneName);
 	//la llena de objetos
 	loader_->loadEntities(sceneName, currentScene_);
 
@@ -58,19 +56,47 @@ void SceneManager::loadScene(const std::string& sceneName)
 
 void SceneManager::cleanupScene()
 {
-	//decir a ogre que limpie la escena
-	
-	if(currentScene_){
-		delete currentScene_; 
-		currentScene_ = nullptr;
-	}
+	currentScene_->clean();
+	delete currentScene_; 
+	currentScene_ = nullptr;
+	WindowGenerator::getInstance()->getRenderWindow()->removeAllViewports();
 }
 
 SceneManager::SceneManager() {
 	loader_ = new LoaderSystem();
-	createStartScene();
+	change_ = false;
 }
 
+
+void SceneManager::update()
+{
+	if (change_) {
+		cleanupScene();
+		loadScene(nextScene_);
+		
+		change_ = false;
+		nextScene_ = "";
+		
+		PapagayoEngine::getInstance()->start();
+	}
+}
+
+void SceneManager::changeScene(const std::string& sceneName)
+{
+	bool exist = false;
+	int i = 0;
+	while (i < sceneFiles_.size() && !exist) {
+		exist = sceneFiles_[i] == sceneName;
+		i++;
+	}
+	if (exist) {
+		nextScene_ = sceneName;
+		change_ = true;
+	}
+	else {
+		throw std::runtime_error("ERROR: Scene: " + sceneName + " doesn't exist\n");	
+	}
+}
 
 void SceneManager::createStartScene() {
 	

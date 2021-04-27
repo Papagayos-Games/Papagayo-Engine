@@ -87,6 +87,7 @@ void InputSystem::handleInput()
 		{
 		case SDL_KEYDOWN:
 			std::cout << "Tecla pulsada perro\n";
+
 			break;
 		case SDL_KEYUP:
 			break;

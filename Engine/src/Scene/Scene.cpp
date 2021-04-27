@@ -9,6 +9,14 @@ Scene::~Scene()
 {
 }
 
+void Scene::clean()
+{
+	for (auto it = entities_.begin(); it != entities_.end(); it = entities_.begin()) {
+		delete (*it);
+		entities_.pop_front();
+	}
+}
+
 
 void Scene::addEntity(Entity* ent)
 {
@@ -31,4 +39,5 @@ Entity* Scene::getEntity(const std::string& name) {
 		return nullptr;
 	else
 		return entity->second;*/
+	return nullptr;
 }

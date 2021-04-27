@@ -24,15 +24,20 @@ std::vector<std::string> LoaderSystem::loadScenes(std::string fileName)
 	}
 	nlohmann::json j;
 	i >> j;
-	return j.get<std::vector<std::string>>();
+	nlohmann::json sceneFiles = j["SceneFiles"];
+	if (sceneFiles.is_null() || !sceneFiles.is_array())
+		throw std::exception("ERROR: Scene files not found\n");
+	std::vector<std::string> scenes = sceneFiles.get<std::vector<std::string>>();
+	return scenes;
 }
 
 
 void LoaderSystem::loadEntities(std::string fileName, Scene* scene)
 {
-	std::fstream i(fileName);
+
+	std::fstream i("Scenes/" + fileName + ".json");	// TO DO: poner la ruta definitiva cuando este la carpeta final
 	if (!i.is_open()) {
-		throw "ERROR: Loading scene " + fileName + " failed, file missing\n";
+		throw std::runtime_error("ERROR: Loading scene " + fileName + " failed, file missing\n");
 	}
 	nlohmann::json j;
 	i >> j;

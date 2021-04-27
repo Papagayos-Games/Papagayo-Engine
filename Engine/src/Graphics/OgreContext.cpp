@@ -1,3 +1,4 @@
+#include "..\..\include\Graphics\OgreContext.h"
 #include "OgreContext.h"
 #include <checkML.h>
 #include "RTShaderTecnhiqueResolveListener.h"
@@ -20,6 +21,8 @@ OgreContext::OgreContext(std::string appName) {
 	appName_ = appName;
 	init();
  }
+
+
 
 OgreContext* OgreContext::getInstance()
 {

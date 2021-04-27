@@ -81,23 +81,37 @@ void PapagayoEngine::init()
 	manRegistry_["Physics"] = PhysicsManager::getInstance();
 	manRegistry_["Common"] = CommonManager::getInstance();
 	manRegistry_["Render"] = RenderManager::getInstance();
+	
+	SceneManager::getInstance()->createStartScene();
 
-	LoaderSystem loader;
 #pragma region TOERASE
 	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
 #pragma endregion
 
 	PhysicsManager::getInstance()->init(Vector3(0.0, -9.8, 0.0));
+	start();
+}
+
+void PapagayoEngine::start()
+{
 	RenderManager::getInstance()->start();
 	PhysicsManager::getInstance()->start();
 }
 
 void PapagayoEngine::update()
 {
+	
 	try {
+		InputSystem::getInstance()->handleInput();
 		PhysicsManager::getInstance()->update();
 		RenderManager::getInstance()->update();
-		InputSystem::getInstance()->handleInput();
+		
+		if (timer_ == 150) {
+			std::cout << "Cambio de escena\n";
+			SceneManager::getInstance()->changeScene("test2");
+		}
+		SceneManager::getInstance()->update();
+		++timer_;
 	}
 	catch (const std::exception& e)
 	{

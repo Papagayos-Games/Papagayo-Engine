@@ -43,7 +43,8 @@ Camera::Camera() : Component(RenderManager::getInstance(), (int)RenderManager::R
 
 Camera::~Camera()
 {
-
+	if (mCamera_ != nullptr) OgreContext::getInstance()->getSceneManager()->destroyCamera(mCamera_);
+	if (camNode_ != nullptr) OgreContext::getInstance()->getSceneManager()->destroySceneNode(camNode_);
 }
 
 void Camera::update()

@@ -30,7 +30,7 @@ public:
 	/// Constructora por defecto Rigibody
 	/// </summary>
 	RigidBody();
-	~RigidBody();
+	virtual ~RigidBody();
 
 
 	virtual void setUp();
