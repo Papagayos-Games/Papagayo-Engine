@@ -78,9 +78,9 @@ void PapagayoEngine::init()
 		throw std::runtime_error("SceneManager init fail \n" + (std::string)e.what() + "\n");
 	}
 
+	manRegistry_["Physics"] = PhysicsManager::getInstance();
 	manRegistry_["Common"] = CommonManager::getInstance();
 	manRegistry_["Render"] = RenderManager::getInstance();
-	manRegistry_["Physics"] = PhysicsManager::getInstance();
 
 	LoaderSystem loader;
 #pragma region TOERASE

@@ -1,9 +1,10 @@
 #pragma once
 
-#ifdef _DEBUG
 #include <vector>
 #include "Manager.h"
+#ifdef _DEBUG
 
+#endif
 class btDefaultCollisionConfiguration;
 class btCollisionDispatcher;
 class btBroadphaseInterface;
@@ -76,5 +77,3 @@ public:
 	virtual void destroyAllComponents();
 	virtual bool destroyComponent(Entity* ent, int compId);
 };
-
-#endif

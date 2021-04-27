@@ -2,10 +2,10 @@
 #include "Vector3.h"
 #include <btBulletCollisionCommon.h>
 #include <btBulletDynamicsCommon.h>
-//#include "OgreContext.h"
 #include "DebugDrawer.h"
 #include "Rigidbody.h"
 #include "Entity.h"
+#include "OgreContext.h"
 
 PhysicsManager* PhysicsManager::instance_ = nullptr;
 
@@ -20,7 +20,7 @@ PhysicsManager* PhysicsManager::getInstance()
 			throw "ERROR: PhysicsManager couldn't be created\n";
 		}
 	}
-	
+
 	return instance_;
 }
 
@@ -46,9 +46,11 @@ void PhysicsManager::init(const Vector3 gravity) {
 
 	dynamicsWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
 
+#ifdef _DEBUG
 	//mDebugDrawer_ = new OgreDebugDrawer(OgreContext::getInstance()->getSceneManager());
-	// mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	// dynamicsWorld->setDebugDrawer(mDebugDrawer_);
+	//mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+	//dynamicsWorld->setDebugDrawer(mDebugDrawer_);
+#endif // DEBUG
 }
 
 void PhysicsManager::destroyWorld()
@@ -103,21 +105,7 @@ btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass)
 
 void PhysicsManager::addComponent(Entity* ent, int compId)
 {
-	//Component* comp;
-	////PhysicsCmpId id = (PhysicsCmpId)compId;
-	//try {
-	//	comp = new Rigidbody(compId);
-	//}
-	//catch (std::string msg) {
-	//	throw "ERROR: Tried to add a non existant Physics Component\n";
-	//}
-	//
-	//if (!comp)
-	//	throw ("ERROR: Physics Manager couldn't create a component with an Id: ", compId, "\n");
-	//
-	//comp->setEntity(ent);
-	//_compsList.push_back(comp);
-	//ent->addComponent(comp);
+
 }
 
 void PhysicsManager::start()
@@ -142,6 +130,11 @@ void PhysicsManager::update()
 		}
 		(*it)->update();
 	}
+
+#ifdef _DEBUG
+	//dynamicsWorld->debugDrawWorld();
+#endif // _DEBUG
+
 }
 
 void PhysicsManager::clean()

@@ -48,11 +48,11 @@ bool OgreDebugDrawer::frameEnded(const Ogre::FrameEvent& evt)
 
 OgreDebugDrawer::OgreDebugDrawer(Ogre::SceneManager* scm)
 {
-    mContactPoints1_ = {};
-    mContactPoints2_ = {};
+    //mContactPoints1_ = {};
+    //mContactPoints2_ = {};
     mContactPoints_ = &mContactPoints1_;
     mLines_ = new Ogre::ManualObject("physics lines");
-    // ASSERT(mLines);
+    //ASSERT(mLines);
     mTriangles_ = new Ogre::ManualObject("physics triangles");
     // ASSERT(mTriangles);
     mLines_->setDynamic(true);
