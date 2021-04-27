@@ -16,8 +16,8 @@ RenderManager::RenderManager() : Manager(ManID::Render)
 
 	registerComponent("MeshComponent", []() -> MeshComponent* { return new  MeshComponent(); });
 	registerComponent("Camera", []() -> Camera* { return new Camera(); });
-	//registerComponent("LightComponent", []() -> LightComponent* { return new LightComponent(); });
-	//registerComponent("PlaneComponent", []() -> PlaneComponent* { return new PlaneComponent(); });
+	registerComponent("LightComponent", []() -> LightComponent* { return new LightComponent(); });
+	registerComponent("PlaneComponent", []() -> PlaneComponent* { return new PlaneComponent(); });
 }
 
 RenderManager::~RenderManager()

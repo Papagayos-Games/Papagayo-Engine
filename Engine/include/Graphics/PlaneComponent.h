@@ -22,10 +22,12 @@ private:
     Ogre::SceneNode* mNode_ = nullptr;
     Ogre::Entity* ent_ = nullptr;
 public:
-    PlaneComponent(std::string name, std::string materialName, int width, int height, PLANE_DIR type = PLANE_DIR::PLANE_Y);
+    PlaneComponent();
 
-    void setTexture(std::string textName);
-    virtual void init() {};
+    void setMaterial(std::string matName);
+    virtual void init();
     virtual void update() {};
+    virtual void load(nlohmann::json params)override;
+
 };
 
