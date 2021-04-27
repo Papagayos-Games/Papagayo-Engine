@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <vector>
 #include <string>
 #ifdef _DEBUG
 #include "checkML.h"

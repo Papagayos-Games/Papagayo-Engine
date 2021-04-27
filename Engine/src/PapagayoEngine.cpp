@@ -88,7 +88,7 @@ void PapagayoEngine::init()
 #pragma endregion
 
 	PhysicsManager::getInstance()->init(Vector3(0.0, -9.8, 0.0));
-	loader.loadEntities("Scenes/testScene.json");
+
 	RenderManager::getInstance()->start();
 	// dejar al final
 }

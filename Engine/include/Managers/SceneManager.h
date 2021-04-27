@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
+#include <vector>
 
+class LoaderSystem;
 class Entity;
 class Scene;
 
@@ -24,7 +26,8 @@ private:
 	SceneManager();
 	static SceneManager* instance_;
 	static Scene* currentScene_;
-
+	std::vector<std::string> sceneFiles_;
+	LoaderSystem* loader_;
 	// Crea la escena por defecto
 	void createStartScene();
 };

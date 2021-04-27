@@ -2,7 +2,7 @@
 #include "Scene/Scene.h"
 #include "Graphics/WindowGenerator.h"
 #include "Graphics/OgreContext.h"
-
+#include "LoaderSystem.h"
 
 #include "PapagayoEngine.h"
 #include "OgreRoot.h"
@@ -16,6 +16,7 @@ Scene* SceneManager::currentScene_ = nullptr;
 
 SceneManager::~SceneManager()
 {
+	clean();
 }
 
 SceneManager* SceneManager::getInstance()
@@ -39,6 +40,7 @@ bool SceneManager::setupInstance()
 void SceneManager::clean()
 {
 	cleanupScene();
+	delete instance_->loader_;
 	delete instance_;
 }
 
@@ -46,8 +48,10 @@ void SceneManager::loadScene(const std::string& sceneName)
 {
 	//crea escena vacia
 	currentScene_ = new Scene();
-
+	currentScene_.
 	//la llena de objetos
+	loader_->loadEntities(sceneName, currentScene_);
+
 	//json j = ResourceManager::getInstance()->getSceneFile(sceneName);
 	//currentScene_->load(j);
 }
@@ -63,11 +67,13 @@ void SceneManager::cleanupScene()
 }
 
 SceneManager::SceneManager() {
-
+	loader_ = new LoaderSystem();
 	createStartScene();
 }
 
 
 void SceneManager::createStartScene() {
-
+	
+	sceneFiles_ = loader_->loadScenes("Scenes/scenes.json");
+	loadScene(sceneFiles_[0]);
 }

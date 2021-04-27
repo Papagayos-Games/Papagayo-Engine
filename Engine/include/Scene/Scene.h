@@ -1,15 +1,9 @@
 #pragma once
 
 #include <string>
-#include <map>
-#include <json.hpp>
-
-using json = nlohmann::json;
-
-using namespace std;
+#include <list>
 
 class Entity;
-
 class Component;
 
 class Scene
@@ -18,16 +12,14 @@ public:
 	Scene();
 	~Scene();
 
-	bool load(json& j);
-
 	void addEntity(Entity* ent);
-	string getName() const;
-	Entity* getEntity(const string& name);
+	void setName(const std::string& s);
+	const std::string& getName() const;
+	// TO DO: buscar a la entidad por tag
+	Entity* getEntity(const std::string& name);
 
 private:
-	map<int, Component*> components_;
-	map<string, Entity*> entities_;
-	list<Entity*> entityList_;
-	string name;
+	std::list<Entity*> entities_;
+	std::string name;
 };
 

@@ -16,14 +16,20 @@
 
 // nlohmann::json;
 
-void LoaderSystem::loadScenes(std::string fileName)
+std::vector<std::string> LoaderSystem::loadScenes(std::string fileName)
 {
+	std::fstream i(fileName);
+	if (!i.is_open()) {
+		throw "ERROR: Loading scene " + fileName + " failed, file missing\n";
+	}
+	nlohmann::json j;
+	i >> j;
+	return j.get<std::vector<std::string>>();
 }
 
 
-void LoaderSystem::loadEntities(std::string fileName/*, Scene* scene*/)
+void LoaderSystem::loadEntities(std::string fileName, Scene* scene)
 {
-	//-- se puede cargar el json previamente y pasarle sus valores cen estos metodos --//
 	std::fstream i(fileName);
 	if (!i.is_open()) {
 		throw "ERROR: Loading scene " + fileName + " failed, file missing\n";
@@ -39,7 +45,8 @@ void LoaderSystem::loadEntities(std::string fileName/*, Scene* scene*/)
 	
 	for (int i = 0; i < entSize; i++) {
 		Entity* ent = new Entity();
-		loadComponents(entities[i]["Components"], ent);		
+		loadComponents(entities[i]["Components"], ent);
+		scene->addEntity(ent);
 	}
 	
 }
