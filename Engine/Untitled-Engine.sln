@@ -12,11 +12,17 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "projects\Common\C
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PapagayoEngine", "projects\PapagayoEngine\PapagayoEngine.vcxproj", "{72F7CF54-9057-44DC-91EB-B0208EF7214A}"
 	ProjectSection(ProjectDependencies) = postProject
+		{8B780620-A498-4E1E-AE87-06279CBC7D61} = {8B780620-A498-4E1E-AE87-06279CBC7D61}
 		{A01F7AF5-4E1E-4311-878A-C76475434688} = {A01F7AF5-4E1E-4311-878A-C76475434688}
 		{9D96A3F7-E843-4086-9BE5-E4E25CA690D3} = {9D96A3F7-E843-4086-9BE5-E4E25CA690D3}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Graphics", "projects\Graphics\Graphics.vcxproj", "{01362587-2C6A-4830-BD0B-49415725530B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LUA", "projects\Lua\LUA.vcxproj", "{8B780620-A498-4E1E-AE87-06279CBC7D61}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A01F7AF5-4E1E-4311-878A-C76475434688} = {A01F7AF5-4E1E-4311-878A-C76475434688}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +64,14 @@ Global
 		{01362587-2C6A-4830-BD0B-49415725530B}.Release|x64.Build.0 = Release|x64
 		{01362587-2C6A-4830-BD0B-49415725530B}.Release|x86.ActiveCfg = Release|Win32
 		{01362587-2C6A-4830-BD0B-49415725530B}.Release|x86.Build.0 = Release|Win32
+		{8B780620-A498-4E1E-AE87-06279CBC7D61}.Debug|x64.ActiveCfg = Debug|x64
+		{8B780620-A498-4E1E-AE87-06279CBC7D61}.Debug|x64.Build.0 = Debug|x64
+		{8B780620-A498-4E1E-AE87-06279CBC7D61}.Debug|x86.ActiveCfg = Debug|Win32
+		{8B780620-A498-4E1E-AE87-06279CBC7D61}.Debug|x86.Build.0 = Debug|Win32
+		{8B780620-A498-4E1E-AE87-06279CBC7D61}.Release|x64.ActiveCfg = Release|x64
+		{8B780620-A498-4E1E-AE87-06279CBC7D61}.Release|x64.Build.0 = Release|x64
+		{8B780620-A498-4E1E-AE87-06279CBC7D61}.Release|x86.ActiveCfg = Release|Win32
+		{8B780620-A498-4E1E-AE87-06279CBC7D61}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
