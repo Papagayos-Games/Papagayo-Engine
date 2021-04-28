@@ -39,6 +39,9 @@
     <ProjectReference Include="..\Input\Input.vcxproj">
       <Project>{749d77f5-ef31-4a74-abce-09db88ef4c00}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\Lua\LUA.vcxproj">
+      <Project>{8b780620-a498-4e1e-ae87-06279cbc7d61}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Physics\Physics.vcxproj">
       <Project>{9d96a3f7-e843-4086-9be5-e4e25ca690d3}</Project>
     </ProjectReference>
@@ -171,14 +174,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\Graphics;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src\$(Configuration);$(SolutionDir)dependencies\JSONforModernC++;$(SolutionDir)dependencies\Ogre\src\RTShaderSystem\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Bullet\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Graphics;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src\$(Configuration);$(SolutionDir)dependencies\JSONforModernC++;$(SolutionDir)dependencies\Ogre\src\RTShaderSystem\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\lua\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>OgreMain_d.lib;OgreRTShaderSystem_d.lib;BulletCollision_Debug.lib;BulletDynamics_Debug.lib;BulletInverseDynamics_Debug.lib;BulletSoftBody_Debug.lib;LinearMath_Debug.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration)\;$(SolutionDir)dependencies\Ogre\build\SDL2-build\RelWithDebInfo</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)dependencies\lua;$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration)\;$(SolutionDir)dependencies\Ogre\build\SDL2-build\RelWithDebInfo</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -189,7 +192,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\Graphics;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src\$(Configuration);$(SolutionDir)dependencies\JSONforModernC++;$(SolutionDir)dependencies\Ogre\src\RTShaderSystem\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Bullet\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Graphics;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src\$(Configuration);$(SolutionDir)dependencies\JSONforModernC++;$(SolutionDir)dependencies\Ogre\src\RTShaderSystem\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\lua\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -198,7 +201,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>OgreMain.lib;OgreRTShaderSystem.lib;BulletDynamics.lib;LinearMath.lib;BulletCollision.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)bin;$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)dependencies\lua;$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)bin;$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

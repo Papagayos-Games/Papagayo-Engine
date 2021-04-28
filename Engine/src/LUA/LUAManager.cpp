@@ -43,5 +43,5 @@ void LUAManager::start()
 
 void LUAManager::update()
 {
-	std::cout << "updating\n";
+	//std::cout << "updating\n";
 }

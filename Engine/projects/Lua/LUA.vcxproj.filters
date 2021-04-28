@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\LUA\prueba.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\LUA\LUAManager.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>

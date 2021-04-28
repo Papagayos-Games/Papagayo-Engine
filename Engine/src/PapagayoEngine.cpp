@@ -25,6 +25,8 @@
 #include "Graphics/PlaneComponent.h"
 #include "Physics/PhysicsManager.h"
 
+#include "LUA/LUAManager.h"
+
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
 
 PapagayoEngine::PapagayoEngine(const std::string& appName) : appName_(appName) {
@@ -98,6 +100,7 @@ void PapagayoEngine::update()
 	try {
 		PhysicsManager::getInstance()->update();
 		RenderManager::getInstance()->update();
+		LUAManager::getInstance()->update();
 		InputSystem::getInstance()->handleInput();
 	}
 	catch (const std::exception& e)
