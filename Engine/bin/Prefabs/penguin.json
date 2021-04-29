@@ -24,8 +24,7 @@
         "Parameters": {
           "dampingLin": 0,
           "dampingAng": 0,
-          "position": [ -100, 0, 10],
-          "gravity": [ 0.0, 0.0, 0.0 ],
+          "gravity": [ 0.0, -9.8, 0.0 ],
           "restitution": 0.5,
           "linealVel": [ 5.0, 0.0, 0.0 ],
           "friction": 0.5,

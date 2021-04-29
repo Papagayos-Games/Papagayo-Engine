@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\LoaderSystem.h" />
-    <ClInclude Include="..\..\include\Managers\RenderManager.h" />
     <ClInclude Include="..\..\include\Managers\SceneManager.h" />
     <ClInclude Include="..\..\include\PapagayoEngine.h" />
     <ClInclude Include="..\..\include\Scene\Scene.h" />

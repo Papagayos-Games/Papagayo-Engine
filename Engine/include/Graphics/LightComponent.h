@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef _GRAPHICS_LIGHTCOMP_H
+#define _GRAPHICS_LIGHTCOMP_H
+
 #include <Component.h>
 #include <string>
 
@@ -31,7 +35,7 @@ public:
 	//	Apaga la luz
 	void turnOff();
 	//	Cambia el color de una luz
-	void setColor(Vector3 newColor);
+	void setColor(const Vector3& newColor);
 	//	Cambia la intensidad de una luz ( 0.0 -> 1.0)
 	void setLightPower(float intensity);
 	//	Activa las sombras
@@ -43,3 +47,4 @@ public:
 	virtual void load(const nlohmann::json& params)override;
 };
 
+#endif

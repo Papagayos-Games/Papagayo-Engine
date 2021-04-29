@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef _PAPAENG_SCENEMAN_H
+#define _PAPAENG_SCENEMAN_H
+
 #include <string>
 #include <vector>
 
@@ -30,3 +34,5 @@ private:
 	bool change_;
 	std::string nextScene_;
 };
+
+#endif // !_PAPAENG_SCENEMAN_H

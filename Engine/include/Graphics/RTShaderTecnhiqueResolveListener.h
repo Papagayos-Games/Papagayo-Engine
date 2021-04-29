@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _GRAPHICS_RTTSHADERLIST_H
+#define _GRAPHICS_RTTSHADERLIST_H
+
 #include <OgreMaterialManager.h>
 
 namespace Ogre {
@@ -25,7 +28,7 @@ public:
 
     //Creacion de shaders en sistemas de renderizado que carecen de FixedPipeline
     Ogre::Technique* handleSchemeNotFound(unsigned short schemeIndex, const Ogre::String& schemeName,
-        Ogre::Material* originalMaterial, unsigned short lodIndex, const Ogre::Renderable* rend)override;
-
+    Ogre::Material* originalMaterial, unsigned short lodIndex, const Ogre::Renderable* rend)override;
 };
 
+#endif

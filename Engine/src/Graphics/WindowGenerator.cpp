@@ -78,7 +78,7 @@ void WindowGenerator::initWindow(std::string name)
 	mRoot_->addFrameListener(this);
 }
 
-WindowGenerator::WindowGenerator(Root* root, std::string name) : mRoot_(root)
+WindowGenerator::WindowGenerator(Root* root, const std::string& name) : mRoot_(root)
 {
 	initWindow(name);
 }
@@ -93,7 +93,7 @@ WindowGenerator* WindowGenerator::getInstance()
 	return instance_;
 }
 
-bool WindowGenerator::setupInstance(Root* root, std::string name)
+bool WindowGenerator::setupInstance(Root* root, const std::string& name)
 {
 	if (instance_ == 0)
 	{
@@ -117,14 +117,30 @@ WindowGenerator::~WindowGenerator()
 	}
 }
 
-RenderWindow* WindowGenerator::getRenderWindow()const
+RenderWindow* WindowGenerator::getRenderWindow()
 {
 	return renderWindow_;
 }
 
-inline RenderSystem* WindowGenerator::getRenderSystem()const
+
+RenderWindow* WindowGenerator::getRenderWindow() const
+{
+	return renderWindow_;
+}
+
+inline RenderSystem* WindowGenerator::getRenderSystem()
 {
 	return nullptr;//renderSystem_;
+}
+
+inline RenderSystem* WindowGenerator::getRenderSystem() const
+{
+	return nullptr;//renderSystem_;
+}
+
+SDL_Window* WindowGenerator::getSDLWindow()
+{
+	return sdlWindow_;
 }
 
 SDL_Window* WindowGenerator::getSDLWindow() const

@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef _GRAPHICS_MESHCOMP_H
+#define _GRAPHICS_MESHCOMP_H
+
 #include "Component.h"
 #include <string>
 
@@ -8,7 +12,6 @@ class Transform;
 namespace Ogre {
 	class SceneNode;
 	class Entity;
-	
 }
 
 class MeshComponent: public Component
@@ -19,7 +22,6 @@ private:
 	Ogre::Entity* ogreEnt_ = nullptr;
 	Transform* tr_ = nullptr;
 	
-
 public:
 	//constructora por defecto
 	MeshComponent();
@@ -29,15 +31,14 @@ public:
 	//metodo para desactivar el componente y su nodo
 	virtual void setActive( bool act) override;
 	
-
 	virtual ~MeshComponent();
 	virtual void update() override;
 	virtual void setUp() override;
-	virtual void load(const nlohmann::json& params)override;
+	virtual void load(const nlohmann::json& params) override;
 	virtual void init()override;
 
-
 	//metodo para asignar un material nuevo a la entidad
-	void setMaterial(std::string matName);
+	void setMaterial(const std::string& matName);
 };
 
+#endif

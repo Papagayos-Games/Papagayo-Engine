@@ -28,9 +28,9 @@ Component* Entity::getComponent(int managerId, int compId)
 	return _componentMap[managerId][compId];
 }
 
-bool Entity::hasComponent(int managerId, int compId)
+bool Entity::hasComponent(int managerId, int compId) const
 {
-	return _componentMap[managerId].count(compId);
+	return _componentMap.find(managerId)->second.count(compId);
 }
 
 bool Entity::removeComponent(int managerId, int compId) {

@@ -92,7 +92,7 @@ void MeshComponent::init()
 {
 }
 
-void MeshComponent::setMaterial(std::string matName)
+void MeshComponent::setMaterial(const std::string& matName)
 {
 	ogreEnt_->setMaterialName(matName);
 }

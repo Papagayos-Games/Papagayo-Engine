@@ -104,21 +104,21 @@ void InputSystem::handleInput()
 	}
 }
 
-bool InputSystem::isKeyDown(SDL_Keycode key)
+bool InputSystem::isKeyDown(SDL_Keycode key) const
 {
 	const Uint8* state = SDL_GetKeyboardState(NULL);
 
 	return state[SDL_Scancode(key)] == true;
 }
 
-bool InputSystem::isKeyUp(SDL_Keycode key)
+bool InputSystem::isKeyUp(SDL_Keycode key) const
 {
 	const Uint8* state = SDL_GetKeyboardState(NULL);
 
 	return state[SDL_Scancode(key)] == false;
 }
 
-void InputSystem::onMouseMotion(SDL_Event& e)
+void InputSystem::onMouseMotion(SDL_Event& e) const
 {
 
 }

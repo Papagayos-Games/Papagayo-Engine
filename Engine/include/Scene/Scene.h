@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _PAPAENG_SCENE_H
+#define _PAPAENG_SCENE_H
+
 #include <string>
 #include <list>
 #include <map>
@@ -35,3 +38,4 @@ private:
 	std::string name;
 };
 
+#endif

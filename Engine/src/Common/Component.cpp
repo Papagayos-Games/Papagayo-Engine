@@ -15,11 +15,15 @@ void Component::setId(int id) {
 	_id = id;
 }
 
+int Component::getId() {
+	return _id;
+}
+
 int Component::getId() const {
 	return _id;
 }
 
-bool Component::isActive() {
+bool Component::isActive() const {
 	return _active;
 }
 
@@ -31,11 +35,19 @@ Entity* Component::getEntity() {
 	return _entity;
 }
 
+Entity* Component::getEntity() const {
+	return _entity;
+}
+
 void Component::setEntity(Entity* e) {
 	_entity = e;
 }
 
 Manager* Component::getManager() {
+	return _manager;
+}
+
+Manager* Component::getManager() const {
 	return _manager;
 }
 

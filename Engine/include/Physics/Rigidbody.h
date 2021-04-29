@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef _PHYSICS_RIGIDBODY_H
+#define _PHYSICS_RIGIDBODY_H
+
 #include "Component.h"
 //#include "BulletDynamics/Dynamics/btRigidBody.h"
 #include <iostream>
@@ -43,10 +47,10 @@ public:
 #pragma region Setters
 
 	//metodo que setea la posicion del rb
-	void setPosition(Vector3 newPos);
+	void setPosition(const Vector3& newPos);
 
 	//Asigna una nueva gravedad al componente
-	void setGravity(const Vector3 newGrav);
+	void setGravity(const Vector3& newGrav);
 
 	//metodo que si recibe true hara que el rigidbody active sus flags de colision para que estos actuen como trigger,
 	//si es false desactivara sus flags de colision para que este deje de ser un trigger.
@@ -67,7 +71,7 @@ public:
 	void setRestitution(float restitution);
 
 	//metodo que setea la velocidad lineal del rb
-	void setLinearVelocity(Vector3 vel);
+	void setLinearVelocity(const Vector3& vel);
 
 	//metodo que setea el rozamiento del rb
 	void setFriction(float friction);
@@ -78,39 +82,43 @@ public:
 
 #pragma region Getters
 	//metodo que devuelve la velocidad lineal del rb
-	Vector3 getLinearVelocity() const;
+	const Vector3& getLinearVelocity();
+	const Vector3& getLinearVelocity() const;
 
 	//metodo que nos dice si el rigidbody es trigger o no
-	bool isTrigger();
+	bool isTrigger() const;
 
 	//metodo que nos dice si el rigidbody es kinematic
-	bool isKinematic();
+	bool isKinematic() const;
 
 	//metodo que nos dice si el rigidbody es estatico
-	bool isStatic();
+	bool isStatic() const;
 
 	btCollisionShape* getShape();
+	btCollisionShape* getShape() const;
 
 	btRigidBody* getBtRb();
+	btRigidBody* getBtRb() const;
 #pragma endregion
 
 #pragma region Adders
 	//Aplica fuerza al rigidbody de tipo Forces
 	//a una posicion relativa del objeto, es decir,
 	//la parte del cuerpo donde se aplica la fuerza
-	void addForce(Vector3 force, Vector3 relativePos, Forces type = Forces::NORMAL);
+	void addForce(const Vector3& force, Vector3& relativePos, Forces type = Forces::NORMAL);
 
 	//Aplica una fuerza de giro al objeto de tipo Forces
-	void addTorque(Vector3 torque, Forces type = Forces::NORMAL);
+	void addTorque(const Vector3& torque, Forces type = Forces::NORMAL);
 #pragma endregion
 
 #pragma region Colisiones
 	//Comprueba la colision con otro objeto de la escena
-	bool onCollisionEnter(std::string id) const;
+	bool onCollisionEnter(const std::string& id) const;
 
 	//Comprueba la colisiones con otros objetos con un tag
 	//dentro de la escena especifica
-	Entity* collidesWithTag(std::string tag) const;
+	Entity* collidesWithTag(const std::string& tag) const;
 #pragma endregion
 };
 
+#endif

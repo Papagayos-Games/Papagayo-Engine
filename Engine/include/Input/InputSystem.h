@@ -21,14 +21,14 @@ public:
 	static void clean();
 
 	void handleInput();
-	bool isKeyDown(SDL_Keycode key);
-	bool isKeyUp(SDL_Keycode key);
+	bool isKeyDown(SDL_Keycode key) const;
+	bool isKeyUp(SDL_Keycode key) const;
 	
 private:
 	InputSystem();
 	static InputSystem* instance_;
 
-	void onMouseMotion(SDL_Event& e);
+	void onMouseMotion(SDL_Event& e) const;
 	
 	// if in this frame there has been an event
 	bool mouseEvent_ = false; // click

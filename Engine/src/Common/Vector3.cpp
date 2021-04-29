@@ -14,7 +14,7 @@ Vector3::Vector3(const float x1, const float y1, const float z1) :
 }
 
 // Se puede tratar la excepcion en el load, si no se trata aqui
-Vector3::Vector3(std::vector<float> pos)
+Vector3::Vector3(const std::vector<float>& pos)
 {
 	if (pos.size() >= 3) {
 		x = pos[0]; y = pos[1]; z = pos[2];

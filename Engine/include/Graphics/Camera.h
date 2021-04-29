@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef _GRAPHICS_CAMERA_H
+#define _GRAPHICS_CAMERA_H
+
 #include "Component.h"
 #include <string>
 
@@ -40,15 +44,16 @@ public:
 	virtual void load(const nlohmann::json& params) override;
 	virtual void init()override;
 
-	void setCameraPosition(Vector3 newPos);
-	void setCameraDir(Vector3 newDir);
-	void setBackgroundColor(Vector3 newColor ,float alpha);
+	void setCameraPosition(const Vector3& newPos);
+	void setCameraDir(Vector3& newDir);
+	void setBackgroundColor(const Vector3& newColor ,float alpha);
 	void setNearClipDistance(int distance);
 	void setFarClipDistance(int distance);
 
-
-	Vector3 getCameraPosition();
+	const Vector3& getCameraPosition();
+	const Vector3& getCameraPosition() const;
 	inline Ogre::Camera* getCamera();
-
+	inline Ogre::Camera* getCamera() const;
 };
 
+#endif

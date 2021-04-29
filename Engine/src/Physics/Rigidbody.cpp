@@ -41,6 +41,10 @@ RigidBody::~RigidBody()
 void RigidBody::setUp()
 {
 	tr_ = static_cast<Transform*>(_entity->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
+	btQuaternion q;
+	Vector3 vRot = tr_->getRot();
+	q.setEulerZYX(vRot.x, vRot.y, vRot.z);
+	rb->setWorldTransform(btTransform(q, convertVector(tr_->getPos())));
 }
 
 void RigidBody::init()
@@ -95,13 +99,6 @@ void RigidBody::load(const nlohmann::json& params)
 		float dL = it->get<float>();
 		float dA = it->get<float>();
 		rb->setDamping(dL, dA);
-	}
-
-	//Posicion
-	it = params.find("position");
-	if (it != params.end()) {
-		std::vector<float> pos = it->get<std::vector<float>>();
-		setPosition(Vector3(pos[0], pos[1], pos[2]));
 	}
 
 	//Gravedad
@@ -214,7 +211,7 @@ void RigidBody::load(const nlohmann::json& params)
 #pragma endregion
 
 #pragma region Setters
-void RigidBody::setPosition(Vector3 newPos)
+void RigidBody::setPosition(const Vector3& newPos)
 {
 	if (_active) {
 		btTransform tr;
@@ -225,7 +222,7 @@ void RigidBody::setPosition(Vector3 newPos)
 	}
 }
 
-void RigidBody::setGravity(const Vector3 newGrav)
+void RigidBody::setGravity(const Vector3& newGrav)
 {
 	rb->setGravity(convertVector(newGrav));
 }
@@ -275,7 +272,7 @@ void RigidBody::setRestitution(float restitution)
 	}
 }
 
-void RigidBody::setLinearVelocity(Vector3 vel)
+void RigidBody::setLinearVelocity(const Vector3& vel)
 {
 	if (_active) {
 		btVector3 v = btVector3(vel.x, vel.y, vel.z);
@@ -298,7 +295,7 @@ void RigidBody::setCollisionShape(btCollisionShape* newShape)
 
 #pragma region Getters
 
-Vector3 RigidBody::getLinearVelocity() const
+const Vector3& RigidBody::getLinearVelocity()
 {
 	if (_active) {
 		btVector3 vel = rb->getLinearVelocity();
@@ -309,17 +306,28 @@ Vector3 RigidBody::getLinearVelocity() const
 	}
 }
 
-bool RigidBody::isTrigger()
+const Vector3& RigidBody::getLinearVelocity() const
+{
+	if (_active) {
+		btVector3 vel = rb->getLinearVelocity();
+		return Vector3(vel.x(), vel.y(), vel.z());
+	}
+	else {
+		return Vector3(0, 0, 0);
+	}
+}
+
+bool RigidBody::isTrigger() const
 {
 	return trigger;
 }
 
-bool RigidBody::isKinematic()
+bool RigidBody::isKinematic() const
 {
 	return rb->isKinematicObject();
 }
 
-bool RigidBody::isStatic()
+bool RigidBody::isStatic() const
 {
 	return rb->isStaticObject();
 }
@@ -329,7 +337,17 @@ btCollisionShape* RigidBody::getShape()
 	return rb->getCollisionShape();
 }
 
+btCollisionShape* RigidBody::getShape() const
+{
+	return rb->getCollisionShape();
+}
+
 btRigidBody* RigidBody::getBtRb()
+{
+	return rb;
+}
+
+btRigidBody* RigidBody::getBtRb() const
 {
 	return rb;
 }
@@ -338,7 +356,7 @@ btRigidBody* RigidBody::getBtRb()
 
 #pragma region Adders
 
-void RigidBody::addForce(Vector3 force, Vector3 relativePos, Forces type)
+void RigidBody::addForce(const Vector3& force, Vector3& relativePos, Forces type)
 {
 	if (_active) {
 		if (relativePos == Vector3(0.0f, 0.0f, 0.0f)) {
@@ -360,7 +378,7 @@ void RigidBody::addForce(Vector3 force, Vector3 relativePos, Forces type)
 	}
 }
 
-void RigidBody::addTorque(Vector3 torque, Forces type)
+void RigidBody::addTorque(const Vector3& torque, Forces type)
 {
 	if (_active) {
 		if (type == Forces::NORMAL)
@@ -406,7 +424,7 @@ bool RigidBody::collidesWithEntity(Entity* other) const
 	return collPoint.m_hasResult && collPoint.m_distance <= 0;
 }
 
-bool RigidBody::onCollisionEnter(std::string id) const
+bool RigidBody::onCollisionEnter(const std::string& id) const
 {
 	//Devuelve true en caso de existir colision
 	if (_active) {
@@ -418,7 +436,7 @@ bool RigidBody::onCollisionEnter(std::string id) const
 	return false;
 }
 
-Entity* RigidBody::collidesWithTag(std::string tag) const
+Entity* RigidBody::collidesWithTag(const std::string& tag) const
 {
 	//Obtiene la lista de entidades de la escena
 	//std::vector<Entity*> tagEntities = scene_->getEntitiesByTag(tag);

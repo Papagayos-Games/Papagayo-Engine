@@ -10,7 +10,11 @@ Manager::~Manager() {
 	destroyAllComponents();
 }
 
-std::list<Component*> Manager::getComponents() {
+const std::list<Component*>& Manager::getComponents() {
+	return _compsList;
+}
+
+const std::list<Component*>& Manager::getComponents() const {
 	return _compsList;
 }
 
@@ -38,12 +42,16 @@ int Manager::getId() {
 	return (int)_manId;
 }
 
-void Manager::registerComponent(std::string name, std::function<Component * ()> compConst)
+int Manager::getId() const {
+	return (int)_manId;
+}
+
+void Manager::registerComponent(const std::string& name, std::function<Component * ()> compConst)
 {
 	compsRegistry_[name] = compConst;
 }
 
-Component* Manager::create(std::string name, Entity* ent)
+Component* Manager::create(const std::string& name, Entity* ent)
 {
 	Component* comp = nullptr;
 	auto it = compsRegistry_.find(name);

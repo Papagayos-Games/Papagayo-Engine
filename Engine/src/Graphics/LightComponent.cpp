@@ -25,7 +25,7 @@ void LightComponent::turnOff()
 	ogreLight_->setVisible(false);
 }
 
-void LightComponent::setColor(Vector3 newColor)
+void LightComponent::setColor(const Vector3& newColor)
 {
 	ogreLight_->setDiffuseColour(Ogre::ColourValue(newColor.x, newColor.y, newColor.z));
 }
@@ -124,6 +124,4 @@ void LightComponent::load(const nlohmann::json& params)
 		ogreLight_->setDirection(diff[0], diff[1], diff[2]);
 	}
 	else ogreLight_->setDirection(0, 0, 1.0);
-	
-
 }

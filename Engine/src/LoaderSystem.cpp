@@ -16,7 +16,7 @@
 
 // nlohmann::json;
 
-std::vector<std::string> LoaderSystem::loadScenes(std::string fileName)
+std::vector<std::string> LoaderSystem::loadScenes(const std::string& fileName)
 {
 	std::fstream i(fileName);
 	if (!i.is_open()) {
@@ -33,7 +33,7 @@ std::vector<std::string> LoaderSystem::loadScenes(std::string fileName)
 }
 
 
-void LoaderSystem::loadEntities(std::string fileName, Scene* scene)
+void LoaderSystem::loadEntities(const std::string& fileName, Scene* scene)
 {
 
 	std::fstream i("Scenes/" + fileName + ".json");	// TO DO: poner la ruta definitiva cuando este la carpeta final
@@ -62,7 +62,7 @@ void LoaderSystem::loadEntities(std::string fileName, Scene* scene)
 	i.close();
 }
 
-void LoaderSystem::loadComponents(nlohmann::json comps, Entity* entity)
+void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 {
 	if (comps.is_null() || !comps.is_array())
 		throw std::exception("ERROR: Components not found\n");
@@ -106,7 +106,7 @@ void LoaderSystem::loadComponents(nlohmann::json comps, Entity* entity)
 }
 
 // Deserialize parameters	
-void LoaderSystem::readParameters(std::string dump, std::map<std::string, std::string>& params)
+void LoaderSystem::readParameters(std::string& dump, std::map<std::string, std::string>& params)
 {
 	std::string delimiter = "\"";
 
@@ -128,7 +128,7 @@ void LoaderSystem::readParameters(std::string dump, std::map<std::string, std::s
 	}
 }
 
-void LoaderSystem::loadPrefabs(nlohmann::json pref, Entity* ent) {
+void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent) {
 	if (pref.is_null() || !pref.is_object())
 		throw std::exception("ERROR: Prefab not found\n");
 

@@ -1,7 +1,10 @@
 #pragma once
+
+#ifndef _GRAPHICS_PLANECOMP_H
+#define _GRAPHICS_PLANECOMP_H
+
 #include <Component.h>
 #include <string>
-
 
 class Vector3;
 namespace Ogre {
@@ -24,10 +27,10 @@ private:
 public:
     PlaneComponent();
 
-    void setMaterial(std::string matName);
+    void setMaterial(const std::string& matName);
     virtual void init();
-    virtual void update() {};
+    virtual void update();
     virtual void load(const nlohmann::json& params)override;
-
 };
 
+#endif

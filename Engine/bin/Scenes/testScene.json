@@ -22,14 +22,7 @@
           "Component": "Transform",
           "Type": "Common",
           "Parameters" : {
-            "position": [ 123,-300,67 ]
-          }
-        },
-        {
-          "Component": "RigidBody",
-          "Type": "Physics",
-          "Parameters" : {
-            "position" : [123, 45, 67]
+            "position": [ 123,45,67 ]
           }
         }
       ]

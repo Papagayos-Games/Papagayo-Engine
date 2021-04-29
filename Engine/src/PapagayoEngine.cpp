@@ -88,7 +88,6 @@ void PapagayoEngine::init()
 	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
 #pragma endregion
 
-	PhysicsManager::getInstance()->init(Vector3(0.0, -9.8, 0.0));
 	start();
 }
 
@@ -129,7 +128,12 @@ void PapagayoEngine::run() {
 	}
 }
 
-std::map<std::string, Manager*> PapagayoEngine::getManagers()
+const std::map<std::string, Manager*>& PapagayoEngine::getManagers()
+{
+	return manRegistry_;
+}
+
+const std::map<std::string, Manager*>& PapagayoEngine::getManagers() const
 {
 	return manRegistry_;
 }

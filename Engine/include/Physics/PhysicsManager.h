@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _PHYSICS_PHYSICSMAN_H
+#define _PHYSICS_PHYSICSMAN_H
+
 #include <vector>
 #include "Manager.h"
 #ifdef _DEBUG
@@ -77,3 +80,5 @@ public:
 	virtual void destroyAllComponents();
 	virtual bool destroyComponent(Entity* ent, int compId);
 };
+
+#endif

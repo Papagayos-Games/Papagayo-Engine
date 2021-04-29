@@ -16,7 +16,9 @@ PlaneComponent::PlaneComponent():
 void PlaneComponent::init(){
 	mNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode();
 }
-void PlaneComponent::setMaterial(std::string matName)
+
+void PlaneComponent::update(){}
+void PlaneComponent::setMaterial(const std::string& matName)
 {
 	try {
 		ent_->setMaterialName(matName);

@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef _GRAPHICS_WINDGENLIST_H
+#define _GRAPHICS_WINDGENLIST_H
+
 #include "OgreFrameListener.h"
 #ifdef _DEBUG
 #include "checkML.h"
@@ -17,8 +21,7 @@ class WindowGenerator : public Ogre::FrameListener
 private:
 	//Singleton
 	static WindowGenerator* instance_;
-	WindowGenerator(Ogre::Root* root, std::string name);
-
+	WindowGenerator(Ogre::Root* root, const std::string& name);
 
 	Ogre::RenderWindow* renderWindow_;
 	Ogre::Root* mRoot_;
@@ -31,14 +34,18 @@ private:
 public:
 	//Singleton, init y get separados
 	static WindowGenerator* getInstance();
-	static bool setupInstance(Ogre::Root* root, std::string name);
+	static bool setupInstance(Ogre::Root* root, const std::string& name);
 	static void clean();
 
 	virtual ~WindowGenerator();
 
 	//Getters
-	Ogre::RenderWindow* getRenderWindow()const;
-	inline Ogre::RenderSystem* getRenderSystem()const;
-	SDL_Window* getSDLWindow()const;
+	Ogre::RenderWindow* getRenderWindow();
+	Ogre::RenderWindow* getRenderWindow() const;
+	inline Ogre::RenderSystem* getRenderSystem();
+	inline Ogre::RenderSystem* getRenderSystem() const;
+	SDL_Window* getSDLWindow();
+	SDL_Window* getSDLWindow() const;
 };
 
+#endif

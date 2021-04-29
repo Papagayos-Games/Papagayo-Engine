@@ -12,7 +12,6 @@
 class Entity;
 class Component;
 
-
 enum class ManID
 {
 	Common = 0,
@@ -44,16 +43,19 @@ public:
 	virtual void start() = 0;
 	virtual void update() = 0;
 
-	std::list<Component*> getComponents();
+	const std::list<Component*>& getComponents();
+	const std::list<Component*>& getComponents() const;
+
 	virtual void destroyAllComponents();
 	virtual bool destroyComponent(Entity* ent, int compId);
 
-
 	//-- Factory --//
-	void registerComponent(std::string name, std::function<Component * ()>compConst);
-	Component* create(std::string name, Entity* ent);	//esto puede ser un puntero inteligente
+	void registerComponent(const std::string& name, std::function<Component * ()>compConst);
+	Component* create(const std::string& name, Entity* ent);	//esto puede ser un puntero inteligente
 	//-------------//
+
 	int getId();
+	int getId() const;
 };
 
 #endif

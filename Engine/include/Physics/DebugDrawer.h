@@ -1,6 +1,7 @@
 #pragma once
-#ifndef DebugDrawer_h__
-#define DebugDrawer_h__
+
+#ifndef _PHYSICS_DEBUGDRAWER_H
+#define _PHYSICS_DEBUGDRAWER_H
 
 #include "LinearMath/btIDebugDraw.h"
 #include <Ogre.h>
@@ -44,4 +45,5 @@ public:
     //Obtener modo debug
     int getDebugMode() const override;
 };
+
 #endif

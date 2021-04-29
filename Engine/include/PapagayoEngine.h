@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _PAPAENG_PAPAENG_H
+#define _PAPAENG_PAPAENG_H
+
 #include <map>
 #include <vector>
 #include <string>
@@ -16,7 +19,8 @@ public:
 	static void clean();
 	void start();
 	void run();
-	std::map<std::string, Manager*> getManagers();
+	const std::map<std::string, Manager*>& getManagers();
+	const std::map<std::string, Manager*>& getManagers() const;
 	
 private:
 	static PapagayoEngine* instance_;
@@ -28,3 +32,5 @@ private:
 	void init();
 	void update();
 };
+
+#endif

@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef _GRAPHICS_RENDMAN_H
+#define _GRAPHICS_RENDMAN_H
+
 #include "Manager.h"
 
 namespace Ogre {
@@ -31,3 +35,4 @@ public:
 	virtual void update();
 };
 
+#endif

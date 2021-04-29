@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _GRAPHICS_OGRECONT_H
+#define _GRAPHICS_OGRECONT_H
+
 #include <string>
 #ifdef _DEBUG
 #endif
@@ -30,21 +33,24 @@ private:
 	std::string appName_;
 
 
-	OgreContext(std::string appName);
+	OgreContext(const std::string& appName);
 	void createRoot();
 	void createSceneManager();
 	void init();
 	void loadFromResourceFile();
 public:
 	~OgreContext();
+	Ogre::Root* getOgreRoot();
 	Ogre::Root* getOgreRoot() const;
+	Ogre::SceneManager* getSceneManager();
 	Ogre::SceneManager* getSceneManager() const;
 	
 	static OgreContext* getInstance();
-	static bool setupInstance(std::string appName);
+	static bool setupInstance(const std::string& appName);
 	void setupRTShaderGenerator();
 	static void clean();
 	//Hay que poner en el material un lighting off
-	void setSkyPlane(std::string materialName, Ogre::Plane plane, int width, int height, float bow);
+	void setSkyPlane(const std::string& materialName, const Ogre::Plane& plane, int width, int height, float bow);
 };
 
+#endif

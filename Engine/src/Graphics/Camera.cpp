@@ -184,18 +184,18 @@ void Camera::load(const nlohmann::json& params)
 
 }
 
-void Camera::setCameraPosition(Vector3 newPos)
+void Camera::setCameraPosition(const Vector3& newPos)
 {
 	camNode_->setPosition(Ogre::Vector3(newPos.x, newPos.y, newPos.z));
 }
 
-void Camera::setCameraDir(Vector3 newDir)
+void Camera::setCameraDir(Vector3& newDir)
 {
 	newDir.normalize();
 	camNode_->lookAt(Ogre::Vector3(newDir.x, newDir.y, newDir.z), Ogre::Node::TS_WORLD);
 }
 
-void Camera::setBackgroundColor(Vector3 newColor, float alpha)
+void Camera::setBackgroundColor(const Vector3& newColor, float alpha)
 {
 	vp_->setBackgroundColour(Ogre::ColourValue(newColor.x, newColor.y, newColor.z, alpha));//cambia el color del fondo
 }
@@ -210,12 +210,22 @@ void Camera::setFarClipDistance(int distance)
 	mCamera_->setFarClipDistance(distance);
 }
 
-Vector3 Camera::getCameraPosition()
+const Vector3& Camera::getCameraPosition()
+{
+	Ogre::Vector3 aux = camNode_->getPosition();
+	return Vector3(aux.x, aux.y, aux.z);
+}
+
+const Vector3& Camera::getCameraPosition() const
 {
 	Ogre::Vector3 aux = camNode_->getPosition();
 	return Vector3(aux.x, aux.y, aux.z);
 }
 
 Ogre::Camera* Camera::getCamera() {
+	return mCamera_;
+}
+
+Ogre::Camera* Camera::getCamera() const {
 	return mCamera_;
 }
