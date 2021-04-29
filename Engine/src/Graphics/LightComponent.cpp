@@ -55,7 +55,7 @@ void LightComponent::setActive(bool status)
 	Component::setActive(status);
 }
 
-void LightComponent::load(nlohmann::json params)
+void LightComponent::load(const nlohmann::json& params)
 {
 	auto it = params.find("lightName");
 	if (it != params.end()) {

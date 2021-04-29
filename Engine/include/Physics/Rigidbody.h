@@ -39,7 +39,7 @@ public:
 	/// <summary>
 	/// Carga datos a partir de un json
 	/// </summary>
-	virtual void load(nlohmann::json params);
+	virtual void load(const nlohmann::json& params);
 #pragma region Setters
 
 	//metodo que setea la posicion del rb

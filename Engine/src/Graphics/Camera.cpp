@@ -68,7 +68,7 @@ void Camera::setUp()
 	tr_ = static_cast<Transform*>(_entity->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
 }
 
-void Camera::load(nlohmann::json params)
+void Camera::load(const nlohmann::json& params)
 {
 	//PARAMETRO NOMBRE OBLIGATORIO
 	auto it = params.find("camName");

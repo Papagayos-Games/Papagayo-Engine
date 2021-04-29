@@ -15,10 +15,10 @@ std::list<Component*> Manager::getComponents() {
 }
 
 void Manager::destroyAllComponents() {
-	for (auto it = _compsList.begin(); it != _compsList.end(); )
+	for (auto it = _compsList.begin(); it != _compsList.end(); it = _compsList.begin())
 	{
-		_compsList.erase(it);
 		delete* it;
+		_compsList.erase(it);
 	}
 }
 

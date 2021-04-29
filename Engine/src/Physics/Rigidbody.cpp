@@ -72,7 +72,7 @@ void RigidBody::update()
 	tr_->setRot(Vector3(roll, pitch, yaw));
 }
 
-void RigidBody::load(nlohmann::json params)
+void RigidBody::load(const nlohmann::json& params)
 {
 	//Masa
 	auto it = params.find("mass");

@@ -21,7 +21,7 @@ public:
 
 
 	virtual void init() = 0;
-	virtual void load(nlohmann::json params);	// por ahora no abstracto para probar
+	virtual void load(const nlohmann::json& params) = 0;
 	virtual void update() = 0;
 	virtual void setUp();
 

@@ -60,7 +60,7 @@ void MeshComponent::setUp()
 	tr_ = static_cast<Transform*>(_entity->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
 }
 
-void MeshComponent::load(nlohmann::json params)
+void MeshComponent::load(const nlohmann::json& params)
 {
 
 	auto it = params.find("meshName");

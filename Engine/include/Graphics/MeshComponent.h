@@ -33,7 +33,7 @@ public:
 	virtual ~MeshComponent();
 	virtual void update() override;
 	virtual void setUp() override;
-	virtual void load(nlohmann::json params)override;
+	virtual void load(const nlohmann::json& params)override;
 	virtual void init()override;
 
 

@@ -26,7 +26,7 @@ void PlaneComponent::setMaterial(std::string matName)
 	}
 }
 
-void PlaneComponent::load(nlohmann::json params)
+void PlaneComponent::load(const nlohmann::json& params)
 {
 	std::string name;
 	auto it = params.find("planeName");

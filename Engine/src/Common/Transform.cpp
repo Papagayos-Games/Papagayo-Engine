@@ -20,38 +20,8 @@ Transform::Transform(Vector3 pos, Vector3 vel,Vector3 dim, Vector3 rotation) :
 {
 }
 
-/*Transform::Transform(nlohmann::json params) : Component(CommonManager::getInstance(), (int)CommonManager::CommonCmpId::TransId)
-{
-	nlohmann::json param;
-	param = params["position"];
-	try {
-		float x = param.get<std::vector<float>>()[0];
-	}
-	catch (std::exception e) {
-		throw "Buenas";
-	}
-	/*auto it = params.find("position");
-	
-	if (it != params.end())
-		_position = Vector3(it->second);
-	else
-		_position = Vector3();
-	if ((it = params.find("velocity")) != params.end())
-		_velocity = Vector3(it->second);
-	else
-		_velocity = Vector3();
-	if ((it = params.find("dimensions")) != params.end())
-		_dimensions = Vector3(it->second);
-	else
-		_dimensions = Vector3(1,1,1);
-	if ((it = params.find("rotation")) != params.end())
-		_rotation = Vector3(it->second);
-	else
-		_rotation = Vector3();
-}*/
-
 // Si algun parametro no se especifica, se mantendra por defecto
-void Transform::load(nlohmann::json params)
+void Transform::load(const nlohmann::json& params)
 {
 	auto it = params.find("position");
 	if (it != params.end()) {

@@ -23,7 +23,7 @@ public:
 	virtual ~Transform();
 
 	virtual void init();
-	virtual void load(nlohmann::json params);
+	virtual void load(const nlohmann::json& params);
 	virtual void update();
 
 	// position

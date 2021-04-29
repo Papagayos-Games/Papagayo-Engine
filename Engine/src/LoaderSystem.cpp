@@ -20,7 +20,7 @@ std::vector<std::string> LoaderSystem::loadScenes(std::string fileName)
 {
 	std::fstream i(fileName);
 	if (!i.is_open()) {
-		throw "ERROR: Loading scene " + fileName + " failed, file missing\n";
+		throw std::runtime_error("ERROR: Loading scene " + fileName + " failed, file missing\n");
 	}
 	nlohmann::json j;
 	i >> j;
@@ -28,6 +28,7 @@ std::vector<std::string> LoaderSystem::loadScenes(std::string fileName)
 	if (sceneFiles.is_null() || !sceneFiles.is_array())
 		throw std::exception("ERROR: Scene files not found\n");
 	std::vector<std::string> scenes = sceneFiles.get<std::vector<std::string>>();
+	i.close();
 	return scenes;
 }
 
@@ -50,10 +51,15 @@ void LoaderSystem::loadEntities(std::string fileName, Scene* scene)
 	
 	for (int i = 0; i < entSize; i++) {
 		Entity* ent = new Entity();
-		loadComponents(entities[i]["Components"], ent);
+		nlohmann::json prefab = entities[i]["Prefab"];
+		if (prefab.is_null() || !prefab.is_string())
+			loadComponents(entities[i]["Components"], ent);
+		else
+			loadPrefabs(entities[i], ent);
 		scene->addEntity(ent);
 	}
 	
+	i.close();
 }
 
 void LoaderSystem::loadComponents(nlohmann::json comps, Entity* entity)
@@ -120,4 +126,54 @@ void LoaderSystem::readParameters(std::string dump, std::map<std::string, std::s
 		auto it = --params.end();
 		it->second.pop_back();
 	}
+}
+
+void LoaderSystem::loadPrefabs(nlohmann::json pref, Entity* ent) {
+	if (pref.is_null() || !pref.is_object())
+		throw std::exception("ERROR: Prefab not found\n");
+
+	if (pref["Prefab"].is_null() || !pref["Prefab"].is_string())
+		throw std::exception("ERROR: Prefab files not found\n");
+
+	std::string fileName = pref["Prefab"].get<std::string>();
+	std::fstream i ("Prefabs/" + fileName + ".json");
+
+	if (!i.is_open()) {
+		throw std::runtime_error("ERROR: Loading scene " + fileName + " failed, file missing\n");
+	}
+
+	nlohmann::json prefJson;
+	i >> prefJson;
+
+	if (!pref["Arguments"].is_null() && pref["Arguments"].is_array()) {
+		nlohmann::json args = pref["Arguments"];
+		int argSize = args.size();
+
+		for (int i = 0; i < argSize; i++) {
+			nlohmann::json type = args[i]["Type"];
+			if (type.is_null() || !type.is_string())
+				throw std::exception("ERROR: Component type not found\n");
+
+			nlohmann::json component = args[i]["Component"];
+			if (component.is_null() || !component.is_string())
+				throw std::exception("ERROR: Component name not found\n");
+
+			for (nlohmann::json::iterator it = prefJson["Components"].begin(); it != prefJson["Components"].end(); ++it) {
+				if (it.value()["Type"] == type && it.value()["Component"] == component) {
+
+					for (auto p : args[i]["Parameters"].items())
+					{
+						it.value()["Parameters"][p.key()] = p.value();
+					}
+					break;
+				}
+				std::cout << *it << '\n';
+			}
+		}
+	}
+
+	loadComponents(prefJson["Components"], ent);
+	// ya funciona sin parametros individuales
+
+	i.close();
 }

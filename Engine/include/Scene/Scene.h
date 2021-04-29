@@ -2,6 +2,13 @@
 
 #include <string>
 #include <list>
+#include <map>
+
+//#include "json.hpp"
+
+//namespace nlohmann {
+//	class json;
+//}
 
 class Entity;
 class Component;
@@ -20,8 +27,10 @@ public:
 	// TO DO: buscar a la entidad por tag
 	Entity* getEntity(const std::string& name);
 
-
 private:
+	// la key seria el nombre del archivo
+	// std::map<std::string, Entity*> prefabs_;
+
 	std::list<Entity*> entities_;
 	std::string name;
 };

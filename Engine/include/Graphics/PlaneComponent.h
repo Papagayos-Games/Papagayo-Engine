@@ -27,7 +27,7 @@ public:
     void setMaterial(std::string matName);
     virtual void init();
     virtual void update() {};
-    virtual void load(nlohmann::json params)override;
+    virtual void load(const nlohmann::json& params)override;
 
 };
 
