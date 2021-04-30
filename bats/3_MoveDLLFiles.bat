@@ -38,6 +38,8 @@ echo moviendo FMOD
 copy ..\Engine\dependencies\fmod\build\lib\fmod.dll ..\Engine\bin
 copy ..\Engine\dependencies\fmod\build\lib\fmodL.dll ..\Engine\bin
 
+echo moviendo LUA
+copy ..\Engine\dependencies\lua\lua54.dll ..\Engine\bin
 
 echo ---------------------------------------------------
 echo FIN

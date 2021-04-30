@@ -17,6 +17,7 @@ enum class ManID
 	Common = 0,
 	Physics,
 	Render,
+	LUA,
 
 	LastManId
 };
@@ -39,7 +40,6 @@ public:
 	/// Ejemplo: desde PhysicsManager hay que pasarle lo siguiente
 	///				PhysicsManager::PhysicsCmpId::Nombre
 	/// </param>
-	virtual void addComponent(Entity* ent, int compId) = 0;
 	virtual void start() = 0;
 	virtual void update() = 0;
 
