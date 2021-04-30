@@ -35,8 +35,8 @@ copy ..\Engine\dependencies\Ogre\build\bin\release\SDL2.dll ..\Engine\bin
 
 ::Para cargar sonidos
 echo moviendo FMOD
-copy ..\Engine\dependencies\fmod\build\lib\fmod.dll ..\Engine\bin
-copy ..\Engine\dependencies\fmod\build\lib\fmodL.dll ..\Engine\bin
+copy ..\Engine\dependencies\fmod\lib\fmod.dll ..\Engine\bin
+copy ..\Engine\dependencies\fmod\lib\fmodL.dll ..\Engine\bin
 
 echo moviendo LUA
 copy ..\Engine\dependencies\lua\lua54.dll ..\Engine\bin
