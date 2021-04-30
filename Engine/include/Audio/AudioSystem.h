@@ -55,31 +55,6 @@ public:
     FMOD_VECTOR VectorToFmod(const Vector3& vPosition);
     FMOD::ChannelGroup* createChannelGroup(const char* name);
     void muteChannelGroup(const char* name);
-    void mute();
 
 
 };
-
-
-
-
-
-
-/*int main(int argc, char* argv[])
-{
-
-  /*  AudioEngine aEngine = AudioEngine();
-    aEngine.Init();
-    aEngine.PlaySound("swish.wav", Vector3( 0,0,0 ), nullptr, 10);
-
-    bool isPlaying = false;
-    do {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        isPlaying = aEngine.IsPlaying(0);
-        aEngine.Update();
-    } while (isPlaying);
-
-    aEngine.Shutdown();
-
-    return 0;
-}*/

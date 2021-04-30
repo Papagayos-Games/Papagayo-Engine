@@ -74,7 +74,7 @@ void AudioEngine::Update() {
     AudioSystem::getInstance()->Update();
 }
 
-
+//Comprueba si hay un error en la ejecucion de comando fmod
 int AudioEngine::ErrorCheck(FMOD_RESULT result)
 {
     if (result != FMOD_OK) {
@@ -83,7 +83,13 @@ int AudioEngine::ErrorCheck(FMOD_RESULT result)
     }
     return 0;
 }
-
+/// <summary>
+/// Carga un sonido en el sistema 
+/// </summary>
+/// <param name="strSoundName"> string del archivo </param>
+/// <param name="b3d"> bool 3d /2d</param>
+/// <param name="bLooping">bool bool on /off</param>
+/// <param name="bStream">bool stream /compresses sample</param>
 void AudioEngine::LoadSound(const std::string& strSoundName, bool b3d, bool bLooping, bool bStream)
 {
     auto encontrado = AudioSystem::getInstance()->mSounds.find(strSoundName);
@@ -103,7 +109,10 @@ void AudioEngine::LoadSound(const std::string& strSoundName, bool b3d, bool bLoo
     }
 
 }
-
+/// <summary>
+/// Libera un sonido del sistema
+/// </summary>
+/// <param name="strSoundName"></param>
 void AudioEngine::UnLoadSound(const std::string& strSoundName)
 {
     auto encontrado = AudioSystem::getInstance()->mSounds.find(strSoundName);
@@ -112,11 +121,22 @@ void AudioEngine::UnLoadSound(const std::string& strSoundName)
     AudioEngine::ErrorCheck(encontrado->second->release());
     AudioSystem::getInstance()->mSounds.erase(encontrado);
 }
-
+/// <summary>
+/// 
+/// </summary>
+/// <param name="vPos"></param>
+/// <param name="fVolumedB"></param>
 void AudioEngine::Set3dListenerAndOrientation(const Vector3& vPos = Vector3{ 0, 0, 0 }, float fVolumedB)
 {   
 }
-
+/// <summary>
+/// Reproduce un sonido , si no existe lo carga 
+/// </summary>
+/// <param name="strSoundName">nombre del archivo </param>
+/// <param name="vPos">posicion</param>
+/// <param name="groupName">nombre del grupo perteneciente si es null lo crea al general </param>
+/// <param name="fVolumedB"> volumen </param>
+/// <returns></returns>
 int AudioEngine::PlaySound(const std::string& strSoundName, const Vector3& vPos = Vector3{ 0, 0, 0 }, const char* groupName,  float fVolumedB)
 {
     int nChannelId = AudioSystem::getInstance()->mnNextChannelId++;
@@ -153,7 +173,7 @@ int AudioEngine::PlaySound(const std::string& strSoundName, const Vector3& vPos 
     return nChannelId;
 
 }
-
+//Para un canal
 void AudioEngine::StopChannel(int nChannelId)
 {
 
@@ -162,14 +182,14 @@ void AudioEngine::StopChannel(int nChannelId)
         return;
     AudioEngine::ErrorCheck(encontrado->second->stop());
 }
-
+//Para todos los canales
 void AudioEngine::StopAllChannels()
 {
 
     for (auto x : AudioSystem::getInstance()->mChannels)
         AudioEngine::ErrorCheck(x.second->stop());
 }
-
+//Coloca un canal en una posicion 3d 
 void AudioEngine::SetChannel3dPosition(int nChannelId, const Vector3& vPosition)
 {
     auto encontrado = AudioSystem::getInstance()->mChannels.find(nChannelId);
@@ -179,9 +199,7 @@ void AudioEngine::SetChannel3dPosition(int nChannelId, const Vector3& vPosition)
     FMOD_VECTOR position = VectorToFmod(vPosition);
     AudioEngine::ErrorCheck(encontrado->second->set3DAttributes(&position, NULL));
 }
-
-
-
+//Devuelve true si un canal esta reproduciendose
 bool AudioEngine::IsPlaying(int nChannelId) const
 {
     auto encontrado = AudioSystem::getInstance()->mChannels.find(nChannelId);
@@ -191,7 +209,7 @@ bool AudioEngine::IsPlaying(int nChannelId) const
     AudioEngine::ErrorCheck(AudioSystem::getInstance()->mChannels.at(nChannelId)->isPlaying(&isplay));
     return isplay;
 }
-
+//Si esta pausado el canal lo resume y si esta sonando lo pausa
 void AudioEngine::Pause_Resume_Channel(int nChannelId)
 {
     auto encontrado = AudioSystem::getInstance()->mChannels.find(nChannelId);
@@ -202,7 +220,7 @@ void AudioEngine::Pause_Resume_Channel(int nChannelId)
     AudioEngine::ErrorCheck(AudioSystem::getInstance()->mChannels.at(nChannelId)->setPaused(!ch));
 
 }
-
+//Convierte un vector fmod
 FMOD_VECTOR AudioEngine::VectorToFmod(const Vector3& vPosition)
 {
     FMOD_VECTOR fVec;
@@ -211,7 +229,7 @@ FMOD_VECTOR AudioEngine::VectorToFmod(const Vector3& vPosition)
     fVec.z = vPosition.z;
     return fVec;
 }
-
+//Crea un grupo de canales
 FMOD::ChannelGroup* AudioEngine::createChannelGroup(const char* name)
 {
     FMOD::ChannelGroup* channelGroup = nullptr;
@@ -219,7 +237,7 @@ FMOD::ChannelGroup* AudioEngine::createChannelGroup(const char* name)
     AudioSystem::getInstance()->mGroup[name] = channelGroup;
     return channelGroup;
 }
-
+//Mutea un grupo de canales especifico  
 void AudioEngine::muteChannelGroup(const char* name)
 {
     bool mute = false;
@@ -227,12 +245,6 @@ void AudioEngine::muteChannelGroup(const char* name)
     AudioEngine::ErrorCheck(AudioSystem::getInstance()->mGroup[name]->setMute(!mute));
 
 }
-
-void AudioEngine::mute()
-{
-    //  for
-}
-
 
 float  AudioEngine::dbToVolume(float dB)
 {
@@ -248,7 +260,7 @@ void AudioEngine::Shutdown() {
     AudioSystem::getInstance()->clean();
 
 }
-
+//Cambia el volumen del canal 
 void AudioEngine::SetChannelvolume(int nChannelId, float fVolumedB)
 {
     auto encontrado = AudioSystem::getInstance()->mChannels.find(nChannelId);
