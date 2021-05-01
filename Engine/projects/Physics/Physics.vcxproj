@@ -22,13 +22,11 @@
     <ClCompile Include="..\..\src\Physics\DebugDrawer.cpp" />
     <ClCompile Include="..\..\src\Physics\PhysicsManager.cpp" />
     <ClCompile Include="..\..\src\Physics\Rigidbody.cpp" />
-    <ClCompile Include="..\..\src\Physics\Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Physics\DebugDrawer.h" />
     <ClInclude Include="..\..\include\Physics\PhysicsManager.h" />
     <ClInclude Include="..\..\include\Physics\Rigidbody.h" />
-    <ClInclude Include="..\..\include\Physics\Test.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">
@@ -133,7 +131,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\bullet3-3.09\build_cmake\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)bin;$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -167,7 +165,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\bullet3-3.09\build_cmake\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)bin;$(SolutionDir)dependencies\Bullet\build\lib\$(Configuration);$(SolutionDir)dependencies\Ogre\build\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

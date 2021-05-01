@@ -24,7 +24,7 @@
 #include "OgrePlane.h"
 #include "Graphics/PlaneComponent.h"
 #include "Physics/PhysicsManager.h"
-//#include "AudioSystem.h"
+#include "AudioSystem.h"
 
 #include "LUA/LUAManager.h"
 
@@ -91,9 +91,9 @@ void PapagayoEngine::init()
 	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
 #pragma endregion
 	//Audio de bad bunny metido 
-	//AudioEngine* au = new AudioEngine();
-	//au->Init();
-	//au->PlaySound("Assets/badbunny.mp3", {0,0,0});
+	AudioEngine* au = new AudioEngine();
+	au->Init();
+	au->PlaySound("Assets/badbunny.mp3", {0,0,0});
 
 	start();
 }

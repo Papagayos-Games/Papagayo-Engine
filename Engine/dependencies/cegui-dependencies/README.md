@@ -1,4 +1,4 @@
-# CEGUI Windows and Mac OS X dependencies package for 'default' branch (CEGUI 1.0)
+# Windows and Mac OS X dependencies package for CEGUI
 
 This package contains source code and a custom cmake build environment for the
 majority of the optional dependency libraries that can be utilised by various

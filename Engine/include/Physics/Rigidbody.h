@@ -4,7 +4,6 @@
 #define _PHYSICS_RIGIDBODY_H
 
 #include "Component.h"
-//#include "BulletDynamics/Dynamics/btRigidBody.h"
 #include <iostream>
 
 class btCollisionShape;
