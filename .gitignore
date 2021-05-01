@@ -45,6 +45,8 @@
 
 # Solo borrar las librerías que haya en bin
 [Ee]ngine/[Bb]in/*.lib
+[Ee]ngine/[Dd]ependencies/cegui/*.lib
+[Ee]ngine/[Dd]ependencies/cegui/dependencies
 
 # Executables
 *.exe
