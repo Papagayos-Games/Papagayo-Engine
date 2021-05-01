@@ -42,7 +42,9 @@
 *.lai
 *.la
 *.a
-*.lib
+
+# Solo borrar las librerías que haya en bin
+[Ee]ngine/[Bb]in/*.lib
 
 # Executables
 *.exe
