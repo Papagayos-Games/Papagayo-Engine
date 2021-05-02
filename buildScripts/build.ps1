@@ -263,68 +263,68 @@ Try {
     }
 
     # Build CEGUI
-    If ($BuildCegui) {
-        $local:CeguiBuiltDependencies = Join-Path -Path $CeguiDependenciesFolder -ChildPath "build/dependencies"
-        Step-CMake $CMake $CeguiFolder @(
-            "-DCEGUI_BUILD_RENDERER_DIRECT3D10:BOOL=OFF",
-            "-DCEGUI_BUILD_RENDERER_DIRECT3D11:BOOL=OFF",
-            "-DCEGUI_BUILD_RENDERER_DIRECT3D9:BOOL=OFF",
-            "-DCEGUI_BUILD_RENDERER_DIRECTFB:BOOL=OFF",
-            "-DCEGUI_BUILD_RENDERER_IRRLICHT:BOOL=OFF",
-            "-DCEGUI_BUILD_RENDERER_NULL:BOOL=OFF",
-            "-DCEGUI_BUILD_RENDERER_OGRE:BOOL=ON",
-            "-DCEGUI_BUILD_RENDERER_OPENGL:BOOL=OFF",
-            "-DCEGUI_BUILD_RENDERER_OPENGL3:BOOL=OFF",
-            "-DCEGUI_BUILD_RENDERER_OPENGLES:BOOL=OFF",
-            "-DCMAKE_PREFIX_PATH:PATH=$CeguiBuiltDependencies",
-            "-DOGRE_H_BUILD_SETTINGS_PATH:PATH=$OgreFolder/build/include",
-            "-DOGRE_H_PATH:PATH=$OgreFolder/OgreMain/include",
-            "-DOGRE_LIB:FILEPATH=$OgreFolder/build/lib/Release/OgreMain.lib",
-            "-DOGRE_LIB_DBG:FILEPATH=$OgreFolder/build/lib/Debug/OgreMain_d.lib"
-        )
-
-        # Let's be honest, I got done with MSBuild here. The world would be beautiful if it'd let me define constants
-        # via CLI, but looks like it's impossible without CMake.
-        $private:Content = Get-Content -Path "$CeguiFolder\build\cegui\include\CEGUI\Config.h"
-        $private:Content = $Content -replace "define CEGUI_OGRE_VERSION_MAJOR 0", "define CEGUI_OGRE_VERSION_MAJOR 1"
-        $private:Content = $Content -replace "define CEGUI_OGRE_VERSION_MINOR 0", "define CEGUI_OGRE_VERSION_MINOR 9"
-        Set-Content -Path "$CeguiFolder\build\cegui\include\CEGUI\Config.h" -Value $Content
-        Remove-Variable Content
-
-        If ($NDebug) {
-            Step-VisualStudio -MsBuild $MsBuild -Path "$CeguiFolder\build\cegui.sln" -Configuration "Debug"
-            Step-CopyToFolder -To $BinaryDirectory -From "cegui" -Paths @(
-                "$CeguiFolder\build\bin\CEGUIBase-0_d.dll",
-                "$CeguiFolder\build\bin\CEGUIOgreRenderer-0_d.dll",
-                "$CeguiBuiltDependencies\bin\freetype_d.dll",
-                "$CeguiBuiltDependencies\bin\glew_d.dll",
-                "$CeguiBuiltDependencies\bin\glfw_d.dll",
-                "$CeguiBuiltDependencies\bin\jpeg_d.dll",
-                "$CeguiBuiltDependencies\bin\libexpat_d.dll",
-                "$CeguiBuiltDependencies\bin\libpng_d.dll",
-                "$CeguiBuiltDependencies\bin\pcre_d.dll",
-                "$CeguiBuiltDependencies\bin\SILLY_d.dll"
-            )
-        }
-
-        If ($NRelease) {
-            Step-VisualStudio -MsBuild $MsBuild -Path "$CeguiFolder\build\cegui.sln" -Configuration "Release"
-            Step-CopyToFolder -To $BinaryDirectory -From "cegui" -Paths @(
-                "$CeguiFolder\build\bin\CEGUIBase-0.dll",
-                "$CeguiFolder\build\bin\CEGUIOgreRenderer-0.dll",
-                "$CeguiBuiltDependencies\bin\freetype.dll",
-                "$CeguiBuiltDependencies\bin\glew.dll",
-                "$CeguiBuiltDependencies\bin\glfw.dll",
-                "$CeguiBuiltDependencies\bin\jpeg.dll",
-                "$CeguiBuiltDependencies\bin\libexpat.dll",
-                "$CeguiBuiltDependencies\bin\libpng.dll",
-                "$CeguiBuiltDependencies\bin\pcre.dll",
-                "$CeguiBuiltDependencies\bin\SILLY.dll"
-            )
-        }
-
-        Remove-Variable CeguiBuiltDependencies
-    }
+    #If ($BuildCegui) {
+    #    $local:CeguiBuiltDependencies = Join-Path -Path $CeguiDependenciesFolder -ChildPath "build/dependencies"
+    #    Step-CMake $CMake $CeguiFolder @(
+    #        "-DCEGUI_BUILD_RENDERER_DIRECT3D10:BOOL=OFF",
+    #        "-DCEGUI_BUILD_RENDERER_DIRECT3D11:BOOL=OFF",
+    #        "-DCEGUI_BUILD_RENDERER_DIRECT3D9:BOOL=OFF",
+    #        "-DCEGUI_BUILD_RENDERER_DIRECTFB:BOOL=OFF",
+    #        "-DCEGUI_BUILD_RENDERER_IRRLICHT:BOOL=OFF",
+    #        "-DCEGUI_BUILD_RENDERER_NULL:BOOL=OFF",
+    #        "-DCEGUI_BUILD_RENDERER_OGRE:BOOL=ON",
+    #        "-DCEGUI_BUILD_RENDERER_OPENGL:BOOL=OFF",
+    #        "-DCEGUI_BUILD_RENDERER_OPENGL3:BOOL=OFF",
+    #        "-DCEGUI_BUILD_RENDERER_OPENGLES:BOOL=OFF",
+    #        "-DCMAKE_PREFIX_PATH:PATH=$CeguiBuiltDependencies",
+    #        "-DOGRE_H_BUILD_SETTINGS_PATH:PATH=$OgreFolder/build/include",
+    #        "-DOGRE_H_PATH:PATH=$OgreFolder/OgreMain/include",
+    #        "-DOGRE_LIB:FILEPATH=$OgreFolder/build/lib/Release/OgreMain.lib",
+    #        "-DOGRE_LIB_DBG:FILEPATH=$OgreFolder/build/lib/Debug/OgreMain_d.lib"
+    #    )
+	#
+    #    # Let's be honest, I got done with MSBuild here. The world would be beautiful if it'd let me define constants
+    #    # via CLI, but looks like it's impossible without CMake.
+    #    $private:Content = Get-Content -Path "$CeguiFolder\build\cegui\include\CEGUI\Config.h"
+    #    $private:Content = $Content -replace "define CEGUI_OGRE_VERSION_MAJOR 0", "define CEGUI_OGRE_VERSION_MAJOR 1"
+    #    $private:Content = $Content -replace "define CEGUI_OGRE_VERSION_MINOR 0", "define CEGUI_OGRE_VERSION_MINOR 9"
+    #    Set-Content -Path "$CeguiFolder\build\cegui\include\CEGUI\Config.h" -Value $Content
+    #    Remove-Variable Content
+	#
+    #    If ($NDebug) {
+    #        Step-VisualStudio -MsBuild $MsBuild -Path "$CeguiFolder\build\cegui.sln" -Configuration "Debug"
+    #        Step-CopyToFolder -To $BinaryDirectory -From "cegui" -Paths @(
+    #            "$CeguiFolder\build\bin\CEGUIBase-0_d.dll",
+    #            "$CeguiFolder\build\bin\CEGUIOgreRenderer-0_d.dll",
+    #            "$CeguiBuiltDependencies\bin\freetype_d.dll",
+    #            "$CeguiBuiltDependencies\bin\glew_d.dll",
+    #            "$CeguiBuiltDependencies\bin\glfw_d.dll",
+    #            "$CeguiBuiltDependencies\bin\jpeg_d.dll",
+    #            "$CeguiBuiltDependencies\bin\libexpat_d.dll",
+    #            "$CeguiBuiltDependencies\bin\libpng_d.dll",
+    #            "$CeguiBuiltDependencies\bin\pcre_d.dll",
+    #            "$CeguiBuiltDependencies\bin\SILLY_d.dll"
+    #        )
+    #    }
+	#
+    #    If ($NRelease) {
+    #        Step-VisualStudio -MsBuild $MsBuild -Path "$CeguiFolder\build\cegui.sln" -Configuration "Release"
+    #        Step-CopyToFolder -To $BinaryDirectory -From "cegui" -Paths @(
+    #            "$CeguiFolder\build\bin\CEGUIBase-0.dll",
+    #            "$CeguiFolder\build\bin\CEGUIOgreRenderer-0.dll",
+    #            "$CeguiBuiltDependencies\bin\freetype.dll",
+    #            "$CeguiBuiltDependencies\bin\glew.dll",
+    #            "$CeguiBuiltDependencies\bin\glfw.dll",
+    #            "$CeguiBuiltDependencies\bin\jpeg.dll",
+    #            "$CeguiBuiltDependencies\bin\libexpat.dll",
+    #            "$CeguiBuiltDependencies\bin\libpng.dll",
+    #            "$CeguiBuiltDependencies\bin\pcre.dll",
+    #            "$CeguiBuiltDependencies\bin\SILLY.dll"
+    #        )
+    #    }
+	#
+    #    Remove-Variable CeguiBuiltDependencies
+    #}
 
 
     # Build project
