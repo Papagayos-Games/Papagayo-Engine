@@ -45,7 +45,6 @@ Import-Module -Name (Join-Path -Path $ModulesFolder -ChildPath "Shared")
 $local:FModFolder = Join-Path -Path $DependenciesRoot -ChildPath "fmod"
 $local:LUAFolder = Join-Path -Path $DependenciesRoot -ChildPath "lua"
 $local:OgreFolder = Join-Path -Path $DependenciesRoot -ChildPath "Ogre"
-$local:OgreSrcFolder = Join-Path -Path $OgreFolder -ChildPath "src"
 $local:BulletFolder = Join-Path -Path $DependenciesRoot -ChildPath "Bullet"
 $local:CeguiFolder = Join-Path -Path $DependenciesRoot -ChildPath "cegui"
 $local:CeguiDependenciesFolder = Join-Path -Path $DependenciesRoot -ChildPath "cegui-dependencies"
@@ -92,11 +91,11 @@ If ($Clean) {
 # Whether or not any dependency was specified
 $private:BuildDependenciesSpecified = $BuildDependencies.ToBool() -Or
     $BuildFmod.ToBool() -Or
-    $BuildLUA.ToBool()
+    $BuildLUA.ToBool()	-Or
     $BuildOgre.ToBool() -Or
     $BuildBullet.ToBool() -Or
     $BuildCegui.ToBool() -Or
-    $BuildCeguiDependencies.ToBool() -Or
+    $BuildCeguiDependencies.ToBool()
 
 # Whether or not any build step was specified
 $private:BuildSpecified = $BuildDependenciesSpecified -Or $BuildAll.ToBool() -Or $BuildProject.ToBool()
@@ -148,7 +147,7 @@ Try {
             "$FModFolder\fmod.dll",
 			"$FModFolder\fmodL.dll",
 			"$FModFolder\lib\fmod_vc.lib",
-			"$FModFolder\lib\fmodL_vc.lib",
+			"$FModFolder\lib\fmodL_vc.lib"
         )
     }
 
@@ -162,13 +161,13 @@ Try {
 	
 	# Build Ogre
     If ($BuildOgre) {
-        Step-CMake $CMake $OgreSrcFolder @(
+        Step-CMake $CMake $OgreFolder @(
 		"-DOGRE_BUILD_COMPONENT_BITES:BOOL=OFF",
 		"-DOGRE_BUILD_COMPONENT_CSHARP:BOOL=OFF",
 		"-DOGRE_BUILD_COMPONENT_HTMLS:BOOL=OFF",
 		"-DOGRE_BUILD_COMPONENT_JAVA:BOOL=OFF",
 		"-DOGRE_BUILD_COMPONENT_PYTHON:BOOL=OFF",
-		"-DOGRE_BUILD_RENDERSYSTEM_TINY:BOOL=ON",
+		"-DOGRE_BUILD_RENDERSYSTEM_TINY:BOOL=OFF"
 		)
 
         If ($NDebug) {
@@ -181,6 +180,8 @@ Try {
                 "$OgreFolder\build\bin\debug\Codec_STBI_d.dll",
                 "$OgreFolder\build\bin\debug\Plugin_ParticleFX_d.dll",
                 "$OgreFolder\build\bin\debug\zlib.dll",
+				"$OgreFolder\build\bin\debug\SDL2.dll",
+				"$OgreFolder\build\SDL2-build\RelWithDebInfo\SDL2.lib",
 				"$OgreFolder\build\lib\Debug\OgreMain_d.lib",
 				"$OgreFolder\build\lib\Debug\OgreRTShaderSystem_d.lib",
 				"$OgreFolder\build\lib\Debug\RenderSystem_Direct3D11_d.lib"
@@ -197,6 +198,8 @@ Try {
                 "$OgreFolder\build\bin\release\Codec_STBI.dll",
                 "$OgreFolder\build\bin\release\Plugin_ParticleFX.dll",
                 "$OgreFolder\build\bin\release\zlib.dll"
+				"$OgreFolder\build\bin\release\SDL2.dll",
+				"$OgreFolder\build\SDL2-build\RelWithDebInfo\SDL2main.lib",
 				"$OgreFolder\build\lib\Release\OgreMain.lib",
 				"$OgreFolder\build\lib\Release\OgreRTShaderSystem.lib",
 				"$OgreFolder\build\lib\Release\RenderSystem_Direct3D11.lib"
@@ -236,11 +239,11 @@ Try {
         If ($NRelease) {
             Step-VisualStudio -MsBuild $MsBuild -Path "$BulletFolder\build\BULLET_PHYSICS.sln" -Configuration "Release"
 			Step-CopyToFolder -To $BinaryDirectory -From "Bullet" -Paths @(
-				"$BulletFolder\\build\lib\Debug\BulletCollision.lib",
-				"$BulletFolder\\build\lib\Debug\BulletDynamics.lib",
-				"$BulletFolder\\build\lib\Debug\BulletInverseDynamics.lib",
-				"$BulletFolder\\build\lib\Debug\BulletSoftBody.lib",
-				"$BulletFolder\\build\lib\Debug\LinearMath.lib"
+				"$BulletFolder\\build\lib\Release\BulletCollision.lib",
+				"$BulletFolder\\build\lib\Release\BulletDynamics.lib",
+				"$BulletFolder\\build\lib\Release\BulletInverseDynamics.lib",
+				"$BulletFolder\\build\lib\Release\BulletSoftBody.lib",
+				"$BulletFolder\\build\lib\Release\LinearMath.lib"
             )
 		}
     }
@@ -275,7 +278,7 @@ Try {
             "-DCEGUI_BUILD_RENDERER_OPENGLES:BOOL=OFF",
             "-DCMAKE_PREFIX_PATH:PATH=$CeguiBuiltDependencies",
             "-DOGRE_H_BUILD_SETTINGS_PATH:PATH=$OgreFolder/build/include",
-            "-DOGRE_H_PATH:PATH=$OgreSrcFolder/OgreMain/include",
+            "-DOGRE_H_PATH:PATH=$OgreFolder/OgreMain/include",
             "-DOGRE_LIB:FILEPATH=$OgreFolder/build/lib/Release/OgreMain.lib",
             "-DOGRE_LIB_DBG:FILEPATH=$OgreFolder/build/lib/Debug/OgreMain_d.lib"
         )
@@ -290,7 +293,7 @@ Try {
 
         If ($NDebug) {
             Step-VisualStudio -MsBuild $MsBuild -Path "$CeguiFolder\build\cegui.sln" -Configuration "Debug"
-            Step-CopyToFolder -To $BinaryDirectory -From "CEGUI" -Paths @(
+            Step-CopyToFolder -To $BinaryDirectory -From "cegui" -Paths @(
                 "$CeguiFolder\build\bin\CEGUIBase-0_d.dll",
                 "$CeguiFolder\build\bin\CEGUIOgreRenderer-0_d.dll",
                 "$CeguiBuiltDependencies\bin\freetype_d.dll",
@@ -306,7 +309,7 @@ Try {
 
         If ($NRelease) {
             Step-VisualStudio -MsBuild $MsBuild -Path "$CeguiFolder\build\cegui.sln" -Configuration "Release"
-            Step-CopyToFolder -To $BinaryDirectory -From "CEGUI" -Paths @(
+            Step-CopyToFolder -To $BinaryDirectory -From "cegui" -Paths @(
                 "$CeguiFolder\build\bin\CEGUIBase-0.dll",
                 "$CeguiFolder\build\bin\CEGUIOgreRenderer-0.dll",
                 "$CeguiBuiltDependencies\bin\freetype.dll",

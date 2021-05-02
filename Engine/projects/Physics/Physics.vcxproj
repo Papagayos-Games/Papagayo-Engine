@@ -121,7 +121,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\Physics;$(SolutionDir)include\Common;$(SolutionDir)include\Graphics;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\json</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Physics;$(SolutionDir)include\Common;$(SolutionDir)include\Graphics;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\json</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -157,7 +157,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\Physics;$(SolutionDir)include\Common;$(SolutionDir)include\Graphics;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\json</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Physics;$(SolutionDir)include\Common;$(SolutionDir)include\Graphics;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\json</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
