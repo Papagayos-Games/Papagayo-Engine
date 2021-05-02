@@ -164,7 +164,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\JSONforModernC++;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\json;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -186,7 +186,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\JSONforModernC++;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\json;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>

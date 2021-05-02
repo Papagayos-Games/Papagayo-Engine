@@ -120,9 +120,7 @@ void PhysicsManager::start()
 void PhysicsManager::update()
 {
 	dynamicsWorld->stepSimulation(1.f / 60.f, 10);
-	//#ifdef _DEBUG
-	//    dynamicsWorld->debugDrawWorld();
-	//#endif
+
 	for (auto it = _compsList.begin(); it != _compsList.end(); ++it) {
 		if (applyTorque) {
 			applyTorque = false;

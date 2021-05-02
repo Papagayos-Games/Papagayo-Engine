@@ -112,7 +112,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\Common;$(SolutionDir)dependencies\fmod\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Common;$(SolutionDir)dependencies\fmod\include;$(SolutionDir)dependencies\json;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,7 +150,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\Common;$(SolutionDir)dependencies\fmod\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Common;$(SolutionDir)dependencies\fmod\include;$(SolutionDir)dependencies\json;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

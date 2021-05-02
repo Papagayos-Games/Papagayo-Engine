@@ -12,11 +12,12 @@ copy ..\Engine\dependencies\Ogre\build\bin\release\OgreMain.dll ..\Engine\bin
 echo moviendo OGRE Debug Libs
 copy ..\Engine\dependencies\Ogre\build\lib\Debug\OgreMain_d.lib ..\Engine\bin
 copy ..\Engine\dependencies\Ogre\build\lib\Debug\OgreRTShaderSystem_d.lib ..\Engine\bin
+copy ..\Engine\dependencies\Ogre\build\lib\Debug\RenderSystem_Direct3D11_d.lib ..\Engine\bin
 
 echo moviendo OGRE Release Libs
 copy ..\Engine\dependencies\Ogre\build\lib\Release\OgreMain.lib ..\Engine\bin
 copy ..\Engine\dependencies\Ogre\build\lib\Release\OgreRTShaderSystem.lib ..\Engine\bin
-
+copy ..\Engine\dependencies\Ogre\build\lib\Release\RenderSystem_Direct3D11.lib ..\Engine\bin
 ::for /R "..\Engine\dependencies\Ogre\build\bin\debug" %%G in (*.dll) do copy "%%G" "..\Engine\bin"
 
 echo moviendo OgreRTShaderSystem

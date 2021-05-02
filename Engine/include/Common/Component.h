@@ -15,7 +15,7 @@ protected:
 	Entity* _entity;
 	Manager* _manager;
 
-public:
+public: 
 	//constructor
 	Component(Manager* man, int id);
 	virtual ~Component();
