@@ -33,6 +33,14 @@ function setgravity(rig)
 	rig:setGravity(vec);
 end
 
+function pressKeyDoSomething(input)
+	if input:keyPressed(97) == true then
+	print("Pulse A perros");
+	--vec= Vector3(0,10,0);
+	--rig:setGravity(vec);
+	end
+end
+
 
 
 

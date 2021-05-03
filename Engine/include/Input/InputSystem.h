@@ -22,6 +22,7 @@ public:
 
 	void handleInput();
 	bool isKeyDown(SDL_Keycode key) const;
+	bool isKeyDownTest(int key)const;
 	bool isKeyUp(SDL_Keycode key) const;
 	
 private:

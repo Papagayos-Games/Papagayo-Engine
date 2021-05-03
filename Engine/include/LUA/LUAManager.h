@@ -21,6 +21,7 @@ private:
 	bool CheckLua(lua_State* L, int r);
 
 	lua_State* script_;
+    lua_State* pruebaXD;
 
 	static LUAManager* instance_;
 

@@ -10,8 +10,9 @@
 #include <Scene/Scene.h>
 #include <Vector3.h>
 #include <PhysicsManager.h>
+#include <./Input/InputSystem.h>
 
-
+using namespace luabridge;
 
 LUAManager* LUAManager::instance_ = nullptr;
 
@@ -46,7 +47,6 @@ void LUAManager::start()
 
 void LUAManager::update()
 {
-	//std::cout << "updating\n";
 }
 
 
@@ -76,7 +76,7 @@ void globalFunction() {
 
 //Aqui van todas las funciones y clases correspondientes 
 void registerClassAndFucntions(lua_State* L) {
-	using namespace luabridge;
+	//using namespace luabridge;
 /*	getGlobalNamespace(L).addFunction("globalFunction", globalFunction);
 	getGlobalNamespace(L)
 		.beginClass<A>("A")
@@ -103,8 +103,9 @@ void registerClassAndFucntions(lua_State* L) {
 		.addFunction("setGravity", &RigidBody::setGravity)
 		.endClass();
 
-	
-		
+	getGlobalNamespace(L).beginClass<InputSystem>("InputSystem")
+		.addFunction("keyPressed", &InputSystem::isKeyDownTest)
+		.endClass();
 }
 
 void testCallLua(lua_State* L) {
@@ -136,9 +137,9 @@ void testCallLua(lua_State* L) {
 	->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);
 	lua_pcall(L, 1, 0, 0);*/
 	
-
-
-
+	lua_getglobal(L, "pressKeyDoSomething");
+	push(L, InputSystem::getInstance(), errorCode);
+	lua_pcall(L, 1, 0, 0);
 
 }
 
@@ -170,6 +171,7 @@ LUAManager::LUAManager() : Manager(ManID::LUA)
 {
 
 	auto L = buildLuaEngine("LuaScripts/prueba.lua");
+	pruebaXD = L;
 	if (L) {
 		registerClassAndFucntions(L);
 		testCallLua(L);

@@ -104,6 +104,12 @@ void InputSystem::handleInput()
 	}
 }
 
+bool InputSystem::isKeyDownTest(int key)const {
+	const Uint8* keystate = SDL_GetKeyboardState(NULL);
+	int pressed = 0;
+	return keystate[SDL_Scancode(key)] == true;
+}
+
 bool InputSystem::isKeyDown(SDL_Keycode key) const
 {
 	const Uint8* state = SDL_GetKeyboardState(NULL);
