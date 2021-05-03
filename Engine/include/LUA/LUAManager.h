@@ -14,6 +14,7 @@
 #include "lua.hpp"
 #include "Entity.h"
 
+
 class LUAManager : Manager {
 private:
 	LUAManager();

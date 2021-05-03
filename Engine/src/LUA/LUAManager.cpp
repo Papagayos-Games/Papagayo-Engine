@@ -1,22 +1,12 @@
 #include <iostream>
 #include "LUAManager.h"
+
+
 #include <LuaBridge.h>
-
-
 
 LUAManager* LUAManager::instance_ = nullptr;
 
-LUAManager::LUAManager() : Manager(ManID::LUA)
-{
-	
-	script_ = luaL_newstate();
-	luaL_openlibs(script_);
 
-	
-	if (CheckLua(script_, luaL_dofile(script_, "LuaScripts/prueba.lua"))) {
-		std::cout << "[C++] tamos bien\n";
-	}
-}
 
 bool LUAManager::CheckLua(lua_State* L, int r)
 {
@@ -51,84 +41,99 @@ void LUAManager::update()
 }
 
 
-
-extern "C"
-{
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
-#include <LuaBridge.h>
-
-}
-
-#include <memory>
-#include <iostream>
-//Prueba
-/*
-class Greeter {
-protected:
-    std::string name;
-
+class A {
 public:
-    Greeter(std::string s) {
-        this->name = s;
-    }
-
-    std::string getName() {
-        return this->name;
-    }
-
-    void printName() {
-        std::cout << "[C++ CODE] Hello, my name is " << this->name << "!\n";
-    }
+	void action() { std::cout << "hello I'm A\n"; }
+	virtual void doPrint(int a, int b) {
+		std::cout << "in A a : " << a << " b : " << b << std::endl;
+	}
+	std::string goodMan() const { return "goodman"; }
 };
 
-void report_errors(lua_State* luaState, int status) {
-    if (status == 0) {
-        return;
-    }
 
-    std::cout << "[LUA ERROR] " << lua_tostring(luaState, -1) << "\n";
+class B : public A {
+public:
+	void hello(const std::string& info) const {
+		std::cout << "hello: " << info << std::endl;
+	}
+	virtual void doPrint(int a, int b) override {
+		std::cout << "in B just " << (a + b) << std::endl;
+	}
+};
 
-    // remove error message from Lua state
-    lua_pop(luaState, 1);
+void globalFunction() {
+	std::cout << "hello this is a global func\n";
 }
 
-int main() {
-    // create a Lua state
-    lua_State* luaState = luaL_newstate();
 
-    // load standard libs 
-    luaL_openlibs(luaState);
+//Aqui van todas las funciones y clases correspondientes 
+void registerClassAndFucntions(lua_State* L) {
+	using namespace luabridge;
+	getGlobalNamespace(L).addFunction("globalFunction", globalFunction);
+	getGlobalNamespace(L)
+		.beginClass<A>("A")
+		.addFunction("action", &A::action)
+		.addFunction("doPrint", &A::doPrint)
+		.addFunction("goodMan", &A::goodMan)
+		.endClass()
+		.deriveClass<B, A>("B")
+		.addFunction("hello", &B::hello)
+		.endClass();
 
-    // expose the A class to the Lua scripts
-    luabridge::getGlobalNamespace(luaState)
-        .beginClass<Greeter>("Greeter")
-        .addConstructor<void(*) (std::string)>()
-        .addFunction("getName", &(Greeter::getName))
-        .addFunction("printName", &(Greeter::printName))
-        .endClass();
+	//getGlobalNamespace(L).beginClass();
 
-    // create a global variable (an instance of A class) in Lua scope
-    Greeter* globalGreeter = new Greeter("noname");
-   // luabridge::push(luaState, *globalGreeter);
-    lua_setglobal(luaState, "greeter");
 
-    // load some code from Lua file
-    int scriptLoadStatus = luaL_dofile(luaState, "test1.lua");
-
-    // define error reporter for any Lua error
-    report_errors(luaState, scriptLoadStatus);
-
-    // call function defined in Lua script
-    luabridge::LuaRef addAndDouble = luabridge::getGlobal(luaState, "addAndDouble");
-
-   // int x = addAndDouble(15, 12);
-
-    //std::cout << "[EVALUATE LUA] (15 + 12) * 2 = " << x << "\n";
-
-    delete globalGreeter;
-
-    return 0;
 }
-*/
+
+void testCallLua(lua_State* L) {
+	std::error_code errorCode;
+
+	A a;
+		lua_getglobal(L, "testA");
+		luabridge::push(L,&a,errorCode);
+	lua_pcall(L, 1, 0, 0);
+	B b;
+	lua_getglobal(L, "testAAndB");
+	luabridge::push(L, &a, errorCode);
+	luabridge::push(L, &b, errorCode);
+	lua_pcall(L, 2, 0, 0);
+
+}
+
+bool reloadLuaScript(lua_State* L, const std::string& luafile) {
+	int state = luaL_dofile(L, luafile.c_str());
+	if (state != LUA_OK) {
+		// std::cout << "ok";
+		return false;
+	}
+	return true;
+}
+void registerClassAndFucntions(lua_State* L);
+void testCallLua(lua_State* L);
+
+lua_State* buildLuaEngine(const std::string& file) {
+	lua_State* L = luaL_newstate();
+	// need check L
+	luaL_openlibs(L);
+	auto ok = reloadLuaScript(L, file);
+	if (!ok) {
+		lua_close(L);
+		L = nullptr;
+	}
+	return L;
+}
+
+
+LUAManager::LUAManager() : Manager(ManID::LUA)
+{
+
+	auto L = buildLuaEngine("LuaScripts/prueba.lua");
+	if (L) {
+		registerClassAndFucntions(L);
+		testCallLua(L);
+	}
+	if (L) {
+		lua_close(L);
+		L = nullptr;
+	}
+}
