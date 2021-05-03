@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef _GRAPHICS_CAMERA_H
+#define _GRAPHICS_CAMERA_H
+
 #include "Component.h"
 #include <string>
 
@@ -11,6 +15,11 @@ namespace Ogre {
 	class Viewport;
 }
 
+enum class CameraType : int {
+	STATIC = 0,
+	DYNAMIC
+};
+
 class Camera : public Component
 {
 protected:
@@ -18,30 +27,33 @@ protected:
 	Ogre::SceneNode* camNode_ = nullptr;
 	Ogre::Camera* mCamera_ = nullptr;
 	Ogre::Viewport* vp_ = nullptr;
-	std::string name = "MainCamera";
+	std::string name_ = "";
 	Transform* tr_ = nullptr;
-	virtual void init()override;
+	CameraType type_ = CameraType::STATIC;
+
 public:
+
 	Camera();
-	Camera(std::string cameraName);
 	//	Constructora de la cámara con un nodo padre
-	Camera(Ogre::SceneNode* parentNode,std::string name);
-	//camara unica de la escena
+	//Camera(Ogre::SceneNode* parentNode,std::string name);
 	
 	virtual ~Camera();
 
 	virtual void update()override;
 	virtual void setUp()override;
+	virtual void load(const nlohmann::json& params) override;
+	virtual void init()override;
 
-	void setCameraPosition(Vector3 newPos);
-	void setCameraDir(Vector3 newDir);
-	void setBackgroundColor(Vector3 newColor ,float alpha);
+	void setCameraPosition(const Vector3& newPos);
+	void setCameraDir(Vector3& newDir);
+	void setBackgroundColor(const Vector3& newColor ,float alpha);
 	void setNearClipDistance(int distance);
 	void setFarClipDistance(int distance);
 
-
-	Vector3 getCameraPosition();
+	const Vector3& getCameraPosition();
+	const Vector3& getCameraPosition() const;
 	inline Ogre::Camera* getCamera();
-
+	inline Ogre::Camera* getCamera() const;
 };
 
+#endif

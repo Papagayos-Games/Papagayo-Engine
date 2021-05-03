@@ -1,6 +1,12 @@
 #pragma once
-#include <string>
 
+#ifndef _PAPAENG_SCENEMAN_H
+#define _PAPAENG_SCENEMAN_H
+
+#include <string>
+#include <vector>
+
+class LoaderSystem;
 class Entity;
 class Scene;
 
@@ -11,20 +17,22 @@ public:
 	static SceneManager* getInstance();
 	static bool setupInstance();
 	static void clean();
-
-	void loadScene(const std::string& sceneName);
-	static void cleanupScene();
-
-	// Añade entidades y componentes a esas entidades al iniciar la escena y al instanciar gameObjects durante ejecuccion
-	void addEntity() {};
-	void addComponentTo(const std::string& entName) {};
-	void addComponentTo(const Entity *ent){};
-
+	
+	void update();
+	void changeScene(const std::string& sceneName);
+	void createStartScene();
 private:
-	SceneManager();
+	SceneManager();	
+	
+	void loadScene(const std::string& sceneName);
+	void cleanupScene();
+
 	static SceneManager* instance_;
 	static Scene* currentScene_;
-
-	// Crea la escena por defecto
-	void createStartScene();
+	std::vector<std::string> sceneFiles_;
+	LoaderSystem* loader_;
+	bool change_;
+	std::string nextScene_;
 };
+
+#endif // !_PAPAENG_SCENEMAN_H

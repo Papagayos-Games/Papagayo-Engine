@@ -1,0 +1,35 @@
+{
+  "Entities": [
+    {
+      "Prefab" : "DefaultCamera",
+      "Arguments" : [
+        {
+          "Component": "Transform",
+          "Type": "Common",
+          "Parameters" : {
+            "position" : [0,100,500]
+          }
+        }
+      ]
+    },
+    {
+      "Prefab" : "DefaultLight"
+    },
+    {
+      "Prefab" : "Penguin",
+      "Arguments" : [
+        {
+          "Component": "Transform",
+          "Type": "Common",
+          "Parameters" : {
+            "position": [ 123,45,67 ]
+          }
+        }
+      ]
+    },
+    {
+      "Prefab" : "Penguin"
+    }
+  ]
+}
+

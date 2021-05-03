@@ -11,7 +11,7 @@ Transform::Transform() :
 {
 }
 
-Transform::Transform(Vector3 pos, Vector3 vel,Vector3 dim, Vector3 rotation) :
+Transform::Transform(const Vector3& pos, const Vector3& vel, const Vector3& dim, const Vector3& rotation) :
 	Component(CommonManager::getInstance(), (int)CommonManager::CommonCmpId::TransId),
 	_position(pos), //
 	_velocity(vel), //
@@ -20,20 +20,50 @@ Transform::Transform(Vector3 pos, Vector3 vel,Vector3 dim, Vector3 rotation) :
 {
 }
 
+// Si algun parametro no se especifica, se mantendra por defecto
+void Transform::load(const nlohmann::json& params)
+{
+	auto it = params.find("position");
+	if (it != params.end()) {
+		std::vector<float> pos = it->get<std::vector<float>>();
+		_position = Vector3(pos[0], pos[1], pos[2]);
+	}
+	it = params.find("velocity");
+	if (it != params.end()) {
+		std::vector<float> pos = it->get<std::vector<float>>();
+		_velocity= Vector3(pos[0], pos[1], pos[2]);
+	}
+	it = params.find("dimensions");
+	if (it != params.end()) {
+		std::vector<float> pos = it->get<std::vector<float>>();
+		_dimensions = Vector3(pos[0], pos[1], pos[2]);
+	}
+	it = params.find("rotation");
+	if (it != params.end()) {
+		std::vector<float> pos = it->get<std::vector<float>>();
+		_rotation = Vector3(pos[0], pos[1], pos[2]);
+	}
+}
 Transform::~Transform() {
 }
 
 void Transform::init() {
-
+	_position = _velocity = _rotation = Vector3();
+	_dimensions = Vector3(1.0f, 1.0f, 1.0f);
 }
 
 void Transform::update() {
 
 }
 
- Vector3 Transform::getPos() 
+const Vector3& Transform::getPos() 
 {
 	return _position;
+}
+
+const Vector3& Transform::getPos() const
+{
+	 return _position;
 }
 
 void Transform::setPos(const Vector3& pos)
@@ -56,7 +86,12 @@ void Transform::setPosZ(double z)
 	_position.setZ(z);
 }
 
-Vector3 Transform::getRot() const
+const Vector3& Transform::getRot()
+{
+	return _rotation;
+}
+
+const Vector3& Transform::getRot() const
 {
 	return _rotation;
 }
@@ -79,6 +114,11 @@ void Transform::setRotY(double y)
 void Transform::setRotZ(double z)
 {
 	_rotation.setZ(z);
+}
+
+const Vector3& Transform::getVel()
+{
+	return _velocity;
 }
 
 const Vector3& Transform::getVel() const
@@ -106,7 +146,12 @@ void Transform::setVelZ(double z)
 	_velocity.setZ(z);
 }
 
-Vector3 Transform::getDimensions()
+const Vector3& Transform::getDimensions()
+{
+	return _dimensions;
+}
+
+const Vector3& Transform::getDimensions() const
 {
 	return _dimensions;
 }

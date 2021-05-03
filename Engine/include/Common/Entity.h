@@ -25,7 +25,7 @@ public:
 	Component* getComponent(int managerId, int compI);
 		
     // comprueba si la entidad tiene el componente id
-	bool hasComponent(int managerId, int compId);
+	bool hasComponent(int managerId, int compId) const;
 
 	// Este metodo solo elimina el componente de la lista de componentes de la entidad
 	// Para destruirlo se debe llamar a Manager::destroyComponent(Entity* ent);

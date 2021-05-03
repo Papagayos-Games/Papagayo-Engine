@@ -2,32 +2,35 @@
 #include "Vector3.h"
 #include <btBulletCollisionCommon.h>
 #include <btBulletDynamicsCommon.h>
+#include "DebugDrawer.h"
 #include "Rigidbody.h"
 #include "Entity.h"
+#include "OgreContext.h"
 
 PhysicsManager* PhysicsManager::instance_ = nullptr;
 
 PhysicsManager* PhysicsManager::getInstance()
 {
-	if (instance_ == nullptr)
-		if (!setUpInstance())
+	if (instance_ == nullptr) {
+		try {
+			instance_ = new PhysicsManager();
+			instance_->init(Vector3(0.0, -9.8, 0.0));
+		}
+		catch (std::string msg) {
 			throw "ERROR: PhysicsManager couldn't be created\n";
+		}
+	}
+
 	return instance_;
 }
 
-bool PhysicsManager::setUpInstance()
-{
-	if (instance_ == nullptr) {
-		instance_ = new PhysicsManager();
-		return true;
-	}
+PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {
+	registerComponent("RigidBody", []() -> RigidBody* { return new RigidBody(); });
+};
 
-	return false;
-}
-
-PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {};
-
-PhysicsManager::~PhysicsManager() {};
+PhysicsManager::~PhysicsManager() {
+	destroyAllComponents();
+};
 
 void PhysicsManager::init(const Vector3 gravity) {
 
@@ -36,7 +39,6 @@ void PhysicsManager::init(const Vector3 gravity) {
 	collDispatcher = new btCollisionDispatcher(collConfig);
 
 	broadPhaseInterface = new btDbvtBroadphase();
-
 	constraintSolver = new btSequentialImpulseConstraintSolver();
 
 	dynamicsWorld = new btDiscreteDynamicsWorld(collDispatcher, broadPhaseInterface,
@@ -44,10 +46,11 @@ void PhysicsManager::init(const Vector3 gravity) {
 
 	dynamicsWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
 
-	/* mDebugDrawer_ =
-		 new OgreDebugDrawer(OgreSDLContext::getInstance()->getSceneManager());
-	 mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	 discreteDynamicsWorld_->setDebugDrawer(mDebugDrawer_);*/
+#ifdef _DEBUG
+	//mDebugDrawer_ = new OgreDebugDrawer(OgreContext::getInstance()->getSceneManager());
+	//mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+	//dynamicsWorld->setDebugDrawer(mDebugDrawer_);
+#endif // DEBUG
 }
 
 void PhysicsManager::destroyWorld()
@@ -62,13 +65,14 @@ void PhysicsManager::destroyWorld()
 
 	delete constraintSolver; constraintSolver = nullptr;
 
-	//delete mDebugDrawer_; mDebugDrawer_ = nullptr;
+	delete mDebugDrawer_; mDebugDrawer_ = nullptr;
 }
 
 void PhysicsManager::destroyRigidBody(btRigidBody* body)
 {
 	dynamicsWorld->removeCollisionObject(body);
 	delete body;
+	body = nullptr;
 }
 
 btDiscreteDynamicsWorld* PhysicsManager::getWorld() const
@@ -76,39 +80,20 @@ btDiscreteDynamicsWorld* PhysicsManager::getWorld() const
 	return dynamicsWorld;
 }
 
-btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass, PhysicsCmpId id)
+btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass)
 {
 	btTransform transform;
 	transform.setIdentity();
 	transform.setOrigin(btVector3(pos.x, pos.y, pos.z));
 
 	btCollisionShape* shapeColl = nullptr;
-
-	switch (id)
-	{
-	case PhysicsManager::PhysicsCmpId::RbBox:
-		shapeColl = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
-		break;
-	case PhysicsManager::PhysicsCmpId::RbSphere:
-		shapeColl = new btSphereShape(1.0f);
-		break;
-	case PhysicsManager::PhysicsCmpId::RbCylinder:
-		shapeColl = new btCylinderShape(btVector3(1.0f, 1.0f, 1.0f));
-		break;
-	case PhysicsManager::PhysicsCmpId::RbCone:
-		shapeColl = new btConeShape(1.0f, 1.0f);
-		break;
-	case PhysicsManager::PhysicsCmpId::RbCapsule:
-		shapeColl = new btCapsuleShape(1.0f, 1.0f);
-		break;
-	default:
-		break;
-	}
+	shapeColl = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
 
 	btMotionState* motion = new btDefaultMotionState(transform);
 
 	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, shapeColl);
 	btRigidBody* rb = new btRigidBody(info);
+
 	rb->forceActivationState(DISABLE_DEACTIVATION);
 
 	dynamicsWorld->addRigidBody(rb);
@@ -121,45 +106,46 @@ btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass, PhysicsCmpId id)
 
 void PhysicsManager::addComponent(Entity* ent, int compId)
 {
-	Component* comp;
-	//PhysicsCmpId id = (PhysicsCmpId)compId;
-	try {
-		comp = new Rigidbody(compId);
-	}
-	catch (std::string msg) {
-		throw "ERROR: Tried to add a non existant Physics Component\n";
-	}
 
-	if (!comp)
-		throw ("ERROR: Physics Manager couldn't create a component with an Id: ", compId, "\n");
-
-	comp->setEntity(ent);
-	_compsList.push_back(comp);
-	ent->addComponent(comp);
 }
 
 void PhysicsManager::start()
 {
-	//TODO: ESTO ES INUTIL BRUH
+	for (Component* cmp : _compsList)
+	{
+		cmp->setUp();
+	}
 }
 
 void PhysicsManager::update()
 {
 	dynamicsWorld->stepSimulation(1.f / 60.f, 10);
-	//#ifdef _DEBUG
-	//    dynamicsWorld->debugDrawWorld();
-	//#endif
+
 	for (auto it = _compsList.begin(); it != _compsList.end(); ++it) {
+		if (applyTorque) {
+			applyTorque = false;
+			static_cast<RigidBody*>(*it)->addTorque(Vector3(0.0f, 0.0, -5.0), Forces::IMPULSE);
+			//static_cast<RigidBody*>(*it)->addForce(Vector3(0.0f, 1, 0.0f), Vector3(1.0f, 0.0, 1.0), Forces::IMPULSE);
+		}
 		(*it)->update();
 	}
-	
+
+#ifdef _DEBUG
+	//dynamicsWorld->debugDrawWorld();
+#endif // _DEBUG
+
+}
+
+void PhysicsManager::clean()
+{
+	delete instance_;
 }
 
 void PhysicsManager::destroyAllComponents()
 {
 	auto i = _compsList.begin();
-	while (i != _compsList.end()) {
-		destroyRigidBody(static_cast<Rigidbody*>((*i))->getBtRb());
+	while (!_compsList.empty()) {
+		destroyRigidBody(static_cast<RigidBody*>((*i))->getBtRb());
 		_compsList.remove((*i));
 	}
 	destroyWorld();
@@ -170,8 +156,9 @@ bool PhysicsManager::destroyComponent(Entity* ent, int compId)
 	auto i = _compsList.begin();
 	while (i != _compsList.end()) {
 		if (ent == (*i)->getEntity()) {
-			destroyRigidBody(static_cast<Rigidbody*>((*i))->getBtRb());
-			_compsList.remove((*i));
+			destroyRigidBody(static_cast<RigidBody*>((*i))->getBtRb());
+			delete *i;
+			_compsList.erase(i);
 			return true;
 		}
 		else {

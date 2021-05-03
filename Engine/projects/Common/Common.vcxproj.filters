@@ -53,9 +53,6 @@
     <ClInclude Include="..\..\include\Common\CommonManager.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Common\ecs.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Common\checkML.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>

@@ -7,11 +7,13 @@ Entity::Entity() {
 }
 
 Entity::~Entity() {
-	for (auto it = _componentMap.begin(); it != _componentMap.end(); it++)
+	for (auto it = _componentMap.begin(); it != _componentMap.end(); ++it)
 	{
-		for (auto it2 = it->second.begin(); it2 != it->second.end();) {
-			if (!it2->second->getManager()->destroyComponent(this, it->first))
-				throw "ERROR: Tried to destroy a non existant component while destroying the entity\n";
+		for (auto it2 = it->second.begin(); it2 != it->second.end(); it2 = it->second.begin()) {
+			int id = it2->second->getId();
+			//removeComponent(it->first, id);
+			if (!it2->second->getManager()->destroyComponent(this, id))
+				throw std::runtime_error("ERROR: Tried to destroy a non existant component while destroying the entity\n");
 		}
 	}
 }
@@ -26,9 +28,9 @@ Component* Entity::getComponent(int managerId, int compId)
 	return _componentMap[managerId][compId];
 }
 
-bool Entity::hasComponent(int managerId, int compId)
+bool Entity::hasComponent(int managerId, int compId) const
 {
-	return _componentMap[managerId].count(compId);
+	return _componentMap.find(managerId)->second.count(compId);
 }
 
 bool Entity::removeComponent(int managerId, int compId) {

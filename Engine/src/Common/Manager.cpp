@@ -10,15 +10,19 @@ Manager::~Manager() {
 	destroyAllComponents();
 }
 
-std::list<Component*> Manager::getComponents() {
+const std::list<Component*>& Manager::getComponents() {
+	return _compsList;
+}
+
+const std::list<Component*>& Manager::getComponents() const {
 	return _compsList;
 }
 
 void Manager::destroyAllComponents() {
-	for (auto it = _compsList.begin(); it != _compsList.end(); )
+	for (auto it = _compsList.begin(); it != _compsList.end(); it = _compsList.begin())
 	{
-		_compsList.erase(it);
 		delete* it;
+		_compsList.erase(it);
 	}
 }
 
@@ -36,4 +40,27 @@ bool Manager::destroyComponent(Entity* ent, int compId) {
 
 int Manager::getId() {
 	return (int)_manId;
+}
+
+int Manager::getId() const {
+	return (int)_manId;
+}
+
+void Manager::registerComponent(const std::string& name, std::function<Component * ()> compConst)
+{
+	compsRegistry_[name] = compConst;
+}
+
+Component* Manager::create(const std::string& name, Entity* ent)
+{
+	Component* comp = nullptr;
+	auto it = compsRegistry_.find(name);
+	if (it != compsRegistry_.end())
+		comp = it->second();
+	if (comp != nullptr) {
+		_compsList.push_back(comp);
+		comp->setEntity(ent);
+		return comp;
+	}
+	return nullptr;
 }

@@ -36,10 +36,10 @@
     <ClCompile Include="..\..\src\Managers\SceneManager.cpp">
       <Filter>Archivos de origen\Managers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Managers\ResourceManager.cpp">
-      <Filter>Archivos de origen\Managers</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\main.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\LoaderSystem.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,11 +53,8 @@
     <ClInclude Include="..\..\include\Managers\SceneManager.h">
       <Filter>Archivos de encabezado\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Managers\ResourceManager.h">
-      <Filter>Archivos de encabezado\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Managers\InputManager.h">
-      <Filter>Archivos de encabezado\Managers</Filter>
+    <ClInclude Include="..\..\include\LoaderSystem.h">
+      <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

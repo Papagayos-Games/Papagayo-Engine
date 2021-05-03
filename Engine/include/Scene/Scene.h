@@ -1,15 +1,19 @@
 #pragma once
 
+#ifndef _PAPAENG_SCENE_H
+#define _PAPAENG_SCENE_H
+
 #include <string>
+#include <list>
 #include <map>
-#include <json.hpp>
 
-using json = nlohmann::json;
+//#include "json.hpp"
 
-using namespace std;
+//namespace nlohmann {
+//	class json;
+//}
 
 class Entity;
-
 class Component;
 
 class Scene
@@ -17,15 +21,21 @@ class Scene
 public:
 	Scene();
 	~Scene();
+	
+	void clean();
 
-	bool load(json& j);
-
-	string getName() const;
-	Entity* getEntity(const string& name);
+	void addEntity(Entity* ent);
+	void setName(const std::string& s);
+	const std::string& getName() const;
+	// TO DO: buscar a la entidad por tag
+	Entity* getEntity(const std::string& name);
 
 private:
-	map<int, Component*> components_;
-	map<string, Entity*> entities_;
-	string name;
+	// la key seria el nombre del archivo
+	// std::map<std::string, Entity*> prefabs_;
+
+	std::list<Entity*> entities_;
+	std::string name;
 };
 
+#endif

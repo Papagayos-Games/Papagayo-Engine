@@ -1,7 +1,10 @@
+#include "..\..\include\Graphics\OgreContext.h"
 #include "OgreContext.h"
+#include <checkML.h>
 #include "RTShaderTecnhiqueResolveListener.h"
 #include "WindowGenerator.h"
 #include "OgrePlane.h"
+#include <checkML.h>
 
 #include <Ogre.h>
 #include <OgreFileSystemLayer.h>
@@ -9,13 +12,17 @@
 #include <OgreShaderGenerator.h>
 #include <OgreLight.h>		//TOERASE
 
+#include "SDL.h"
+
 
 OgreContext* OgreContext::instance_ = nullptr;
 
-OgreContext::OgreContext(std::string appName) {
+OgreContext::OgreContext(const std::string& appName) {
 	appName_ = appName;
 	init();
  }
+
+
 
 OgreContext* OgreContext::getInstance()
 {
@@ -25,8 +32,7 @@ OgreContext* OgreContext::getInstance()
 	return instance_;
 }
 
-
-bool OgreContext::setupInstance(std::string appName)
+bool OgreContext::setupInstance(const std::string& appName)
 {
 	if (instance_ == nullptr) {
 		instance_ = new OgreContext(appName);
@@ -39,15 +45,17 @@ bool OgreContext::setupInstance(std::string appName)
 void OgreContext::createRoot()
 {
 #ifdef _DEBUG
-	ogreRoot_ = new Ogre::Root("OgreD/plugins.cfg");
+	ogreRoot_ = new Ogre::Root("OgreD/plugins.cfg", "OgreD/ogre.cfg");
 #else
-	ogreRoot_ = new Ogre::Root("Ogre/plugins.cfg");
+	ogreRoot_ = new Ogre::Root("Ogre/plugins.cfg", "Ogre/ogre.cfg");
 #endif
 
 	if (ogreRoot_ == nullptr) {
 		throw std::exception("No se ha podido crear el mRoot");
 	}
 
+	ogreRoot_->restoreConfig();
+	ogreRoot_->initialise(false);
 }
 
 void OgreContext::createSceneManager()
@@ -83,7 +91,7 @@ void OgreContext::clean()
 	delete instance_;
 }
 
-void OgreContext::setSkyPlane(std::string materialName, Ogre::Plane plane, int width, int height, float bow)
+void OgreContext::setSkyPlane(const std::string& materialName, const Ogre::Plane& plane, int width, int height, float bow)
 {
 		ogreSceneManager_->setSkyPlane(true,plane, materialName, 1, 1, true, bow, width, height);	
 }
@@ -91,6 +99,8 @@ void OgreContext::setSkyPlane(std::string materialName, Ogre::Plane plane, int w
 void OgreContext::init()
 {
 	createRoot();
+
+	SDL_Init(SDL_INIT_EVERYTHING);
 
 	try { WindowGenerator::setupInstance(getOgreRoot(), appName_); }
 	catch (const std::exception & e)
@@ -176,12 +186,22 @@ OgreContext::~OgreContext()
 	delete  mMaterialListener_;
 }
 
+Ogre::Root* OgreContext::getOgreRoot()
+{
+	return ogreRoot_;
+}
+
 Ogre::Root* OgreContext::getOgreRoot() const
 {
 	return ogreRoot_;
 }
 
- Ogre::SceneManager* OgreContext::getSceneManager() const
+Ogre::SceneManager* OgreContext::getSceneManager()
+{
+	return ogreSceneManager_;
+}
+
+Ogre::SceneManager* OgreContext::getSceneManager() const
 {
 	return ogreSceneManager_;
 }

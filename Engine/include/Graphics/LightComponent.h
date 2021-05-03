@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef _GRAPHICS_LIGHTCOMP_H
+#define _GRAPHICS_LIGHTCOMP_H
+
 #include <Component.h>
 #include <string>
 
@@ -22,25 +26,25 @@ private:
 	Ogre::SceneNode* parentNode_ = nullptr;
 	Ogre::Light* ogreLight_ = nullptr;
 	LIGHT_TYPE lightType_;
-	void initLight(std::string name);
 
 public:
-	//	Constructora para las luces de tipo point y direcional
-	LightComponent(Vector3 pos, std::string name, LIGHT_TYPE type = LIGHT_TYPE::POINT);
-	//	Constructora para la luz de tipo spotlight
-	LightComponent(Vector3 pos, Vector3 dir, std::string name);
+	//Constructora
+	LightComponent();
 	//	Enciende la luz
 	inline void turnOn();
 	//	Apaga la luz
 	void turnOff();
 	//	Cambia el color de una luz
-	void setColor(Vector3 newColor);
+	void setColor(const Vector3& newColor);
 	//	Cambia la intensidad de una luz ( 0.0 -> 1.0)
 	void setLightPower(float intensity);
 	//	Activa las sombras
 	void setCastShadow(bool status);
+
 	virtual void init()override;
 	virtual void update()override;
 	virtual void setActive(bool status)override;
+	virtual void load(const nlohmann::json& params)override;
 };
 
+#endif

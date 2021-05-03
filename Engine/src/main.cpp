@@ -23,6 +23,12 @@ int main(){
 	catch (std::exception e) {
 		std::cout << e.what() << "\n";
 	}
+	catch (const std::string& e) {
+		std::cout << e << "\n";
+	}
+	catch (...) {
+		std::cout << "EXCEPCION NO CONTROLADA\n";
+	}
 
 	return 0;
 }
