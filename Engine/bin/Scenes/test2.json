@@ -1,80 +1,83 @@
 {
     "Entities": [
-        {
-            "Components": [
-              {
-                "Component": "Transform",
-                "Type": "Common",
-                "Parameters": {
-                  "position": [ 0, 0, 1000 ],
-                  "velocity": [ 0, 0, 0 ],
-                  "dimensions": [ 1, 1, 1 ],
-                  "rotation": [ 0, 0, 0 ]
-                }
-              },
-              {
-                "Component": "Camera",
-                "Type": "Render",
-                "Parameters": {
-                  "camName": "mainCamera",
-                  "lookAt": [ 0, 0, 0 ],
-                  "camType": 0,
-                  "viewportColor": [ 1.0, 0.0, 0.0, 1.0 ],
-                  "autoAspectRatio": true,
-                  "viewport": {
-                    "zOrder": 0,
-                    "left": 0,
-                    "top": 0,
-                    "width": 1,
-                    "height": 1
-                  },
-                  "nearClipDistance": 1,
-                  "farClipDistance": 10000
-                }
-              }
-            ]
+      {
+        "Name" : "Camera",
+        "Components": [
+          {
+            "Component": "Transform",
+            "Type": "Common",
+            "Parameters": {
+              "position": [ 0, 0, 1000 ],
+              "velocity": [ 0, 0, 0 ],
+              "dimensions": [ 1, 1, 1 ],
+              "rotation": [ 0, 0, 0 ]
+            }
           },
-        {
-            "Components": [
-                
-                {
-                    "Component" : "Transform",
-                    "Type" : "Common",
-                    "Parameters" : {
-                        "position" : [0.2684, 10.054, 9.357],
-                        "velocity" : [0, 0, 0],
-                        "dimensions" : [1, 1, 1],
-                        "rotation" : [0, 0, 0]
-                    }
-                },
-                {
-                    "Component" : "MeshComponent",
-                    "Type" : "Render",
-                    "Parameters" : {
-                        "meshName" : "penguin",
-                        "meshMaterial" : "Practica1_Azulejo"
-                    }
-                }   ,
-                {
-                  "Component": "RigidBody",
-                  "Type": "Physics",
-                  "Parameters": {
-                    "dampingLin": 0,
-                    "dampingAng": 0,
-                    "gravity": [ 0.0, -9.8, 0.0 ],
-                    "restitution": 0.5,
-                    "linealVel": [ 5.0, 0.0, 0.0 ],
-                    "friction": 0.5,
-                    "state": "None",
-                    "shape": {
-                      "id": "Box"
-                    }
-                  }
-                }    
-            ]
-        },
-        {
-          "Prefab" : "Penguin"
-        }
+          {
+            "Component": "Camera",
+            "Type": "Render",
+            "Parameters": {
+              "camName": "mainCamera",
+              "lookAt": [ 0, 0, 0 ],
+              "camType": 0,
+              "viewportColor": [ 1.0, 0.0, 0.0, 1.0 ],
+              "autoAspectRatio": true,
+              "viewport": {
+                "zOrder": 0,
+                "left": 0,
+                "top": 0,
+                "width": 1,
+                "height": 1
+              },
+              "nearClipDistance": 1,
+              "farClipDistance": 10000
+            }
+          }
+        ]
+      },
+      {
+        "Name" : "Penguin",
+        "Components": [
+
+          {
+            "Component": "Transform",
+            "Type": "Common",
+            "Parameters": {
+              "position": [ 0.2684, 10.054, 9.357 ],
+              "velocity": [ 0, 0, 0 ],
+              "dimensions": [ 1, 1, 1 ],
+              "rotation": [ 0, 0, 0 ]
+            }
+          },
+          {
+            "Component": "MeshComponent",
+            "Type": "Render",
+            "Parameters": {
+              "meshName": "penguin",
+              "meshMaterial": "Practica1_Azulejo"
+            }
+          },
+          {
+            "Component": "RigidBody",
+            "Type": "Physics",
+            "Parameters": {
+              "dampingLin": 0,
+              "dampingAng": 0,
+              "gravity": [ 0.0, -9.8, 0.0 ],
+              "restitution": 0.5,
+              "linealVel": [ 5.0, 0.0, 0.0 ],
+              "friction": 0.5,
+              "state": "None",
+              "shape": {
+                "id": "Box"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "Name": "Penguin",
+        "Prefab": "Penguin"
+      }
     ]
 }

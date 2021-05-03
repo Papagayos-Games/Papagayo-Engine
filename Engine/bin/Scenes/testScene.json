@@ -1,34 +1,38 @@
 {
   "Entities": [
     {
-      "Prefab" : "DefaultCamera",
-      "Arguments" : [
+      "Name": "Camera",
+      "Prefab": "DefaultCamera",
+      "Arguments": [
         {
           "Component": "Transform",
           "Type": "Common",
-          "Parameters" : {
-            "position" : [0,100,500]
+          "Parameters": {
+            "position": [ 0, 100, 500 ]
           }
         }
       ]
     },
     {
-      "Prefab" : "DefaultLight"
+      "Name": "Light",
+      "Prefab": "DefaultLight"
     },
     {
-      "Prefab" : "Penguin",
-      "Arguments" : [
+      "Name": "Penguin",
+      "Prefab": "Penguin",
+      "Arguments": [
         {
           "Component": "Transform",
           "Type": "Common",
-          "Parameters" : {
-            "position": [ 123,45,67 ]
+          "Parameters": {
+            "position": [ 123, 45, 67 ]
           }
         }
       ]
     },
     {
-      "Prefab" : "Penguin"
+      "Name": "Penguin",
+      "Prefab": "Penguin"
     }
   ]
 }

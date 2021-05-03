@@ -51,12 +51,19 @@ void LoaderSystem::loadEntities(const std::string& fileName, Scene* scene)
 	
 	for (int i = 0; i < entSize; i++) {
 		Entity* ent = new Entity();
+
+		nlohmann::json name = entities[i]["Name"];
+		if (name.is_null() || !name.is_string())
+			throw std::exception("ERROR: Name not found for entity\n");
+
 		nlohmann::json prefab = entities[i]["Prefab"];
 		if (prefab.is_null() || !prefab.is_string())
 			loadComponents(entities[i]["Components"], ent);
-		else
+		else {
+			name = entities[i]["Name"];
 			loadPrefabs(entities[i], ent);
-		scene->addEntity(ent);
+		}
+		scene->addEntity(name, ent);
 	}
 	
 	i.close();

@@ -23,6 +23,21 @@ void Entity::addComponent(Component* comp)
 	_componentMap[comp->getManager()->getId()][comp->getId()] = comp;
 }
 
+std::string& Entity::getName()
+{
+	return name_;
+}
+
+const std::string& Entity::getName() const
+{
+	return name_;
+}
+
+void Entity::setName(const std::string& name)
+{
+	name_ = name;
+}
+
 Component* Entity::getComponent(int managerId, int compId)
 {
 	return _componentMap[managerId][compId];

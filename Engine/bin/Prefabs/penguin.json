@@ -1,38 +1,38 @@
 {
-    "Components": [
-      {
-        "Component": "Transform",
-        "Type": "Common",
-        "Parameters": {
-          "position": [ 0, 0, 10],
-          "velocity": [ 0, 0, 0 ],
-          "dimensions": [ 1, 1, 1 ],
-          "rotation": [ 0, 0, 0 ]
-        }
-      },
-      {
-        "Component": "MeshComponent",
-        "Type": "Render",
-        "Parameters": {
-          "meshName": "penguin",
-          "meshMaterial": "Practica1_Azulejo"
-        }
-      },
-      {
-        "Component": "RigidBody",
-        "Type": "Physics",
-        "Parameters": {
-          "dampingLin": 0,
-          "dampingAng": 0,
-          "gravity": [ 0.0, -9.8, 0.0 ],
-          "restitution": 0.5,
-          "linealVel": [ 5.0, 0.0, 0.0 ],
-          "friction": 0.5,
-          "state": "None",
-          "shape": {
-            "id": "Box"
-          }
+  "Components": [
+    {
+      "Component": "Transform",
+      "Type": "Common",
+      "Parameters": {
+        "position": [ 0, 0, 10 ],
+        "velocity": [ 0, 0, 0 ],
+        "dimensions": [ 1, 1, 1 ],
+        "rotation": [ 0, 0, 0 ]
+      }
+    },
+    {
+      "Component": "MeshComponent",
+      "Type": "Render",
+      "Parameters": {
+        "meshName": "penguin",
+        "meshMaterial": "Practica1_Azulejo"
+      }
+    },
+    {
+      "Component": "RigidBody",
+      "Type": "Physics",
+      "Parameters": {
+        "dampingLin": 0,
+        "dampingAng": 0,
+        "gravity": [ 0.0, -9.8, 0.0 ],
+        "restitution": 0.5,
+        "linealVel": [ 5.0, 0.0, 0.0 ],
+        "friction": 0.5,
+        "state": "None",
+        "shape": {
+          "id": "Box"
         }
       }
-    ]
-  }
+    }
+  ]
+}
