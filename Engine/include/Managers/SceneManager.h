@@ -15,6 +15,7 @@ public:
 	~SceneManager();
 
 	static SceneManager* getInstance();
+	static Scene* getCurrentScene();
 	static bool setupInstance();
 	static void clean();
 	

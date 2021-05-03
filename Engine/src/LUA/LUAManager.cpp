@@ -4,6 +4,15 @@
 
 #include <LuaBridge.h>
 
+
+#include <Rigidbody.h>
+#include <Managers/SceneManager.h>
+#include <Scene/Scene.h>
+#include <Vector3.h>
+#include <PhysicsManager.h>
+
+
+
 LUAManager* LUAManager::instance_ = nullptr;
 
 
@@ -65,11 +74,10 @@ void globalFunction() {
 	std::cout << "hello this is a global func\n";
 }
 
-
 //Aqui van todas las funciones y clases correspondientes 
 void registerClassAndFucntions(lua_State* L) {
 	using namespace luabridge;
-	getGlobalNamespace(L).addFunction("globalFunction", globalFunction);
+/*	getGlobalNamespace(L).addFunction("globalFunction", globalFunction);
 	getGlobalNamespace(L)
 		.beginClass<A>("A")
 		.addFunction("action", &A::action)
@@ -78,17 +86,31 @@ void registerClassAndFucntions(lua_State* L) {
 		.endClass()
 		.deriveClass<B, A>("B")
 		.addFunction("hello", &B::hello)
+		.endClass();*/
+
+
+	getGlobalNamespace(L).beginClass<Vector3>("Vector3")
+		.addConstructor<void (*) (float,float,float)>()
+		.addProperty("x", &Vector3::x)
+		.addProperty("y", &Vector3::y)
+		.addProperty("z", &Vector3::z)
 		.endClass();
 
-	//getGlobalNamespace(L).beginClass();
 
+	getGlobalNamespace(L).beginClass<RigidBody>("Rigidbody")
+		.addFunction("setPosition", &RigidBody::setPosition)
+		.addFunction("addForce1", &RigidBody::addForce)
+		.addFunction("setGravity", &RigidBody::setGravity)
+		.endClass();
 
+	
+		
 }
 
 void testCallLua(lua_State* L) {
 	std::error_code errorCode;
-
-	A a;
+	using namespace luabridge;
+	/*A a;
 		lua_getglobal(L, "testA");
 		luabridge::push(L,&a,errorCode);
 	lua_pcall(L, 1, 0, 0);
@@ -97,6 +119,26 @@ void testCallLua(lua_State* L) {
 	luabridge::push(L, &a, errorCode);
 	luabridge::push(L, &b, errorCode);
 	lua_pcall(L, 2, 0, 0);
+	*/
+	
+	/*lua_getglobal(L, "setPosition");
+	push(L, static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
+	->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);
+	lua_pcall(L, 1, 0, 0);*/
+
+	lua_getglobal(L, "addForce");
+	push(L, static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
+	->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);
+	lua_pcall(L, 1, 0, 0);
+	
+	/*lua_getglobal(L, "setgravity");
+	push(L, static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
+	->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);
+	lua_pcall(L, 1, 0, 0);*/
+	
+
+
+
 
 }
 

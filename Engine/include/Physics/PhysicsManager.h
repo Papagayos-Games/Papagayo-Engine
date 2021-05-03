@@ -79,6 +79,12 @@ public:
 
 	virtual void destroyAllComponents();
 	virtual bool destroyComponent(Entity* ent, int compId);
+
+
+	enum class PhysicsCmpId : int {
+		RigigbodyId = 0,
+		LastPhysicsCmpId
+	};
 };
 
 #endif

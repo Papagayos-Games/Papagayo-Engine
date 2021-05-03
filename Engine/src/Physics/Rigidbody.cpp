@@ -356,21 +356,21 @@ btRigidBody* RigidBody::getBtRb() const
 
 #pragma region Adders
 
-void RigidBody::addForce(const Vector3& force, Vector3& relativePos, Forces type)
+void RigidBody::addForce(const Vector3& force, Vector3& relativePos, int type)
 {
 	if (_active) {
 		if (relativePos == Vector3(0.0f, 0.0f, 0.0f)) {
-			if (type == Forces::NORMAL)
+			if (type == (int)Forces::NORMAL)
 				rb->applyCentralForce(btVector3(btScalar(force.x), btScalar(force.y), btScalar(force.z)));
-			else if (type == Forces::IMPULSE)
+			else if (type == (int)Forces::IMPULSE)
 				rb->applyCentralImpulse(btVector3(btScalar(force.x), btScalar(force.y), btScalar(force.z)));
 		}
 		else {
-			if (type == Forces::NORMAL)
+			if (type == (int)Forces::NORMAL)
 				rb->applyForce(
 					(btVector3(btScalar(force.x), btScalar(force.y), btScalar(force.z))),
 					(btVector3(btScalar(relativePos.x), btScalar(relativePos.y), btScalar(relativePos.z))));
-			else if (type == Forces::IMPULSE)
+			else if (type == (int)Forces::IMPULSE)
 				rb->applyImpulse(
 					(btVector3(btScalar(force.x), btScalar(force.y), btScalar(force.z))),
 					(btVector3(btScalar(relativePos.x), btScalar(relativePos.y), btScalar(relativePos.z))));
