@@ -24,6 +24,11 @@ public:
 	bool isKeyDown(SDL_Keycode key) const;
 	bool isKeyDownTest(int key)const;
 	bool isKeyUp(SDL_Keycode key) const;
+
+	SDL_Scancode lastKey()
+	{
+		return lstKey;
+	}
 	
 private:
 	InputSystem();
@@ -35,6 +40,8 @@ private:
 	bool mouseEvent_ = false; // click
 	bool keyboardEvent_ = false; // press
 	bool read = false;
+	SDL_Scancode lstKey;
+
 };
 
 #endif // !_INPUTSYSTEM_H

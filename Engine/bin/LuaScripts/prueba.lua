@@ -1,17 +1,3 @@
-function testA(a)
-	print("call c++ part");
-	globalFunction();
-	a:action();
-	a:doPrint(1,2);
-end
-
-function testAAndB(a, b)
-	print("A and B");
-	globalFunction();
-	a:action();
-  	a:doPrint(1,2);
-	b:hello("Good using c++ and Lua");
-end
 
 function setPosition(rig)
 
@@ -33,14 +19,20 @@ function setgravity(rig)
 	rig:setGravity(vec);
 end
 
-function pressKeyDoSomething(input)
-	if input:keyPressed(97) == true then
+function pressKeyDoSomething(input,rig)
+	if input:keyPressed(4) == true then
 	print("Pulse A perros");
-	--vec= Vector3(0,10,0);
-	--rig:setGravity(vec);
+	 vec= Vector3(100,100,1000);
+    rel= Vector3(0,0,0);
+	rig:addForce1(vec,rel,1);
 	end
 end
 
+function addTorque(rig)
 
+    vec= Vector3(100,100,1000);
+    rel= Vector3(0,0,0);
+	rig:addTorque(vec,rel,1);
+end
 
 

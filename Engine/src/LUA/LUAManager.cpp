@@ -1,5 +1,6 @@
-#include <iostream>
 #include "LUAManager.h"
+
+#include <iostream>
 
 
 #include <LuaBridge.h>
@@ -12,10 +13,12 @@
 #include <PhysicsManager.h>
 #include <./Input/InputSystem.h>
 
+
+
+
 using namespace luabridge;
 
 LUAManager* LUAManager::instance_ = nullptr;
-
 
 
 bool LUAManager::CheckLua(lua_State* L, int r)
@@ -30,6 +33,8 @@ bool LUAManager::CheckLua(lua_State* L, int r)
 
 LUAManager::~LUAManager()
 {
+	lua_close(L);
+	L = nullptr;
 }
 
 LUAManager* LUAManager::getInstance()
@@ -47,48 +52,22 @@ void LUAManager::start()
 
 void LUAManager::update()
 {
+	std::error_code errorCode;
+
+	lua_getglobal(L, "pressKeyDoSomething");
+	push(L, InputSystem::getInstance(), errorCode);
+	push(L, static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
+		->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);
+	lua_pcall(L, 2, 0, 0);
+
 }
 
 
-class A {
-public:
-	void action() { std::cout << "hello I'm A\n"; }
-	virtual void doPrint(int a, int b) {
-		std::cout << "in A a : " << a << " b : " << b << std::endl;
-	}
-	std::string goodMan() const { return "goodman"; }
-};
 
-
-class B : public A {
-public:
-	void hello(const std::string& info) const {
-		std::cout << "hello: " << info << std::endl;
-	}
-	virtual void doPrint(int a, int b) override {
-		std::cout << "in B just " << (a + b) << std::endl;
-	}
-};
-
-void globalFunction() {
-	std::cout << "hello this is a global func\n";
-}
 
 //Aqui van todas las funciones y clases correspondientes 
-void registerClassAndFucntions(lua_State* L) {
-	//using namespace luabridge;
-/*	getGlobalNamespace(L).addFunction("globalFunction", globalFunction);
-	getGlobalNamespace(L)
-		.beginClass<A>("A")
-		.addFunction("action", &A::action)
-		.addFunction("doPrint", &A::doPrint)
-		.addFunction("goodMan", &A::goodMan)
-		.endClass()
-		.deriveClass<B, A>("B")
-		.addFunction("hello", &B::hello)
-		.endClass();*/
-
-
+void LUAManager::registerClassAndFunctions(lua_State* L) {
+	
 	getGlobalNamespace(L).beginClass<Vector3>("Vector3")
 		.addConstructor<void (*) (float,float,float)>()
 		.addProperty("x", &Vector3::x)
@@ -101,6 +80,7 @@ void registerClassAndFucntions(lua_State* L) {
 		.addFunction("setPosition", &RigidBody::setPosition)
 		.addFunction("addForce1", &RigidBody::addForce)
 		.addFunction("setGravity", &RigidBody::setGravity)
+		.addFunction("addTorque",&RigidBody::addTorque)
 		.endClass();
 
 	getGlobalNamespace(L).beginClass<InputSystem>("InputSystem")
@@ -108,9 +88,11 @@ void registerClassAndFucntions(lua_State* L) {
 		.endClass();
 }
 
-void testCallLua(lua_State* L) {
+void LUAManager::testCallLua(lua_State* L) {
 	std::error_code errorCode;
 	using namespace luabridge;
+
+
 	/*A a;
 		lua_getglobal(L, "testA");
 		luabridge::push(L,&a,errorCode);
@@ -121,29 +103,39 @@ void testCallLua(lua_State* L) {
 	luabridge::push(L, &b, errorCode);
 	lua_pcall(L, 2, 0, 0);
 	*/
-	
-	/*lua_getglobal(L, "setPosition");
-	push(L, static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
-	->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);
-	lua_pcall(L, 1, 0, 0);*/
 
-	lua_getglobal(L, "addForce");
+
+	/*
+	lua_getglobal(L, "setPosition");
 	push(L, static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
 	->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);
-	lua_pcall(L, 1, 0, 0);
+	pcall(L, 1, 0, 0);*/
+
+	/*lua_getglobal(L, "addTorque");
+	push(L, static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
+	->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);
+	lua_pcall(L, 3, 0, 0);*/
 	
+	
+	/*lua_getglobal(L, "addForce");
+	push(L, static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
+	->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);
+	pcall(L, 1, 0, 0);*/
+
 	/*lua_getglobal(L, "setgravity");
 	push(L, static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
 	->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);
 	lua_pcall(L, 1, 0, 0);*/
 	
-	lua_getglobal(L, "pressKeyDoSomething");
+	/*lua_getglobal(L, "pressKeyDoSomething");
 	push(L, InputSystem::getInstance(), errorCode);
 	lua_pcall(L, 1, 0, 0);
+	*/
+	
 
 }
 
-bool reloadLuaScript(lua_State* L, const std::string& luafile) {
+bool LUAManager::reloadLuaScript(lua_State* L, const std::string& luafile) {
 	int state = luaL_dofile(L, luafile.c_str());
 	if (state != LUA_OK) {
 		// std::cout << "ok";
@@ -151,11 +143,9 @@ bool reloadLuaScript(lua_State* L, const std::string& luafile) {
 	}
 	return true;
 }
-void registerClassAndFucntions(lua_State* L);
-void testCallLua(lua_State* L);
 
-lua_State* buildLuaEngine(const std::string& file) {
-	lua_State* L = luaL_newstate();
+lua_State* LUAManager::buildLuaEngine(const std::string& file) {
+	auto L= luaL_newstate();
 	// need check L
 	luaL_openlibs(L);
 	auto ok = reloadLuaScript(L, file);
@@ -166,18 +156,17 @@ lua_State* buildLuaEngine(const std::string& file) {
 	return L;
 }
 
-
 LUAManager::LUAManager() : Manager(ManID::LUA)
 {
 
-	auto L = buildLuaEngine("LuaScripts/prueba.lua");
-	pruebaXD = L;
+	 L = buildLuaEngine("LuaScripts/prueba.lua");
+	//pruebaXD = L;
 	if (L) {
-		registerClassAndFucntions(L);
+		registerClassAndFunctions(L);
 		testCallLua(L);
 	}
-	if (L) {
+	/*if (L) {
 		lua_close(L);
 		L = nullptr;
-	}
+	}*/
 }
