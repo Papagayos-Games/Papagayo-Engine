@@ -48,24 +48,17 @@ void LoaderSystem::loadEntities(const std::string& fileName, Scene* scene)
 		throw std::exception("ERROR: Entities not found\n");
 
 	size_t entSize = entities.size();
-	
+
 	for (int i = 0; i < entSize; i++) {
 		Entity* ent = new Entity();
-
-		nlohmann::json name = entities[i]["Name"];
-		if (name.is_null() || !name.is_string())
-			throw std::exception("ERROR: Name not found for entity\n");
-
 		nlohmann::json prefab = entities[i]["Prefab"];
 		if (prefab.is_null() || !prefab.is_string())
 			loadComponents(entities[i]["Components"], ent);
-		else {
-			name = entities[i]["Name"];
+		else
 			loadPrefabs(entities[i], ent);
-		}
-		scene->addEntity(name, ent);
+		scene->addEntity(ent);
 	}
-	
+
 	i.close();
 }
 
@@ -74,7 +67,7 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 	if (comps.is_null() || !comps.is_array())
 		throw std::exception("ERROR: Components not found\n");
 	int compSize = comps.size();
-	
+
 	auto mans = PapagayoEngine::getInstance()->getManagers();
 	nlohmann::json type;
 	nlohmann::json component;
@@ -83,7 +76,7 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 		//std::map<std::string, std::string> p;
 		//readParameters(comps[i]["Parameters"].dump(), p);
 		type = comps[i]["Type"];
-		if(type.is_null() || !type.is_string())
+		if (type.is_null() || !type.is_string())
 			throw std::exception("ERROR: Component type not found\n");
 
 		component = comps[i]["Component"];
@@ -95,19 +88,19 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 			throw std::exception("ERROR: Component couldn't be created, it is not registered\n");
 
 		// Si hay parametros, se cargan; si no, se crea el componente por defecto
-		
+
 		params = comps[i]["Parameters"];
 		if (!params.is_null() && params.is_object()) {
-			
+
 			try { c->load(params); }
-			catch(std::exception e){
+			catch (std::exception e) {
 				//resetear los valores del componente si hay algun parametro con un formato erroneo
 				std::cout << "WARNING: Component " + component.get<std::string>() + " parameters are wrong, reseting to default\n";
 				c->init();
 				//throw std::exception("WARNING: Component parametrs are wrong\n");
 			}
 		}
-		
+
 		entity->addComponent(c);
 	}
 }
@@ -143,7 +136,7 @@ void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent) {
 		throw std::exception("ERROR: Prefab files not found\n");
 
 	std::string fileName = pref["Prefab"].get<std::string>();
-	std::fstream i ("Prefabs/" + fileName + ".json");
+	std::fstream i("Prefabs/" + fileName + ".json");
 
 	if (!i.is_open()) {
 		throw std::runtime_error("ERROR: Loading scene " + fileName + " failed, file missing\n");

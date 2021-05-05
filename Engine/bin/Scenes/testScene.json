@@ -1,26 +1,23 @@
 {
   "Entities": [
     {
-      "Name": "Camera",
-      "Prefab": "DefaultCamera",
-      "Arguments": [
+      "Prefab" : "DefaultCamera",
+      "Arguments" : [
         {
           "Component": "Transform",
           "Type": "Common",
-          "Parameters": {
-            "position": [ 0, 100, 500 ]
+          "Parameters" : {
+            "position" : [0,100,500]
           }
         }
       ]
     },
     {
-      "Name": "Light",
-      "Prefab": "DefaultLight"
+      "Prefab" : "DefaultLight"
     },
     {
-      "Name": "Penguin",
-      "Prefab": "Penguin",
-      "Arguments": [
+      "Prefab" : "Penguin",
+      "Arguments" : [
         {
           "Component": "Transform",
           "Type": "Common",

@@ -21,10 +21,10 @@ class Scene
 public:
 	Scene();
 	~Scene();
-	
+
 	void clean();
 
-	void addEntity(const std::string& name, Entity* ent);
+	void addEntity(Entity* ent);
 	void setName(const std::string& s);
 	const std::string& getName() const;
 	// TO DO: buscar a la entidad por tag
