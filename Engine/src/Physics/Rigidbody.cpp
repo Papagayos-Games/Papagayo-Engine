@@ -17,6 +17,13 @@
 #include "PhysicsManager.h"
 #include "Transform.h"
 #include "CommonManager.h"
+#include "MeshComponent.h"
+#include "RenderManager.h"
+#include <OgreEntity.h>
+#include <OgreSceneManager.h>
+#include <OgreSceneNode.h>
+#include "OgreContext.h"
+#include "MeshStrider.h"
 
 inline Vector3 convertVector(const btVector3& V) {
 	return Vector3(V.x(), V.y(), V.z());
@@ -45,6 +52,21 @@ void RigidBody::setUp()
 	Vector3 vRot = tr_->getRot();
 	q.setEulerZYX(vRot.x, vRot.y, vRot.z);
 	rb->setWorldTransform(btTransform(q, convertVector(tr_->getPos())));
+
+	MeshComponent* mesh = static_cast<MeshComponent*>(_entity->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
+	if (mesh) {
+		Ogre::MeshPtr meshPtr = mesh->getOgreEntity()->getMesh();
+		//float x = meshPtr.getPointer()->getBounds().getSize().x;
+		//float y = meshPtr.getPointer()->getBounds().getSize().y;
+		//float z = meshPtr.getPointer()->getBounds().getSize().z;
+		//rb->getCollisionShape()->setLocalScaling(btVector3(x, y, z));
+
+		MeshStrider* strider = new MeshStrider(meshPtr.get());
+		//btCollisionShape* newShape = new btBvhTriangleMeshShape(strider, true, true);
+		btConvexTriangleMeshShape* a = new btConvexTriangleMeshShape(strider, true);
+		rb->setCollisionShape(a);
+
+	}
 }
 
 void RigidBody::init()
@@ -52,18 +74,11 @@ void RigidBody::init()
 	rb = PhysicsManager::getInstance()->createRB(Vector3(0, 0, 0), mass);
 	rb->setMassProps(1.0f, btVector3(1.0, 1.0, 1.0));
 	rb->setDamping(0.5, 0.5);
-	//CommonManager* instance = CommonManager::getInstance();
-	//auto* transform = reinterpret_cast<Transform*>(
-	//	_entity->getComponent(instance->getId(), (int)CommonManager::CommonCmpId::TransId));
 }
 
 void RigidBody::update()
 {
 	//actualizacion del transform a partir del btRigidbody
-	//CommonManager* instance = CommonManager::getInstance();
-	//auto* transform = reinterpret_cast<Transform*>(
-	//	_entity->getComponent(instance->getId(), (int)CommonManager::CommonCmpId::TransId));
-
 	const auto worldTransform = rb->getWorldTransform();
 	const auto origin = worldTransform.getOrigin();
 

@@ -67,16 +67,18 @@ void MeshComponent::load(const nlohmann::json& params)
 	std::string meshName;
 
 	//Cogemos el nombre de la malla
-	if (it != params.end()) meshName = it->get<std::string>();
+	if (it != params.end()) {
+		meshName = it->get<std::string>();
+	}
 	//Si no se ha especificado ningún nombre creamos por defecto un pinguino
 	else meshName = "penguin";
-	
+
 	//Tratamos de crear la malla
 	try {
 		ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity(meshName + ".mesh");
 	}
 	catch (const std::exception& e) {
-		throw std::runtime_error("Error creating MeshComponent. Can't find mesh with mesh name: " + meshName + " "+ e.what());
+		throw std::runtime_error("Error creating MeshComponent. Can't find mesh with mesh name: " + meshName + " " + e.what());
 	}
 	mNode_->attachObject(ogreEnt_);
 
@@ -90,6 +92,11 @@ void MeshComponent::load(const nlohmann::json& params)
 
 void MeshComponent::init()
 {
+}
+
+Ogre::Entity* MeshComponent::getOgreEntity()
+{
+	return ogreEnt_;
 }
 
 void MeshComponent::setMaterial(const std::string& matName)

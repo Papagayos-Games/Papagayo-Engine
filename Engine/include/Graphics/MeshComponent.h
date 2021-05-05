@@ -21,7 +21,6 @@ private:
 	Ogre::SceneNode* mNode_ = nullptr;		
 	Ogre::Entity* ogreEnt_ = nullptr;
 	Transform* tr_ = nullptr;
-	
 public:
 	//constructora por defecto
 	MeshComponent();
@@ -37,6 +36,7 @@ public:
 	virtual void load(const nlohmann::json& params) override;
 	virtual void init()override;
 
+	Ogre::Entity* getOgreEntity();
 	//metodo para asignar un material nuevo a la entidad
 	void setMaterial(const std::string& matName);
 };
