@@ -108,7 +108,7 @@ void PapagayoEngine::update()
 {
 	
 	try {
-		InputSystem::getInstance()->handleInput();
+		InputSystem::getInstance()->handleInput(running_);
 		PhysicsManager::getInstance()->update();
 		RenderManager::getInstance()->update();
 		

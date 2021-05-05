@@ -84,7 +84,8 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.endClass();
 
 	getGlobalNamespace(L).beginClass<InputSystem>("InputSystem")
-		.addFunction("keyPressed", &InputSystem::isKeyDownTest)
+		.addFunction("keyPressed", &InputSystem::isKeyDown)
+		.addFunction("mouseButtonPressed", &InputSystem::clickEvent)
 		.endClass();
 }
 
