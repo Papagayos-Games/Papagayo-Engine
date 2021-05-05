@@ -176,8 +176,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\Graphics;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src\$(Configuration);$(SolutionDir)dependencies\json;$(SolutionDir)dependencies\Ogre\RTShaderSystem\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\lua\include;$(SolutionDir)dependencies\fmod\include;$(SolutionDir)include\Audio</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Graphics;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src\$(Configuration);$(SolutionDir)dependencies\json;$(SolutionDir)dependencies\Ogre\RTShaderSystem\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\lua\include;$(SolutionDir)dependencies\fmod\include;$(SolutionDir)dependencies\LuaBridge3-master\Source\LuaBridge;$(SolutionDir)dependencies\LuaBridge3-master\Source\LuaBridge\detail;$(SolutionDir)include\Audio</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -194,8 +195,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\Graphics;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src\$(Configuration);$(SolutionDir)dependencies\json;$(SolutionDir)dependencies\Ogre\RTShaderSystem\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\lua\include;$(SolutionDir)dependencies\fmod\include;$(SolutionDir)include\Audio</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Graphics;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src\$(Configuration);$(SolutionDir)dependencies\json;$(SolutionDir)dependencies\Ogre\RTShaderSystem\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\lua\include;$(SolutionDir)dependencies\fmod\include;$(SolutionDir)dependencies\LuaBridge3-master\Source\LuaBridge;$(SolutionDir)dependencies\LuaBridge3-master\Source\LuaBridge\detail;$(SolutionDir)include\Audio</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

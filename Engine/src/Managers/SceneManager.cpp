@@ -25,6 +25,14 @@ SceneManager* SceneManager::getInstance()
 		return instance_;
 }
 
+Scene* SceneManager::getCurrentScene()
+{
+	if (currentScene_ == nullptr)
+		return nullptr;
+
+	return currentScene_;
+}
+
 bool SceneManager::setupInstance()
 {
 	if (instance_ == nullptr) {

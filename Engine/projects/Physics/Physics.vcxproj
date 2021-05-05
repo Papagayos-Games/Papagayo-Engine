@@ -20,11 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Physics\DebugDrawer.cpp" />
+    <ClCompile Include="..\..\src\Physics\MeshStrider.cpp" />
     <ClCompile Include="..\..\src\Physics\PhysicsManager.cpp" />
     <ClCompile Include="..\..\src\Physics\Rigidbody.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Physics\DebugDrawer.h" />
+    <ClInclude Include="..\..\include\Physics\MeshStrider.h" />
     <ClInclude Include="..\..\include\Physics\PhysicsManager.h" />
     <ClInclude Include="..\..\include\Physics\Rigidbody.h" />
   </ItemGroup>

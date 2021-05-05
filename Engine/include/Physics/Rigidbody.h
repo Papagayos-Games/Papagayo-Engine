@@ -104,7 +104,8 @@ public:
 	//Aplica fuerza al rigidbody de tipo Forces
 	//a una posicion relativa del objeto, es decir,
 	//la parte del cuerpo donde se aplica la fuerza
-	void addForce(const Vector3& force, Vector3& relativePos, Forces type = Forces::NORMAL);
+	void addForce(const Vector3& force, Vector3& relativePos, int type =(int)Forces::NORMAL);
+
 
 	//Aplica una fuerza de giro al objeto de tipo Forces
 	void addTorque(const Vector3& torque, Forces type = Forces::NORMAL);

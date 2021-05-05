@@ -87,6 +87,7 @@ void InputSystem::handleInput()
 		{
 		case SDL_KEYDOWN:
 			std::cout << "Tecla pulsada perro\n";
+			lstKey = e.key.keysym.scancode;
 
 			break;
 		case SDL_KEYUP:
@@ -102,6 +103,12 @@ void InputSystem::handleInput()
 			break;
 		}
 	}
+}
+
+bool InputSystem::isKeyDownTest(int key)const {
+	const Uint8* keystate = SDL_GetKeyboardState(NULL);
+	int pressed = 0;
+	return keystate[SDL_Scancode(key)] == true;
 }
 
 bool InputSystem::isKeyDown(SDL_Keycode key) const
