@@ -134,6 +134,7 @@ class XMLAttributes;
 class XMLHandler;
 class XMLParser;
 class XMLSerializer;
+class OgreRenderer;
 
 /*************************************************************************
     Forward declare window / widget classes.

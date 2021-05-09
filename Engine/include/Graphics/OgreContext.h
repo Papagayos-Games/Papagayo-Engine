@@ -15,6 +15,7 @@ namespace Ogre {
 	class SceneNode;
 	class FileSystemLayer;
 	class Plane;
+	class RenderTarget;
 
 	namespace RTShader {
 		class ShaderGenerator;
@@ -32,7 +33,6 @@ private:
 	RTShaderTecnhiqueResolveListener* mMaterialListener_;
 	std::string appName_;
 
-
 	OgreContext(const std::string& appName);
 	void createRoot();
 	void createSceneManager();
@@ -44,7 +44,8 @@ public:
 	Ogre::Root* getOgreRoot() const;
 	Ogre::SceneManager* getSceneManager();
 	Ogre::SceneManager* getSceneManager() const;
-	
+	Ogre::RenderTarget* getRenderTarget() const;
+	Ogre::RenderWindow* getRenderWindow() const;
 	static OgreContext* getInstance();
 	static bool setupInstance(const std::string& appName);
 	void setupRTShaderGenerator();

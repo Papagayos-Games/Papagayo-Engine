@@ -383,11 +383,11 @@ Try {
     #Build project
     If ($BuildProject) {
         If ($NDebug) {
-            Step-VisualStudio $MsBuild "$RootFolder\Engine\Untitled-Engine.sln" -ThrowOnError $True -Configuration "Debug" -WarningLevel "3"
+            Step-VisualStudio $MsBuild "$RootFolder\Engine\Papagayo-Engine.sln" -ThrowOnError $True -Configuration "Debug" -WarningLevel "3"
         }
 	
         If ($NRelease) {
-            Step-VisualStudio $MsBuild "$RootFolder\Engine\Untitled-Engine.sln" -ThrowOnError $True -Configuration "Release" -WarningLevel "3"
+            Step-VisualStudio $MsBuild "$RootFolder\Engine\Papagayo-Engine.sln" -ThrowOnError $True -Configuration "Release" -WarningLevel "3"
         }
     }
 

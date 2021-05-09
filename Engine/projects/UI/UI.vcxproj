@@ -121,13 +121,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\json;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)include\Graphics;$(SolutionDir)include\UI;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\cegui-dependencies\build\dependencies\include;$(SolutionDir)dependencies\cegui\cegui\include;$(SolutionDir)dependencies\cegui\build\cegui\include;$(SolutionDir)dependencies\Ogre\PlugIns\STBICodec\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\UI;$(SolutionDir)include\Common;$(SolutionDir)include\Graphics;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\JSONforModernC++;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CEGUIBase-0_d.lib;CEGUIOgreRenderer-0_d.lib;Common_d.lib;freetype_d.lib;glew_d.lib;glfw_d.lib;Graphics_d.lib;jpeg_d.lib;libexpat_d.lib;libpng_d.lib;LinearMath_Debug.lib;OgreMain_d.lib;OgreRTShaderSystem_d.lib;pcre_d.lib;SDL2.lib;SILLY_d.lib;RenderSystem_Direct3D11_d.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -138,6 +140,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\json;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)include\Graphics;$(SolutionDir)include\UI;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\cegui-dependencies\build\dependencies\include;$(SolutionDir)dependencies\cegui\cegui\include;$(SolutionDir)dependencies\cegui\build\cegui\include;$(SolutionDir)dependencies\Ogre\PlugIns\STBICodec\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,7 +149,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\UI;$(SolutionDir)include\Common;$(SolutionDir)include\Graphics;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\src\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\src\OgreMain\include;$(SolutionDir)dependencies\JSONforModernC++;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -156,6 +159,12 @@
     <ProjectReference Include="..\Graphics\Graphics.vcxproj">
       <Project>{01362587-2c6a-4830-bd0b-49415725530b}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\UI\UIManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\UI\UIManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

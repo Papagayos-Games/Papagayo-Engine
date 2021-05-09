@@ -18,6 +18,7 @@ enum class ManID
 	Physics,
 	Render,
 	LUA,
+	UI,
 
 	LastManId
 };

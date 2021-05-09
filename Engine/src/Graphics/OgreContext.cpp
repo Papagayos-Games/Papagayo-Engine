@@ -5,6 +5,7 @@
 #include "WindowGenerator.h"
 #include "OgrePlane.h"
 #include <checkML.h>
+#include "OgreRenderTarget.h"
 
 #include <Ogre.h>
 #include <OgreFileSystemLayer.h>
@@ -21,8 +22,6 @@ OgreContext::OgreContext(const std::string& appName) {
 	appName_ = appName;
 	init();
  }
-
-
 
 OgreContext* OgreContext::getInstance()
 {
@@ -206,4 +205,11 @@ Ogre::SceneManager* OgreContext::getSceneManager() const
 	return ogreSceneManager_;
 }
 
+Ogre::RenderTarget* OgreContext::getRenderTarget() const {
+	return ogreRoot_->getRenderTarget("Test");
+}
 
+Ogre::RenderWindow* OgreContext::getRenderWindow() const
+{
+	return WindowGenerator::getInstance()->getRenderWindow();
+}
