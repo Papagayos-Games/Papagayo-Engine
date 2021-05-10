@@ -12,7 +12,11 @@
 
 #include "Manager.h"
 #include "lua.hpp"
-#include "Entity.h"
+class Entity;
+class RigidBody;
+class InputSystem;
+
+
 
 
 class LUAManager : Manager {
@@ -40,6 +44,9 @@ public:
 
 	void start();
 	void update();
+
+	RigidBody* getEntity();
+	InputSystem* getInputManager();
 
     
 

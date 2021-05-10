@@ -29,14 +29,14 @@ public:
 	virtual void setActive(bool act);
 
 	void setId(int);
-	int getId();
+	//int getId();
 	int getId() const;
 
 	void setEntity(Entity* e);
-	Entity* getEntity();
+	//Entity* getEntity();
 	Entity* getEntity() const;
 	
-	Manager* getManager();
+	//Manager* getManager();
 	Manager* getManager() const;
 };
 

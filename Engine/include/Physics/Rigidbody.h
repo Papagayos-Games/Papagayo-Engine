@@ -81,7 +81,7 @@ public:
 
 #pragma region Getters
 	//metodo que devuelve la velocidad lineal del rb
-	const Vector3& getLinearVelocity();
+	//const Vector3& getLinearVelocity();
 	const Vector3& getLinearVelocity() const;
 
 	//metodo que nos dice si el rigidbody es trigger o no
@@ -93,10 +93,10 @@ public:
 	//metodo que nos dice si el rigidbody es estatico
 	bool isStatic() const;
 
-	btCollisionShape* getShape();
+	//btCollisionShape* getShape();
 	btCollisionShape* getShape() const;
 
-	btRigidBody* getBtRb();
+	//btRigidBody* getBtRb();
 	btRigidBody* getBtRb() const;
 #pragma endregion
 
