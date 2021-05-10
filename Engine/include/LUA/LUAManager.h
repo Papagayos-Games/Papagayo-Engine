@@ -14,7 +14,8 @@
 #include "lua.hpp"
 #include "Entity.h"
 
-class Rigidbody;
+class RigidBody;
+class InputSystem;
 
 
 class LUAManager : public Manager {
@@ -38,8 +39,8 @@ public:
 
 	static LUAManager* getInstance();
 
-	int getEntity();
-	int getInputManager();
+	RigidBody* getEntity();
+	InputSystem* getInputManager();
 	void start();
 	void update();
 };

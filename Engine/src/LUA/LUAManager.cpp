@@ -48,37 +48,21 @@ LUAManager* LUAManager::getInstance()
 
 void LUAManager::start()
 {
-	
+	//TO DO:Prueba
+	std::error_code errorCode;
+	lua_getglobal(L, "start");
+	push(L, getInstance(), errorCode);
+	/*push(L, static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
+		->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);*/
+	lua_pcall(L, 1, 0, 0);
+
 }
 
 void LUAManager::update()
 {
-
-	//TO DO:Prueba
-	std::error_code errorCode;
-	lua_getglobal(L, "start");
-	push(L, InputSystem::getInstance(), errorCode);
-	push(L, static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
-		->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);
-	lua_pcall(L, 2, 0, 0);
-
-
 	//TO DO:Prueba
 	lua_getglobal(L, "update");
 	lua_pcall(L, 0, 0, 0);
-
-
-	lua_getglobal(L, "start");
-	push(L, InputSystem::getInstance(), errorCode);
-	push(L, static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.front()
-		->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);
-	lua_pcall(L, 2, 0, 0);
-
-
-	//TO DO:Prueba
-	lua_getglobal(L, "update");
-	lua_pcall(L, 0, 0, 0);
-
 
 }
 
@@ -170,19 +154,22 @@ bool LUAManager::reloadLuaScript(lua_State* L, const std::string& luafile) {
 }
 
 //TEMPORAL
-int LUAManager::getEntity()
+RigidBody* LUAManager::getEntity()
 {
 	std::error_code errorCode;
-	push(L, static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
-		->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);
-	return 1;
+
+	RigidBody* r = static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
+		->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId));
+
+	push(L, r, errorCode);
+	return r;
 }
 //TEMPORAL
-int LUAManager::getInputManager()
+InputSystem* LUAManager::getInputManager()
 {
 	std::error_code errorCode;
 	push(L, InputSystem::getInstance(), errorCode);
-	return 1;
+	return InputSystem::getInstance();
 }
 
 void LUAManager::buildLuaEngine(const std::string& file) {
@@ -203,6 +190,6 @@ LUAManager::LUAManager() : Manager(ManID::LUA)
 	if (L) {
 		registerClassAndFunctions(L);
 		testCallLua(L);
-		
+
 	}
 }

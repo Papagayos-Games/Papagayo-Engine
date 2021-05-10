@@ -4,10 +4,10 @@ k()
 local input_ = nil--Pillar desde c++
 local rig_ = nil--Pillar desde c++
 
-function start(input, rig)
-    input_ = input;
+function start(lua)
+    input_ = lua:getInputManager();
     print(input_);
-    rig_ = rig;
+    rig_ = lua:getEntity();
     print(rig_);
 end
 
