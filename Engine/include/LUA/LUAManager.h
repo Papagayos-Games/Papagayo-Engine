@@ -7,40 +7,35 @@
 #ifdef _WIN64
 #pragma comment(lib, "liblua54.a")
 #endif
-
 #include <string>
-
 #include "Manager.h"
 #include "lua.hpp"
+
 class Entity;
 class RigidBody;
 class InputSystem;
-
 class RigidBody;
 class InputSystem;
 
 
 class LUAManager : public Manager {
 private:
-	LUAManager();
-	bool CheckLua(lua_State* L, int r);
-
-	
 	lua_State* L;
-
+	
+	LUAManager();
 	static LUAManager* instance_;
+	
+	bool CheckLua(lua_State* L, int r);
 	void buildLuaEngine(const std::string& file);
 	void registerClassAndFunctions(lua_State* L);
-	void testCallLua(lua_State* L);
 	bool reloadLuaScript(lua_State* L, const std::string& luafile);
-
-
 
 public:
 	~LUAManager();
 
 	static LUAManager* getInstance();
 
+	//METODOS DE PRUEBA
 	RigidBody* getEntity();
 	InputSystem* getInputManager();
 
