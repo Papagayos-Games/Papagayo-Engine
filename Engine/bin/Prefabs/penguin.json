@@ -33,6 +33,13 @@
             "id": "Box"
           }
         }
+      },
+      {
+        "Component": "LuaComponent",
+        "Type": "LUA",
+        "Parameters": {
+          "luaMethod": "update"
+        }
       }
     ]
   }

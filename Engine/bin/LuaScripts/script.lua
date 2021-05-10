@@ -1,19 +1,24 @@
 k = loadfile("LuaScripts/keycode.lua")
 k()
+--EJEMPLOS
+--local input_ = nil--Pillar desde c++
+--local rig_ = nil--Pillar desde c++
 
-local input_ = nil--Pillar desde c++
-local rig_ = nil--Pillar desde c++
+--function start(lua)
+--    input_ = lua:getInputManager();
+--    print(input_);
+--    rig_ = lua:getEntity();
+--    print(rig_);
+--end
 
-function start(lua)
-    input_ = lua:getInputManager();
-    print(input_);
-    rig_ = lua:getEntity();
-    print(rig_);
+--Metodo por defecto para cuando no asignen ninguno
+function default(lua)
+
 end
 
-function update()
+function update(lua)
     print("Coso del update");
-    pressKeyDoSomething(input_, rig_);
+    pressKeyDoSomething(lua:getInputManager(), lua:getEntity());
     print("Final update");
 end
 

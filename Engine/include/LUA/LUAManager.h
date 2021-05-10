@@ -41,8 +41,13 @@ public:
 
 	RigidBody* getEntity();
 	InputSystem* getInputManager();
-	void start();
-	void update();
+
+	//Obtener el estado de LUA
+	lua_State* getLuaState()const;
+	//Metodos heredados de la clase padre
+	virtual void start() override;
+	virtual void update() override;
+
 };
 
 #endif // _LUA_MANAGER_H

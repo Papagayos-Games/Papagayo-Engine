@@ -12,6 +12,7 @@
 #include <Vector3.h>
 #include <PhysicsManager.h>
 #include <./Input/InputSystem.h>
+#include "LuaComponent.h"
 
 
 
@@ -48,22 +49,14 @@ LUAManager* LUAManager::getInstance()
 
 void LUAManager::start()
 {
-	//TO DO:Prueba
-	std::error_code errorCode;
-	lua_getglobal(L, "start");
-	push(L, getInstance(), errorCode);
-	/*push(L, static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
-		->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId)), errorCode);*/
-	lua_pcall(L, 1, 0, 0);
-
 }
 
 void LUAManager::update()
 {
-	//TO DO:Prueba
-	lua_getglobal(L, "update");
-	lua_pcall(L, 0, 0, 0);
-
+	for (Component* cmp : _compsList)
+	{
+		cmp->update();
+	}
 }
 
 
@@ -172,6 +165,11 @@ InputSystem* LUAManager::getInputManager()
 	return InputSystem::getInstance();
 }
 
+lua_State* LUAManager::getLuaState() const
+{
+	return L;
+}
+
 void LUAManager::buildLuaEngine(const std::string& file) {
 	// need check L
 	luaL_openlibs(L);
@@ -184,6 +182,10 @@ void LUAManager::buildLuaEngine(const std::string& file) {
 
 LUAManager::LUAManager() : Manager(ManID::LUA)
 {
+	//Registro de componentes
+	registerComponent("LuaComponent", []() -> LuaComponent* { return new LuaComponent(); });
+
+	//Inicializacion del estado de LUA
 	L = luaL_newstate();
 	buildLuaEngine("LuaScripts/script.lua");
 
