@@ -14,8 +14,10 @@
 #include "lua.hpp"
 #include "Entity.h"
 
+class Rigidbody;
 
-class LUAManager : Manager {
+
+class LUAManager : public Manager {
 private:
 	LUAManager();
 	bool CheckLua(lua_State* L, int r);
@@ -24,12 +26,10 @@ private:
 	lua_State* L;
 
 	static LUAManager* instance_;
-	lua_State* buildLuaEngine(const std::string& file);
+	void buildLuaEngine(const std::string& file);
 	void registerClassAndFunctions(lua_State* L);
 	void testCallLua(lua_State* L);
 	bool reloadLuaScript(lua_State* L, const std::string& luafile);
-
-
 
 
 
@@ -38,12 +38,10 @@ public:
 
 	static LUAManager* getInstance();
 
+	int getEntity();
+	int getInputManager();
 	void start();
 	void update();
-
-    
-
-
 };
 
 #endif // _LUA_MANAGER_H

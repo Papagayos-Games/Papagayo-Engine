@@ -102,6 +102,8 @@ void PapagayoEngine::start()
 {
 	RenderManager::getInstance()->start();
 	PhysicsManager::getInstance()->start();
+	LUAManager::getInstance()->start();
+
 }
 
 void PapagayoEngine::update()
