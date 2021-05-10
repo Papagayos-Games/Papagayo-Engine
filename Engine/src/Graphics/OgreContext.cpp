@@ -206,7 +206,7 @@ Ogre::SceneManager* OgreContext::getSceneManager() const
 }
 
 Ogre::RenderTarget* OgreContext::getRenderTarget() const {
-	return ogreRoot_->getRenderTarget("Test");
+	return ogreRoot_->getRenderTarget(WindowGenerator::getInstance()->getRenderWindow()->getName());
 }
 
 Ogre::RenderWindow* OgreContext::getRenderWindow() const

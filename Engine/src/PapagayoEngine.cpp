@@ -25,6 +25,7 @@
 #include "Graphics/PlaneComponent.h"
 #include "Physics/PhysicsManager.h"
 #include "AudioSystem.h"
+#include "UIManager.h"
 
 #include "LUA/LUAManager.h"
 
@@ -84,16 +85,20 @@ void PapagayoEngine::init()
 	manRegistry_["Physics"] = PhysicsManager::getInstance();
 	manRegistry_["Common"] = CommonManager::getInstance();
 	manRegistry_["Render"] = RenderManager::getInstance();
-	
+	UIManager* ui = UIManager::getInstance();
+	//ui->loadScheme("AlfiskoSkin", "./bin/cegui/AlfiskoSkin.scheme");
+
 	SceneManager::getInstance()->createStartScene();
 
 #pragma region TOERASE
 	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
-#pragma endregion
 	//Audio de bad bunny metido 
 	AudioEngine* au = new AudioEngine();
 	au->Init();
 	au->PlaySound("Assets/badbunny.mp3", {0,0,0});
+
+	ui->createButton("Probando boton", glm::vec2(100, 100), glm::vec2(10, 10), "Prueba");
+#pragma endregion
 
 	start();
 }
