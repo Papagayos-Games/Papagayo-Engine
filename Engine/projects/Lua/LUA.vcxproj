@@ -160,9 +160,11 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\LUA\LuaComponent.cpp" />
     <ClCompile Include="..\..\src\LUA\LUAManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\LUA\LuaComponent.h" />
     <ClInclude Include="..\..\include\LUA\LUAManager.h" />
   </ItemGroup>
   <ItemGroup>

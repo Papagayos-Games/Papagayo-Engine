@@ -29,8 +29,6 @@ public:
 	};
 
 	static RenderManager* getInstance();
-
-	virtual void addComponent(Entity* ent, int compId);
 	virtual void start();
 	virtual void update();
 };

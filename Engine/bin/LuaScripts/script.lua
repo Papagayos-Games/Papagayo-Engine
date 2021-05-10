@@ -1,66 +1,55 @@
 k = loadfile("LuaScripts/keycode.lua")
 k()
+--EJEMPLOS
+--local input_ = nil--Pillar desde c++
+--local rig_ = nil--Pillar desde c++
 
-i = "Me quiero morir\n"
-print("HazCosas\n");
+--function start(lua)
+--    input_ = lua:getInputManager();
+--    print(input_);
+--    rig_ = lua:getEntity();
+--    print(rig_);
+--end
 
-function setPosition(rig)
+--Metodo por defecto para cuando no asignen ninguno
+function default(lua)
 
-    vec = Vector3(200, 0, 0);
-    rig:setPosition(vec);
 end
 
-function addForce(rig)
-
-    vec = Vector3(100, 100, 1000);
-    rel = Vector3(0, 0, 0);
-    rig:addForce1(vec, rel, 1);
-end
-
-function setgravity(rig)
-
-    vec = Vector3(0, 10, 0);
-    rig:setGravity(vec);
+function update(lua)
+    print("Coso del update");
+    pressKeyDoSomething(lua:getInputManager(), lua:getEntity());
+    print("Final update");
 end
 
 function pressKeyDoSomething(input, rig)
     if input:keyPressed(Keycode.A) == true then
         print("Pulse A perros");
-        print(i);
         vec = Vector3(-10, 0, 0);
         rel = Vector3(0, 0, 0);
         rig:addForce1(vec, rel, 1);
     end
     if input:keyPressed(Keycode.S) == true then
         print("Pulse S perros");
-        print(i);
         vec = Vector3(0, -10, 0);
         rel = Vector3(0, 0, 0);
         rig:addForce1(vec, rel, 1);
     end
     if input:keyPressed(Keycode.W) == true then
         print("Pulse W perros");
-        print(i);
         vec = Vector3(0, 10, 0);
         rel = Vector3(0, 0, 0);
         rig:addForce1(vec, rel, 1);
     end
     if input:keyPressed(Keycode.D) == true then
         print("Pulse D perros");
-        print(i);
         vec = Vector3(10, 0, 0);
         rel = Vector3(0, 0, 0);
         rig:addForce1(vec, rel, 1);
     end
+    print("KeyPressed");
     if input:keyPressed(Keycode.Escape) == true then print("Escape perro") end
     if input:mouseButtonPressed() == MouseButton.Left then print("[LUA] Left Click") end
     if input:mouseButtonPressed() == MouseButton.Right then print("[LUA] Right Click") end
+   
 end
-
-function addTorque(rig)
-
-    vec = Vector3(100, 100, 1000);
-    rel = Vector3(0, 0, 0);
-    rig:addTorque(vec, rel, 1);
-end
-
