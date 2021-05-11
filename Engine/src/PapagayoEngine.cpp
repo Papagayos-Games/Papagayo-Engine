@@ -86,8 +86,9 @@ void PapagayoEngine::init()
 	manRegistry_["Common"] = CommonManager::getInstance();
 	manRegistry_["Render"] = RenderManager::getInstance();
 	UIManager* ui = UIManager::getInstance();
-	//ui->loadScheme("AlfiskoSkin", "./bin/cegui/AlfiskoSkin.scheme");
-
+	ui->loadScheme("AlfiskoSkin", "AlfiskoSkin.scheme");
+	ui->loadFont("DejaVuSans-12.font");
+	//ui->loadLayout("TreeDemoTaharez.layout");
 	SceneManager::getInstance()->createStartScene();
 
 #pragma region TOERASE
@@ -97,7 +98,8 @@ void PapagayoEngine::init()
 	au->Init();
 	au->PlaySound("Assets/badbunny.mp3", {0,0,0});
 
-	ui->createButton("Probando boton", glm::vec2(100, 100), glm::vec2(10, 10), "Prueba");
+	//ui->createButton("Probando_boton", glm::vec2(100, 100), glm::vec2(10, 10), "Prueba");
+	//ui->createLabel("Probando_boton", glm::vec2(100, 100), glm::vec2(10, 10), "Prueba");
 #pragma endregion
 
 	start();

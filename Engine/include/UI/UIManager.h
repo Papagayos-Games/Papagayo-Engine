@@ -28,9 +28,9 @@ private:
 	//CEGUI context
 	CEGUI::GUIContext* guiContext = nullptr;
 	//Ventana de cegui
-	CEGUI::Window* guiWindow = nullptr;
+	CEGUI::Window* winRoot = nullptr;
 	//Manager de la ventana de cegui
-	CEGUI::WindowManager* guiWindowManager = nullptr;
+	CEGUI::WindowManager* guiWinMng = nullptr;
 	//CEGUI + Ogre Renderer
 	CEGUI::OgreRenderer* guiRenderer = nullptr;
 
@@ -52,6 +52,10 @@ public:
 	//Permite cargar la configuracion propia de la interfaz
 	void loadScheme(const std::string& schemeName,
 		const std::string& schemeFile);
+
+	void loadFont(const std::string& filename);
+
+	void loadLayout(const std::string& layaoutName);
 
 	//Aplica una nueva fuente
 	void setFont(const std::string& fontFile);

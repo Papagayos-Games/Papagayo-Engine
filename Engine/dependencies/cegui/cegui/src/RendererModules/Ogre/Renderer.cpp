@@ -383,7 +383,7 @@ void OgreRenderer::destroySystem()
     OgreRenderer* renderer = static_cast<OgreRenderer*>(sys->getRenderer());
     OgreResourceProvider* rp =
         static_cast<OgreResourceProvider*>(sys->getResourceProvider());
-
+    
     OgreImageCodec* ic = &static_cast<OgreImageCodec&>(sys->getImageCodec());
 
     System::destroy();
