@@ -16,6 +16,7 @@ namespace Ogre {
 	class FileSystemLayer;
 	class Plane;
 	class RenderTarget;
+	class RenderWindow;
 
 	namespace RTShader {
 		class ShaderGenerator;
