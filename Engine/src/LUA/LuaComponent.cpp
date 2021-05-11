@@ -11,11 +11,22 @@ LuaComponent::LuaComponent():Component(LUAManager::getInstance(), 0)
 
 LuaComponent::~LuaComponent()
 {
+	//¿QUIZA?
+	delete tabla;
 }
 
 void LuaComponent::init()
 {
 	currState = LUAManager::getInstance()->getLuaState();
+	tabla = new luabridge::LuaRef(currState);
+
+	lua_getglobal(currState, "start");
+	luabridge::push(currState, LUAManager::getInstance(), errorCode);
+	lua_pcall(currState, 1, 0, 0);
+	(*tabla) = luabridge::getGlobal(currState, "sj");
+	//TO DO: Erase
+	(*tabla)["vida"] = 10;
+
 }
 
 void LuaComponent::load(const nlohmann::json& params)
@@ -36,7 +47,10 @@ void LuaComponent::load(const nlohmann::json& params)
 
 void LuaComponent::update()
 {
+
 	lua_getglobal(currState, methodName_.c_str());
+	luabridge::push(currState, tabla, errorCode);
 	luabridge::push(currState, LUAManager::getInstance(), errorCode);
-	lua_pcall(currState, 1, 0, 0);
+
+	lua_pcall(currState, 2, 0, 0);
 }

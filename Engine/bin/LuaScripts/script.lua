@@ -1,5 +1,6 @@
 k = loadfile("LuaScripts/keycode.lua")
 k()
+sj = {}
 --EJEMPLOS
 --local input_ = nil--Pillar desde c++
 --local rig_ = nil--Pillar desde c++
@@ -16,9 +17,25 @@ function default(lua)
 
 end
 
-function update(lua)
-    print("Coso del update");
-    pressKeyDoSomething(lua:getInputManager(), lua:getEntity());
+function start(lua)
+    sj["vida"] = 50
+    print(sj["vida"])
+
+end
+
+function patata(tabla)
+    sj = tabla
+    print(sj["vida"])
+end
+--function start(lua)
+    --vida = lua:getEntity():getLinearVelocity().x;
+    --print(vida);
+--end
+
+function update(tabla,lua)
+    print("Coso del update")
+    print(tabla["vida"])
+    pressKeyDoSomething(lua:getInputManager(), lua:getEntity())
     print("Final update");
 end
 
