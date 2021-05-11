@@ -5,6 +5,7 @@
 #include "SDL.h"
 #include "SDL_joystick.h"
 #include "SDL_keyboard.h"
+#include "SDL_mouse.h"
 #include <SDL_gamecontroller.h>
 #include <SDL_events.h>
 
@@ -78,7 +79,7 @@ void InputSystem::clean()
 	delete instance_;
 }
 
-void InputSystem::handleInput()
+void InputSystem::handleInput(bool& run)
 {
 	SDL_Event e;
 	while (SDL_PollEvent(&e))
@@ -86,18 +87,27 @@ void InputSystem::handleInput()
 		switch (e.type)
 		{
 		case SDL_KEYDOWN:
-			std::cout << "Tecla pulsada perro\n";
 			lstKey = e.key.keysym.scancode;
 
 			break;
 		case SDL_KEYUP:
 			break;
 		case SDL_MOUSEMOTION:
-
+			SDL_GetMouseState(&mousePos.x, &mousePos.y);
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			if (e.button.button == SDL_BUTTON_LEFT) {
+				clickEvent_ = 1;
+			}
+			if (e.button.button == SDL_BUTTON_RIGHT) {
+				clickEvent_ = 2;
+			}
+			break;
+		case SDL_MOUSEBUTTONUP:
+				clickEvent_ = 0;
 			break;
 		case SDL_QUIT:
-			//mandar mensaje a papagayo
-			std::cout << "Cerrate\n";
+			run = false;
 			break;
 		default:
 			break;
@@ -125,7 +135,11 @@ bool InputSystem::isKeyUp(SDL_Keycode key) const
 	return state[SDL_Scancode(key)] == false;
 }
 
+int InputSystem::clickEvent() const
+{
+	return clickEvent_;
+}
+
 void InputSystem::onMouseMotion(SDL_Event& e) const
 {
-
 }

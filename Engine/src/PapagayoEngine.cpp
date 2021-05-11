@@ -84,6 +84,7 @@ void PapagayoEngine::init()
 	manRegistry_["Physics"] = PhysicsManager::getInstance();
 	manRegistry_["Common"] = CommonManager::getInstance();
 	manRegistry_["Render"] = RenderManager::getInstance();
+	manRegistry_["LUA"] = LUAManager::getInstance();
 	
 	SceneManager::getInstance()->createStartScene();
 
@@ -102,13 +103,15 @@ void PapagayoEngine::start()
 {
 	RenderManager::getInstance()->start();
 	PhysicsManager::getInstance()->start();
+	LUAManager::getInstance()->start();
+
 }
 
 void PapagayoEngine::update()
 {
 	
 	try {
-		InputSystem::getInstance()->handleInput();
+		InputSystem::getInstance()->handleInput(running_);
 		PhysicsManager::getInstance()->update();
 		RenderManager::getInstance()->update();
 		

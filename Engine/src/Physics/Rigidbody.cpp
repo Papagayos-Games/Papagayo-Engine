@@ -310,16 +310,16 @@ void RigidBody::setCollisionShape(btCollisionShape* newShape)
 
 #pragma region Getters
 
-const Vector3& RigidBody::getLinearVelocity()
-{
-	if (_active) {
-		btVector3 vel = rb->getLinearVelocity();
-		return Vector3(vel.x(), vel.y(), vel.z());
-	}
-	else {
-		return Vector3(0, 0, 0);
-	}
-}
+//const Vector3& RigidBody::getLinearVelocity()
+//{
+//	if (_active) {
+//		btVector3 vel = rb->getLinearVelocity();
+//		return Vector3(vel.x(), vel.y(), vel.z());
+//	}
+//	else {
+//		return Vector3(0, 0, 0);
+//	}
+//}
 
 const Vector3& RigidBody::getLinearVelocity() const
 {
@@ -347,20 +347,20 @@ bool RigidBody::isStatic() const
 	return rb->isStaticObject();
 }
 
-btCollisionShape* RigidBody::getShape()
-{
-	return rb->getCollisionShape();
-}
+//btCollisionShape* RigidBody::getShape()
+//{
+//	return rb->getCollisionShape();
+//}
 
 btCollisionShape* RigidBody::getShape() const
 {
 	return rb->getCollisionShape();
 }
 
-btRigidBody* RigidBody::getBtRb()
-{
-	return rb;
-}
+//btRigidBody* RigidBody::getBtRb()
+//{
+//	return rb;
+//}
 
 btRigidBody* RigidBody::getBtRb() const
 {

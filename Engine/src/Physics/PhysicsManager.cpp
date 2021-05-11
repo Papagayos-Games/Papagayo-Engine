@@ -143,8 +143,8 @@ void PhysicsManager::clean()
 
 void PhysicsManager::destroyAllComponents()
 {
-	auto i = _compsList.begin();
 	while (!_compsList.empty()) {
+		auto i = _compsList.begin();
 		destroyRigidBody(static_cast<RigidBody*>((*i))->getBtRb());
 		_compsList.remove((*i));
 	}

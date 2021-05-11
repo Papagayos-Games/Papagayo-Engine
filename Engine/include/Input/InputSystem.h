@@ -7,6 +7,11 @@
 
 union SDL_Event;
 
+struct Vector2
+{
+	int x, y;
+};
+
 class InputSystem
 {
 public:
@@ -20,10 +25,14 @@ public:
 	static InputSystem* getInstance();
 	static void clean();
 
-	void handleInput();
+	void handleInput(bool& run);
 	bool isKeyDown(SDL_Keycode key) const;
 	bool isKeyDownTest(int key)const;
 	bool isKeyUp(SDL_Keycode key) const;
+
+	int clickEvent()const;
+	int getMouseX()const { return mousePos.x; };
+	int getMouseY()const { return mousePos.y; };
 
 	SDL_Scancode lastKey()
 	{
@@ -37,11 +46,11 @@ private:
 	void onMouseMotion(SDL_Event& e) const;
 	
 	// if in this frame there has been an event
-	bool mouseEvent_ = false; // click
+	int clickEvent_ = 0; // 1 Left, 2 Right
 	bool keyboardEvent_ = false; // press
 	bool read = false;
 	SDL_Scancode lstKey;
-
+	Vector2 mousePos;
 };
 
 #endif // !_INPUTSYSTEM_H

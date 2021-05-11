@@ -32,31 +32,6 @@ RenderManager* RenderManager::getInstance()
 	return instance_;
 }
 
-void RenderManager::addComponent(Entity* ent, int compId)
-{
-	
-	RenderCmpId id = (RenderCmpId)compId;
-	Component* cmp = nullptr;
-	switch (id)
-	{
-	case RenderCmpId::Mesh:
-		cmp = new MeshComponent();
-		break;
-	case RenderCmpId::Camera:
-		cmp = new Camera();
-		break;
-	case RenderCmpId::LastRenderCmpId:
-		break;
-	default:
-		throw "ERROR: Tried to add a non existant Common Component\n";
-	}
-	if (!cmp)
-		throw ("ERROR: Common Manager couldn't create a component with an Id: ", compId, "\n");
-	_compsList.push_back(cmp);
-	cmp->setEntity(ent);
-	ent->addComponent(cmp);
-}
-
 void RenderManager::start()
 {
 	for (Component* cmp : _compsList)

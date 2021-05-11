@@ -210,11 +210,11 @@ void Camera::setFarClipDistance(int distance)
 	mCamera_->setFarClipDistance(distance);
 }
 
-const Vector3& Camera::getCameraPosition()
-{
-	Ogre::Vector3 aux = camNode_->getPosition();
-	return Vector3(aux.x, aux.y, aux.z);
-}
+//const Vector3& Camera::getCameraPosition()
+//{
+//	Ogre::Vector3 aux = camNode_->getPosition();
+//	return Vector3(aux.x, aux.y, aux.z);
+//}
 
 const Vector3& Camera::getCameraPosition() const
 {
@@ -222,9 +222,9 @@ const Vector3& Camera::getCameraPosition() const
 	return Vector3(aux.x, aux.y, aux.z);
 }
 
-Ogre::Camera* Camera::getCamera() {
-	return mCamera_;
-}
+//Ogre::Camera* Camera::getCamera() {
+//	return mCamera_;
+//}
 
 Ogre::Camera* Camera::getCamera() const {
 	return mCamera_;
