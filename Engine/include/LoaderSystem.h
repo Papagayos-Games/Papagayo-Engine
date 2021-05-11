@@ -15,9 +15,10 @@ private:
 	const std::string FILE_EXTENSION = ".json";
 
 	void loadComponents(const nlohmann::json& comps, Entity* entity);
-	void loadPrefabs(nlohmann::json& pref, Entity* ent);
 	void readParameters(std::string& dump, std::map<std::string, std::string>& params);
 public:
+	void loadPrefabs(nlohmann::json& pref, Entity* ent);
+	void loadPrefabByName(std::string fileName, Entity* ent);
 	std::vector<std::string> loadScenes(const std::string& fileName);
 	void loadEntities(const std::string& fileName, Scene* scene);
 };

@@ -20,12 +20,26 @@ void LuaComponent::init()
 	currState = LUAManager::getInstance()->getLuaState();
 	tabla = new luabridge::LuaRef(currState);
 
+#pragma region Pruebas
+
 	lua_getglobal(currState, "start");
-	luabridge::push(currState, LUAManager::getInstance(), errorCode);
-	lua_pcall(currState, 1, 0, 0);
+	//luabridge::push(currState, LUAManager::getInstance(), errorCode);
+	lua_pcall(currState, 0, 0, 0);
 	(*tabla) = luabridge::getGlobal(currState, "sj");
 	//TO DO: Erase
-	(*tabla)["vida"] = 10;
+	//(*tabla)["vida"] = 10;
+
+	lua_getglobal(currState, "creaPinguino");
+	luabridge::push(currState, LUAManager::getInstance(), errorCode);
+	lua_pcall(currState, 1, 0, 0);
+
+	luabridge::LuaRef a = luabridge::getGlobal(currState, "a");
+	if (a.isFunction()) {
+		std::cout << "Es una funcion loco\n";
+		a();
+	}
+#pragma endregion
+
 
 }
 

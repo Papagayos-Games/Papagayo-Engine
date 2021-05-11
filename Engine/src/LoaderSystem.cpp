@@ -177,3 +177,20 @@ void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent) {
 
 	i.close();
 }
+
+void LoaderSystem::loadPrefabByName(std::string fileName, Entity* ent)
+{
+	std::fstream i("Prefabs/" + fileName + ".json");
+
+	if (!i.is_open()) {
+		throw std::runtime_error("ERROR: Loading scene " + fileName + " failed, file missing\n");
+	}
+
+	nlohmann::json prefJson;
+	i >> prefJson;
+
+	loadComponents(prefJson["Components"], ent);
+	// ya funciona sin parametros individuales
+
+	i.close();
+}

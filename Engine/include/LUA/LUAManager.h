@@ -50,6 +50,7 @@ public:
 	LightComponent* getLightComponent(Entity* ent);
 	Camera* getCamera(Entity* ent);
 	Transform* getTransform(Entity* ent);
+	Entity* instantiate(std::string prefabName);
 
 	//Obtener el estado de LUA
 	lua_State* getLuaState()const;

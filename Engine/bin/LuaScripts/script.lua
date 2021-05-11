@@ -1,6 +1,10 @@
-k = loadfile("LuaScripts/keycode.lua")
-k()
+loadfile("LuaScripts/keycode.lua")()
+b = loadfile("LuaScripts/prueba.lua")()
+
+a = function () print(b.instantiate()) end
+
 sj = {}
+
 --EJEMPLOS
 --local input_ = nil--Pillar desde c++
 --local rig_ = nil--Pillar desde c++
@@ -17,26 +21,32 @@ function default(lua)
 
 end
 
-function start(lua)
+function start()
     sj["vida"] = 50
-    print(sj["vida"])
 
+    print("Principio start")
+    prueba()
+
+    print("Ejecuto bien start")
 end
 
 function patata(tabla)
     sj = tabla
     print(sj["vida"])
+    sj["vida"] = tabla["vida"] -2
+    print(sj["vida"])
 end
---function start(lua)
-    --vida = lua:getEntity():getLinearVelocity().x;
-    --print(vida);
---end
+
+function creaPinguino(lua)
+    lua:instantiate("penguin2")
+end
+
 
 function update(tabla,lua)
-    print("Coso del update")
-    print(tabla["vida"])
+    --print("Coso del update")
+    --print(tabla["vida"])
     pressKeyDoSomething(lua:getInputManager(), lua:getRigidbody1())
-    print("Final update");
+    --print("Final update");
 end
 
 function pressKeyDoSomething(input, rig)
@@ -64,7 +74,7 @@ function pressKeyDoSomething(input, rig)
         rel = Vector3(0, 0, 0);
         rig:addForce1(vec, rel, 1);
     end
-    print("KeyPressed");
+
     if input:keyPressed(Keycode.Escape) == true then print("Escape perro") end
     if input:mouseButtonPressed() == MouseButton.Left then print("[LUA] Left Click") end
     if input:mouseButtonPressed() == MouseButton.Right then print("[LUA] Right Click") end

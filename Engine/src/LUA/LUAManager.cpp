@@ -29,6 +29,9 @@
 #include "LuaComponent.h"
 #include <LuaBridge.h>
 
+//
+#include "LoaderSystem.h"
+
 using namespace luabridge;
 
 LUAManager* LUAManager::instance_ = nullptr;
@@ -172,6 +175,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getTransform", &LUAManager::getTransform)
 		//prueba
 		.addFunction("getRigidbody1", &LUAManager::getRigidbody1)
+		.addFunction("instantiate", &LUAManager::instantiate)
 		.endClass();
 }
 
@@ -189,7 +193,7 @@ Entity* LUAManager::getEntity(std::string name)
 {
 	std::error_code errorCode;
 	Entity* ent = SceneManager::getInstance()->getCurrentScene()->getEntity(name);
-	push(L, ent, errorCode);
+	//push(L, ent, errorCode);
 	return ent;
 }
 
@@ -260,6 +264,16 @@ Transform* LUAManager::getTransform(Entity* ent)
 	Transform* m = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
 	//push(L, m, errorCode);
 	return m;
+}
+
+Entity* LUAManager::instantiate(std::string prefabName)
+{
+	Entity* e = new Entity();
+	LoaderSystem s;
+
+	s.loadPrefabByName(prefabName, e);
+
+	return e;
 }
 
 lua_State* LUAManager::getLuaState() const
