@@ -35,7 +35,7 @@ end
 function update(tabla,lua)
     print("Coso del update")
     print(tabla["vida"])
-    pressKeyDoSomething(lua:getInputManager(), lua:getEntity())
+    pressKeyDoSomething(lua:getInputManager(), lua:getRigidbody1())
     print("Final update");
 end
 

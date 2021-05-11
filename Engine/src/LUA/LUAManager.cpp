@@ -13,6 +13,7 @@
 #include <Vector3.h>
 #include <Transform.h>
 #include <Entity.h>
+#include <CommonManager.h>
 
 //input
 #include <./Input/InputSystem.h>
@@ -22,6 +23,7 @@
 #include <Camera.h>
 #include <LightComponent.h>
 #include <PlaneComponent.h>
+#include <RenderManager.h>
 
 //LUA
 #include "LuaComponent.h"
@@ -147,9 +149,14 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("setMaterial", &PlaneComponent::setMaterial)
 		.endClass();
 
-	//TO DO:faltan los de la clase Scene
 
-
+	getGlobalNamespace(L).beginClass<Scene>("Scene")
+		.addFunction("clean", &Scene::clean)
+		.addFunction("addEntity", &Scene::addEntity)
+		.addFunction("setName", &Scene::setName)
+		.addFunction("getName", &Scene::getName)
+		.addFunction("getEntity", &Scene::getEntity)
+		.endClass();
 
 		
 
@@ -157,6 +164,14 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 	getGlobalNamespace(L).beginClass<LUAManager>("LuaManager")
 		.addFunction("getEntity", &LUAManager::getEntity)
 		.addFunction("getInputManager", &LUAManager::getInputManager)
+		.addFunction("getLight", &LUAManager::getLightComponent)
+		.addFunction("getRigidbody", &LUAManager::getRigidbody)
+		.addFunction("getCamera", &LUAManager::getCamera)
+		.addFunction("getPlane", &LUAManager::getPlaneComponent)
+		.addFunction("getMesh", &LUAManager::getMeshComponent)
+		.addFunction("getTransform", &LUAManager::getTransform)
+		//prueba
+		.addFunction("getRigidbody1", &LUAManager::getRigidbody1)
 		.endClass();
 }
 
@@ -170,14 +185,32 @@ bool LUAManager::reloadLuaScript(lua_State* L, const std::string& luafile) {
 }
 
 //TEMPORAL
-RigidBody* LUAManager::getEntity()
+Entity* LUAManager::getEntity(std::string name)
 {
 	std::error_code errorCode;
+	Entity* ent = SceneManager::getInstance()->getCurrentScene()->getEntity(name);
+	push(L, ent, errorCode);
+	return ent;
+}
 
+
+	//temporal
+RigidBody* LUAManager::getRigidbody1()
+{
+	std::error_code errorCode;
 	RigidBody* r = static_cast<RigidBody*>(SceneManager::getInstance()->getCurrentScene()->entities_.back()
 		->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId));
-
-	push(L, r, errorCode);
+	
+	//push(L, r, errorCode);
+	return r;
+}
+RigidBody* LUAManager::getRigidbody(Entity* ent)
+{
+	std::error_code errorCode;
+	
+	RigidBody* r = static_cast<RigidBody*>(ent->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId));
+	
+	//push(L, r, errorCode);
 	return r;
 }
 
@@ -185,8 +218,48 @@ RigidBody* LUAManager::getEntity()
 InputSystem* LUAManager::getInputManager()
 {
 	std::error_code errorCode;
-	push(L, InputSystem::getInstance(), errorCode);
+	//push(L, InputSystem::getInstance(), errorCode);
 	return InputSystem::getInstance();
+}
+
+MeshComponent* LUAManager::getMeshComponent(Entity* ent)
+{
+	std::error_code errorCode;
+	MeshComponent* m = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
+	//push(L, m, errorCode);
+	return m;
+}
+
+PlaneComponent* LUAManager::getPlaneComponent(Entity* ent)
+{
+	std::error_code errorCode;
+	PlaneComponent* m = static_cast<PlaneComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Plane));
+	//push(L, m, errorCode);
+	return m;
+}
+
+LightComponent* LUAManager::getLightComponent(Entity* ent)
+{
+	std::error_code errorCode;
+	LightComponent* m = static_cast<LightComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Light));
+	//push(L, m, errorCode);
+	return m;
+}
+
+Camera* LUAManager::getCamera(Entity* ent)
+{
+	std::error_code errorCode;
+	Camera* m = static_cast<Camera*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Camera));
+	//push(L, m, errorCode);
+	return m;
+}
+
+Transform* LUAManager::getTransform(Entity* ent)
+{
+	std::error_code errorCode;
+	Transform* m = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
+	//push(L, m, errorCode);
+	return m;
 }
 
 lua_State* LUAManager::getLuaState() const
@@ -212,7 +285,7 @@ LUAManager::LUAManager() : Manager(ManID::LUA)
 	//Inicializacion del estado de LUA
 	L = luaL_newstate();
 	buildLuaEngine("LuaScripts/script.lua");
-
+	
 	//Registro de las funciones
 	if (L) {
 		registerClassAndFunctions(L);

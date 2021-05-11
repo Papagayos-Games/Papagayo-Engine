@@ -16,6 +16,11 @@ class RigidBody;
 class InputSystem;
 class RigidBody;
 class InputSystem;
+class MeshComponent;
+class Camera;
+class LightComponent;
+class PlaneComponent;
+class Transform;
 
 
 class LUAManager : public Manager {
@@ -36,8 +41,15 @@ public:
 	static LUAManager* getInstance();
 
 	//METODOS DE PRUEBA
-	RigidBody* getEntity();
+	Entity* getEntity(std::string name);
 	InputSystem* getInputManager();
+	RigidBody* getRigidbody1();
+	RigidBody* getRigidbody(Entity* ent);
+	MeshComponent* getMeshComponent(Entity* ent);
+	PlaneComponent* getPlaneComponent(Entity* ent);
+	LightComponent* getLightComponent(Entity* ent);
+	Camera* getCamera(Entity* ent);
+	Transform* getTransform(Entity* ent);
 
 	//Obtener el estado de LUA
 	lua_State* getLuaState()const;
