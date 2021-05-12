@@ -12,43 +12,26 @@ UIManager* UIManager::instance_ = nullptr;
 
 UIManager::UIManager() : Manager(ManID::UI)
 {
-	guiRenderer = &CEGUI::OgreRenderer::bootstrapSystem(*OgreContext::getInstance()->getRenderTarget());
+	//Ogre
 	oRoot = OgreContext::getInstance()->getOgreRoot();
 	oWindow = OgreContext::getInstance()->getRenderWindow();
+	
+	//Cegui
+	//guiRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
+	guiRenderer = &CEGUI::OgreRenderer::bootstrapSystem(*OgreContext::getInstance()->getRenderTarget());
 	guiContext = &CEGUI::System::getSingleton().getDefaultGUIContext();
 	guiWinMng = &CEGUI::WindowManager::getSingleton();
 	winRoot = guiWinMng->createWindow("DefaultWindow", "rootWindow");
-	/**
-	* Carga del directorio de los recursos con Ogre
-	*/
-	// initialise the required dirs for the DefaultResourceProvider
-	Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
 
-	rgm.createResourceGroup("imagesets");
-	rgm.createResourceGroup("fonts");
-	rgm.createResourceGroup("layouts");
-	rgm.createResourceGroup("schemes");
-	rgm.createResourceGroup("looknfeel");
-	rgm.createResourceGroup("lua_scripts");
-	rgm.createResourceGroup("schemas");
-
-	rgm.addResourceLocation("cegui/schemes/", "FileSystem", "schemes");
-	rgm.addResourceLocation("cegui/imagesets/", "FileSystem", "imagesets");
-	rgm.addResourceLocation("cegui/fonts/", "FileSystem", "fonts");
-	rgm.addResourceLocation("cegui/layouts/", "FileSystem", "layouts");
-	rgm.addResourceLocation("cegui/looknfeel/", "FileSystem", "looknfeel");
-	rgm.addResourceLocation("cegui/lua_scripts/", "FileSystem", "lua_scripts");
-
-	CEGUI::ImageManager::setImagesetDefaultResourceGroup("imagesets");
-	CEGUI::Font::setDefaultResourceGroup("fonts");
-	CEGUI::Scheme::setDefaultResourceGroup("schemes");
-	CEGUI::WindowManager::setDefaultResourceGroup("layouts");
-	CEGUI::WidgetLookManager::setDefaultResourceGroup("looknfeel");
-
-	CEGUI::System::getSingleton().getResourceProvider()->setDefaultResourceGroup("Gui");
+	CEGUI::ImageManager::setImagesetDefaultResourceGroup("Imagesets");
+	CEGUI::Font::setDefaultResourceGroup("Fonts");
+	CEGUI::Scheme::setDefaultResourceGroup("Schemes");
+	CEGUI::WidgetLookManager::setDefaultResourceGroup("Looknfeel");
+	CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
+	CEGUI::AnimationManager::setDefaultResourceGroup("Animations");
 
 	CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(winRoot);
-
+	
 	createFrameListener();
 }
 
@@ -131,29 +114,17 @@ void UIManager::setFont(const std::string& fontFile)
 
 void UIManager::setMouseImage(const std::string& imageFile)
 {
-	CEGUI::System::getSingleton()
-		.getDefaultGUIContext()
-		.getMouseCursor()
-		.setDefaultImage(imageFile);
+	CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setDefaultImage(imageFile);
 
-	CEGUI::System::getSingleton()
-		.getDefaultGUIContext()
-		.getMouseCursor()
-		.setImage(imageFile);
+	CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setImage(imageFile);
 }
 
 void UIManager::setMouseVisibility(bool b)
 {
 	if (b)
-		CEGUI::System::getSingleton()
-		.getDefaultGUIContext()
-		.getMouseCursor()
-		.show();
+		CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().show();
 	else
-		CEGUI::System::getSingleton()
-		.getDefaultGUIContext()
-		.getMouseCursor()
-		.hide();
+		CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
 }
 
 #pragma endregion

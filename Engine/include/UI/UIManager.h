@@ -10,6 +10,7 @@ namespace CEGUI {
 	class Window;
 	class WindowManager;
 	class OgreRenderer;
+	class System;
 	enum MouseButton;
 } // namespace CEGUI
 
@@ -21,10 +22,12 @@ private:
 	//Nombre de la configuracion del GUI
 	std::string schemeName;
 
+
 	//Ventana de ogre
 	Ogre::RenderWindow* oWindow = nullptr;
 	//Root de ogre
 	Ogre::Root* oRoot = nullptr;
+
 	//CEGUI context
 	CEGUI::GUIContext* guiContext = nullptr;
 	//Ventana de cegui
@@ -36,6 +39,9 @@ private:
 
 	UIManager();
 	~UIManager();
+
+	static void setWidgetDestRect(CEGUI::Window* widget, glm::vec2 position,
+		glm::vec2 size);
 public:
 
 #pragma region Generales
@@ -106,9 +112,6 @@ public:
 	/// </summary>
 	CEGUI::Window* createImage(const std::string& image, glm::vec2 position,
 		glm::vec2 size, const std::string& name = "");
-
-	static void setWidgetDestRect(CEGUI::Window* widget, glm::vec2 position,
-		glm::vec2 size);
 #pragma endregion
 
 #pragma region INPUT

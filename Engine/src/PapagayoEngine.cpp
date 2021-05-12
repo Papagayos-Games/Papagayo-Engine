@@ -85,21 +85,22 @@ void PapagayoEngine::init()
 	manRegistry_["Physics"] = PhysicsManager::getInstance();
 	manRegistry_["Common"] = CommonManager::getInstance();
 	manRegistry_["Render"] = RenderManager::getInstance();
-	UIManager* ui = UIManager::getInstance();
-	ui->loadScheme("AlfiskoSkin", "AlfiskoSkin.scheme");
-	ui->loadFont("DejaVuSans-12.font");
-	//ui->loadLayout("TreeDemoTaharez.layout");
 	SceneManager::getInstance()->createStartScene();
+	UIManager* ui = UIManager::getInstance();
 
 #pragma region TOERASE
+	ui->loadScheme("TaharezLook", "TaharezLook.scheme");
+	ui->loadFont("DejaVuSans-12.font");
+	//ui->setMouseImage("TaharezLook/MouseArrow");
+	//ui->createButton("Probando_boton", glm::vec2(100, 100), glm::vec2(10, 10), "Prueba");
+	//ui->createLabel("Probando_boton", glm::vec2(100, 100), glm::vec2(10, 10), "Prueba");
+
 	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
 	//Audio de bad bunny metido 
 	AudioEngine* au = new AudioEngine();
 	au->Init();
 	au->PlaySound("Assets/badbunny.mp3", {0,0,0});
 
-	//ui->createButton("Probando_boton", glm::vec2(100, 100), glm::vec2(10, 10), "Prueba");
-	//ui->createLabel("Probando_boton", glm::vec2(100, 100), glm::vec2(10, 10), "Prueba");
 #pragma endregion
 
 	start();
