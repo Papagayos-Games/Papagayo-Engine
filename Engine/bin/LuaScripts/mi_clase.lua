@@ -1,3 +1,5 @@
+--JSON = require("json")
+
 local mi_clase = {}
 
 -- function mi_clase:instantiate(param)
@@ -9,10 +11,10 @@ local mi_clase = {}
 -- end
 
 mi_clase["instantiate"] = function (params)
+    p = JSON:decode(params)
     local self = {}
-    self.hp = params
-    self.name = "xd"
-    self.func = function (s) print(s) end
+    self.hp = p.hp
+    self.name = p.name
     return self
 end
 

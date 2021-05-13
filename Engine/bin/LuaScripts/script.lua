@@ -2,7 +2,7 @@ loadfile("LuaScripts/keycode.lua")()
 b = loadfile("LuaScripts/prueba.lua")()
 miclase = loadfile("LuaScripts/mi_clase.lua")()
 a = function () print(b.instantiate()) end
-
+print("me cargo")
 sj = {}
 
 --EJEMPLOS

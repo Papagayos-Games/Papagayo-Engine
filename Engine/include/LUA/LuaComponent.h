@@ -7,13 +7,13 @@ class LuaRef;
 
 class LuaComponent : public Component {
 private:
-	//String que identifica al nombre del METODO DE LUA
+	//String que identifica al nombre del CLASE DE LUA
 	//que llamará este componente en su update
-	std::string methodName_;
-
+	std::string className_;
+	luabridge::LuaRef* self_;
 	//Referencia al LUASTATE
 	lua_State* currState = nullptr;
-	luabridge::LuaRef* tabla;
+	
 
 	//Gestión de errores
 	std::error_code errorCode;

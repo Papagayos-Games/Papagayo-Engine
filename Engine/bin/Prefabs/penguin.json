@@ -38,7 +38,11 @@
         "Component": "LuaComponent",
         "Type": "LUA",
         "Parameters": {
-          "luaMethod": "update"
+          "Class": "miclase",
+          "Parameters" : {
+              "hp" : 30,
+              "name" : "prueba"
+          }
         }
       }
   ]
