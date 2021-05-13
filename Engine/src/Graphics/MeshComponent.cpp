@@ -24,13 +24,6 @@ void MeshComponent::setActive(bool act)
 	mNode_->setVisible(_active);
 }
 
-//MeshComponent::MeshComponent(Ogre::SceneNode* parentNode, std::string meshName): Component(nullptr, (int)RenderManager::RenderCmpId::Mesh)
-//{
-//	mNode_ = parentNode->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
-//	ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity(meshName + ".mesh");
-//	mNode_->attachObject(ogreEnt_);
-//}
-
 MeshComponent::~MeshComponent()
 {
 	if (ogreEnt_ != nullptr) OgreContext::getInstance()->getSceneManager()->destroyEntity(ogreEnt_);
@@ -43,7 +36,7 @@ void MeshComponent::update()
 	Vector3 pos = tr_->getPos();
 	mNode_->setPosition(Ogre::Vector3(pos.x, pos.y, pos.z));
 	Vector3 rot = tr_->getRot();
-	//rotaciones //TO DO: revisar
+	//rotaciones 
 	mNode_->resetOrientation();
 	mNode_->yaw(Ogre::Radian(rot.z), Ogre::Node::TS_WORLD);//ejeY
 	mNode_->pitch(Ogre::Radian(rot.y), Ogre::Node::TS_WORLD);//ejex

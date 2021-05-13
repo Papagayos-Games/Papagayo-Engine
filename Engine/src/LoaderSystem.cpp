@@ -36,7 +36,7 @@ std::vector<std::string> LoaderSystem::loadScenes(const std::string& fileName)
 void LoaderSystem::loadEntities(const std::string& fileName, Scene* scene)
 {
 
-	std::fstream i("Scenes/" + fileName + ".json");	// TO DO: poner la ruta definitiva cuando este la carpeta final
+	std::fstream i(SCENES_FILE_PATH + fileName + FILE_EXTENSION);	// TO DO: poner la ruta definitiva cuando este la carpeta final
 	if (!i.is_open()) {
 		throw std::runtime_error("ERROR: Loading scene " + fileName + " failed, file missing\n");
 	}
@@ -56,7 +56,7 @@ void LoaderSystem::loadEntities(const std::string& fileName, Scene* scene)
 			loadComponents(entities[i]["Components"], ent);
 		else
 			loadPrefabs(entities[i], ent);
-		scene->addEntity(ent);
+		scene->addEntity(fileName, ent);	// TO DO: procesar el nombre de las entidades desde json
 	}
 
 	i.close();
@@ -136,7 +136,7 @@ void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent) {
 		throw std::exception("ERROR: Prefab files not found\n");
 
 	std::string fileName = pref["Prefab"].get<std::string>();
-	std::fstream i("Prefabs/" + fileName + ".json");
+	std::fstream i(PREFAB_FILE_PATH + fileName + FILE_EXTENSION);
 
 	if (!i.is_open()) {
 		throw std::runtime_error("ERROR: Loading scene " + fileName + " failed, file missing\n");
@@ -180,7 +180,7 @@ void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent) {
 
 void LoaderSystem::loadPrefabByName(std::string fileName, Entity* ent)
 {
-	std::fstream i("Prefabs/" + fileName + ".json");
+	std::fstream i(PREFAB_FILE_PATH + fileName + FILE_EXTENSION);
 
 	if (!i.is_open()) {
 		throw std::runtime_error("ERROR: Loading scene " + fileName + " failed, file missing\n");

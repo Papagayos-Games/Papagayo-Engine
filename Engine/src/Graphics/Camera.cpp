@@ -53,7 +53,7 @@ void Camera::update()
 	Vector3 pos = tr_->getPos();
 	camNode_->setPosition(Ogre::Vector3(pos.x, pos.y, pos.z));
 	Vector3 rot = tr_->getRot();
-	//rotaciones //TO DO: revisar
+	//rotaciones
 	camNode_->resetOrientation();
 	camNode_->yaw(Ogre::Degree(rot.y), Ogre::Node::TS_WORLD);//ejeY
 	camNode_->pitch(Ogre::Degree(rot.x), Ogre::Node::TS_WORLD);//ejex
@@ -82,7 +82,6 @@ void Camera::load(const nlohmann::json& params)
 	}
 
 	//Posición de la cámara
-	//TO DO: Probably lo lleve el transform
 	it = params.find("camPosition");
 	if (it != params.end()) {
 		std::vector<float> pos = it->get<std::vector<float>>();

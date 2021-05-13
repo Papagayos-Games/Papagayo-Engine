@@ -43,7 +43,6 @@ public:
 	//METODOS DE PRUEBA
 	Entity* getEntity(std::string name);
 	InputSystem* getInputManager();
-	RigidBody* getRigidbody1();
 	RigidBody* getRigidbody(Entity* ent);
 	MeshComponent* getMeshComponent(Entity* ent);
 	PlaneComponent* getPlaneComponent(Entity* ent);
