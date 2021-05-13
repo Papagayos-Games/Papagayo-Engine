@@ -181,6 +181,31 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 
 bool LUAManager::reloadLuaScript(lua_State* L, const std::string& luafile) {
 	int state = luaL_dofile(L, luafile.c_str());
+	
+	//int state = luaL_dofile(L, "LuaScripts/mi_clase.lua");
+	//luabridge::pcall();
+	//
+	//luabridge::get_length(L, 0);
+	//luabridge::
+	//if (lua_type(L, lua_gettop(L)) == LUA_TTABLE) {
+	//	std::cout << "mi_clase supongo\n";
+	//	//luabridge::get
+	//}
+	//luabridge::
+	/*luabridge::LuaRef my_class = luabridge::getGlobal(L, "mi_clase");
+	if (my_class.isTable()) {
+		luabridge::LuaResult instance = my_class["instantiate"]();
+		instance.wasOk();
+		luabridge::LuaRef a = instance[0];
+		a["func"]();
+		if (a.isTable()) {
+			std::cout << instance[0]["name"].cast<std::string>() << instance[1] << instance[2].cast<std::string>() << '\n';
+		}*/
+		
+		//luabridge::
+		//luabridge::LuaRef casi = instance["xd"];
+		//std::cout << casi << '\n';
+	//}
 	if (state != LUA_OK) {
 		// std::cout << "ok";
 		return false;
@@ -272,6 +297,7 @@ Entity* LUAManager::instantiate(std::string prefabName)
 	LoaderSystem s;
 
 	s.loadPrefabByName(prefabName, e);
+	SceneManager::getCurrentScene()->addEntity(e);
 
 	return e;
 }

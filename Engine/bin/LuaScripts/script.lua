@@ -1,6 +1,6 @@
 loadfile("LuaScripts/keycode.lua")()
 b = loadfile("LuaScripts/prueba.lua")()
-
+miclase = loadfile("LuaScripts/mi_clase.lua")()
 a = function () print(b.instantiate()) end
 
 sj = {}
@@ -42,12 +42,12 @@ function creaPinguino(lua)
 end
 
 
-function update(tabla,lua)
-    --print("Coso del update")
-    --print(tabla["vida"])
-    pressKeyDoSomething(lua:getInputManager(), lua:getRigidbody1())
-    --print("Final update");
-end
+-- function update(tabla,lua)
+--     --print("Coso del update")
+--     --print(tabla["vida"])
+--     pressKeyDoSomething(lua:getInputManager(), lua:getRigidbody1())
+--     --print("Final update");
+-- end
 
 function pressKeyDoSomething(input, rig)
     if input:keyPressed(Keycode.A) == true then

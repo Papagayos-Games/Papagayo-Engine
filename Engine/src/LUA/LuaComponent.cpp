@@ -33,11 +33,31 @@ void LuaComponent::init()
 	luabridge::push(currState, LUAManager::getInstance(), errorCode);
 	lua_pcall(currState, 1, 0, 0);
 
-	luabridge::LuaRef a = luabridge::getGlobal(currState, "a");
-	if (a.isFunction()) {
+	luabridge::LuaRef mi_clase = luabridge::getGlobal(currState, "miclase");
+	if (mi_clase.isTable()) {
+		luabridge::LuaRef self = mi_clase["instantiate"](15)[0];
+		if (self.isTable()) {
+			try {
+				std::cout << self["hp"] << " " << self["name"] << '\n';
+				//luabridge::call(self["func"], "hola");
+			}
+			catch (luabridge::LuaException e) {
+				std::cout << e.what() << '\n';
+			}
+			luabridge::LuaRef update = mi_clase["update"](self)[0];
+			if (update.isTable()) {
+				std::cout << update["hp"] << '\n';
+			}
+			//luabridge::push(currState, update, errorCode);
+			//luabridge::push(currState, self, errorCode);
+			//lua_pcall(currState, 1, 0, 0);
+		}
+		//luabridge::push(currState, "hola", errorCode);
+	}
+	/*if (a.isTable()) {
 		std::cout << "Es una funcion loco\n";
 		a();
-	}
+	}*/
 #pragma endregion
 
 
