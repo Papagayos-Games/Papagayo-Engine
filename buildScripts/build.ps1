@@ -274,7 +274,7 @@ Try {
 
     # Build CEGUI
     If ($BuildCegui) {
-		#Expand-Archive -Path $DependenciesRoot\cegui.zip -DestinationPath $DependenciesRoot
+		Expand-Archive -Path $DependenciesRoot\cegui.zip -DestinationPath $DependenciesRoot
         $local:CeguiBuiltDependencies = Join-Path -Path $CeguiDependenciesFolder -ChildPath "build/dependencies"
 		Step-CMake $CMake $CeguiFolder @(
 			"-DCEGUI_BUILD_RENDERER_OGRE:BOOL=ON",
