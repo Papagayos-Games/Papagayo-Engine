@@ -69,7 +69,7 @@ void MeshComponent::load(const nlohmann::json& params)
 	//Cogemos el nombre de la malla
 	if (it != params.end()) {
 		meshName = it->get<std::string>();
-	}
+	} 
 	//Si no se ha especificado ningún nombre creamos por defecto un pinguino
 	else meshName = "penguin";
 

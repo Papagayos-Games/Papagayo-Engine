@@ -87,11 +87,12 @@ static Ogre::String S_hlsl_vs_source(
 );
 
 static Ogre::String S_hlsl_ps_source(
-    "float4 main(float4 colour : COLOR,"
-    "            float2 texCoord : TEXCOORD0,"
-    "            uniform sampler2D texture0 : TEXUNIT0) : COLOR"
+    "float4 main(float4 position : POSITION,"
+    "            float2 uv : TEXCOORD0,"
+    "            float4 colour : COLOR,"
+    "            uniform sampler2D _texture : TEXUNIT0) : COLOR"
     "{"
-    "    return tex2D(texture0, texCoord) * colour;"
+    "    return tex2D(_texture, uv) * colour;"
     "}"
 );
 
@@ -962,11 +963,13 @@ void OgreRenderer::initialiseShaders()
         if (Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0"))
         {    
             d_pimpl->d_pixelShader->setParameter("target", "ps_4_0");
+            d_pimpl->d_pixelShader->setParameter("enable_backwards_compatibility", "yes");
             d_pimpl->d_pixelShader->setSource(S_hlsl_ps_source);
         }
         else if (Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0"))
         {
             d_pimpl->d_pixelShader->setParameter("target", "ps_2_0");
+            //d_pimpl->d_pixelShader->setParameter("enable_backwards_compatibility", "yes");
             d_pimpl->d_pixelShader->setSource(S_hlsl_ps_source);
         }
         else

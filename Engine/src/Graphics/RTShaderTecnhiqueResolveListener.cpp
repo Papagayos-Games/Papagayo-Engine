@@ -22,7 +22,7 @@ Ogre::Technique* RTShaderTecnhiqueResolveListener::handleSchemeNotFound(unsigned
 	if (!techniqueCreated)return nullptr;
 
 	//Force creating the shaders for the generated technique.
-	mShaderGenerator_->validateMaterial(schemeName, *originalMaterial);
+	mShaderGenerator_->validateMaterial(schemeName, originalMaterial->getName());
 
 	// Grab the generated technique.
 	Ogre::Material::Techniques itTech = originalMaterial->getTechniques();

@@ -3,7 +3,7 @@
 #include <checkML.h>
 #include "RTShaderTecnhiqueResolveListener.h"
 #include "WindowGenerator.h"
-#include "OgrePlane.h"
+//#include "OgrePlane.h"
 #include <checkML.h>
 #include "OgreRenderTarget.h"
 
@@ -11,10 +11,11 @@
 #include <OgreFileSystemLayer.h>
 #include <OgreEntity.h>
 #include <OgreShaderGenerator.h>
+#include <OgreSTBICodec.h>
 #include <OgreLight.h>		//TOERASE
 
 #include "SDL.h"
-
+#include <iostream>
 
 OgreContext* OgreContext::instance_ = nullptr;
 
@@ -53,6 +54,8 @@ void OgreContext::createRoot()
 		throw std::exception("No se ha podido crear el mRoot");
 	}
 
+	Ogre::STBIImageCodec::startup();
+
 	ogreRoot_->restoreConfig();
 	ogreRoot_->initialise(false);
 }
@@ -76,8 +79,12 @@ void OgreContext::setupRTShaderGenerator()
 			mMaterialListener_ = new RTShaderTecnhiqueResolveListener(mShaderGenerator_);
 			Ogre::MaterialManager::getSingleton().addListener(mMaterialListener_);
 
+			// Add the shader libs resource location.
+			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+				"media", "FileSystem");
 		}
-		else throw std::runtime_error("RTShader has not been initialized\n");
+		else
+			throw std::runtime_error("RTShader has not been initialized\n");
 	}
 	catch (const std::exception & e)
 	{
@@ -114,47 +121,44 @@ void OgreContext::init()
 
 void OgreContext::loadFromResourceFile()
 {
-	mFSLayer_ = new Ogre::FileSystemLayer("OgreContext");
+	// create a Ogre::ConfigFile object and use it to parse our cfg file
 
-	Ogre::ConfigFile configFile;
-	std::string configurationPath;
-
+	Ogre::ConfigFile cf;
 #ifdef _DEBUG
-	configurationPath = "OgreD/resources.cfg";
+	std::string mResourcesCfg_ = "OgreD/resources.cfg";
 #else
-	configurationPath = "Ogre/resources.cfg";
+	std::string mResourcesCfg_ = "Ogre/resources.cfg";
 #endif
-	mFSLayer_->setHomePath("./bin");
-	Ogre::String resourcesPath = mFSLayer_->getConfigFilePath(configurationPath);
+	cf.load(mResourcesCfg_);
 
-	if (Ogre::FileSystemLayer::fileExists(resourcesPath))
-		configFile.load(resourcesPath);
-	else
-	{
-		throw std::exception("No se ha encontrado el archivo de recursos de Ogre");
-	}
+	// Filesystem, Zip, etc.)
 
-	Ogre::String sec, type, arch;
+	// allow us to iterate through all of the sections discovered by the parser
+	Ogre::ConfigFile::SettingsBySection_ secIt = cf.getSettingsBySection();
 
-	// go through all specified resource groups
-	Ogre::ConfigFile::SettingsBySection_::const_iterator seci;
-	for (seci = configFile.getSettingsBySection().begin(); seci != configFile.getSettingsBySection().end(); ++seci) {
-		sec = seci->first;
-		const Ogre::ConfigFile::SettingsMultiMap& settings = seci->second;
-		Ogre::ConfigFile::SettingsMultiMap::const_iterator i;
+	// Ogre::MaterialManager::getSingleton().initialise();
+	// Ogre::ParticleSystemManager::getSingleton()._createRenderer(
+	// mRoot->getRenderSystem()->getName());
 
-		// go through all resource paths
-		for (i = settings.begin(); i != settings.end(); i++)
-		{
-			type = i->first;
-			arch = Ogre::FileSystemLayer::resolveBundlePath(i->second);
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch, type, sec);
+	// iterate through all of the results.
+	for (auto it : secIt) {
+		Ogre::String secName = it.first;
+		// ask for another iterator that will let us iterate through the items
+		// in each section
+		Ogre::ConfigFile::SettingsMultiMap* settings = &it.second;
+		Ogre::ConfigFile::SettingsMultiMap::iterator it2;
+
+		// scan through each item with this iterator
+		for (it2 = settings->begin(); it2 != settings->end(); ++it2) {
+			// unpack each pair
+			Ogre::String locType = it2->first; // location type of this resource
+			Ogre::String name = it2->second;   // the path
+
+			// add this location to our ResourceGroupManager
+			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+				name, locType, secName);
 		}
 	}
-
-	sec = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
-	const Ogre::ResourceGroupManager::LocationList genLocs = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(sec);
-
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 

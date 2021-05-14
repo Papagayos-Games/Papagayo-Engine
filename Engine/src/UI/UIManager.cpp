@@ -19,9 +19,8 @@ UIManager::UIManager() : Manager(ManID::UI)
 	//Cegui
 	//guiRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
 	guiRenderer = &CEGUI::OgreRenderer::bootstrapSystem(*OgreContext::getInstance()->getRenderTarget());
+	guiRenderer->setUsingShaders(true);
 	guiContext = &CEGUI::System::getSingleton().getDefaultGUIContext();
-	guiWinMng = &CEGUI::WindowManager::getSingleton();
-	winRoot = guiWinMng->createWindow("DefaultWindow", "rootWindow");
 
 	CEGUI::ImageManager::setImagesetDefaultResourceGroup("Imagesets");
 	CEGUI::Font::setDefaultResourceGroup("Fonts");
@@ -30,6 +29,8 @@ UIManager::UIManager() : Manager(ManID::UI)
 	CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
 	CEGUI::AnimationManager::setDefaultResourceGroup("Animations");
 
+	guiWinMng = &CEGUI::WindowManager::getSingleton();
+	winRoot = guiWinMng->createWindow("DefaultWindow", "rootWindow");
 	CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(winRoot);
 	
 	createFrameListener();

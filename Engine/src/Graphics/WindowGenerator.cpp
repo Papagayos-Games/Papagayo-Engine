@@ -41,8 +41,11 @@ void WindowGenerator::initWindow(std::string name)
 
 	std::cout << '\n' << w << " " << h << '\n';
 
-	if (!SDL_WasInit(SDL_INIT_VIDEO))
-		SDL_InitSubSystem(SDL_INIT_VIDEO);
+
+	if (!SDL_WasInit(SDL_INIT_VIDEO | SDL_INIT_TIMER))
+		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
+			SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
+		}
 
 	Uint32 flags = SDL_WINDOW_ALLOW_HIGHDPI; //SDL_WINDOW_RESIZABLE
 
@@ -70,11 +73,6 @@ void WindowGenerator::initWindow(std::string name)
 	SDL_SetWindowGrab(sdlWindow_, SDL_bool(false));
 	SDL_ShowCursor(true);
 	
-	//TEST: Configuracion inicial de la ventana 
-	//renderWindow_ = mRoot_->initialise(true, name);
-	//renderWindow_->resize(800, 600);
-	//renderWindow_->windowMovedOrResized();
-
 	mRoot_->addFrameListener(this);
 }
 
