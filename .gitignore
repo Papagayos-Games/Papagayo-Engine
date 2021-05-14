@@ -1,6 +1,6 @@
 #Cegui folder
-[Ee]ngine/dependencies/cegui
-
+[Ee]ngine/[Dd]ependencies/
+./
 # Prerequisites
 *.d
 
