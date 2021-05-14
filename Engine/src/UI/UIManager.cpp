@@ -30,7 +30,7 @@ UIManager::UIManager() : Manager(ManID::UI)
 
 	guiWinMng = &CEGUI::WindowManager::getSingleton();
 	winRoot = guiWinMng->createWindow("DefaultWindow", "rootWindow");
-	CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(winRoot);
+	guiContext->setRootWindow(winRoot);
 	
 	createFrameListener();
 }
@@ -134,12 +134,13 @@ void UIManager::setMouseVisibility(bool b)
 CEGUI::Window* UIManager::createButton(const std::string& text, glm::vec2 position,
 	glm::vec2 size, const std::string& name)
 {
-	CEGUI::Window* button = CEGUI::WindowManager::getSingleton().createWindow(schemeName + "/Button", name);
+	CEGUI::Window* button = NULL;
+	button = guiWinMng->createWindow(schemeName + "/Button", name);  // Create Window
 
 	setWidgetDestRect(button, position, size);
+
 	button->setText(text);
 	winRoot->addChild(button);
-
 	return button;
 }
 

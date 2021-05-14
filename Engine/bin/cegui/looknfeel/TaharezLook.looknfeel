@@ -561,7 +561,7 @@
     ***************************************************
     -->
     <WidgetLook name="TaharezLook/FrameWindow">
-        <PropertyDefinition name="ClientAreaColour" initialValue="FF141B38" redrawOnWrite="true" type="ColourRect"/>
+        <PropertyDefinition name="ClientAreaColour" initialValue="FFFF1B38" redrawOnWrite="true" type="ColourRect"/>
         <PropertyLinkDefinition name="CaptionColour" widget="__auto_titlebar__" targetProperty="CaptionColour" initialValue="FFFFFFFF" type="ColourRect"/>
         <PropertyLinkDefinition name="TitlebarFont" widget="__auto_titlebar__" targetProperty="Font" type="Font"/>
         <Property name="NSSizingCursorImage" value="TaharezLook/MouseNoSoCursor" />

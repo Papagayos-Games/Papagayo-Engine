@@ -92,7 +92,7 @@ void PapagayoEngine::init()
 	ui->loadScheme("TaharezLook", "TaharezLook.scheme");
 	//ui->loadFont("DejaVuSans-12.font"); 
 	ui->setMouseImage("TaharezLook/MouseArrow");
-	//ui->createButton("Probando_boton", glm::vec2(0, 0), glm::vec2(0.5, 0.5), "Prueba");
+	ui->createButton("Probando_boton", glm::vec2(0.75, 0.5), glm::vec2(100, 50), "Prueba");
 	//ui->createLabel("Probando_boton", glm::vec2(100, 100), glm::vec2(10, 10), "Prueba");
 
 	OgreContext::getInstance()->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
