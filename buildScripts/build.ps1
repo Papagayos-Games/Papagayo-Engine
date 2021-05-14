@@ -274,49 +274,50 @@ Try {
 
     # Build CEGUI
     If ($BuildCegui) {
+		Expand-Archive -Path $DependenciesRoot\cegui.zip -DestinationPath $DependenciesRoot
         $local:CeguiBuiltDependencies = Join-Path -Path $CeguiDependenciesFolder -ChildPath "build/dependencies"
-		#Step-CMake $CMake $CeguiFolder @(
-		#	"-DCEGUI_BUILD_RENDERER_OGRE:BOOL=ON",
-		#	"-DCEGUI_SAMPLES_ENABLED:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_COMMON_DIALOGUES_DEMO:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_DEMO6:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_DRAGDROP_DEMO:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_EFFECTS_DEMO:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_FONT_DEMO:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_GAMEMENU_DEMO:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_HELLO_WORLD_DEMO:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_HUD_DEMO:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_INVENTORY:_DEMO:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_LOOKNFEELOVERVIEW_DEMO:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_MINESWEEPER_DEMO:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_SCROLLABLEPANE_DEMO:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_TABCONTROL_DEMO:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_TEXT_DEMO:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_TREE_DEMO:BOOL=OFF",
-		#	"-DCEGUI_SAMPLES_ENABLED_WIDGET_DEMO:BOOL=OFF",
-		#	"-DCMAKE_PREFIX_PATH:PATH=$CeguiBuiltDependencies",
-		#	"-DOGRE_H_BUILD_SETTINGS_PATH:PATH=$OgreFolder/build/include",
-		#	"-DOGRE_H_PATH:PATH=$OgreFolder/OgreMain/include",
-		#	"-DOGRE_LIB:FILEPATH=$OgreFolder/build/lib/Release/OgreMain.lib",
-		#	"-DOGRE_LIB_DBG:FILEPATH=$OgreFolder/build/lib/Debug/OgreMain_d.lib"
-		#)
+		Step-CMake $CMake $CeguiFolder @(
+			"-DCEGUI_BUILD_RENDERER_OGRE:BOOL=ON",
+			"-DCEGUI_SAMPLES_ENABLED:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_COMMON_DIALOGUES_DEMO:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_DEMO6:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_DRAGDROP_DEMO:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_EFFECTS_DEMO:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_FONT_DEMO:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_GAMEMENU_DEMO:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_HELLO_WORLD_DEMO:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_HUD_DEMO:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_INVENTORY:_DEMO:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_LOOKNFEELOVERVIEW_DEMO:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_MINESWEEPER_DEMO:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_SCROLLABLEPANE_DEMO:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_TABCONTROL_DEMO:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_TEXT_DEMO:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_TREE_DEMO:BOOL=OFF",
+			"-DCEGUI_SAMPLES_ENABLED_WIDGET_DEMO:BOOL=OFF",
+			"-DCMAKE_PREFIX_PATH:PATH=$CeguiBuiltDependencies",
+			"-DOGRE_H_BUILD_SETTINGS_PATH:PATH=$OgreFolder/build/include",
+			"-DOGRE_H_PATH:PATH=$OgreFolder/OgreMain/include",
+			"-DOGRE_LIB:FILEPATH=$OgreFolder/build/lib/Release/OgreMain.lib",
+			"-DOGRE_LIB_DBG:FILEPATH=$OgreFolder/build/lib/Debug/OgreMain_d.lib"
+		)
 		
         # Let's be honest, I got done with MSBuild here. The world would be beautiful if it'd let me define constants
         # via CLI, but looks like it's impossible without CMake.
-        #$private:Content = Get-Content -Path "$CeguiFolder\build\cegui\include\CEGUI\Config.h"
-        #$private:Content = $Content -replace "define CEGUI_OGRE_VERSION_MAJOR 0", "define CEGUI_OGRE_VERSION_MAJOR 1"
-        #$private:Content = $Content -replace "define CEGUI_OGRE_VERSION_MINOR 0", "define CEGUI_OGRE_VERSION_MINOR 12"
-        #$private:Content = $Content -replace "define CEGUI_OGRE_VERSION_PATCH 0", "define CEGUI_OGRE_VERSION_PATCH 11"
-		#
-        #Set-Content -Path "$CeguiFolder\build\cegui\include\CEGUI\Config.h" -Value $Content
-        #Remove-Variable Content
-		#
-		##Arregla el error de Texture.cpp
-        #$private:Content = Get-Content -Path "$CeguiFolder\cegui\src\RendererModules\Ogre\Texture.cpp"
-        #$private:Content = $Content -replace "Ogre::Image::Box", "Ogre::Box"
-		#
-		#Set-Content -Path "$CeguiFolder\cegui\src\RendererModules\Ogre\Texture.cpp" -Value $Content
-        #Remove-Variable Content
+        $private:Content = Get-Content -Path "$CeguiFolder\build\cegui\include\CEGUI\Config.h"
+        $private:Content = $Content -replace "define CEGUI_OGRE_VERSION_MAJOR 0", "define CEGUI_OGRE_VERSION_MAJOR 1"
+        $private:Content = $Content -replace "define CEGUI_OGRE_VERSION_MINOR 0", "define CEGUI_OGRE_VERSION_MINOR 12"
+        $private:Content = $Content -replace "define CEGUI_OGRE_VERSION_PATCH 0", "define CEGUI_OGRE_VERSION_PATCH 11"
+		
+        Set-Content -Path "$CeguiFolder\build\cegui\include\CEGUI\Config.h" -Value $Content
+        Remove-Variable Content
+		
+		#Arregla el error de Texture.cpp
+        $private:Content = Get-Content -Path "$CeguiFolder\cegui\src\RendererModules\Ogre\Texture.cpp"
+        $private:Content = $Content -replace "Ogre::Image::Box", "Ogre::Box"
+		
+		Set-Content -Path "$CeguiFolder\cegui\src\RendererModules\Ogre\Texture.cpp" -Value $Content
+        Remove-Variable Content
 		
         If ($NDebug) {
             Step-VisualStudio -MsBuild $MsBuild -Path "$CeguiFolder\build\cegui.sln" -Configuration "Debug"
