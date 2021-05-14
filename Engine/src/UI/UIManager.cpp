@@ -17,7 +17,6 @@ UIManager::UIManager() : Manager(ManID::UI)
 	oWindow = OgreContext::getInstance()->getRenderWindow();
 	
 	//Cegui
-	//guiRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
 	guiRenderer = &CEGUI::OgreRenderer::bootstrapSystem(*OgreContext::getInstance()->getRenderTarget());
 	guiRenderer->setUsingShaders(true);
 	guiContext = &CEGUI::System::getSingleton().getDefaultGUIContext();
