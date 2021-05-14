@@ -1,4 +1,3 @@
-#include "..\..\include\Graphics\OgreContext.h"
 #include "OgreContext.h"
 #include <checkML.h>
 #include "RTShaderTecnhiqueResolveListener.h"
@@ -44,9 +43,9 @@ bool OgreContext::setupInstance(const std::string& appName)
 void OgreContext::createRoot()
 {
 #ifdef _DEBUG
-	ogreRoot_ = new Ogre::Root("OgreD/plugins.cfg", "OgreD/ogre.cfg");
+	ogreRoot_ = new Ogre::Root(enginePath_ + "/OgreD/plugins.cfg", enginePath_ + "/OgreD/ogre.cfg");
 #else
-	ogreRoot_ = new Ogre::Root("Ogre/plugins.cfg", "Ogre/ogre.cfg");
+	ogreRoot_ = new Ogre::Root(enginePath_ + "/Ogre/plugins.cfg", enginePath_ + "/Ogre/ogre.cfg");
 #endif
 
 	if (ogreRoot_ == nullptr) {
@@ -120,9 +119,9 @@ void OgreContext::loadFromResourceFile()
 	std::string configurationPath;
 
 #ifdef _DEBUG
-	configurationPath = "OgreD/resources.cfg";
+	configurationPath = enginePath_ +"/OgreD/resources.cfg";
 #else
-	configurationPath = "Ogre/resources.cfg";
+	configurationPath = enginePath_ + "/Ogre/resources.cfg";
 #endif
 	mFSLayer_->setHomePath("./bin");
 	Ogre::String resourcesPath = mFSLayer_->getConfigFilePath(configurationPath);

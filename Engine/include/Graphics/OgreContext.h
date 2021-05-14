@@ -33,6 +33,7 @@ private:
 	Ogre::FileSystemLayer* mFSLayer_;
 	RTShaderTecnhiqueResolveListener* mMaterialListener_;
 	std::string appName_;
+	const std::string enginePath_ = "..\dependencies\Papagayo-Engine\Engine\bin";
 
 	OgreContext(const std::string& appName);
 	void createRoot();
