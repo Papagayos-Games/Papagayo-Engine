@@ -18,6 +18,16 @@ Entity::~Entity() {
 	}
 }
 
+void Entity::start()
+{
+	for (auto it = _componentMap.begin(); it != _componentMap.end(); ++it)
+	{
+		for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+			it2->second->setUp();
+		}
+	}
+}
+
 void Entity::addComponent(Component* comp)
 {
 	_componentMap[comp->getManager()->getId()][comp->getId()] = comp;

@@ -21,6 +21,8 @@ public:
 	//destructor
 	~Entity();
 
+	// inicializa las componentes
+	void start();
 	// añade un componente
 	void addComponent(Component* comp);
 

@@ -1,32 +1,31 @@
 {
-  "Entities": [
-    {
-      "Prefab" : "DefaultCamera",
-      "Arguments" : [
-        {
-          "Component": "Transform",
-          "Type": "Common",
-          "Parameters" : {
-            "position" : [0,100,500]
+    "Entities": [
+      {
+        "Prefab" : "DefaultCamera",
+        "Arguments" : [
+          {
+            "Component": "Transform",
+            "Type": "Common",
+            "Parameters" : {
+              "position" : [0,100,500]
+            }
           }
-        }
-      ]
-    },
-    {
-      "Prefab" : "DefaultLight"
-    },
-    {
-      "Prefab": "Penguin",
-      "Arguments" : [
-        {
-          "Component": "Transform",
-          "Type": "Common",
-          "Parameters": {
-            "position": [ 10, 0, 0 ]
+        ]
+      },
+      {
+        "Prefab" : "DefaultLight"
+      },
+      {
+        "Prefab": "Penguin",
+        "Arguments" : [
+          {
+            "Component": "Transform",
+            "Type": "Common",
+            "Parameters": {
+              "position": [ 10, 0, 0 ]
+            }
           }
-        }
-      ]
-    }
-  ]
+        ]
+      }
+    ]
 }
-

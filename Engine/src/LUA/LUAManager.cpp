@@ -64,6 +64,10 @@ LUAManager* LUAManager::getInstance()
 
 void LUAManager::start()
 {
+	for (Component* cmp : _compsList)
+	{
+		cmp->setUp();
+	}
 }
 
 void LUAManager::update()
@@ -262,7 +266,7 @@ Entity* LUAManager::instantiate(std::string prefabName)
 
 	s.loadPrefabByName(prefabName, e);
 	SceneManager::getCurrentScene()->addEntity(prefabName, e);
-
+	e->start();
 	return e;
 }
 
@@ -288,7 +292,7 @@ LUAManager::LUAManager() : Manager(ManID::LUA)
 
 	//Inicializacion del estado de LUA
 	L = luaL_newstate();
-	buildLuaEngine("LuaScripts/script.lua");
+	buildLuaEngine("LuaScripts/clases.lua");
 	
 	//Registro de las funciones
 	if (L) {

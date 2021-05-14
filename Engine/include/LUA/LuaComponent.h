@@ -7,10 +7,9 @@ class LuaRef;
 
 class LuaComponent : public Component {
 private:
-	//String que identifica al nombre del CLASE DE LUA
-	//que llamará este componente en su update
-	std::string className_;
+	luabridge::LuaRef* class_;
 	luabridge::LuaRef* self_;
+
 	//Referencia al LUASTATE
 	lua_State* currState = nullptr;
 	
@@ -26,6 +25,8 @@ public:
 	virtual void init()override;
 	//Carga desde archivo JSON
 	virtual void load(const nlohmann::json& params) override;
+	// 
+	virtual void setUp() override;
 	//Llamada a funciones de LUA
 	virtual void update() override;
 
