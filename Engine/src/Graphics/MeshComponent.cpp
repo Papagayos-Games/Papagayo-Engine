@@ -36,7 +36,7 @@ void MeshComponent::update()
 	Vector3 pos = tr_->getPos();
 	mNode_->setPosition(Ogre::Vector3(pos.x, pos.y, pos.z));
 	Vector3 rot = tr_->getRot();
-	//rotaciones //TO DO: revisar
+	//rotaciones 
 	mNode_->resetOrientation();
 	mNode_->yaw(Ogre::Radian(rot.z), Ogre::Node::TS_WORLD);//ejeY
 	mNode_->pitch(Ogre::Radian(rot.y), Ogre::Node::TS_WORLD);//ejex

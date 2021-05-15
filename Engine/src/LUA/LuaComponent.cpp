@@ -11,46 +11,49 @@ LuaComponent::LuaComponent():Component(LUAManager::getInstance(), 0)
 
 LuaComponent::~LuaComponent()
 {
-	//¿QUIZA?
-	delete tabla;
+	delete class_;
+	delete self_;
 }
 
 void LuaComponent::init()
 {
 	currState = LUAManager::getInstance()->getLuaState();
-	tabla = new luabridge::LuaRef(currState);
-
-	lua_getglobal(currState, "start");
-	luabridge::push(currState, LUAManager::getInstance(), errorCode);
-	lua_pcall(currState, 1, 0, 0);
-	(*tabla) = luabridge::getGlobal(currState, "sj");
-	//TO DO: Erase
-	(*tabla)["vida"] = 10;
-
+	class_ = new luabridge::LuaRef(currState);
+	self_ = new luabridge::LuaRef(currState);
 }
 
 void LuaComponent::load(const nlohmann::json& params)
 {
-	auto it = params.find("luaMethod");
-	std::string method;
+	auto it = params.find("Class");
+	std::string className;
 
 	//Cogemos el nombre del metodo al que llamar en el update
-	if (it != params.end()) methodName_ = it->get<std::string>();
+	if (it != params.end()) 
+		className = it->get<std::string>();
 	else {
-		methodName_ = "default";
+		className = "default";
 #ifdef _DEBUG
-		std::cout << "No method name found while loading LUAComponent. Assigned default\n";
+		std::cout << "No class found while loading LUAComponent. Assigned default\n";
 #endif
 	}
+	(*class_) = luabridge::getGlobal(currState, className.c_str());
 
+	it = params.find("Parameters");
+	if (it != params.end()) {
+		(*self_) = (*class_)["instantiate"]((*it).dump())[0];
+		std::cout << (*self_)["hp"] << '\n';
+		if (self_->isTable()) {
+			std::cout << "tabla\n";
+		}
+	}
+}
+
+void LuaComponent::setUp()
+{
+	(*class_)["start"](self_, LUAManager::getInstance());
 }
 
 void LuaComponent::update()
 {
-
-	lua_getglobal(currState, methodName_.c_str());
-	luabridge::push(currState, tabla, errorCode);
-	luabridge::push(currState, LUAManager::getInstance(), errorCode);
-
-	lua_pcall(currState, 2, 0, 0);
+	(*class_)["update"](self_, LUAManager::getInstance());
 }

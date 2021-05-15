@@ -1,56 +1,45 @@
 {
-  "Entities": [
-    {
-      "Prefab" : "Penguin",
-      "Arguments" : [
-        {
-          "Component": "Transform",
-          "Type": "Common",
-          "Parameters" : {
-            "position": [ 0,45,67 ]
+    "Entities": [
+      {
+        "Prefab" : "DefaultCamera",
+        "Components" : [
+          {
+            "Component": "Transform",
+            "Type": "Common",
+            "Parameters" : {
+              "position" : [0,100,500]
+            }
           }
-        }
-      ]
-    },
-    {
-      "Prefab" : "DefaultCamera",
-      "Arguments" : [
-        {
-          "Component": "Transform",
-          "Type": "Common",
-          "Parameters" : {
-            "position" : [0,100,500]
+        ]
+      },
+      {
+        "Prefab" : "DefaultLight"
+      },
+      {
+        "Prefab": "Penguin",
+        "Components" : [
+          {
+            "Component": "Transform",
+            "Type": "Common",
+            "Parameters": {
+              "position": [ 10, 0, 0 ]
+            }
+          },
+          {
+            "Component": "Transform",
+            "Type": "Common",
+            "Parameters": {
+              "position": [ 50, 0, 0 ]
+            }
+          },
+          {
+            "Component": "LuaComponent",
+            "Type": "LUA",
+            "Parameters": {
+              "Class": "default"
+            }
           }
-        }
-      ]
-    },
-    {
-      "Prefab" : "DefaultLight"
-    },
-    {
-      "Prefab" : "Penguin",
-      "Arguments" : [
-        {
-          "Component": "Transform",
-          "Type": "Common",
-          "Parameters": {
-            "position": [ 10, 0, 0 ]
-          }
-        },
-
-        {
-          "Component": "RigidBody",
-          "Type": "Physics",
-          "Parameters": {
-            "state": "Static",
-            "linealVel": [ 0.0, 0.0, 0.0 ]
-          }
-        }
-      ]
-    },
-    {
-      "Prefab": "Penguin"
-    }
-  ]
+        ]
+      }
+    ]
 }
-

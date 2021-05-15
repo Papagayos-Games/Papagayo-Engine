@@ -4,6 +4,11 @@ k()
 i = "Me quiero morir\n"
 print("HazCosas\n");
 
+
+local function prueba()
+    print("Soy una funcion de otro script")
+end
+
 function setPosition(rig)
 
     vec = Vector3(200, 0, 0);
@@ -64,3 +69,20 @@ function addTorque(rig)
     rig:addTorque(vec, rel, 1);
 end
 
+local miclase = {}
+
+function miclase:instantiate()
+    return "Hola"
+end
+
+--local function miclase.start(self, lua)
+--    self.hp = lua.GetMiFuncionGlobalQueMeCambiaLaVida()
+--end
+
+--local function miclase.update(self, lua)
+--    if lua.keydown(space) then
+--        print(self.damage)
+--    end
+--end
+
+return miclase

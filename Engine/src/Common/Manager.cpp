@@ -10,6 +10,14 @@ Manager::~Manager() {
 	destroyAllComponents();
 }
 
+int Manager::getCompID(const std::string& s)
+{
+	auto e = enum_map_.find(s);
+	if (e != enum_map_.end())
+		return e->second;
+	return -1;
+}
+
 const std::list<Component*>& Manager::getComponents() {
 	return _compsList;
 }
@@ -46,15 +54,16 @@ int Manager::getId() const {
 	return (int)_manId;
 }
 
-void Manager::registerComponent(const std::string& name, std::function<Component * ()> compConst)
+void Manager::registerComponent(const std::string& name, int id, std::function<Component * ()> compConst)
 {
-	compsRegistry_[name] = compConst;
+	enum_map_[name] = id;
+	compsRegistry_[id] = compConst;
 }
 
 Component* Manager::create(const std::string& name, Entity* ent)
 {
 	Component* comp = nullptr;
-	auto it = compsRegistry_.find(name);
+	auto it = compsRegistry_.find(enum_map_[name]);
 	if (it != compsRegistry_.end())
 		comp = it->second();
 	if (comp != nullptr) {
