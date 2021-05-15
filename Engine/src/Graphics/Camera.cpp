@@ -3,7 +3,6 @@
 #include "RenderManager.h"
 #include "OgreContext.h"
 #include <checkML.h>
-#include "WindowGenerator.h"
 #include "Ogre.h"
 #include "OgreSceneNode.h"
 #include "Vector3.h"
@@ -21,25 +20,6 @@ Camera::Camera() : Component(RenderManager::getInstance(), (int)RenderManager::R
 {
 	init();
 }
-
-
-//Camera::Camera(Ogre::SceneNode* parentNode,std::string cameraName) : Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Camera), name_(cameraName)
-//{
-//	mCamera_ = OgreContext::getInstance()->getSceneManager()->createCamera(name_);
-//	mCamera_->setNearClipDistance(1);
-//	mCamera_->setFarClipDistance(10000);
-//	//mCamera_->lookAt(0, 0, -1);
-//	mCamera_->setAutoAspectRatio(true);
-//	//cam->setPolygonMode(Ogre::PM_WIREFRAME); 
-//
-//	camNode_ = parentNode->createChildSceneNode(name_ + "Node");
-//	camNode_->attachObject(mCamera_);
-//
-//	camNode_->setPosition(0, 0, 1000);
-//	camNode_->lookAt(Ogre::Vector3(0, 0, 0), Ogre::Node::TS_WORLD);
-//	vp_ = WindowGenerator::getInstance()->getRenderWindow()->addViewport(mCamera_);
-//	vp_->setBackgroundColour(Ogre::ColourValue(0.0, 1.0, 0.0, 1.0));//cambia el color del fondo
-//}
 
 Camera::~Camera()
 {
@@ -145,10 +125,10 @@ void Camera::load(const nlohmann::json& params)
 				height = value;
 		}
 
-		vp_ = WindowGenerator::getInstance()->getRenderWindow()->addViewport(mCamera_, zOrder, left, top, width, height);
+		vp_ = OgreContext::getInstance()->getRenderWindow()->addViewport(mCamera_, zOrder, left, top, width, height);
 	}
 	//Viewport por defecto
-	else vp_ = WindowGenerator::getInstance()->getRenderWindow()->addViewport(mCamera_);
+	else vp_ = OgreContext::getInstance()->getRenderWindow()->addViewport(mCamera_);
 
 	//Color del viewPort
 	it = params.find("viewportColor");

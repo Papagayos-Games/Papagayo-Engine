@@ -11,7 +11,6 @@ namespace CEGUI {
 	class WindowManager;
 	class OgreRenderer;
 	class System;
-	enum MouseButton;
 } // namespace CEGUI
 
 class UIManager : public Ogre::FrameListener, public Manager

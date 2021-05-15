@@ -1,34 +1,40 @@
 #include "..\..\include\Graphics\OgreContext.h"
+#include "..\..\include\Graphics\OgreContext.h"
 #include "OgreContext.h"
-#include <checkML.h>
 #include "RTShaderTecnhiqueResolveListener.h"
-#include "WindowGenerator.h"
-//#include "OgrePlane.h"
-#include <checkML.h>
-#include "OgreRenderTarget.h"
-
 #include <Ogre.h>
-#include <OgreFileSystemLayer.h>
-#include <OgreEntity.h>
-#include <OgreShaderGenerator.h>
-#include <OgreSTBICodec.h>
-#include <OgreLight.h>		//TOERASE
 
-#include "SDL.h"
+#include <SDL.h>
+#include <SDL_syswm.h>
+#include <SDL_events.h>
 #include <iostream>
+
+#include <OgreSTBICodec.h>
+#include <checkML.h>
+#include <OgreShaderGenerator.h>
+
+/*#include <OgreFileSystemLayer.h>
+#include "WindowGenerator.h"
+#include <OgreEntity.h>
+#include <OgreLight.h>		//TOERASE
+*/
 
 OgreContext* OgreContext::instance_ = nullptr;
 
-OgreContext::OgreContext(const std::string& appName) {
+OgreContext::OgreContext(const std::string& appName) : 
+	mResourcesCfg(Ogre::BLANKSTRING),
+	mPluginsCfg(Ogre::BLANKSTRING)
+{
 	appName_ = appName;
 	init();
- }
+}
 
 OgreContext* OgreContext::getInstance()
 {
 	if (instance_ == nullptr)
 		if (!setupInstance("PAPAGAYO ENGINE"))
 			throw "ERROR: OgreContext couldn't be created\n";
+
 	return instance_;
 }
 
@@ -42,81 +48,97 @@ bool OgreContext::setupInstance(const std::string& appName)
 	return false;
 }
 
+#pragma region INIT_OGRE
+
+void OgreContext::init()
+{
+	//-------ROOT--------------//
+	createRoot();
+
+	//------WINDOW-------------//
+	createWindow();
+
+	//----SETTING-RESOURCES----//
+	loadFromResourceFile();
+
+	//----WINDOW-GRAB----------//
+	const auto g = SDL_bool(grab);
+	SDL_SetWindowGrab(native, g);
+	SDL_ShowCursor(showCursor);
+
+	//ogreRoot_->addFrameListener(render);
+	//----RT-SHADER-SYSTEM-----//
+	setupRTShaderGenerator();
+}
+
 void OgreContext::createRoot()
 {
 #ifdef _DEBUG
-	ogreRoot_ = new Ogre::Root("OgreD/plugins.cfg", "OgreD/ogre.cfg");
+	mResourcesCfg = "OgreD/resources.cfg";
+	mPluginsCfg = "OgreD/plugins.cfg";
+	mOgreCfg = "OgreD/ogre.cfg";
 #else
-	ogreRoot_ = new Ogre::Root("Ogre/plugins.cfg", "Ogre/ogre.cfg");
+	mResourcesCfg = "Ogre/resources.cfg";
+	mPluginsCfg = "Ogre/plugins.cfg";
+	mOgreCfg = "Ogre/ogre.cfg";
 #endif
+	ogreRoot_ = new Ogre::Root(mPluginsCfg, mOgreCfg);
 
 	if (ogreRoot_ == nullptr) {
 		throw std::exception("No se ha podido crear el mRoot");
 	}
 
 	Ogre::STBIImageCodec::startup();
-
 	ogreRoot_->restoreConfig();
 	ogreRoot_->initialise(false);
 }
 
-void OgreContext::createSceneManager()
+void OgreContext::createWindow()  
 {
-	ogreSceneManager_ = ogreRoot_->createSceneManager();
-	ogreSceneManager_->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
-}
+	Ogre::ConfigOptionMap ropts = ogreRoot_->getRenderSystem()->getConfigOptions();
 
-void OgreContext::setupRTShaderGenerator()
-{
-	try {
-		if (Ogre::RTShader::ShaderGenerator::initialize())
-		{
-			//Cogemos la instancia
-			mShaderGenerator_ = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
-			mShaderGenerator_->addSceneManager(ogreSceneManager_);
+	std::istringstream mode(ropts["Video Mode"].currentValue);
+	Ogre::String token;
+	uint32_t w, h;
+	mode >> w;     // width
+	mode >> token; // 'x' as separator between width and height
+	mode >> h;     // height
 
-			//Resolutor de mallas 
-			mMaterialListener_ = new RTShaderTecnhiqueResolveListener(mShaderGenerator_);
-			Ogre::MaterialManager::getSingleton().addListener(mMaterialListener_);
-
-			// Add the shader libs resource location.
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-				"media", "FileSystem");
+	std::cout << '\n' << w << " " << h << '\n';
+	if (!SDL_WasInit(SDL_INIT_VIDEO | SDL_INIT_TIMER))
+		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
+			SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
+			/*EXCEPCION*/
 		}
-		else
-			throw std::runtime_error("RTShader has not been initialized\n");
-	}
-	catch (const std::exception & e)
-	{
-		throw std::runtime_error("Fallo al inicializar el RTShader\n" + (std::string)e.what() + "\n");
-	}
-}
 
-void OgreContext::clean()
-{
-	delete instance_;
-}
+#ifdef _DEBUG
+	int flags = 0;
+#else
+	int flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
+#endif
 
-void OgreContext::setSkyPlane(const std::string& materialName, const Ogre::Plane& plane, int width, int height, float bow)
-{
-		ogreSceneManager_->setSkyPlane(true,plane, materialName, 1, 1, true, bow, width, height);	
-}
+	native = SDL_CreateWindow(appName_.c_str(), SDL_WINDOWPOS_CENTERED,
+		SDL_WINDOWPOS_CENTERED, w, h, flags);
 
-void OgreContext::init()
-{
-	createRoot();
+	SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
+	SDL_GetWindowWMInfo(native, &wmInfo);
 
-	SDL_Init(SDL_INIT_EVERYTHING);
+	Ogre::NameValuePairList miscParams;
 
-	try { WindowGenerator::setupInstance(getOgreRoot(), appName_); }
-	catch (const std::exception & e)
-	{
-		throw std::runtime_error("WindowGenerator init fail \n" + (std::string)e.what() + "\n");
-	}
+	miscParams["FSAA"] = ropts["FSAA"].currentValue;
+	miscParams["vsync"] = ropts["VSync"].currentValue;
+	miscParams["gamma"] = ropts["sRGB Gamma Conversion"].currentValue;
 
-	createSceneManager();
-	loadFromResourceFile();
-	setupRTShaderGenerator();
+
+	miscParams["externalWindowHandle"] =
+		Ogre::StringConverter::toString(size_t(wmInfo.info.win.window));
+
+	render = ogreRoot_->createRenderWindow(appName_, w, h, false, &miscParams);
+
+	// create a SceneManager instance
+	mSM = ogreRoot_->createSceneManager();
+	mSM->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
 }
 
 void OgreContext::loadFromResourceFile()
@@ -124,21 +146,10 @@ void OgreContext::loadFromResourceFile()
 	// create a Ogre::ConfigFile object and use it to parse our cfg file
 
 	Ogre::ConfigFile cf;
-#ifdef _DEBUG
-	std::string mResourcesCfg_ = "OgreD/resources.cfg";
-#else
-	std::string mResourcesCfg_ = "Ogre/resources.cfg";
-#endif
-	cf.load(mResourcesCfg_);
-
-	// Filesystem, Zip, etc.)
+	cf.load(mResourcesCfg);
 
 	// allow us to iterate through all of the sections discovered by the parser
 	Ogre::ConfigFile::SettingsBySection_ secIt = cf.getSettingsBySection();
-
-	// Ogre::MaterialManager::getSingleton().initialise();
-	// Ogre::ParticleSystemManager::getSingleton()._createRenderer(
-	// mRoot->getRenderSystem()->getName());
 
 	// iterate through all of the results.
 	for (auto it : secIt) {
@@ -162,33 +173,89 @@ void OgreContext::loadFromResourceFile()
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 
+void OgreContext::setupRTShaderGenerator()
+{
+	try {
+		if (Ogre::RTShader::ShaderGenerator::initialize())
+		{
+			//Cogemos la instancia
+			mShaderGenerator_ = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
+			mShaderGenerator_->addSceneManager(mSM);
+
+			Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media", "FileSystem");
+			//Set the scene manager
+			mShaderGenerator_->addSceneManager(mSM);
+
+			//Resolutor de mallas 
+			mMaterialListener_ = new RTShaderTecnhiqueResolveListener(mShaderGenerator_);
+			Ogre::MaterialManager::getSingleton().addListener(mMaterialListener_);
+
+		}
+		else
+			throw std::runtime_error("RTShader has not been initialized\n");
+	}
+	catch (const std::exception& e)
+	{
+		throw std::runtime_error("Fallo al inicializar el RTShader\n" + (std::string)e.what() + "\n");
+	}
+}
+
+#pragma endregion
+
+void OgreContext::clean()
+{
+	delete instance_;
+}
+
+void OgreContext::setSkyPlane(const std::string& materialName, const Ogre::Plane& plane, int width, int height, float bow)
+{
+	mSM->setSkyPlane(true, plane, materialName, 1, 1, true, bow, width, height);
+}
+
 OgreContext::~OgreContext()
 {
-	mShaderGenerator_->removeSceneManager(ogreSceneManager_);
+	if (ogreRoot_ != nullptr)
+		ogreRoot_->saveConfig();
+
+	// restore default scheme.
+	Ogre::MaterialManager::getSingleton().setActiveScheme(
+		Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
 
 	// destroy RTShader system.
 	if (mShaderGenerator_ != nullptr) {
+		mShaderGenerator_->removeSceneManager(mSM);
 		Ogre::RTShader::ShaderGenerator::getSingleton().destroy();
 		mShaderGenerator_ = nullptr;
 	}
 
-	//Destruir ventana
-	WindowGenerator::getInstance()->clean();
+	if (render != nullptr) {
+		ogreRoot_->destroyRenderTarget(render);
+		render = nullptr;
+	}
+
+	if (native != nullptr) {
+		SDL_DestroyWindow(native);
+		SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_TIMER);
+		native = nullptr;
+	}
 
 	//Destruir FileSystemLayer
-	delete mFSLayer_;	
+	delete mFSLayer_;
 
 	//Destruir SceneManager
-	if (ogreRoot_ != nullptr)ogreRoot_->destroySceneManager(ogreSceneManager_);
+	ogreRoot_->destroySceneManager(mSM);
 
-	//Destruir root
-	if (ogreRoot_ != nullptr)delete ogreRoot_;
+	delete ogreRoot_;
 	ogreRoot_ = nullptr;
+
 
 	//Destruir RTShaderSystem;
 	delete  mMaterialListener_;
+
+	Ogre::STBIImageCodec::shutdown();
 }
 
+#pragma region GET
 Ogre::Root* OgreContext::getOgreRoot()
 {
 	return ogreRoot_;
@@ -201,19 +268,26 @@ Ogre::Root* OgreContext::getOgreRoot() const
 
 Ogre::SceneManager* OgreContext::getSceneManager()
 {
-	return ogreSceneManager_;
+	return mSM;
 }
 
 Ogre::SceneManager* OgreContext::getSceneManager() const
 {
-	return ogreSceneManager_;
+	return mSM;
 }
 
 Ogre::RenderTarget* OgreContext::getRenderTarget() const {
-	return ogreRoot_->getRenderTarget(WindowGenerator::getInstance()->getRenderWindow()->getName());
+	return ogreRoot_->getRenderTarget(render->getName());
 }
 
 Ogre::RenderWindow* OgreContext::getRenderWindow() const
 {
-	return WindowGenerator::getInstance()->getRenderWindow();
+	return render;
 }
+
+SDL_Window* OgreContext::getSDLWindow() const
+{
+	return native;
+}
+
+#pragma endregion

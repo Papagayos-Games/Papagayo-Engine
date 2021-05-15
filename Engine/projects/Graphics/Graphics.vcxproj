@@ -26,7 +26,6 @@
     <ClInclude Include="..\..\include\Graphics\PlaneComponent.h" />
     <ClInclude Include="..\..\include\Graphics\RenderManager.h" />
     <ClInclude Include="..\..\include\Graphics\RTShaderTecnhiqueResolveListener.h" />
-    <ClInclude Include="..\..\include\Graphics\WindowGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Graphics\Camera.cpp" />
@@ -37,7 +36,6 @@
     <ClCompile Include="..\..\src\Graphics\RenderManager.cpp" />
     <ClCompile Include="..\..\src\Graphics\RTShaderTecnhiqueResolveListener.cpp" />
     <ClCompile Include="..\..\src\Graphics\SkyPlaneComponent.cpp" />
-    <ClCompile Include="..\..\src\Graphics\WindowGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">

@@ -20,13 +20,13 @@ InputSystem::InputSystem()
 	clearState();
 	// For later knowing if the mouse moved
 	SDL_Event e;
-	
+
 	///
 	for (int i = 0; i < numKeys_; ++i) {
 		lastKeyboardState_[i] = keyboardState_[i];
 	}
 
-	while (SDL_PollEvent(&e)) 
+	while (SDL_PollEvent(&e))
 	{
 		switch (e.type) {
 		case SDL_KEYDOWN:
@@ -51,7 +51,7 @@ InputSystem::InputSystem()
 			break;
 		case SDL_MOUSEMOTION:
 			onMouseMotion(e);
-			break;		
+			break;
 		}
 	}
 
@@ -78,31 +78,33 @@ void InputSystem::clean()
 	delete instance_;
 }
 
-void InputSystem::handleInput()
+bool InputSystem::handleInput(const SDL_Event& e)
 {
-	SDL_Event e;
-	while (SDL_PollEvent(&e))
+	switch (e.type)
 	{
-		switch (e.type)
-		{
-		case SDL_KEYDOWN:
-			std::cout << "Tecla pulsada perro\n";
-			lstKey = e.key.keysym.scancode;
+	case SDLK_ESCAPE:
+		std::cout << "CERRANDO...\n";
+		return false;
+		break;
+	case SDL_KEYDOWN:
+		std::cout << "Tecla pulsada perro\n";
+		lstKey = e.key.keysym.scancode;
 
-			break;
-		case SDL_KEYUP:
-			break;
-		case SDL_MOUSEMOTION:
+		break;
+	case SDL_KEYUP:
+		break;
+	case SDL_MOUSEMOTION:
 
-			break;
-		case SDL_QUIT:
-			//mandar mensaje a papagayo
-			std::cout << "Cerrate\n";
-			break;
-		default:
-			break;
-		}
+		break;
+	case SDL_QUIT:
+		//mandar mensaje a papagayo
+		std::cout << "Cerrate\n";
+		break;
+	default:
+		break;
 	}
+
+	return true;
 }
 
 bool InputSystem::isKeyDownTest(int key)const {

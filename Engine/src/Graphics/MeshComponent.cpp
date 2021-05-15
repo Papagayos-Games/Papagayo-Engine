@@ -24,13 +24,6 @@ void MeshComponent::setActive(bool act)
 	mNode_->setVisible(_active);
 }
 
-//MeshComponent::MeshComponent(Ogre::SceneNode* parentNode, std::string meshName): Component(nullptr, (int)RenderManager::RenderCmpId::Mesh)
-//{
-//	mNode_ = parentNode->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
-//	ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity(meshName + ".mesh");
-//	mNode_->attachObject(ogreEnt_);
-//}
-
 MeshComponent::~MeshComponent()
 {
 	if (ogreEnt_ != nullptr) OgreContext::getInstance()->getSceneManager()->destroyEntity(ogreEnt_);

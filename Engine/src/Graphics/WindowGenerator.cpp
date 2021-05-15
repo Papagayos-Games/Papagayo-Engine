@@ -21,15 +21,6 @@ using namespace Ogre;
 
 void WindowGenerator::initWindow(std::string name)
 {
-	/*const Ogre::RenderSystemList& lRenderSystemList = mRoot_->getAvailableRenderers();
-	if (lRenderSystemList.size() == 0) {
-		throw std::exception("No se encuentra sistema de render disponible");
-	}
-	else {
-		//renderSystem_ = lRenderSystemList[0];
-		//mRoot_->setRenderSystem(renderSystem_);
-	}*/
-
 	Ogre::ConfigOptionMap ropts = mRoot_->getRenderSystem()->getConfigOptions();
 
 	std::istringstream mode(ropts["Video Mode"].currentValue);
@@ -41,13 +32,17 @@ void WindowGenerator::initWindow(std::string name)
 
 	std::cout << '\n' << w << " " << h << '\n';
 
-
 	if (!SDL_WasInit(SDL_INIT_VIDEO | SDL_INIT_TIMER))
 		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
 			SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
+			/*EXCEPCION*/
 		}
 
-	Uint32 flags = SDL_WINDOW_ALLOW_HIGHDPI; //SDL_WINDOW_RESIZABLE
+#ifdef _DEBUG
+	int flags = 0;
+#else
+	int flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
+#endif
 
 	sdlWindow_ = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED, w, h, flags);
