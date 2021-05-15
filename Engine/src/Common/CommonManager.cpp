@@ -5,7 +5,7 @@
 CommonManager* CommonManager::_instance = nullptr;
 
 CommonManager::CommonManager() : Manager(ManID::Common) {
-	registerComponent("Transform", []() -> Transform* { return new Transform(); });
+	registerComponent("Transform", (int)CommonCmpId::TransId, []() -> Transform* { return new Transform(); });
 }
 
 CommonManager::~CommonManager() {

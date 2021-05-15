@@ -2,7 +2,7 @@
     "Entities": [
       {
         "Prefab" : "DefaultCamera",
-        "Arguments" : [
+        "Components" : [
           {
             "Component": "Transform",
             "Type": "Common",
@@ -17,12 +17,26 @@
       },
       {
         "Prefab": "Penguin",
-        "Arguments" : [
+        "Components" : [
           {
             "Component": "Transform",
             "Type": "Common",
             "Parameters": {
               "position": [ 10, 0, 0 ]
+            }
+          },
+          {
+            "Component": "Transform",
+            "Type": "Common",
+            "Parameters": {
+              "position": [ 50, 0, 0 ]
+            }
+          },
+          {
+            "Component": "LuaComponent",
+            "Type": "LUA",
+            "Parameters": {
+              "Class": "default"
             }
           }
         ]

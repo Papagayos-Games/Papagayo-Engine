@@ -53,10 +53,10 @@ void LoaderSystem::loadEntities(const std::string& fileName, Scene* scene)
 	for (int i = 0; i < entSize; i++) {
 		Entity* ent = new Entity();
 		nlohmann::json prefab = entities[i]["Prefab"];
-		if (prefab.is_null() || !prefab.is_string())
-			loadComponents(entities[i]["Components"], ent);
-		else
+		if (!prefab.is_null() && prefab.is_string())
 			loadPrefabs(entities[i], ent);
+		if(!entities[i]["Components"].is_null() && entities[i]["Components"].is_array())
+			loadComponents(entities[i]["Components"], ent);
 		scene->addEntity(fileName, ent);	// TO DO: procesar el nombre de las entidades desde json
 	}
 
@@ -83,13 +83,16 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 		component = comps[i]["Component"];
 		if (component.is_null() || !component.is_string())
 			throw std::exception("ERROR: Component name not found\n");
-
-		Component* c = mans[type]->create(component, entity);
-		if (c == nullptr)
-			throw std::exception("ERROR: Component couldn't be created, it is not registered\n");
-
+		Component* c;
+		if (!entity->hasComponent(mans[type]->getId(), mans[type]->getCompID(component))){
+			c = mans[type]->create(component, entity);
+				if (c == nullptr)
+					throw std::exception("ERROR: Component couldn't be created, it is not registered\n");
+		}
 		// Si hay parametros, se cargan; si no, se crea el componente por defecto
-
+		else {
+			c = entity->getComponent(mans[type]->getId(), mans[type]->getCompID(component));
+		}
 		params = comps[i]["Parameters"];
 		if (!params.is_null() && params.is_object()) {
 
@@ -146,7 +149,7 @@ void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent) {
 	nlohmann::json prefJson;
 	i >> prefJson;
 
-	if (!pref["Arguments"].is_null() && pref["Arguments"].is_array()) {
+	/*if (!pref["Arguments"].is_null() && pref["Arguments"].is_array()) {
 		nlohmann::json args = pref["Arguments"];
 		int argSize = args.size();
 
@@ -160,6 +163,7 @@ void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent) {
 				throw std::exception("ERROR: Component name not found\n");
 
 			for (nlohmann::json::iterator it = prefJson["Components"].begin(); it != prefJson["Components"].end(); ++it) {
+				
 				if (it.value()["Type"] == type && it.value()["Component"] == component) {
 
 					for (auto p : args[i]["Parameters"].items())
@@ -171,9 +175,9 @@ void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent) {
 				std::cout << *it << '\n';
 			}
 		}
-	}
-
-	loadComponents(prefJson["Components"], ent);
+	}*/
+	if(!prefJson["Components"].is_null() && prefJson["Components"].is_array())
+		loadComponents(prefJson["Components"], ent);
 	// ya funciona sin parametros individuales
 
 	i.close();

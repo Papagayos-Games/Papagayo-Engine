@@ -288,7 +288,7 @@ void LUAManager::buildLuaEngine(const std::string& file) {
 LUAManager::LUAManager() : Manager(ManID::LUA)
 {
 	//Registro de componentes
-	registerComponent("LuaComponent", []() -> LuaComponent* { return new LuaComponent(); });
+	registerComponent("LuaComponent", 0,[]() -> LuaComponent* { return new LuaComponent(); });
 
 	//Inicializacion del estado de LUA
 	L = luaL_newstate();
