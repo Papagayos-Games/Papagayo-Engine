@@ -17,7 +17,7 @@
         "camName": "mainCamera",
         "lookAt": [ 0, 0, 0 ],
         "camType": 0,
-        "viewportColor": [ 1.0, 0.0, 0.0, 1.0 ],
+        "viewportColor": [ 1.0, 0.0, 0.0, 0.2 ],
         "autoAspectRatio": true,
         "viewport": {
           "zOrder": 0,

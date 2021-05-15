@@ -25,7 +25,7 @@ public:
 	static InputSystem* getInstance();
 	static void clean();
 
-	void handleInput(bool& run);
+	bool handleInput(const SDL_Event& e);
 	bool isKeyDown(SDL_Keycode key) const;
 	bool isKeyDownTest(int key)const;
 	bool isKeyUp(SDL_Keycode key) const;

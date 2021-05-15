@@ -24,13 +24,6 @@ void MeshComponent::setActive(bool act)
 	mNode_->setVisible(_active);
 }
 
-//MeshComponent::MeshComponent(Ogre::SceneNode* parentNode, std::string meshName): Component(nullptr, (int)RenderManager::RenderCmpId::Mesh)
-//{
-//	mNode_ = parentNode->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
-//	ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity(meshName + ".mesh");
-//	mNode_->attachObject(ogreEnt_);
-//}
-
 MeshComponent::~MeshComponent()
 {
 	if (ogreEnt_ != nullptr) OgreContext::getInstance()->getSceneManager()->destroyEntity(ogreEnt_);
@@ -69,7 +62,7 @@ void MeshComponent::load(const nlohmann::json& params)
 	//Cogemos el nombre de la malla
 	if (it != params.end()) {
 		meshName = it->get<std::string>();
-	}
+	} 
 	//Si no se ha especificado ningún nombre creamos por defecto un pinguino
 	else meshName = "penguin";
 

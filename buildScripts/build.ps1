@@ -162,12 +162,8 @@ Try {
 	# Build Ogre
     If ($BuildOgre) {
         Step-CMake $CMake $OgreFolder @(
-		"-DOGRE_BUILD_COMPONENT_BITES:BOOL=OFF",
-		"-DOGRE_BUILD_COMPONENT_CSHARP:BOOL=OFF",
-		"-DOGRE_BUILD_COMPONENT_HTMLS:BOOL=OFF",
-		"-DOGRE_BUILD_COMPONENT_JAVA:BOOL=OFF",
-		"-DOGRE_BUILD_COMPONENT_PYTHON:BOOL=OFF",
-		"-DOGRE_BUILD_RENDERSYSTEM_TINY:BOOL=OFF"
+		"-DOGRE_BUILD_COMPONENT_OVERLAY:BOOL=OFF",
+		"-DOGRE_BUILD_COMPONENT_BITES:BOOL=OFF"
 		)
 	
         If ($NDebug) {
@@ -183,6 +179,7 @@ Try {
 				"$OgreFolder\build\bin\debug\SDL2.dll",
 				"$OgreFolder\build\SDL2-build\RelWithDebInfo\SDL2.lib",
 				"$OgreFolder\build\lib\Debug\OgreMain_d.lib",
+				"$OgreFolder\build\lib\Debug\Codec_STBI_d.lib",
 				"$OgreFolder\build\lib\Debug\OgreRTShaderSystem_d.lib",
 				"$OgreFolder\build\lib\Debug\RenderSystem_Direct3D11_d.lib"
             )
@@ -201,6 +198,7 @@ Try {
 				"$OgreFolder\build\bin\release\SDL2.dll",
 				"$OgreFolder\build\SDL2-build\RelWithDebInfo\SDL2main.lib",
 				"$OgreFolder\build\lib\Release\OgreMain.lib",
+				"$OgreFolder\build\lib\Release\Codec_STBI.lib",
 				"$OgreFolder\build\lib\Release\OgreRTShaderSystem.lib",
 				"$OgreFolder\build\lib\Release\RenderSystem_Direct3D11.lib"
             )
@@ -276,6 +274,7 @@ Try {
 
     # Build CEGUI
     If ($BuildCegui) {
+		Expand-Archive -Path $DependenciesRoot\cegui.zip -DestinationPath $DependenciesRoot
         $local:CeguiBuiltDependencies = Join-Path -Path $CeguiDependenciesFolder -ChildPath "build/dependencies"
 		Step-CMake $CMake $CeguiFolder @(
 			"-DCEGUI_BUILD_RENDERER_OGRE:BOOL=ON",
@@ -312,7 +311,7 @@ Try {
 		
         Set-Content -Path "$CeguiFolder\build\cegui\include\CEGUI\Config.h" -Value $Content
         Remove-Variable Content
-	
+		
 		#Arregla el error de Texture.cpp
         $private:Content = Get-Content -Path "$CeguiFolder\cegui\src\RendererModules\Ogre\Texture.cpp"
         $private:Content = $Content -replace "Ogre::Image::Box", "Ogre::Box"
@@ -377,8 +376,7 @@ Try {
         }
 		
         Remove-Variable CeguiBuiltDependencies
-    }
-	
+	}
 	
     #Build project
     If ($BuildProject) {

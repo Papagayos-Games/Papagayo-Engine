@@ -1,12 +1,9 @@
 #include "Managers/SceneManager.h"
 #include "Scene/Scene.h"
-#include "Graphics/WindowGenerator.h"
-#include "Graphics/OgreContext.h"
 #include "LoaderSystem.h"
 
 #include "PapagayoEngine.h"
 #include "OgreContext.h"
-#include "WindowGenerator.h"
 #include "OgreRenderWindow.h"
 
 SceneManager* SceneManager::instance_= nullptr;
@@ -20,7 +17,7 @@ SceneManager::~SceneManager()
 SceneManager* SceneManager::getInstance()
 {
 	if (instance_ == nullptr)
-		return nullptr;
+		return new SceneManager();
 	
 		return instance_;
 }
@@ -67,7 +64,7 @@ void SceneManager::cleanupScene()
 	currentScene_->clean();
 	delete currentScene_; 
 	currentScene_ = nullptr;
-	WindowGenerator::getInstance()->getRenderWindow()->removeAllViewports();
+	OgreContext::getInstance()->getRenderWindow()->removeAllViewports();
 }
 
 SceneManager::SceneManager() {

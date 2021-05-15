@@ -21,13 +21,13 @@ InputSystem::InputSystem()
 	clearState();
 	// For later knowing if the mouse moved
 	SDL_Event e;
-	
+
 	///
 	for (int i = 0; i < numKeys_; ++i) {
 		lastKeyboardState_[i] = keyboardState_[i];
 	}
 
-	while (SDL_PollEvent(&e)) 
+	while (SDL_PollEvent(&e))
 	{
 		switch (e.type) {
 		case SDL_KEYDOWN:
@@ -52,7 +52,7 @@ InputSystem::InputSystem()
 			break;
 		case SDL_MOUSEMOTION:
 			onMouseMotion(e);
-			break;		
+			break;
 		}
 	}
 
@@ -79,16 +79,11 @@ void InputSystem::clean()
 	delete instance_;
 }
 
-void InputSystem::handleInput(bool& run)
+bool InputSystem::handleInput(const SDL_Event& e)
 {
-	SDL_Event e;
-	while (SDL_PollEvent(&e))
-	{
-		switch (e.type)
-		{
+    switch(e.type){
 		case SDL_KEYDOWN:
 			lstKey = e.key.keysym.scancode;
-
 			break;
 		case SDL_KEYUP:
 			break;
@@ -107,12 +102,14 @@ void InputSystem::handleInput(bool& run)
 				clickEvent_ = 0;
 			break;
 		case SDL_QUIT:
-			run = false;
+			return false;
 			break;
 		default:
-			break;
-		}
+                break;
+		
 	}
+
+	return true;
 }
 
 bool InputSystem::isKeyDownTest(int key)const {
