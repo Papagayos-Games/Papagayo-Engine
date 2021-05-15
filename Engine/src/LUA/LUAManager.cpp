@@ -24,6 +24,7 @@
 #include <LightComponent.h>
 #include <PlaneComponent.h>
 #include <RenderManager.h>
+#include <WindowGenerator.h>
 
 //LUA
 #include "LuaComponent.h"
@@ -90,12 +91,15 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addProperty("x", &Vector3::x)
 		.addProperty("y", &Vector3::y)
 		.addProperty("z", &Vector3::z)
+		.addFunction("normalize", &Vector3::normalize)
 		.endClass();
 	//input
 
 	getGlobalNamespace(L).beginClass<InputSystem>("InputSystem")
 		.addFunction("keyPressed", &InputSystem::isKeyDown)
 		.addFunction("mouseButtonPressed", &InputSystem::clickEvent)
+		.addFunction("getMouseX", &InputSystem::getMouseX)
+		.addFunction("getMouseY", &InputSystem::getMouseY)
 		.endClass();
 	
 	getGlobalNamespace(L).beginClass<Component>("Component")
@@ -143,6 +147,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("setBackgroundColor", &Camera::setBackgroundColor)
 		.addFunction("setNearClipDistance", &Camera::setNearClipDistance)
 		.addFunction("setFarClipDistance", &Camera::setFarClipDistance)
+		.addFunction("getScreenCoordinates", &Camera::getScreenCoordinates)
 		.endClass();
 
 	getGlobalNamespace(L).deriveClass<LightComponent,Component>("Light")
@@ -156,6 +161,11 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("setMaterial", &PlaneComponent::setMaterial)
 		.endClass();
 
+	getGlobalNamespace(L).beginClass<WindowGenerator>("WindowGenerator")
+		.addFunction("getWindowWidth", &WindowGenerator::getWindowWidth)
+		.addFunction("getWindowHeight", &WindowGenerator::getWindowHeight)
+		.endClass();
+
 
 	getGlobalNamespace(L).beginClass<Scene>("Scene")
 		.addFunction("clean", &Scene::clean)
@@ -164,6 +174,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getName", &Scene::getName)
 		.addFunction("getEntity", &Scene::getEntity)
 		.endClass();
+
 
 		
 
@@ -178,6 +189,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getMesh", &LUAManager::getMeshComponent)
 		.addFunction("getTransform", &LUAManager::getTransform)
 		.addFunction("instantiate", &LUAManager::instantiate)
+		.addFunction("getWindowGenerator", &LUAManager::getWindowGenerator)
 		.endClass();
 }
 
@@ -268,6 +280,11 @@ Entity* LUAManager::instantiate(std::string prefabName)
 	SceneManager::getCurrentScene()->addEntity(prefabName, e);
 	e->start();
 	return e;
+}
+
+WindowGenerator* LUAManager::getWindowGenerator()
+{
+	return WindowGenerator::getInstance();
 }
 
 lua_State* LUAManager::getLuaState() const

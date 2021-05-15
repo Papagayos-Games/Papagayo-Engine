@@ -209,6 +209,14 @@ void Camera::setFarClipDistance(int distance)
 	mCamera_->setFarClipDistance(distance);
 }
 
+Vector3 Camera::getScreenCoordinates(const Vector3& iPoint)
+{
+	Ogre::Vector3 ogrePoint = mCamera_->getProjectionMatrix() * 
+		(mCamera_->getViewMatrix() * Ogre::Vector3(iPoint.x, iPoint.y, iPoint.z));
+
+	return Vector3(((ogrePoint.x / 2.f) + 0.5f)*vp_->getActualWidth(), ((ogrePoint.y / 2.f) + 0.5f)*vp_->getActualHeight(), 0);
+}
+
 //const Vector3& Camera::getCameraPosition()
 //{
 //	Ogre::Vector3 aux = camNode_->getPosition();

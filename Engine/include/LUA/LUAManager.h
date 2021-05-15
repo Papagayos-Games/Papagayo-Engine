@@ -21,6 +21,7 @@ class Camera;
 class LightComponent;
 class PlaneComponent;
 class Transform;
+class WindowGenerator;
 
 
 class LUAManager : public Manager {
@@ -50,9 +51,11 @@ public:
 	Camera* getCamera(Entity* ent);
 	Transform* getTransform(Entity* ent);
 	Entity* instantiate(std::string prefabName);
+	WindowGenerator* getWindowGenerator();
 
 	//Obtener el estado de LUA
 	lua_State* getLuaState()const;
+
 	//Metodos heredados de la clase padre
 	virtual void start() override;
 	virtual void update() override;
