@@ -64,6 +64,15 @@ public:
 
 	//Aplica una nueva fuente
 	void setFont(const std::string& fontFile);
+
+	enum class UICmpId : int {
+		Button = 0,
+		Slider,
+		Label,
+		Image,
+		Pointer,
+		LastUICmpId
+	};
 #pragma endregion
 
 #pragma region Mouse
