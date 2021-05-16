@@ -346,9 +346,11 @@ namespace Ogre
 		for(unsigned short a = 0; a < mesh->getNumAnimations(); ++a)
 		{
 			Animation* anim = mesh->getAnimation(a);
-			for (const auto& trackIt : anim->_getVertexTrackList())
+			Animation::VertexTrackIterator trackIt = anim->getVertexTrackIterator();
+			while(trackIt.hasMoreElements())
 			{
-				performAnimationTrackRemap(mesh->getHardwareBufferManager(), trackIt.second, remapInfos[trackIt.first]);
+				VertexAnimationTrack* track = trackIt.getNext();
+				performAnimationTrackRemap(mesh->getHardwareBufferManager(), track, remapInfos[track->getHandle()]);
 			}
 		}
 

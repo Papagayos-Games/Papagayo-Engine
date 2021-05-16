@@ -35,18 +35,19 @@ namespace Ogre {
     D3D11HardwareBuffer::D3D11HardwareBuffer(
         BufferType btype, size_t sizeBytes,
         HardwareBuffer::Usage usage, D3D11Device & device, 
-        bool useShadowBuffer, bool streamOut)
-        : HardwareBuffer(usage, false,  useShadowBuffer),
+        bool useSystemMemory, bool useShadowBuffer, bool streamOut)
+        : HardwareBuffer(usage, useSystemMemory,  useShadowBuffer),
+        mpTempStagingBuffer(0),
         mUseTempStagingBuffer(false),
         mBufferType(btype),
         mDevice(device)
     {
         mSizeInBytes = sizeBytes;
         mDesc.ByteWidth = static_cast<UINT>(sizeBytes);
-        mDesc.CPUAccessFlags = 0;
+        mDesc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage); 
         mDesc.MiscFlags = 0;
 
-        if (usage == HBU_CPU_ONLY)
+        if (useSystemMemory)
         {
             mDesc.Usage = D3D11_USAGE_STAGING;
             //A D3D11_USAGE_STAGING Resource cannot be bound to any parts of the graphics pipeline, so therefore cannot have any BindFlags bits set.
@@ -67,7 +68,7 @@ namespace Ogre {
             mDesc.BindFlags |= D3D11_BIND_STREAM_OUTPUT;
         }
 
-        if (usage == HBU_CPU_TO_GPU)
+        if (!useSystemMemory && (usage & HardwareBuffer::HBU_DYNAMIC))
         {
             // We want to be able to map this buffer
             mDesc.CPUAccessFlags |= D3D11_CPU_ACCESS_WRITE;
@@ -79,26 +80,55 @@ namespace Ogre {
         // which themselves cannot be used for input / output to the GPU. Thus
         // for any locks except write locks on dynamic resources, we have to use
         // temporary staging resources instead and use async copies.
+        // We use the 'useSystemMemory' option to indicate a staging resource
+
 
         // TODO: we can explicitly initialise the buffer contents here if we like
         // not doing this since OGRE doesn't support this model yet
-        OGRE_CHECK_DX_ERROR(device->CreateBuffer(&mDesc, NULL, mlpD3DBuffer.ReleaseAndGetAddressOf()));
+        HRESULT hr = device->CreateBuffer( &mDesc, NULL, mlpD3DBuffer.ReleaseAndGetAddressOf() );
+        if (FAILED(hr) || mDevice.isError())
+        {
+            String msg = device.getErrorDescription(hr);
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Cannot create D3D11 buffer: " + msg, 
+                "D3D11HardwareBuffer::D3D11HardwareBuffer");
+        }
 
         // Create shadow buffer
-        if (useShadowBuffer)
+        if (mUseShadowBuffer)
         {
             mShadowBuffer.reset(new D3D11HardwareBuffer(mBufferType,
-                    mSizeInBytes, HBU_CPU_ONLY, mDevice, false, false));
+                    mSizeInBytes, mUsage, mDevice, true, false, false));
         }
 
     }
     //---------------------------------------------------------------------
-    D3D11HardwareBuffer::~D3D11HardwareBuffer() {}
+    D3D11HardwareBuffer::~D3D11HardwareBuffer()
+    {
+        SAFE_DELETE(mpTempStagingBuffer); // should never be nonzero unless destroyed while locked
+        mShadowBuffer.reset();
+    }
     //---------------------------------------------------------------------
     void* D3D11HardwareBuffer::lockImpl(size_t offset, 
         size_t length, LockOptions options)
     {
-        if (mUsage == HBU_CPU_ONLY || (mUsage & HardwareBuffer::HBU_DYNAMIC &&
+        if (length > mSizeInBytes)
+        {
+            // need to realloc
+            mDesc.ByteWidth = static_cast<UINT>(mSizeInBytes);
+            HRESULT hr = mDevice->CreateBuffer(&mDesc, 0, mlpD3DBuffer.ReleaseAndGetAddressOf());
+            if (FAILED(hr) || mDevice.isError())
+            {
+                String msg = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                    "Cannot create D3D11 buffer: " + msg, 
+                    "D3D11HardwareBuffer::D3D11HardwareBuffer");
+            }
+        }
+
+
+        if (mSystemMemory ||
+            (mUsage & HardwareBuffer::HBU_DYNAMIC && 
             (options == HardwareBuffer::HBL_DISCARD || options == HardwareBuffer::HBL_NO_OVERWRITE)))
         {
             // Staging (system memory) buffers or dynamic, write-only buffers 
@@ -113,12 +143,12 @@ namespace Ogre {
             {
             case HBL_DISCARD:
                 // To use D3D11_MAP_WRITE_DISCARD resource must have been created with write access and dynamic usage.
-                mapType = mUsage == HBU_CPU_ONLY ? D3D11_MAP_WRITE : D3D11_MAP_WRITE_DISCARD;
+                mapType = mSystemMemory ? D3D11_MAP_WRITE : D3D11_MAP_WRITE_DISCARD;
                 break;
             case HBL_NO_OVERWRITE:
                 // To use D3D11_MAP_WRITE_NO_OVERWRITE resource must have been created with write access.
-                // TODO: check (D3D11_USAGE_STAGING => D3D11_MAP_WRITE_NO_OVERWRITE) combo - it`s not forbidden by MSDN
-                mapType = mUsage == HBU_CPU_ONLY ? D3D11_MAP_WRITE : D3D11_MAP_WRITE_NO_OVERWRITE;
+                // TODO: check (mSystemMemory aka D3D11_USAGE_STAGING => D3D11_MAP_WRITE_NO_OVERWRITE) combo - it`s not forbidden by MSDN
+                mapType = mSystemMemory ? D3D11_MAP_WRITE : D3D11_MAP_WRITE_NO_OVERWRITE; 
                 break;
             case HBL_NORMAL:
                 mapType = (mDesc.CPUAccessFlags & D3D11_CPU_ACCESS_READ) ? D3D11_MAP_READ_WRITE : D3D11_MAP_WRITE;
@@ -134,7 +164,14 @@ namespace Ogre {
             void * pRet = NULL;
             D3D11_MAPPED_SUBRESOURCE mappedSubResource;
             mappedSubResource.pData = NULL;
-            OGRE_CHECK_DX_ERROR(mDevice.GetImmediateContext()->Map(mlpD3DBuffer.Get(), 0, mapType, 0, &mappedSubResource));
+            HRESULT hr = mDevice.GetImmediateContext()->Map(mlpD3DBuffer.Get(), 0, mapType, 0, &mappedSubResource);
+            if (FAILED(hr) || mDevice.isError())
+            {
+                String msg = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                    "Error calling Map: " + msg, 
+                    "D3D11HardwareBuffer::lockImpl");
+            }
 
             pRet = static_cast<void*>(static_cast<char*>(mappedSubResource.pData) + offset);
 
@@ -143,44 +180,64 @@ namespace Ogre {
         }
         else
         {
-            mIsLocked = false; // locking staging buffer instead
             mUseTempStagingBuffer = true;
-            OgreAssertDbg(!mShadowBuffer,
-                          "we should never arrive here, when already having a shadow buffer");
-            // create temporary shadow buffer
-            mShadowBuffer.reset(new D3D11HardwareBuffer(mBufferType,
-                    mSizeInBytes, HBU_CPU_ONLY, mDevice, false, false));
+            if (!mpTempStagingBuffer)
+            {
+                // create another buffer instance but use system memory
+                mpTempStagingBuffer = new D3D11HardwareBuffer(mBufferType, 
+                    mSizeInBytes, mUsage, mDevice, true, false, false);
+            }
 
             // schedule a copy to the staging
             if (options != HBL_DISCARD)
-                mShadowBuffer->copyData(*this, offset, offset, length, true);
+                mpTempStagingBuffer->copyData(*this, 0, 0, mSizeInBytes, true);
 
             // register whether we'll need to upload on unlock
-            mShadowUpdated = (options != HBL_READ_ONLY);
+            mStagingUploadNeeded = (options != HBL_READ_ONLY);
 
-            return mShadowBuffer->lock(offset, length, options);
+            return mpTempStagingBuffer->lock(offset, length, options);
+
+
         }
     }
     //---------------------------------------------------------------------
     void D3D11HardwareBuffer::unlockImpl(void)
     {
-        OgreAssertDbg(!mUseTempStagingBuffer, "should be handled by _updateFromShadow");
 
-        // unmap
-        mDevice.GetImmediateContext()->Unmap(mlpD3DBuffer.Get(), 0);
+        if (mUseTempStagingBuffer)
+        {
+            mUseTempStagingBuffer = false;
+
+            // ok, we locked the staging buffer
+            mpTempStagingBuffer->unlock();
+
+            // copy data if needed
+            // this is async but driver should keep reference
+            if (mStagingUploadNeeded)
+                copyData(*mpTempStagingBuffer, 0, 0, mSizeInBytes, true);
+
+            // delete
+            // not that efficient, but we should not be locking often
+            SAFE_DELETE(mpTempStagingBuffer);
+        }
+        else
+        {
+            // unmap
+            mDevice.GetImmediateContext()->Unmap(mlpD3DBuffer.Get(), 0);
+        }
     }
     //---------------------------------------------------------------------
     void D3D11HardwareBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
         size_t dstOffset, size_t length, bool discardWholeBuffer)
     {
-		if (mShadowBuffer)
+		if (mUseShadowBuffer)
 		{
-			mShadowBuffer->copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+			static_cast<D3D11HardwareBuffer*>(mShadowBuffer.get())->copyDataImpl(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
 		}
 		copyDataImpl(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
 	}
 	//---------------------------------------------------------------------
-	void D3D11HardwareBuffer::copyDataImpl(HardwareBuffer& srcBuffer, size_t srcOffset,
+	void D3D11HardwareBuffer::copyDataImpl(HardwareBuffer& srcBuffer, size_t srcOffset, 
 		size_t dstOffset, size_t length, bool discardWholeBuffer)
 	{
         // If we're copying same-size buffers in their entirety...
@@ -222,18 +279,11 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void D3D11HardwareBuffer::_updateFromShadow(void)
 	{
-		if(mShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
+		if(mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
 		{
 			bool discardWholeBuffer = mLockStart == 0 && mLockSize == mSizeInBytes;
 			copyDataImpl(*mShadowBuffer, mLockStart, mLockStart, mLockSize, discardWholeBuffer);
 			mShadowUpdated = false;
-        }
-
-        if (mUseTempStagingBuffer)
-        {
-            // delete
-            mShadowBuffer.reset();
-            mUseTempStagingBuffer = false;
         }
     }
     //---------------------------------------------------------------------

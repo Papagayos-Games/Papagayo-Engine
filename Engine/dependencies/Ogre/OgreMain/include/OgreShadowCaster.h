@@ -125,7 +125,7 @@ namespace Ogre {
         /** Returns details of the edges which might be used to determine a silhouette. */
         virtual EdgeData* getEdgeList(void) = 0;
         /** Returns whether the object has a valid edge list. */
-        bool hasEdgeList() { return getEdgeList() != NULL; }
+        virtual bool hasEdgeList(void) = 0;
 
         /** Get the world bounding box of the caster. */
         virtual const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const = 0;

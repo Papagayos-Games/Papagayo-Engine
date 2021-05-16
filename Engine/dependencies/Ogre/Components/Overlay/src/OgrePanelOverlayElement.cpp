@@ -219,10 +219,11 @@ namespace Ogre {
             }
 
             // Also add children
-            for (const auto& p : mChildren)
+            ChildIterator it = getChildIterator();
+            while (it.hasMoreElements())
             {
                 // Give children Z-order 1 higher than this
-                p.second->_updateRenderQueue(queue);
+                it.getNext()->_updateRenderQueue(queue);
             }
         }
     }

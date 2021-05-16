@@ -537,9 +537,14 @@ namespace Ogre
                     // add the node to the render queue
                     pczsn -> _addToRenderQueue(camera, queue, onlyShadowCasters, visibleBounds );
                     // if we are displaying nodes, add the node renderable to the queue
-                    if (mPCZSM->getDebugDrawer())
+                    if ( displayNodes )
                     {
-                        mPCZSM->getDebugDrawer()->drawSceneNode(pczsn);
+                        queue -> addRenderable( pczsn->getDebugRenderable() );
+                    }
+                    // if the scene manager or the node wants the bounding box shown, add it to the queue
+                    if (pczsn->getShowBoundingBox() || showBoundingBoxes)
+                    {
+                        pczsn->_addBoundingBoxToQueue(queue);
                     }
                     // flag the node as being visible this frame
                     pczsn->setLastVisibleFrame(mLastVisibleFrame);
@@ -566,9 +571,14 @@ namespace Ogre
                     // add the node to the render queue
                     pczsn->_addToRenderQueue(camera, queue, onlyShadowCasters, visibleBounds );
                     // if we are displaying nodes, add the node renderable to the queue
-                    if (mPCZSM->getDebugDrawer())
+                    if ( displayNodes )
                     {
-                        mPCZSM->getDebugDrawer()->drawSceneNode(pczsn);
+                        queue -> addRenderable( pczsn->getDebugRenderable() );
+                    }
+                    // if the scene manager or the node wants the bounding box shown, add it to the queue
+                    if (pczsn->getShowBoundingBox() || showBoundingBoxes)
+                    {
+                        pczsn->_addBoundingBoxToQueue(queue);
                     }
                     // flag the node as being visible this frame
                     pczsn->setLastVisibleFrame(mLastVisibleFrame);

@@ -49,7 +49,6 @@ namespace Ogre {
     */
     class _OgreExport SimpleRenderable : public MovableObject, public Renderable
     {
-        bool getCastsShadows(void) const override { return getCastShadows(); }
     protected:
         RenderOperation mRenderOp;
 

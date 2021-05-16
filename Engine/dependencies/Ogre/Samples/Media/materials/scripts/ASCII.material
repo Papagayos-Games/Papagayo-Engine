@@ -1,7 +1,8 @@
-fragment_program Ogre/Compositor/ASCIIFPCg hlsl
+fragment_program Ogre/Compositor/ASCIIFPCg cg
 {
 	source ASCIIFP.cg
 	entry_point ASCII_ps
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 	
 	default_params
 	{
@@ -33,7 +34,7 @@ fragment_program Ogre/Compositor/ASCIIFPGLSL glsl
 fragment_program Ogre/Compositor/ASCIIFPGLSLES glsles
 {
 	source ASCIIFP.glsles
-	syntax glsl300es
+	syntax glsles
 	
 	default_params
 	{

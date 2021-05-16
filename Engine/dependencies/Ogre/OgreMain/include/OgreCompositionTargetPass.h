@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define __CompositionTargetPass_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreIteratorWrapper.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreHeaderPrefix.h"
 #include "OgreCompositionPass.h"
 

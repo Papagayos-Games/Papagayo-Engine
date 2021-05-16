@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "OgreGLRenderToVertexBuffer.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreGLHardwareBuffer.h"
+#include "OgreGLHardwareVertexBuffer.h"
 #include "OgreRenderable.h"
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
@@ -145,8 +145,6 @@ namespace Ogre {
 
         bindVerticesOutput(r2vbPass);
 
-        r2vbPass->_updateAutoParams(sceneMgr->_getAutoParamDataSource(), GPV_GLOBAL);
-
         RenderOperation renderOp;
         size_t targetBufferIndex;
         if (mResetRequested || mResetsEveryUpdate)
@@ -168,7 +166,7 @@ namespace Ogre {
             reallocateBuffer(targetBufferIndex);
         }
 
-        GLHardwareBuffer* vertexBuffer = mVertexBuffers[targetBufferIndex]->_getImpl<GLHardwareBuffer>();
+        GLHardwareVertexBuffer* vertexBuffer = static_cast<GLHardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].get());
         GLuint bufferId = vertexBuffer->getGLBufferId();
 
         //Bind the target buffer
@@ -257,7 +255,7 @@ namespace Ogre {
         //TODO : Implement more?
         default:
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "Unsupported vertex element semantic in render to vertex buffer",
+                "Unsupported vertex element sematic in render to vertex buffer", 
                 "OgreGLRenderToVertexBuffer::getSemanticVaryingName");
         }
     }
@@ -277,7 +275,7 @@ namespace Ogre {
         //TODO : Implement more?
         default:
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "Unsupported vertex element semantic in render to vertex buffer",
+                "Unsupported vertex element sematic in render to vertex buffer", 
                 "OgreGLRenderToVertexBuffer::getGLSemanticType");
             
         }

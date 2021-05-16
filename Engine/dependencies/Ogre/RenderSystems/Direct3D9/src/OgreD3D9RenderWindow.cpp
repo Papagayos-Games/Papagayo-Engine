@@ -730,6 +730,11 @@ namespace Ogre
             setVSyncEnabled(true);
     }
 
+    unsigned int D3D9RenderWindow::getVSyncInterval() const
+    {
+        return mVSyncInterval;
+    }
+
     void D3D9RenderWindow::reposition(int top, int left)
     {
         if (mHWnd && !mIsFullScreen)

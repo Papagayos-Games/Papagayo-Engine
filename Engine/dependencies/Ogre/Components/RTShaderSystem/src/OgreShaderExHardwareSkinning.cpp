@@ -539,7 +539,7 @@ bool HardwareSkinningFactory::imprintSkeletonData(const MaterialPtr& pMaterial, 
 
             //update the data in the material and invalidate it in the RTShader system
             //do it will be regenerated
-            binding.setUserAny(HS_DATA_BIND_NAME, data);
+            binding.setUserAny(HS_DATA_BIND_NAME, Any(data));
 
             size_t schemeCount = ShaderGenerator::getSingleton().getRTShaderSchemeCount();
             for(size_t i = 0 ; i < schemeCount ; ++i)
@@ -547,7 +547,9 @@ bool HardwareSkinningFactory::imprintSkeletonData(const MaterialPtr& pMaterial, 
                 //invalidate the material so it will be recreated with the correct
                 //amount of bones and weights
                 const String& schemeName = ShaderGenerator::getSingleton().getRTShaderScheme(i);
-                ShaderGenerator::getSingleton().invalidateMaterial(schemeName, *pMaterial);
+                ShaderGenerator::getSingleton().invalidateMaterial(
+                    schemeName, pMaterial->getName(), pMaterial->getGroup());
+
             }
 
         }

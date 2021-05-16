@@ -81,7 +81,7 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     
     // Resolve texture sampler parameter.       
-    textureUnitParams->mTextureSampler = psProgram->resolveParameter(textureUnitParams->mTextureSamplerType, "gTextureSampler", textureUnitParams->mTextureSamplerIndex);
+    textureUnitParams->mTextureSampler = psProgram->resolveParameter(textureUnitParams->mTextureSamplerType, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSampler");
 
     // Resolve texture matrix parameter.
     if (needsTextureMatrix(textureUnitParams->mTextureUnitState))
@@ -300,7 +300,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
     
             
     // Add texture sampling code.
-    ParameterPtr texel = psMain->resolveLocalParameter(GCT_FLOAT4, c_ParamTexelEx + StringConverter::toString(textureUnitParams->mTextureSamplerIndex));
+    ParameterPtr texel = psMain->resolveLocalParameter(c_ParamTexelEx + StringConverter::toString(textureUnitParams->mTextureSamplerIndex), GCT_FLOAT4);
     addPSSampleTexelInvocation(textureUnitParams, psMain, texel, FFP_PS_SAMPLING);
 
     // Build colour argument for source1.
@@ -554,12 +554,6 @@ void FFPTexturing::copyFrom(const SubRenderState& rhs)
 bool FFPTexturing::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
     mIsPointSprite = srcPass->getPointSpritesEnabled();
-
-    if (auto rs = Root::getSingleton().getRenderSystem())
-    {
-        if (mIsPointSprite && !rs->getCapabilities()->hasCapability(RSC_POINT_SPRITES))
-            return false;
-    }
 
     //count the number of texture units we need to process
     size_t validTexUnits = 0;

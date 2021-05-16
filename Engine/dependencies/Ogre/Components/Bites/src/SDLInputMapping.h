@@ -1,7 +1,9 @@
-// This file is part of the OGRE project.
-// It is subject to the license terms in the LICENSE file found in the top-level directory
-// of this distribution and at https://www.ogre3d.org/licensing.
-// SPDX-License-Identifier: MIT
+/*
+ * Input.h
+ *
+ *  Created on: 05.12.2015
+ *      Author: pavel
+ */
 
 #ifndef BITES_SDL_INPUTMAPPING
 #define BITES_SDL_INPUTMAPPING
@@ -67,21 +69,6 @@ namespace {
         case SDL_TEXTINPUT:
             out.type = OgreBites::TEXTINPUT;
             out.text.chars = in.text.text;
-            break;
-        case SDL_CONTROLLERAXISMOTION:
-            out.type = OgreBites::CONTROLLERAXISMOTION;
-            out.axis.which = in.caxis.which;
-            out.axis.axis = in.caxis.axis;
-            out.axis.value = in.caxis.value;
-            break;
-        case SDL_CONTROLLERBUTTONDOWN:
-            out.type = OgreBites::CONTROLLERBUTTONDOWN;
-            OGRE_FALLTHROUGH;
-        case SDL_CONTROLLERBUTTONUP:
-            if(!out.type)
-                out.type = OgreBites::CONTROLLERBUTTONUP;
-            out.cbutton.which = in.cbutton.which;
-            out.cbutton.button = in.cbutton.button;
             break;
         }
 

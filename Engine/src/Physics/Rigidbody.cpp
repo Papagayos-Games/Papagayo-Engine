@@ -24,6 +24,8 @@
 #include <OgreSceneNode.h>
 #include "OgreContext.h"
 #include "MeshStrider.h"
+#include <Managers/SceneManager.h>
+#include <Scene/Scene.h>
 
 inline Vector3 convertVector(const btVector3& V) {
 	return Vector3(V.x(), V.y(), V.z());
@@ -444,8 +446,8 @@ bool RigidBody::onCollisionEnter(const std::string& id) const
 	//Devuelve true en caso de existir colision
 	if (_active) {
 		//Se obtiene la entidad de la escena y se comprueba la colision
-		//Entity* other = scene_->getEntityById(id);
-		//return collidesWithEntity(other);
+		Entity* other = SceneManager::getInstance()->getCurrentScene()->getEntity(id);
+		return collidesWithEntity(other);
 	}
 
 	return false;

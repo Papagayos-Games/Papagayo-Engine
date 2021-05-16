@@ -141,7 +141,6 @@ namespace Ogre {
         bool newMaterialCreated = false;
         // if submesh has texture aliases
         // ask the material manager if the current submesh material exists
-        OGRE_IGNORE_DEPRECATED_BEGIN
         if (hasTextureAliases() && mMaterial)
         {
             // get the current submesh material
@@ -187,7 +186,6 @@ namespace Ogre {
                 newMaterialCreated = true;
             }
         }
-        OGRE_IGNORE_DEPRECATED_END
 
         return newMaterialCreated;
     }

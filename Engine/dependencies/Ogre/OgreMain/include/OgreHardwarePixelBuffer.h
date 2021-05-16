@@ -60,7 +60,6 @@ namespace Ogre {
         PixelFormat mFormat;
         /// Currently locked region (local coords)
         PixelBox mCurrentLock;
-        LockOptions mCurrentLockOptions;
         /// The current locked box of this surface (entire surface coords)
         Box mLockedBox;
 
@@ -95,15 +94,9 @@ namespace Ogre {
             @return PixelBox containing the locked region, the pitches and
                 the pixel format
         */
-        const PixelBox& lock(const Box& lockBox, LockOptions options);
-        /** @copydoc HardwareBuffer::lock
-            @attention this method returns a pointer to the raw buffer storage, which is likely not what you
-           want. The RenderSystem is free to add padding, which you have to query from @ref getCurrentLock()
-           and apply during copying. Prefer @ref blitFromMemory, which correctly
-           handles copying in this case
-           @see @ref Updating-Pixel-Buffers
-         */
-        void* lock(size_t offset, size_t length, LockOptions options) override;
+        virtual const PixelBox& lock(const Box& lockBox, LockOptions options);
+        /// @copydoc HardwareBuffer::lock
+        virtual void* lock(size_t offset, size_t length, LockOptions options);
 
         /** Get the current locked region. This is the same value as returned
             by lock(const Box, LockOptions)

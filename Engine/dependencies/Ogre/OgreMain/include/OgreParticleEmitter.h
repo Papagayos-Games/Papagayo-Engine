@@ -72,12 +72,8 @@ namespace Ogre {
     protected:
         /// Parent particle system
         ParticleSystem* mParent;
-
         /// Position relative to the center of the ParticleSystem
-        // inherited: Vector3 mPosition;
-        // Note, that position of the emitter becomes a position in worldspace if mLocalSpace is set
-        // to false (will this become a problem?)
-
+        Vector3 mPosition;
         /// Rate in particles per second at which this emitter wishes to emit particles
         Real mEmissionRate;
         /// Name of the type of emitter, MUST be initialised by subclasses

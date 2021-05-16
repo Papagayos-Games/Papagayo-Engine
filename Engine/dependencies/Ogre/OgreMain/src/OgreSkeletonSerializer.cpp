@@ -94,8 +94,11 @@ namespace Ogre {
         }
 
         // Write links
-        for(const auto& link : pSkeleton->getLinkedSkeletonAnimationSources())
+        Skeleton::LinkedSkeletonAnimSourceIterator linkIt = 
+            pSkeleton->getLinkedSkeletonAnimationSourceIterator();
+        while(linkIt.hasMoreElements())
         {
+            const LinkedSkeletonAnimationSource& link = linkIt.getNext();
             writeSkeletonAnimationLink(pSkeleton, link);
         }       
         popInnerChunk(stream);
@@ -275,9 +278,10 @@ namespace Ogre {
         }
 
         // Write all tracks
-        for (const auto& it : anim->_getNodeTrackList())
+        Animation::NodeTrackIterator trackIt = anim->getNodeTrackIterator();
+        while(trackIt.hasMoreElements())
         {
-            writeAnimationTrack(pSkel, it.second);
+            writeAnimationTrack(pSkel, trackIt.getNext());
         }
         }
         popInnerChunk(mStream);
@@ -392,9 +396,10 @@ namespace Ogre {
         }
 
         // Nested animation tracks
-        for (const auto& it : pAnim->_getNodeTrackList())
+        Animation::NodeTrackIterator trackIt = pAnim->getNodeTrackIterator();
+        while(trackIt.hasMoreElements())
         {
-            size += calcAnimationTrackSize(pSkel, it.second);
+            size += calcAnimationTrackSize(pSkel, trackIt.getNext());
         }
 
         return size;

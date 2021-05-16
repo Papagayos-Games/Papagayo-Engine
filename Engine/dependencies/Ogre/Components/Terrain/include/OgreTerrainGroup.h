@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreTerrainPrerequisites.h"
 #include "OgreTerrain.h"
 #include "OgreWorkQueue.h"
-#include "OgreIteratorWrapper.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreConfigFile.h"
 
 namespace Ogre
@@ -246,14 +246,15 @@ namespace Ogre
 
         /** Load any terrain instances that have been defined but not loaded yet. 
         @param synchronous Whether we should force this to happen entirely in the
-            primary thread
+            primary thread (default false, operations are threaded if possible)
         */
         virtual void loadAllTerrains(bool synchronous = false);
         
         /** Load a specific terrain slot based on the definition that has already 
             been supplied.
         @param x, y The coordinates of the terrain slot relative to the centre slot (signed).
-        @copydetails loadAllTerrains
+        @param synchronous Whether we should force this to happen entirely in the
+            primary thread (default false, operations are threaded if possible)
         */
         virtual void loadTerrain(long x, long y, bool synchronous = false);
         
@@ -263,7 +264,6 @@ namespace Ogre
          * @attention not all of the legacy parameters/ parameter combinations are supported
          * @param cfgFilename .cfg file that specifices what textures/scale/mipmaps/etc to use.
          * @param x, y The coordinates of the terrain slot relative to the centre slot (signed).
-         * @copydetails loadAllTerrains
          */
         void loadLegacyTerrain(const String& cfgFilename, long x = 0, long y = 0, bool synchronous = true);
 
@@ -566,7 +566,7 @@ namespace Ogre
         {
             TerrainSlot* slot;
             TerrainGroup* origin;
-            OGRE_DEPRECATED _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const LoadRequest& r)
+            _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const LoadRequest& r)
             { return o; }       
         };
         

@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 #include "OgreRenderTarget.h"
 #include "OgreDepthBuffer.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreHardwareOcclusionQuery.h"
 #include "OgreComponents.h"
 
@@ -196,12 +197,10 @@ namespace Ogre {
             miscParams.emplace("FSAA", std::to_string(fsaa));
 
             // D3D specific
+            String hint;
+            fsaaMode >> hint;
             if(!fsaaMode.eof())
-            {
-                String hint;
-                fsaaMode >> hint;
                 miscParams.emplace("FSAAHint", hint);
-            }
         }
 
         if((opt = mOptions.find("VSync")) != end)
@@ -221,15 +220,6 @@ namespace Ogre {
 
         if((opt = mOptions.find("Content Scaling Factor")) != end)
             miscParams["contentScalingFactor"] = opt->second.currentValue;
-
-        if((opt = mOptions.find("Rendering Device")) != end)
-        {
-            // try to parse "Monitor-NN-"
-            auto start = opt->second.currentValue.find('-') + 1;
-            auto len = opt->second.currentValue.find('-', start) - start;
-            if(start != String::npos)
-                miscParams["monitorIndex"] = opt->second.currentValue.substr(start, len);
-        }
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
         if((opt = mOptions.find("Stereo Mode")) != end)
@@ -318,38 +308,6 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------------------------------
-    RenderWindow* RenderSystem::_createRenderWindow(const String& name, unsigned int width,
-                                                    unsigned int height, bool fullScreen,
-                                                    const NameValuePairList* miscParams)
-    {
-        if (mRenderTargets.find(name) != mRenderTargets.end())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Window with name '" + name + "' already exists");
-        }
-
-        // Log a message
-        StringStream ss;
-        ss << "RenderSystem::_createRenderWindow \"" << name << "\", " <<
-            width << "x" << height << " ";
-        if (fullScreen)
-            ss << "fullscreen ";
-        else
-            ss << "windowed ";
-
-        if (miscParams)
-        {
-            ss << " miscParams: ";
-            NameValuePairList::const_iterator it;
-            for (const auto& p : *miscParams)
-            {
-                ss << p.first << "=" << p.second << " ";
-            }
-        }
-        LogManager::getSingleton().logMessage(ss.str());
-
-        return NULL;
-    }
-
     bool RenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
         RenderWindowList& createdWindows)
     {
@@ -402,19 +360,6 @@ namespace Ogre {
                     "Can not create mix of full screen and windowed rendering windows",
                     "RenderSystem::createRenderWindows");
             }                   
-        }
-
-        // Simply call _createRenderWindow in a loop.
-        for (const auto& curRenderWindowDescription : renderWindowDescriptions)
-        {
-            RenderWindow* curWindow = NULL;
-            curWindow = _createRenderWindow(curRenderWindowDescription.name,
-                                            curRenderWindowDescription.width,
-                                            curRenderWindowDescription.height,
-                                            curRenderWindowDescription.useFullScreen,
-                                            &curRenderWindowDescription.miscParams);
-
-            createdWindows.push_back(curWindow);
         }
 
         return true;
@@ -622,11 +567,9 @@ namespace Ogre {
     void RenderSystem::_setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
             FilterOptions magFilter, FilterOptions mipFilter)
     {
-        OGRE_IGNORE_DEPRECATED_BEGIN
         _setTextureUnitFiltering(unit, FT_MIN, minFilter);
         _setTextureUnitFiltering(unit, FT_MAG, magFilter);
         _setTextureUnitFiltering(unit, FT_MIP, mipFilter);
-        OGRE_IGNORE_DEPRECATED_END
     }
     //---------------------------------------------------------------------
     void RenderSystem::_cleanupDepthBuffers( bool bCleanManualBuffers )
@@ -652,11 +595,6 @@ namespace Ogre {
         }
 
         mDepthBufferPool.clear();
-    }
-    void RenderSystem::_beginFrame(void)
-    {
-        if (!mActiveViewport)
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Cannot begin frame - no viewport selected.");
     }
     //-----------------------------------------------------------------------
     CullingMode RenderSystem::_getCullingMode(void) const
@@ -704,12 +642,6 @@ namespace Ogre {
         return mIsReverseDepthBufferEnabled;
     }
     //-----------------------------------------------------------------------
-    void RenderSystem::reinitialise()
-    {
-        shutdown();
-        _initialise();
-    }
-
     void RenderSystem::shutdown(void)
     {
         // Remove occlusion queries
@@ -786,9 +718,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::convertColourValue(const ColourValue& colour, uint32* pDest)
     {
-        OGRE_IGNORE_DEPRECATED_BEGIN
         *pDest = VertexElement::convertColourValue(colour, getColourVertexElementType());
-        OGRE_IGNORE_DEPRECATED_END
+
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_render(const RenderOperation& op)
@@ -875,13 +806,6 @@ namespace Ogre {
     {
         if (mCurrentPassIterationCount <= 1)
             return false;
-
-        // Update derived depth bias
-        if (mDerivedDepthBias)
-        {
-            _setDepthBias(mDerivedDepthBiasBase + mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
-                          mDerivedDepthBiasSlopeScale);
-        }
 
         --mCurrentPassIterationCount;
         ++mCurrentPassIterationNum;
@@ -1138,16 +1062,6 @@ namespace Ogre {
         optVSync.possibleValues.push_back("Yes");
         optVSync.currentValue = optVSync.possibleValues[1];
         mOptions[optVSync.name] = optVSync;
-
-        ConfigOption optVSyncInterval;
-        optVSyncInterval.name = "VSync Interval";
-        optVSyncInterval.immutable = false;
-        optVSyncInterval.possibleValues.push_back("1");
-        optVSyncInterval.possibleValues.push_back("2");
-        optVSyncInterval.possibleValues.push_back("3");
-        optVSyncInterval.possibleValues.push_back("4");
-        optVSyncInterval.currentValue = optVSyncInterval.possibleValues[0];
-        mOptions[optVSyncInterval.name] = optVSyncInterval;
 
         ConfigOption optSRGB;
         optSRGB.name = "sRGB Gamma Conversion";

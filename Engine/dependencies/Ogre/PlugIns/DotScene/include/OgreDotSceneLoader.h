@@ -9,7 +9,6 @@
 #include <OgreSceneLoader.h>
 #include <OgreString.h>
 #include <OgrePlugin.h>
-#include <OgreCodec.h>
 
 namespace pugi
 {
@@ -21,6 +20,7 @@ namespace Ogre
 {
 class SceneManager;
 class SceneNode;
+class TerrainGroup;
 
 class _OgreDotScenePluginExport DotSceneLoader : public Ogre::SceneLoader
 {
@@ -29,6 +29,8 @@ public:
     virtual ~DotSceneLoader();
 
     void load(Ogre::DataStreamPtr& stream, const Ogre::String& groupName, Ogre::SceneNode* rootNode);
+
+    Ogre::TerrainGroup* getTerrainGroup() { return mTerrainGroup.get(); }
 
     const Ogre::ColourValue& getBackgroundColour() { return mBackgroundColour; }
 
@@ -63,6 +65,7 @@ protected:
     Ogre::SceneManager* mSceneMgr;
     Ogre::SceneNode* mAttachNode;
     Ogre::String m_sGroupName;
+    std::unique_ptr<TerrainGroup> mTerrainGroup;
     Ogre::ColourValue mBackgroundColour;
 };
 
@@ -74,8 +77,8 @@ class DotScenePlugin : public Plugin
     void initialise();
     void shutdown();
     void uninstall() {}
-private:
-    Codec* mCodec;
+protected:
+    SceneLoader* mDotSceneLoader;
 };
 } // namespace Ogre
 #endif // DOT_SCENELOADER_H

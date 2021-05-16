@@ -64,7 +64,7 @@ namespace Ogre
         const Camera& cam, const Light& light, Affine3 *out_view, Matrix4 *out_proj,
         Camera *out_cam) const
     {
-        // get the shadow far distance
+        // get the shadow frustum's far distance
         Real shadowDist = light.getShadowFarDistance();
         if (!shadowDist)
         {
@@ -136,7 +136,7 @@ namespace Ogre
                 mTempFrustum->setFOVy(Degree(120));
 
                 mTempFrustum->setNearClipDistance(light._deriveShadowNearClipDistance(&cam));
-                mTempFrustum->setFarClipDistance(light._deriveShadowFarClipDistance());
+                mTempFrustum->setFarClipDistance(light._deriveShadowFarClipDistance(&cam));
 
                 *out_proj = mTempFrustum->getProjectionMatrix();
             }
@@ -149,7 +149,7 @@ namespace Ogre
                 out_cam->getParentSceneNode()->setPosition(light.getDerivedPosition());
                 out_cam->setFOVy(Degree(120));
                 out_cam->setNearClipDistance(light._deriveShadowNearClipDistance(&cam));
-                out_cam->setFarClipDistance(light._deriveShadowFarClipDistance());
+                out_cam->setFarClipDistance(light._deriveShadowFarClipDistance(&cam));
             }
         }
         else if (light.getType() == Light::LT_SPOTLIGHT)
@@ -169,7 +169,7 @@ namespace Ogre
                 mTempFrustum->setFOVy(Ogre::Math::Clamp<Radian>(light.getSpotlightOuterAngle() * 1.2, Radian(0), Radian(Math::PI/2.0f)));
 
                 mTempFrustum->setNearClipDistance(light._deriveShadowNearClipDistance(&cam));
-                mTempFrustum->setFarClipDistance(light._deriveShadowFarClipDistance());
+                mTempFrustum->setFarClipDistance(light._deriveShadowFarClipDistance(&cam));
 
                 *out_proj = mTempFrustum->getProjectionMatrix();
             }
@@ -182,7 +182,7 @@ namespace Ogre
                 out_cam->getParentSceneNode()->setPosition(light.getDerivedPosition());
                 out_cam->setFOVy(Ogre::Math::Clamp<Radian>(light.getSpotlightOuterAngle() * 1.2, Radian(0), Radian(Math::PI/2.0f)));
                 out_cam->setNearClipDistance(light._deriveShadowNearClipDistance(&cam));
-                out_cam->setFarClipDistance(light._deriveShadowFarClipDistance());
+                out_cam->setFarClipDistance(light._deriveShadowFarClipDistance(&cam));
             }
         }
     }
@@ -245,7 +245,7 @@ namespace Ogre
         {
             // For directional lights, all we care about is projecting the receivers
             // backwards towards the light, clipped by the camera region
-            mBodyB.clip(receiverBB.intersection(sceneBB));
+            mBodyB.clip(receiverBB);
 
             // Also clip based on shadow far distance if appropriate
             Real farDist = light.getShadowFarDistance();
@@ -387,11 +387,16 @@ namespace Ogre
     Affine3 FocusedShadowCameraSetup::buildViewMatrix(const Vector3& pos, const Vector3& dir,
         const Vector3& up) const
     {
-        Matrix3 Rt = Math::lookRotation(-dir, up).transpose();
-        Matrix4 m;
-        m = Rt;
-        m.setTrans(-Rt * pos);
-        return Affine3(m); // make sure projective part is identity
+        Vector3 xN = dir.crossProduct(up);
+        xN.normalise();
+        Vector3 upN = xN.crossProduct(dir);
+        upN.normalise();
+
+        Affine3 m(xN.x,     xN.y,       xN.z,       -xN.dotProduct(pos),
+            upN.x,      upN.y,      upN.z,      -upN.dotProduct(pos),
+            -dir.x,     -dir.y, -dir.z, dir.dotProduct(pos));
+
+        return m;
     }
     //-----------------------------------------------------------------------
     void FocusedShadowCameraSetup::getShadowCamera (const SceneManager *sm, const Camera *cam, 
@@ -405,7 +410,7 @@ namespace Ogre
         mLightFrustumCameraCalculated = false;
 
         texCam->setNearClipDistance(light->_deriveShadowNearClipDistance(cam));
-        texCam->setFarClipDistance(light->_deriveShadowFarClipDistance());
+        texCam->setFarClipDistance(light->_deriveShadowFarClipDistance(cam));
 
         // calculate standard shadow mapping matrix
         Affine3 LView; Matrix4 LProj;
@@ -415,6 +420,7 @@ namespace Ogre
         const VisibleObjectsBoundsInfo& visInfo = sm->getVisibleObjectsBoundsInfo(texCam);
         AxisAlignedBox sceneBB = visInfo.aabb;
         AxisAlignedBox receiverAABB = sm->getVisibleObjectsBoundsInfo(cam).receiverAabb;
+        sceneBB.merge(receiverAABB);
         sceneBB.merge(cam->getDerivedPosition());
 
         // in case the sceneBB is empty (e.g. nothing visible to the cam) simply

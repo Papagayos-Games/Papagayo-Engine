@@ -66,10 +66,10 @@ typedef long HRESULT;
 
 namespace Ogre
 {
-    /** \addtogroup RenderSystems
+    /** \addtogroup Core
     *  @{
     */
-    /** \addtogroup Direct3D11
+    /** \addtogroup General
     *  @{
     */
 

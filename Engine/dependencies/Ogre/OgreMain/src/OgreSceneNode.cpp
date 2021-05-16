@@ -84,9 +84,9 @@ namespace Ogre {
         {
             mIsInSceneGraph = inGraph;
             // Tell children
-            for (auto child : getChildren())
+            for (ChildNodeMap::iterator child = mChildren.begin(); child != mChildren.end(); ++child)
             {
-                SceneNode* sceneChild = static_cast<SceneNode*>(child);
+                SceneNode* sceneChild = static_cast<SceneNode*>(*child);
                 sceneChild->setInSceneGraph(inGraph);
             }
         }
@@ -246,9 +246,10 @@ namespace Ogre {
         }
 
         // Merge with children
-        for (auto child : getChildren())
+        ChildNodeMap::iterator child;
+        for (child = mChildren.begin(); child != mChildren.end(); ++child)
         {
-            SceneNode* sceneChild = static_cast<SceneNode*>(child);
+            SceneNode* sceneChild = static_cast<SceneNode*>(*child);
             mWorldAABB.merge(sceneChild->mWorldAABB);
         }
 
@@ -274,18 +275,31 @@ namespace Ogre {
 
         if (includeChildren)
         {
-            for (auto child : getChildren())
+            ChildNodeMap::iterator child, childend;
+            childend = mChildren.end();
+            for (child = mChildren.begin(); child != childend; ++child)
             {
-                SceneNode* sceneChild = static_cast<SceneNode*>(child);
+                SceneNode* sceneChild = static_cast<SceneNode*>(*child);
                 sceneChild->_findVisibleObjects(cam, queue, visibleBounds, includeChildren, 
                     displayNodes, onlyShadowCasters);
             }
         }
 
-        if (mCreator && mCreator->getDebugDrawer())
+        if (displayNodes)
         {
-            mCreator->getDebugDrawer()->drawSceneNode(this);
+            // Include self in the render queue
+            queue->addRenderable(getDebugRenderable());
         }
+
+        // Check if the bounding box should be shown.
+        // See if our flag is set or if the scene manager flag is set.
+        if ( !mHideBoundingBox &&
+             (mShowBoundingBox || (mCreator && mCreator->getShowBoundingBoxes())) )
+        { 
+            _addBoundingBoxToQueue(queue);
+        }
+
+
     }
 
     Node::DebugRenderable* SceneNode::getDebugRenderable()
@@ -294,9 +308,7 @@ namespace Ogre {
         Real sz = std::min(hs.x, hs.y);
         sz = std::min(sz, hs.z);
         sz = std::max(sz, (Real)1.0);
-        OGRE_IGNORE_DEPRECATED_BEGIN
         return Node::getDebugRenderable(sz);
-        OGRE_IGNORE_DEPRECATED_END
     }
 
 
@@ -315,9 +327,9 @@ namespace Ogre {
         Node::updateFromParentImpl();
 
         // Notify objects that it has been moved
-        for (auto o : mObjectsByName)
+        for (ObjectMap::const_iterator i = mObjectsByName.begin(); i != mObjectsByName.end(); ++i)
         {
-            o->_notifyMoved();
+            (*i)->_notifyMoved();
         }
     }
     //-----------------------------------------------------------------------
@@ -345,7 +357,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyChild(unsigned short index)
     {
-        SceneNode* pChild = static_cast<SceneNode*>(getChildren()[index]);
+        SceneNode* pChild = static_cast<SceneNode*>(mChildren[index]);
         pChild->removeAndDestroyAllChildren();
 
         removeChild(index);
@@ -354,16 +366,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyChild(SceneNode* child)
     {
-        removeAndDestroyChild(std::find(getChildren().begin(), getChildren().end(), child) -
-                              getChildren().begin());
+        removeAndDestroyChild(std::find(mChildren.begin(), mChildren.end(), child) - mChildren.begin());
     }
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyAllChildren(void)
     {
         // do not store iterators (invalidated by
         // SceneManager::destroySceneNode because it causes removal from parent)
-        while(!getChildren().empty()) {
-            SceneNode* sn = static_cast<SceneNode*>(getChildren().front());
+        while(!mChildren.empty()) {
+            SceneNode* sn = static_cast<SceneNode*>(*mChildren.begin());
             sn->removeAndDestroyAllChildren();
             sn->getCreator()->destroySceneNode(sn);
         }
@@ -462,11 +473,11 @@ namespace Ogre {
         switch (relativeTo)
         {
         case TS_PARENT:
-            if (getInheritOrientation())
+            if (mInheritOrientation)
             {
-                if (getParent())
+                if (mParent)
                 {
-                    targetDir = getParent()->_getDerivedOrientation() * targetDir;
+                    targetDir = mParent->_getDerivedOrientation() * targetDir;
                 }
             }
             break;
@@ -485,12 +496,16 @@ namespace Ogre {
             // Calculate the quaternion for rotate local Z to target direction
             Vector3 yawAxis = mYawFixedAxis;
 
-            if (getInheritOrientation() && getParent())
+            if (mInheritOrientation && mParent)
             {
-                yawAxis = getParent()->_getDerivedOrientation() * yawAxis;
+                yawAxis = mParent->_getDerivedOrientation() * yawAxis;
             }
 
-            Quaternion unitZToTarget = Math::lookRotation(targetDir, yawAxis);
+            Vector3 xVec = yawAxis.crossProduct(targetDir);
+            xVec.normalise();
+            Vector3 yVec = targetDir.crossProduct(xVec);
+            yVec.normalise();
+            Quaternion unitZToTarget = Quaternion(xVec, yVec, targetDir);
 
             if (localDirectionVector == Vector3::NEGATIVE_UNIT_Z)
             {
@@ -528,8 +543,8 @@ namespace Ogre {
         }
 
         // Set target orientation, transformed to parent space
-        if (getParent() && getInheritOrientation())
-            setOrientation(getParent()->_getDerivedOrientation().UnitInverse() * targetOrientation);
+        if (mParent && mInheritOrientation)
+            setOrientation(mParent->_getDerivedOrientation().UnitInverse() * targetOrientation);
         else
             setOrientation(targetOrientation);
     }
@@ -546,7 +561,7 @@ namespace Ogre {
             origin = _getDerivedPosition();
             break;
         case TS_PARENT:
-            origin = getPosition();
+            origin = mPosition;
             break;
         case TS_LOCAL:
             origin = Vector3::ZERO;
@@ -573,50 +588,62 @@ namespace Ogre {
         return static_cast<SceneNode*>(getParent());
     }
     //-----------------------------------------------------------------------
-    void SceneNode::setVisible(bool visible, bool cascade) const
+    void SceneNode::setVisible(bool visible, bool cascade)
     {
-        for (auto o : mObjectsByName)
+        ObjectMap::iterator oi, oiend;
+        oiend = mObjectsByName.end();
+        for (oi = mObjectsByName.begin(); oi != oiend; ++oi)
         {
-            o->setVisible(visible);
+            (*oi)->setVisible(visible);
         }
 
         if (cascade)
         {
-            for (auto c : getChildren())
+            ChildNodeMap::iterator i, iend;
+            iend = mChildren.end();
+            for (i = mChildren.begin(); i != iend; ++i)
             {
-                static_cast<SceneNode*>(c)->setVisible(visible, cascade);
+                static_cast<SceneNode*>(*i)->setVisible(visible, cascade);
             }
         }
     }
     //-----------------------------------------------------------------------
-    void SceneNode::setDebugDisplayEnabled(bool enabled, bool cascade) const
+    void SceneNode::setDebugDisplayEnabled(bool enabled, bool cascade)
     {
-        for (auto o : mObjectsByName)
+        ObjectMap::iterator oi, oiend;
+        oiend = mObjectsByName.end();
+        for (oi = mObjectsByName.begin(); oi != oiend; ++oi)
         {
-            o->setDebugDisplayEnabled(enabled);
+            (*oi)->setDebugDisplayEnabled(enabled);
         }
 
         if (cascade)
         {
-            for (auto c : getChildren())
+            ChildNodeMap::iterator i, iend;
+            iend = mChildren.end();
+            for (i = mChildren.begin(); i != iend; ++i)
             {
-                static_cast<SceneNode*>(c)->setDebugDisplayEnabled(enabled, cascade);
+                static_cast<SceneNode*>(*i)->setDebugDisplayEnabled(enabled, cascade);
             }
         }
     }
     //-----------------------------------------------------------------------
-    void SceneNode::flipVisibility(bool cascade) const
+    void SceneNode::flipVisibility(bool cascade)
     {
-        for (auto o : mObjectsByName)
+        ObjectMap::iterator oi, oiend;
+        oiend = mObjectsByName.end();
+        for (oi = mObjectsByName.begin(); oi != oiend; ++oi)
         {
-            o->setVisible(!o->getVisible());
+            (*oi)->setVisible(!(*oi)->getVisible());
         }
 
         if (cascade)
         {
-            for (auto c : getChildren())
+            ChildNodeMap::iterator i, iend;
+            iend = mChildren.end();
+            for (i = mChildren.begin(); i != iend; ++i)
             {
-                static_cast<SceneNode*>(c)->flipVisibility(cascade);
+                static_cast<SceneNode*>((*i))->flipVisibility(cascade);
             }
         }
     }

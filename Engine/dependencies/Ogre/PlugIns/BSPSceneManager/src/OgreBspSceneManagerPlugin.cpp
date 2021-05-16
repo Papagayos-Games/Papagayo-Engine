@@ -28,37 +28,16 @@ THE SOFTWARE.
 
 #include "OgreBspSceneManagerPlugin.h"
 #include "OgreRoot.h"
-#include "OgreCodec.h"
-#include "OgreQuake3ShaderManager.h"
 
 namespace Ogre 
 {
-namespace {
-    struct BspSceneCodec : public Codec
-    {
-        String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const { return ""; }
-        String getType() const override { return "bsp"; }
-        void decode(const DataStreamPtr& stream, const Any& output) const override
-        {
-            auto group = ResourceGroupManager::getSingleton().getWorldResourceGroupName();
-            auto rootNode = any_cast<SceneNode*>(output);
-            BspSceneManager* mgr = dynamic_cast<BspSceneManager*>(rootNode->getCreator());
-
-            OgreAssert(mgr, "only loading into a BspSceneManager supported");
-
-            mgr->setLevel(BspLevelPtr()); // clear
-
-            auto bspLevel = std::make_shared<BspLevel>(nullptr, "bsplevel", 0, group, false, nullptr);
-            bspLevel->load(stream);
-
-            mgr->setLevel(bspLevel);
-        }
-    };
-}
     const String sPluginName = "BSP Scene Manager";
     //---------------------------------------------------------------------
-    BspSceneManagerPlugin::BspSceneManagerPlugin() : mBspFactory(0) {}
-    BspSceneManagerPlugin::~BspSceneManagerPlugin() {}
+    BspSceneManagerPlugin::BspSceneManagerPlugin()
+        :mBspFactory(0), mBspSceneLoader(0)
+    {
+
+    }
     //---------------------------------------------------------------------
     const String& BspSceneManagerPlugin::getName() const
     {
@@ -76,12 +55,8 @@ namespace {
     {
         // Register (factory not dependent on rsys resources)
         Root::getSingleton().addSceneManagerFactory(mBspFactory);
-
-        // Also create related shader manager (singleton managed)
-        mShaderMgr = OGRE_NEW Quake3ShaderManager();
-
-        mCodec.reset(new BspSceneCodec());
-        Codec::registerCodec(mCodec.get());
+        // Create resource manager (registers itself)
+        mBspSceneLoader = new BspSceneLoader();
     }
     //---------------------------------------------------------------------
     void BspSceneManagerPlugin::shutdown()
@@ -89,10 +64,10 @@ namespace {
         // Unregister SM factory
         Root::getSingleton().removeSceneManagerFactory(mBspFactory);
 
-        Codec::unregisterCodec(mCodec.get());
-        mCodec.reset();
+        // delete resource manager, will unregister itself
+        OGRE_DELETE mBspSceneLoader;
+        mBspSceneLoader = 0;
 
-        OGRE_DELETE mShaderMgr;
     }
     //---------------------------------------------------------------------
     void BspSceneManagerPlugin::uninstall()

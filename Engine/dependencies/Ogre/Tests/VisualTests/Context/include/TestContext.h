@@ -51,8 +51,6 @@ class TestContext : public OgreBites::SampleContext
     /** Does basic setup for the context */
     virtual void setup();
 
-    bool frameRenderingQueued(const Ogre::FrameEvent& evt);
-
     /** Frame listener callback, handles updating of the tests at the start of frames
      *        @param evt The frame event (passed in for the framelistener) */
     virtual bool frameStarted(const FrameEvent& evt);
@@ -96,6 +94,8 @@ class TestContext : public OgreBites::SampleContext
     /** Gets the current timestep value */
     Real getTimestep();
 
+    VisualTest* getCurrentTest() { return mCurrentTest; }
+
     /// Returns whether the entire test was successful or not.
     bool wasSuccessful() const {
         return mSuccess;
@@ -122,8 +122,11 @@ class TestContext : public OgreBites::SampleContext
     /// Path to the reference set location
     String mReferenceSetPath;
 
+    /// The active test (0 if none is active)
+    VisualTest* mCurrentTest;
+
     /// The current frame of a running test
-    int mCurrentFrame;
+    unsigned int mCurrentFrame;
 
     /// Info about the running batch of tests
     TestBatch* mBatch;
@@ -279,7 +282,7 @@ class TestContext : public OgreBites::SampleContext
                        Root::getSingleton().renderOneFrame((Real)differenceInSeconds);
                    });
 
-    if(Root::getSingletonPtr() && Root::getSingleton().isInitialised() && !tc->getCurrentSample())
+    if(Root::getSingletonPtr() && Root::getSingleton().isInitialised() && !tc->getCurrentTest())
     {
         tc->finishedTests();
 

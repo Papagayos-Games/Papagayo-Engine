@@ -172,7 +172,7 @@ public:
         return _getParameterByContent(mOutputParameters, content, type);
     }
 
-    /// @deprecated local parameters do not have index or semantic. use resolveLocalParameter(const String&, GpuConstantType)
+    /// @deprecated local parameters do not have index or sematic. use resolveLocalParameter(const String&, GpuConstantType)
     ParameterPtr resolveLocalParameter(Parameter::Semantic semantic, int index, const String& name, GpuConstantType type);
 
     /** Resolve local parameter of this function    
@@ -180,18 +180,12 @@ public:
     @param type The type of the desired parameter.  
     Return parameter instance in case of that resolve operation succeeded.
     */
-    ParameterPtr resolveLocalParameter(GpuConstantType type, const String& name)
+    ParameterPtr resolveLocalParameter(const String& name, GpuConstantType type)
     {
         return resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, name, type);
     }
 
-    /// @deprecated
-    OGRE_DEPRECATED ParameterPtr resolveLocalParameter(const String& name, GpuConstantType type)
-    {
-        return resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, name, type);
-    }
-
-    /// @deprecated local parameters do not have index or semantic. use resolveLocalParameter(const String&, GpuConstantType)
+    /// @deprecated local parameters do not have index or sematic. use resolveLocalParameter(const String&, GpuConstantType)
     ParameterPtr resolveLocalParameter(Parameter::Semantic semantic, int index, const Parameter::Content content, GpuConstantType type);
 
     /** Resolve local parameter of this function

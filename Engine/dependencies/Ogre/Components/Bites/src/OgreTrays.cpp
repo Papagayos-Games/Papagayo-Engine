@@ -32,9 +32,11 @@ void Widget::nukeOverlayElement(Ogre::OverlayElement *element)
     if (container)
     {
         std::vector<Ogre::OverlayElement*> toDelete;
-        for (const auto& p : container->getChildren())
+
+        Ogre::OverlayContainer::ChildIterator children = container->getChildIterator();
+        while (children.hasMoreElements())
         {
-            toDelete.push_back(p.second);
+            toDelete.push_back(children.getNext());
         }
 
         for (unsigned int i = 0; i < toDelete.size(); i++)
@@ -677,7 +679,7 @@ void SelectMenu::_cursorMoved(const Ogre::Vector2 &cursorPos, float wheelDelta)
             if (newIndex != mDisplayIndex) setDisplayIndex(newIndex);
             return;
         }
-        else if(fabsf(wheelDelta) > 0.5f)
+        else if(fabsf(wheelDelta) > 0.5f * 120.0f) // seems that OIS uses click == WHEEL_DELTA == 120 for all platforms
         {
             int newIndex = Ogre::Math::Clamp<int>(mDisplayIndex + (wheelDelta > 0 ? -1 : 1), 0, (int)(mItems.size() - mItemElements.size()));
             Ogre::Real lowerBoundary = mScrollTrack->getHeight() - mScrollHandle->getHeight();
@@ -2130,11 +2132,10 @@ bool TrayManager::mouseReleased(const MouseButtonEvent &evt)
 
 bool TrayManager::mouseMoved(const MouseMotionEvent &evt)
 {
-    // thats a separate event. Ignore for now.
-    static float wheelDelta = 0;
-
     // always keep track of the mouse pos for refreshCursor()
     mCursorPos = Ogre::Vector2(evt.x, evt.y);
+
+    float wheelDelta = 0;//evt.state.Z.rel;
     mCursor->setPosition(mCursorPos.x, mCursorPos.y);
 
     if (mExpandedMenu)   // only check top priority widget until it passes on
@@ -2170,16 +2171,6 @@ bool TrayManager::mouseMoved(const MouseMotionEvent &evt)
     }
 
     if (mTrayDrag) return true;  // don't pass this event on if we're in the middle of a drag
-    return false;
-}
-
-bool TrayManager::mouseWheelRolled(const MouseWheelEvent& evt)
-{
-    if (mExpandedMenu)
-    {
-        mExpandedMenu->_cursorMoved(mCursorPos, evt.y);
-        return true;
-    }
     return false;
 }
 

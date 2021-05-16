@@ -12,10 +12,19 @@
 file(GLOB HEADER_FILES vrmllib/*.h)
 file(GLOB SOURCE_FILES src/VRML2mesh.cpp vrmllib/src/*.cpp)
 
-add_executable(VRMLConverter ${HEADER_FILES} ${SOURCE_FILES})
-target_include_directories(VRMLConverter PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vrmllib/include)
-target_link_libraries(VRMLConverter OgreMain)
+if(UNIX)
+    # add_definitions(-Wno-shadow) # inside tinyxml sources
+endif()
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vrmllib/include)
+
+add_executable(VRMLConverter ${HEADER_FILES} ${SOURCE_FILES})
+target_link_libraries(VRMLConverter ${OGRE_LIBRARIES})
+
+if (APPLE)
+    set_target_properties(VRMLConverter PROPERTIES
+        LINK_FLAGS "-framework Carbon -framework Cocoa")
+endif ()
 if (OGRE_PROJECT_FOLDERS)
 	set_property(TARGET VRMLConverter PROPERTY FOLDER Tools)
 endif ()

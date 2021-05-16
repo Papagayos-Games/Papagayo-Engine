@@ -44,7 +44,7 @@ namespace Ogre {
 
     EGLSupport::EGLSupport(int profile)
         : GLNativeSupport(profile), mGLDisplay(0),
-          mNativeDisplay(EGL_DEFAULT_DISPLAY)
+          mNativeDisplay(0)
     {
     }
 
@@ -323,11 +323,6 @@ namespace Ogre {
             contextAttrs[0] = EGL_NONE;
         }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        // try WebGL2 context
-        contextAttrs[1] = 3;
-#endif
-
         ::EGLContext context = 0;
         if (!eglDisplay)
         {
@@ -339,16 +334,6 @@ namespace Ogre {
             context = eglCreateContext(eglDisplay, glconfig, 0, contextAttrs);
             EGL_CHECK_ERROR
         }
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        if (!context)
-        {
-            // fall back to WebGL
-            contextAttrs[1] = 2;
-            context = eglCreateContext(mGLDisplay, glconfig, shareList, contextAttrs);
-            EGL_CHECK_ERROR
-        }
-#endif
 
         if (!context)
         {
@@ -377,25 +362,21 @@ namespace Ogre {
     void EGLSupport::initialiseExtensions() {
         assert (mGLDisplay);
 
-        const char* propStr = eglQueryString(mGLDisplay, EGL_VENDOR);
-        LogManager::getSingleton().stream() << "EGL_VENDOR = " << propStr;
+        const char* verStr = eglQueryString(mGLDisplay, EGL_VERSION);
+        LogManager::getSingleton().stream() << "EGL_VERSION = " << verStr;
 
-        propStr = eglQueryString(mGLDisplay, EGL_VERSION);
-        LogManager::getSingleton().stream() << "EGL_VERSION = " << propStr;
+        const char* extensionsString;
+
+        // This is more realistic than using glXGetClientString:
+        extensionsString = eglQueryString(mGLDisplay, EGL_EXTENSIONS);
+
+        LogManager::getSingleton().stream() << "EGL_EXTENSIONS = " << extensionsString;
 
         StringStream ext;
-
-        // client extensions
-        propStr = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
-        ext << propStr << " ";
-
-        // display extension
-        propStr = eglQueryString(mGLDisplay, EGL_EXTENSIONS);
-        ext << propStr;
-
-        LogManager::getSingleton().stream() << "EGL_EXTENSIONS = " << ext.str();
-
         String instr;
+
+        ext << extensionsString;
+
         while(ext >> instr)
         {
             extensionList.insert(instr);
@@ -405,10 +386,5 @@ namespace Ogre {
     void EGLSupport::setGLDisplay( EGLDisplay val )
     {
         mGLDisplay = val;
-    }
-
-    GLPBuffer* EGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )
-    {
-        return new EGLPBuffer(this, format, width, height);
     }
 }

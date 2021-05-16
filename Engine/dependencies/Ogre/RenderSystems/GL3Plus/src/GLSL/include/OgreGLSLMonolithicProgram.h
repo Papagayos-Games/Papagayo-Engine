@@ -31,7 +31,7 @@
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
-#include "OgreGL3PlusHardwareBuffer.h"
+#include "OgreGL3PlusHardwareUniformBuffer.h"
 #include "OgreGLSLProgram.h"
 
 namespace Ogre {

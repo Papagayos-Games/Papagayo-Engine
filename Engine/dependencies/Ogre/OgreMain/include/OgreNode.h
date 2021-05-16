@@ -195,7 +195,14 @@ namespace Ogre {
             general sequence of updateFromParent (e.g. raising events)
         */
         virtual void updateFromParentImpl(void) const;
-    protected: // private in 1.13
+
+
+        /** Internal method for creating a new child node - must be overridden per subclass. */
+        virtual Node* createChildImpl(void) = 0;
+
+        /** Internal method for creating a new child node - must be overridden per subclass. */
+        virtual Node* createChildImpl(const String& name) = 0;
+
         /// The position to use as a base for keyframe animation
         Vector3 mInitialPosition;
         /// The orientation to use as a base for keyframe animation
@@ -214,11 +221,6 @@ namespace Ogre {
         typedef std::vector<Node*> QueuedUpdates;
         static QueuedUpdates msQueuedUpdates;
 
-        /** Internal method for creating a new child node - must be overridden per subclass. */
-        virtual Node* createChildImpl(void) = 0;
-
-        /** Internal method for creating a new child node - must be overridden per subclass. */
-        virtual Node* createChildImpl(const String& name) = 0;
     public:
         /// Constructor, should only be called by parent, not directly.
         Node();
@@ -279,7 +281,7 @@ namespace Ogre {
         void setPosition(const Vector3& pos);
 
         /// @overload
-        void setPosition(Real x, Real y, Real z) { setPosition(Vector3(x, y, z)); }
+        void setPosition(Real x, Real y, Real z);
 
         /** Gets the position of the node relative to it's parent.
         */
@@ -300,7 +302,7 @@ namespace Ogre {
         void setScale(const Vector3& scale);
 
         /// @overload
-        void setScale(Real x, Real y, Real z) { setScale(Vector3(x, y, z)); }
+        void setScale(Real x, Real y, Real z);
 
         /** Gets the scaling factor of this node.
         */
@@ -381,10 +383,7 @@ namespace Ogre {
         */
         void translate(const Vector3& d, TransformSpace relativeTo = TS_PARENT);
         /// @overload
-        void translate(Real x, Real y, Real z, TransformSpace relativeTo = TS_PARENT)
-        {
-            translate(Vector3(x, y, z), relativeTo);
-        }
+        void translate(Real x, Real y, Real z, TransformSpace relativeTo = TS_PARENT);
         /** Moves the node along arbitrary axes.
         @remarks
             This method translates the node by a vector which is relative to
@@ -404,43 +403,25 @@ namespace Ogre {
         @param relativeTo
             The space which this transform is relative to.
         */
-        void translate(const Matrix3& axes, const Vector3& move, TransformSpace relativeTo = TS_PARENT)
-        {
-            translate(axes * move, relativeTo);
-        }
+        void translate(const Matrix3& axes, const Vector3& move, TransformSpace relativeTo = TS_PARENT);
         /// @overload
-        void translate(const Matrix3& axes, Real x, Real y, Real z, TransformSpace relativeTo = TS_PARENT)
-        {
-            translate(axes, Vector3(x, y, z), relativeTo);
-        }
+        void translate(const Matrix3& axes, Real x, Real y, Real z, TransformSpace relativeTo = TS_PARENT);
 
         /** Rotate the node around the Z-axis.
         */
-        virtual void roll(const Radian& angle, TransformSpace relativeTo = TS_LOCAL)
-        {
-            rotate(Quaternion(angle, Vector3::UNIT_Z), relativeTo);
-        }
+        virtual void roll(const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
 
         /** Rotate the node around the X-axis.
         */
-        virtual void pitch(const Radian& angle, TransformSpace relativeTo = TS_LOCAL)
-        {
-            rotate(Quaternion(angle, Vector3::UNIT_X), relativeTo);
-        }
+        virtual void pitch(const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
 
         /** Rotate the node around the Y-axis.
         */
-        virtual void yaw(const Radian& angle, TransformSpace relativeTo = TS_LOCAL)
-        {
-            rotate(Quaternion(angle, Vector3::UNIT_Y), relativeTo);
-        }
+        virtual void yaw(const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
 
         /** Rotate the node around an arbitrary axis.
         */
-        void rotate(const Vector3& axis, const Radian& angle, TransformSpace relativeTo = TS_LOCAL)
-        {
-            rotate(Quaternion(angle, axis), relativeTo);
-        }
+        void rotate(const Vector3& axis, const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
 
         /** Rotate the node around an aritrary axis using a Quarternion.
         */
@@ -655,8 +636,8 @@ namespace Ogre {
         /** Called by children to notify their parent that they no longer need an update. */
         void cancelUpdate(Node* child);
 
-        /// @deprecated use DefaultDebugDrawer::drawAxes
-        OGRE_DEPRECATED DebugRenderable* getDebugRenderable(Real scaling);
+        /** Get a debug renderable for rendering the Node.  */
+        DebugRenderable* getDebugRenderable(Real scaling);
 
         /** Queue a 'needUpdate' call to a node safely.
         @remarks

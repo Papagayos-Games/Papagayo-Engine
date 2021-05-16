@@ -50,13 +50,13 @@ namespace Ogre {
         const String& getLanguage(void) const;
 
         bool getPassTransformStates(void) const {
-            return mPassFFPStates;
+            return true;
         }
         bool getPassSurfaceAndLightStates(void) const {
-            return mPassFFPStates;
+            return true;
         }
         bool getPassFogStates(void) const {
-            return mPassFFPStates;
+            return true;
         }
 
         /** Returns the operation type that this geometry program expects to
@@ -119,7 +119,6 @@ namespace Ogre {
         RenderOperation::OperationType mInputOperationType;
         RenderOperation::OperationType mOutputOperationType;
         int mMaxOutputVertices;
-        bool mPassFFPStates;
     };
     }
 }

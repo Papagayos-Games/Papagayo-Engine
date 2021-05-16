@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreSkeletonManager.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreEdgeListBuilder.h"
 #include "OgreAnimation.h"
 #include "OgreAnimationState.h"
@@ -218,6 +219,9 @@ namespace Ogre {
     }
     void Mesh::loadImpl()
     {
+        MeshSerializer serializer;
+        serializer.setListener(MeshManager::getSingleton().getListener());
+
         // If the only copy is local on the stack, it will be cleaned
         // up reliably in case of exceptions, etc
         DataStreamPtr data(mFreshFromDisk);
@@ -229,12 +233,7 @@ namespace Ogre {
                         "Mesh::loadImpl()");
         }
 
-        String baseName, strExt;
-        StringUtil::splitBaseFilename(mName, baseName, strExt);
-        auto codec = Codec::getCodec(strExt);
-        OgreAssert(codec, ("No codec found to load "+mName).c_str());
-
-        codec->decode(data, this);
+        serializer.importMesh(data, this);
 
         /* check all submeshes to see if their materials should be
            updated.  If the submesh has texture aliases that match those
@@ -992,7 +991,7 @@ namespace Ogre {
             const VertexElement* posElem = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
             HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(posElem->getSource());
             // if usage is write only,
-            if ( !vbuf->hasShadowBuffer() && (vbuf->getUsage() & HBU_DETAIL_WRITE_ONLY) )
+            if ( !vbuf->hasShadowBuffer() && (vbuf->getUsage() & HardwareBuffer::HBU_WRITE_ONLY) )
             {
                 // can't do it
                 return Real(0.0f);
@@ -1115,6 +1114,11 @@ namespace Ogre {
     const String& Mesh::getSkeletonName(void) const
     {
         return mSkeletonName;
+    }
+    //---------------------------------------------------------------------
+    ushort Mesh::getNumLodLevels(void) const
+    {
+        return mNumLods;
     }
     //---------------------------------------------------------------------
     const MeshLodUsage& Mesh::getLodLevel(ushort index) const
@@ -2228,12 +2232,15 @@ namespace Ogre {
 
         // Scan all animations and determine the type of animation tracks
         // relating to each vertex data
-        for(const auto& ai : mAnimationsList)
+        for(AnimationList::const_iterator ai = mAnimationsList.begin();
+            ai != mAnimationsList.end(); ++ai)
         {
-            for (const auto& vit : ai.second->_getVertexTrackList())
+            Animation* anim = ai->second;
+            Animation::VertexTrackIterator vit = anim->getVertexTrackIterator();
+            while (vit.hasMoreElements())
             {
-                VertexAnimationTrack* track = vit.second;
-                ushort handle = vit.first;
+                VertexAnimationTrack* track = vit.getNext();
+                ushort handle = track->getHandle();
                 if (handle == 0)
                 {
                     // shared data

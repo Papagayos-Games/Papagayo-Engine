@@ -62,12 +62,6 @@ THE SOFTWARE.
 // Language: GLSL
 //-----------------------------------------------------------------------------
 
-#if defined(OGRE_HLSL) || defined(OGRE_CG)
-// this is technically wrong, thats why we dont put it into OgreUnifiedShader.h
-#define mat2x4 float2x4
-#define mat3x4 float3x4
-#endif
-
 //-----------------------------------------------------------------------------
 void SGX_BlendWeight(in float blendWgt, in mat2x4 dualQuaternion, out mat2x4 vOut)
 {
@@ -113,7 +107,7 @@ void SGX_NormalizeDualQuaternion(inout mat2x4 dq)
 //-----------------------------------------------------------------------------
 void SGX_AdjointTransposeMatrix(in mat3x4 M, out mat3 vOut)
 {
-	mat3 atM;
+	mat3x3 atM;
 	atM[0][0] = M[2][2] * M[1][1] - M[1][2] * M[2][1];
 	atM[0][1] = M[1][2] * M[2][0] - M[1][0] * M[2][2];
 	atM[0][2] = M[1][0] * M[2][1] - M[2][0] * M[1][1];

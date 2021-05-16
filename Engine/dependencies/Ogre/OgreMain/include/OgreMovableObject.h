@@ -261,9 +261,6 @@ namespace Ogre {
         */
         virtual Real getBoundingRadius(void) const = 0;
 
-        /// as getBoundingRadius, but with scaling applied
-        Real getBoundingRadiusScaled() const;
-
         /** Retrieves the axis-aligned bounding box for this object in world coordinates. */
         virtual const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const;
         /** Retrieves the worldspace bounding sphere for this object. */
@@ -414,7 +411,7 @@ namespace Ogre {
         void removeQueryFlags(uint32 flags) { mQueryFlags &= ~flags; }
         
         /// Returns the query flags relevant for this object
-        virtual uint32 getQueryFlags(void) const { return mQueryFlags; }
+        uint32 getQueryFlags(void) const { return mQueryFlags; }
 
         /** Set the default query flags for all future MovableObject instances.
         */
@@ -442,7 +439,7 @@ namespace Ogre {
         void removeVisibilityFlags(uint32 flags) { mVisibilityFlags &= ~flags; }
         
         /// Returns the visibility flags relevant for this object
-        virtual uint32 getVisibilityFlags(void) const { return mVisibilityFlags; }
+        uint32 getVisibilityFlags(void) const { return mVisibilityFlags; }
 
         /** Set the default visibility flags for all future MovableObject instances.
         */
@@ -506,6 +503,8 @@ namespace Ogre {
 
         /// Returns details of the edges which might be used to determine a silhouette
         EdgeData* getEdgeList(void) { return NULL; }
+        /// Returns whether the object has a valid edge list.
+        bool hasEdgeList(void) { return false; }
         /// Define a default implementation of method from ShadowCaster which implements no shadows
         const ShadowRenderableList& getShadowVolumeRenderableList(
             ShadowTechnique shadowTechnique, const Light* light, 
@@ -611,7 +610,7 @@ namespace Ogre {
             const String& name, SceneManager* manager, 
             const NameValuePairList* params = 0);
         /** Destroy an instance of the object */
-        virtual void destroyInstance(MovableObject* obj) { delete obj; }
+        virtual void destroyInstance(MovableObject* obj) = 0;
 
         /** Does this factory require the allocation of a 'type flag', used to 
             selectively include / exclude this type from scene queries?

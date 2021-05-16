@@ -43,13 +43,6 @@ namespace OgreBites {
 class TrayManager;
 class ParamsPanel;
 
-/** \addtogroup Optional
-*  @{
-*/
-/** \addtogroup Bites
-*  @{
-*/
-
 /**
    - F:        Toggle frame rate stats on/off
    - G:        Toggle advanced frame stats on/off
@@ -87,8 +80,7 @@ protected:
     Ogre::RTShader::ShaderGenerator* mShaderGenerator;
 #endif
 };
-/** @} */
-/** @} */
+
 } /* namespace OgreBites */
 
 #endif /* COMPONENTS_BITES_INCLUDE_OGREADVANCEDRENDERCONTROLS_H_ */

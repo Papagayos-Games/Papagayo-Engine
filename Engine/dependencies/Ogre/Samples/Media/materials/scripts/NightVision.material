@@ -28,7 +28,7 @@ fragment_program Ogre/Compositor/NightVisionFPGLSL glsl
 fragment_program Ogre/Compositor/NightVisionFPGLSLES glsles
 {
 	source NightVisionFP.glsles
-	syntax glsl300es
+	syntax glsles
 	
 	default_params
 	{

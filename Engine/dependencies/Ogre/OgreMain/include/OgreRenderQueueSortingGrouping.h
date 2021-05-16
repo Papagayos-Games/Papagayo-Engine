@@ -143,11 +143,11 @@ namespace Ogre {
             }
         };
         /// Comparator to order objects by descending camera distance
-        struct DistanceSortDescendingLess
+        struct DepthSortDescendingLess
         {
             const Camera* camera;
 
-            DistanceSortDescendingLess(const Camera* cam)
+            DepthSortDescendingLess(const Camera* cam)
                 : camera(cam)
             {
             }
@@ -161,18 +161,18 @@ namespace Ogre {
                 }
                 else
                 {
-                    // Different renderables, sort by distance
-                    Real adist = a.renderable->getSquaredViewDepth(camera);
-                    Real bdist = b.renderable->getSquaredViewDepth(camera);
-                    if (Math::RealEqual(adist, bdist))
+                    // Different renderables, sort by depth
+                    Real adepth = a.renderable->getSquaredViewDepth(camera);
+                    Real bdepth = b.renderable->getSquaredViewDepth(camera);
+                    if (Math::RealEqual(adepth, bdepth))
                     {
                         // Must return deterministic result, doesn't matter what
                         return a.pass < b.pass;
                     }
                     else
                     {
-                        // Sort DESCENDING by dist (i.e. far objects first)
-                        return (adist > bdist);
+                        // Sort DESCENDING by depth (i.e. far objects first)
+                        return (adepth > bdepth);
                     }
                 }
 
@@ -491,16 +491,14 @@ namespace Ogre {
             }
         }
 
-        const PriorityMap& getPriorityGroups() const { return mPriorityGroups; }
-
-        /// @deprecated use getPriorityGroups()
-        OGRE_DEPRECATED PriorityMapIterator getIterator(void)
+        /** Get an iterator for browsing through child contents. */
+        PriorityMapIterator getIterator(void)
         {
             return PriorityMapIterator(mPriorityGroups.begin(), mPriorityGroups.end());
         }
 
-        /// @deprecated use getPriorityGroups()
-        OGRE_DEPRECATED ConstPriorityMapIterator getIterator(void) const
+        /** Get a const iterator for browsing through child contents. */
+        ConstPriorityMapIterator getIterator(void) const
         {
             return ConstPriorityMapIterator(mPriorityGroups.begin(), mPriorityGroups.end());
         }
@@ -675,10 +673,12 @@ namespace Ogre {
         */
         void merge( const RenderQueueGroup* rhs )
         {
-            for ( const auto& pg : rhs->getPriorityGroups() )
+            ConstPriorityMapIterator it = rhs->getIterator();
+
+            while( it.hasMoreElements() )
             {
-                ushort priority = pg.first;
-                RenderPriorityGroup* pSrcPriorityGrp = pg.second;
+                ushort priority = it.peekNextKey();
+                RenderPriorityGroup* pSrcPriorityGrp = it.getNext();
                 RenderPriorityGroup* pDstPriorityGrp;
 
                 // Check if priority group is there

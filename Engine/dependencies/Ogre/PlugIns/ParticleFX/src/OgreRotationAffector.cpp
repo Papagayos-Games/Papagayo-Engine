@@ -88,6 +88,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RotationAffector::_affectParticles(ParticleSystem* pSystem, Real timeElapsed)
     {
+        ParticleIterator pi = pSystem->_getIterator();
+        Particle *p;
         Real ds;
 
         // Rotation adjustments by time
@@ -95,8 +97,10 @@ namespace Ogre {
 
         Radian NewRotation;
 
-        for (auto p : pSystem->_getActiveParticles())
+        while (!pi.end())
         {
+            p = pi.getNext();
+
             NewRotation = p->mRotation + (ds * p->mRotationSpeed);
             p->setRotation( NewRotation );
         }

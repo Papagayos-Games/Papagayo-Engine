@@ -63,7 +63,7 @@ elseif (APPLE)
   set(NATIVE_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/OSX 
     ${PROJECT_SOURCE_DIR}/OgreMain/include/OSX)
-  set(PLATFORM_LIBS "-framework CoreGraphics" "-framework Foundation" "-framework AppKit")
+  set(PLATFORM_LIBS ${Cocoa_LIBRARY_FWK})
 elseif (UNIX)
   if(OGRE_GLSUPPORT_USE_EGL)
     file(GLOB PLATFORM_HEADERS "include/EGL/X11/*.h" "include/EGL/*.h")
@@ -78,8 +78,7 @@ elseif (UNIX)
     file(GLOB PLATFORM_SOURCES "src/GLX/*.cpp")
 
     set(NATIVE_INCLUDES
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/GLX
-        ${OPENGL_INCLUDE_DIR})
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/GLX)
     
     set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${OPENGL_gl_LIBRARY})
   endif()
@@ -117,6 +116,8 @@ generate_export_header(OgreGLSupport
     EXPORT_MACRO_NAME _OgreGLExport
     EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgreGLSupportPrerequisites.h)
 
-if(OGRE_STATIC)
-  ogre_config_lib(OgreGLSupport TRUE)
+if (APPLE)
+    set_target_properties(OgreGLSupport PROPERTIES LINK_FLAGS "-framework Cocoa -framework OpenGL")
 endif()
+
+ogre_config_component(OgreGLSupport)

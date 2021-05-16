@@ -89,7 +89,6 @@ namespace Ogre
     public:
         /** Default constructor.
         @param gptype The type of program to link to
-        @param parent
         */
         GpuProgramUsage(GpuProgramType gptype, Pass* parent);
 

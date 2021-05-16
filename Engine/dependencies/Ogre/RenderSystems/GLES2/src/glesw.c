@@ -34,14 +34,13 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
+#include <EGL/egl.h>
 
 static HMODULE libgl;
-static PROC (__stdcall *wgl_get_proc_address)(LPCSTR);
 
 static void open_libgl(void)
 {
-    libgl = LoadLibraryA("opengl32.dll");
-    *(void **)(&wgl_get_proc_address) = GetProcAddress(libgl, "wglGetProcAddress");
+    libgl = LoadLibraryA("libGLESv2.dll");
 }
 
 static void close_libgl(void)
@@ -53,10 +52,10 @@ static GLESWglProc get_proc(const char *proc)
 {
     GLESWglProc res;
 
-	res = (GLESWglProc)wgl_get_proc_address(proc);
-	if (!res)
-		res = (GLESWglProc)GetProcAddress(libgl, proc);
-	return res;
+    res = (GLESWglProc)eglGetProcAddress(proc);
+    if (!res)
+        res = (GLESWglProc)GetProcAddress(libgl, proc);
+    return res;
 }
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
 #include <CoreFoundation/CoreFoundation.h>

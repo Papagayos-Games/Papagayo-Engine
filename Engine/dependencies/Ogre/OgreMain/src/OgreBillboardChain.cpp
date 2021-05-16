@@ -124,7 +124,7 @@ namespace Ogre {
 
             if (mUseVertexColour)
             {
-                offset += decl->addElement(0, offset, VET_UBYTE4_NORM, VES_DIFFUSE).getSize();
+                offset += decl->addElement(0, offset, VET_COLOUR, VES_DIFFUSE).getSize();
             }
 
             if (mUseTexCoords)
@@ -517,7 +517,7 @@ namespace Ogre {
                     uint16 baseIdx = static_cast<uint16>((e + seg.start) * 2);
 
                     // Determine base pointer to vertex #1
-                    float* pFloat = reinterpret_cast<float*>(
+                    void* pBase = static_cast<void*>(
                         static_cast<char*>(vertexLock.pData) +
                             pBuffer->getVertexSize() * baseIdx);
 
@@ -557,19 +557,25 @@ namespace Ogre {
                     Vector3 pos0 = elem.position - vPerpendicular;
                     Vector3 pos1 = elem.position + vPerpendicular;
 
+                    float* pFloat = static_cast<float*>(pBase);
                     // pos1
                     *pFloat++ = pos0.x;
                     *pFloat++ = pos0.y;
                     *pFloat++ = pos0.z;
 
+                    pBase = static_cast<void*>(pFloat);
+
                     if (mUseVertexColour)
                     {
-                        RGBA col = elem.colour.getAsBYTE();
-                        memcpy(pFloat++, &col, sizeof(RGBA));
+                        RGBA* pCol = static_cast<RGBA*>(pBase);
+                        Root::getSingleton().convertColourValue(elem.colour, pCol);
+                        pCol++;
+                        pBase = static_cast<void*>(pCol);
                     }
 
                     if (mUseTexCoords)
                     {
+                        pFloat = static_cast<float*>(pBase);
                         if (mTexCoordDir == TCD_U)
                         {
                             *pFloat++ = elem.texCoord;
@@ -580,21 +586,27 @@ namespace Ogre {
                             *pFloat++ = mOtherTexCoordRange[0];
                             *pFloat++ = elem.texCoord;
                         }
+                        pBase = static_cast<void*>(pFloat);
                     }
 
                     // pos2
+                    pFloat = static_cast<float*>(pBase);
                     *pFloat++ = pos1.x;
                     *pFloat++ = pos1.y;
                     *pFloat++ = pos1.z;
+                    pBase = static_cast<void*>(pFloat);
 
                     if (mUseVertexColour)
                     {
-                        RGBA col = elem.colour.getAsBYTE();
-                        memcpy(pFloat++, &col, sizeof(RGBA));
+                        RGBA* pCol = static_cast<RGBA*>(pBase);
+                        Root::getSingleton().convertColourValue(elem.colour, pCol);
+                        pCol++;
+                        pBase = static_cast<void*>(pCol);
                     }
 
                     if (mUseTexCoords)
                     {
+                        pFloat = static_cast<float*>(pBase);
                         if (mTexCoordDir == TCD_U)
                         {
                             *pFloat++ = elem.texCoord;
@@ -704,10 +716,10 @@ namespace Ogre {
 
         if (!mMaterial)
         {
-            LogManager::getSingleton().logError("Can't assign material " + name +
+            LogManager::getSingleton().logMessage("Can't assign material " + name +
                 " to BillboardChain " + mName + " because this "
                 "Material does not exist in group "+groupName+". Have you forgotten to define it in a "
-                ".material script?");
+                ".material script?", LML_CRITICAL);
             mMaterial = MaterialManager::getSingleton().getDefaultMaterial(false);
         }
         // Ensure new material loaded (will not load again if already loaded)
@@ -823,6 +835,12 @@ namespace Ogre {
         return OGRE_NEW BillboardChain(name, maxElements, numberOfChains, useTex, useCol, dynamic);
 
     }
+    //-----------------------------------------------------------------------
+    void BillboardChainFactory::destroyInstance( MovableObject* obj)
+    {
+        OGRE_DELETE  obj;
+    }
+
 }
 
 

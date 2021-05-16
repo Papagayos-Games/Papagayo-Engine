@@ -31,7 +31,8 @@ THE SOFTWARE.
 #include "OgreGLES2DepthBuffer.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2HardwareBufferManager.h"
-#include "OgreGLES2HardwareBuffer.h"
+#include "OgreGLES2HardwareIndexBuffer.h"
+#include "OgreGLES2HardwareVertexBuffer.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreGLUtil.h"
 #include "OgreGLES2FBORenderTexture.h"
@@ -246,7 +247,7 @@ namespace Ogre {
         }
 
         rsc->setRenderSystemName(getName());
-        rsc->setVendor(mVendor);
+        rsc->parseVendorFromString(mVendor);
 
         // Multitexturing support and set number of texture units
         GLint units;
@@ -444,9 +445,6 @@ namespace Ogre {
         if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_texture_3D"))
             rsc->setCapability(RSC_TEXTURE_3D);
 
-        if(hasMinGLVersion(3, 0))
-            rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
-
         // ES 3 always supports NPOT textures
         if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_texture_npot") || checkExtension("GL_ARB_texture_non_power_of_two"))
         {
@@ -464,9 +462,8 @@ namespace Ogre {
         
         // No point sprites, so no size
         rsc->setMaxPointSize(0.f);
-
-        if (hasMinGLVersion(3, 0) ||
-            (checkExtension("GL_OES_vertex_array_object") && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN))
+        
+        if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_vertex_array_object"))
             rsc->setCapability(RSC_VAO);
 
         if (hasMinGLVersion(3, 0) || checkExtension("GL_OES_get_program_binary"))
@@ -551,6 +548,12 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("GL ES 2: Using FBOs for rendering to textures");
         mRTTManager = new GLES2FBOManager();
 
+        Log* defaultLog = LogManager::getSingleton().getDefaultLog();
+        if (defaultLog)
+        {
+            caps->log(defaultLog);
+        }
+
         mGLInitialised = true;
     }
 
@@ -613,7 +616,33 @@ namespace Ogre {
     RenderWindow* GLES2RenderSystem::_createRenderWindow(const String &name, unsigned int width, unsigned int height,
                                                         bool fullScreen, const NameValuePairList *miscParams)
     {
-        RenderSystem::_createRenderWindow(name, width, height, fullScreen, miscParams);
+        if (mRenderTargets.find(name) != mRenderTargets.end())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "NativeWindowType with name '" + name + "' already exists",
+                        "GLES2RenderSystem::_createRenderWindow");
+        }
+
+        // Log a message
+        StringStream ss;
+        ss << "GLES2RenderSystem::_createRenderWindow \"" << name << "\", " <<
+            width << "x" << height << " ";
+        if (fullScreen)
+            ss << "fullscreen ";
+        else
+            ss << "windowed ";
+
+        if (miscParams)
+        {
+            ss << " miscParams: ";
+            NameValuePairList::const_iterator it;
+            for (it = miscParams->begin(); it != miscParams->end(); ++it)
+            {
+                ss << it->first << "=" << it->second << " ";
+            }
+
+            LogManager::getSingleton().logMessage(ss.str());
+        }
 
         // Create the window
         RenderWindow* win = mGLSupport->newWindow(name, width, height, fullScreen, miscParams);
@@ -908,6 +937,74 @@ namespace Ogre {
         return GL_ONE;
     }
 
+    void GLES2RenderSystem::_setSeparateSceneBlending(
+        SceneBlendFactor sourceFactor, SceneBlendFactor destFactor,
+        SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha,
+        SceneBlendOperation op, SceneBlendOperation alphaOp )
+    {
+        GLenum sourceBlend = getBlendMode(sourceFactor);
+        GLenum destBlend = getBlendMode(destFactor);
+        GLenum sourceBlendAlpha = getBlendMode(sourceFactorAlpha);
+        GLenum destBlendAlpha = getBlendMode(destFactorAlpha);
+        
+        if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO && 
+           sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
+        {
+            mStateCacheManager->setDisabled(GL_BLEND);
+        }
+        else
+        {
+            mStateCacheManager->setEnabled(GL_BLEND);
+            mStateCacheManager->setBlendFunc(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
+        }
+        
+        GLint func = GL_FUNC_ADD, alphaFunc = GL_FUNC_ADD;
+        
+        switch(op)
+        {
+            case SBO_ADD:
+                func = GL_FUNC_ADD;
+                break;
+            case SBO_SUBTRACT:
+                func = GL_FUNC_SUBTRACT;
+                break;
+            case SBO_REVERSE_SUBTRACT:
+                func = GL_FUNC_REVERSE_SUBTRACT;
+                break;
+            case SBO_MIN:
+                if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax"))
+                    func = GL_MIN_EXT;
+                break;
+            case SBO_MAX:
+                if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax"))
+                    func = GL_MAX_EXT;
+                break;
+        }
+        
+        switch(alphaOp)
+        {
+            case SBO_ADD:
+                alphaFunc = GL_FUNC_ADD;
+                break;
+            case SBO_SUBTRACT:
+                alphaFunc = GL_FUNC_SUBTRACT;
+                break;
+            case SBO_REVERSE_SUBTRACT:
+                alphaFunc = GL_FUNC_REVERSE_SUBTRACT;
+                break;
+            case SBO_MIN:
+                if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax"))
+                    alphaFunc = GL_MIN_EXT;
+                break;
+            case SBO_MAX:
+                if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax"))
+                    alphaFunc = GL_MAX_EXT;
+                break;
+        }
+        
+        mStateCacheManager->setBlendEquation(func, alphaFunc);
+    }
+
     void GLES2RenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
         if (getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
@@ -935,14 +1032,18 @@ namespace Ogre {
             _setRenderTarget(target);
             mActiveViewport = vp;
             
+            GLsizei x, y, w, h;
+            
             // Calculate the "lower-left" corner of the viewport
-            Rect vpRect = vp->getActualDimensions();
+            w = vp->getActualWidth();
+            h = vp->getActualHeight();
+            x = vp->getActualLeft();
+            y = vp->getActualTop();
+            
             if (!target->requiresTextureFlipping())
             {
                 // Convert "upper-left" corner to "lower-left"
-                std::swap(vpRect.top, vpRect.bottom);
-                vpRect.top = target->getHeight() - vpRect.top;
-                vpRect.bottom = target->getHeight() - vpRect.bottom;
+                y = target->getHeight() - h - y;
             }
             
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
@@ -952,13 +1053,25 @@ namespace Ogre {
             if ((opt = mGLSupport->getConfigOptions().find("Orientation")) != end)
             {
                 String val = opt->second.currentValue;
-                if (val.find("Landscape") != String::npos)
+                String::size_type pos = val.find("Landscape");
+                
+                if (pos != String::npos)
                 {
-                    std::swap(vpRect.right, vpRect.bottom);
+                    GLsizei temp = h;
+                    h = w;
+                    w = temp;
                 }
             }
 #endif
-            mStateCacheManager->setViewport(vpRect);
+            
+            mStateCacheManager->setViewport(x, y, w, h);
+
+            // Configure the viewport clipping
+            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+            mScissorBox[0] = x;
+            mScissorBox[1] = y;
+            mScissorBox[2] = w;
+            mScissorBox[3] = h;
 
             vp->_clearUpdatedFlag();
         }
@@ -974,8 +1087,21 @@ namespace Ogre {
 #endif
     }
 
+    void GLES2RenderSystem::_beginFrame(void)
+    {
+        if (!mActiveViewport)
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                        "Cannot begin frame - no viewport selected.",
+                        "GLES2RenderSystem::_beginFrame");
+
+        mStateCacheManager->setEnabled(GL_SCISSOR_TEST);
+    }
+
     void GLES2RenderSystem::_endFrame(void)
     {
+        // Deactivate the viewport clipping.
+        mStateCacheManager->setDisabled(GL_SCISSOR_TEST);
+
         // unbind GPU programs at end of frame
         // this is mostly to avoid holding bound programs that might get deleted
         // outside via the resource manager
@@ -1074,44 +1200,10 @@ namespace Ogre {
             mStateCacheManager->setDisabled(GL_POLYGON_OFFSET_FILL);
         }
     }
-    static GLenum getBlendOp(SceneBlendOperation op, bool hasMinMax)
-    {
-        switch (op)
-        {
-        case SBO_ADD:
-            return GL_FUNC_ADD;
-        case SBO_SUBTRACT:
-            return GL_FUNC_SUBTRACT;
-        case SBO_REVERSE_SUBTRACT:
-            return GL_FUNC_REVERSE_SUBTRACT;
-        case SBO_MIN:
-            return hasMinMax ? GL_MIN : GL_FUNC_ADD;
-        case SBO_MAX:
-            return hasMinMax ? GL_MAX : GL_FUNC_ADD;
-        }
-        return GL_FUNC_ADD;
-    }
-    void GLES2RenderSystem::setColourBlendState(const ColourBlendState& state)
-    {
-        // record this
-        mCurrentBlend = state;
 
-        if (state.blendingEnabled())
-        {
-            mStateCacheManager->setEnabled(GL_BLEND);
-            mStateCacheManager->setBlendFunc(
-                getBlendMode(state.sourceFactor), getBlendMode(state.destFactor),
-                getBlendMode(state.sourceFactorAlpha), getBlendMode(state.destFactorAlpha));
-        }
-        else
-        {
-            mStateCacheManager->setDisabled(GL_BLEND);
-        }
-
-        bool hasMinMax = hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax");
-        mStateCacheManager->setBlendEquation(getBlendOp(state.operation, hasMinMax),
-                                             getBlendOp(state.alphaOperation, hasMinMax));
-        mStateCacheManager->setColourMask(state.writeR, state.writeG, state.writeB, state.writeA);
+    void GLES2RenderSystem::_setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha)
+    {
+        mStateCacheManager->setColourMask(red, green, blue, alpha);
     }
 
     //---------------------------------------------------------------------
@@ -1305,7 +1397,7 @@ namespace Ogre {
         // as one shared vertex buffer could be rendered with several index buffers, from submeshes and/or LODs
         if (op.useIndexes)
             mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                op.indexData->indexBuffer->_getImpl<GLES2HardwareBuffer>()->getGLBufferId());
+                static_cast<GLES2HardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
 
 
         if (getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA)
@@ -1356,6 +1448,14 @@ namespace Ogre {
 
             do
             {
+                // Update derived depth bias
+                if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
+                {
+                    _setDepthBias(mDerivedDepthBiasBase +
+                                  mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
+                                  mDerivedDepthBiasSlopeScale);
+                }
+
                 if(hasInstanceData && getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA))
                 {
                     OGRE_CHECK_GL_ERROR(glDrawElementsInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData, static_cast<GLsizei>(numberOfInstances)));
@@ -1371,6 +1471,14 @@ namespace Ogre {
         {
             do
             {
+                // Update derived depth bias
+                if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
+                {
+                    _setDepthBias(mDerivedDepthBiasBase +
+                                  mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
+                                  mDerivedDepthBiasSlopeScale);
+                }
+
                 if(getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA) && hasInstanceData)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawArraysInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, 0, static_cast<GLsizei>(op.vertexData->vertexCount), static_cast<GLsizei>(numberOfInstances)));
@@ -1402,24 +1510,49 @@ namespace Ogre {
         mRenderInstanceAttribsBound.clear();
     }
 
-    void GLES2RenderSystem::setScissorTest(bool enabled, const Rect& rect)
+    void GLES2RenderSystem::setScissorTest(bool enabled, size_t left,
+                                        size_t top, size_t right,
+                                        size_t bottom)
     {
-        if (!enabled)
-        {
-            mStateCacheManager->setDisabled(GL_SCISSOR_TEST);
-            return;
-        }
-
-        mStateCacheManager->setEnabled(GL_SCISSOR_TEST);
-
         // If request texture flipping, use "upper-left", otherwise use "lower-left"
         bool flipping = mActiveRenderTarget->requiresTextureFlipping();
-
         //  GL measures from the bottom, not the top
-        long targetHeight = mActiveRenderTarget->getHeight();
-        long top = flipping ? rect.top : targetHeight - rect.bottom;
-        // NB GL uses width / height rather than right / bottom
-        OGRE_CHECK_GL_ERROR(glScissor(rect.left, top, rect.width(), rect.height()));
+        size_t targetHeight = mActiveRenderTarget->getHeight();
+        // Calculate the "lower-left" corner of the viewport
+        size_t w, h, x, y;
+
+        if (enabled)
+        {
+            mStateCacheManager->setEnabled(GL_SCISSOR_TEST);
+            // NB GL uses width / height rather than right / bottom
+            x = left;
+            if (flipping)
+                y = top;
+            else
+                y = targetHeight - bottom;
+            w = right - left;
+            h = bottom - top;
+            OGRE_CHECK_GL_ERROR(glScissor(static_cast<GLsizei>(x),
+                                          static_cast<GLsizei>(y),
+                                          static_cast<GLsizei>(w),
+                                          static_cast<GLsizei>(h)));
+        }
+        else
+        {
+            mStateCacheManager->setDisabled(GL_SCISSOR_TEST);
+            // GL requires you to reset the scissor when disabling
+            w = mActiveViewport->getActualWidth();
+            h = mActiveViewport->getActualHeight();
+            x = mActiveViewport->getActualLeft();
+            if (flipping)
+                y = mActiveViewport->getActualTop();
+            else
+                y = targetHeight - mActiveViewport->getActualTop() - h;
+            OGRE_CHECK_GL_ERROR(glScissor(static_cast<GLsizei>(x),
+                                          static_cast<GLsizei>(y),
+                                          static_cast<GLsizei>(w),
+                                          static_cast<GLsizei>(h)));
+        }
     }
 
     void GLES2RenderSystem::clearFrameBuffer(unsigned int buffers,
@@ -1457,14 +1590,19 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glClearStencil(stencil));
         }
 
-        Rect vpRect = mActiveViewport->getActualDimensions();
-        bool needScissorBox =
-            vpRect != Rect(0, 0, mActiveRenderTarget->getWidth(), mActiveRenderTarget->getHeight());
-        if (needScissorBox)
+        // Should be enable scissor test due the clear region is
+        // relied on scissor box bounds.
+         mStateCacheManager->setEnabled(GL_SCISSOR_TEST);
+
+        // Sets the scissor box as same as viewport
+        GLint viewport[4];
+        mStateCacheManager->getViewport(viewport);
+        bool scissorBoxDifference =
+            viewport[0] != mScissorBox[0] || viewport[1] != mScissorBox[1] ||
+            viewport[2] != mScissorBox[2] || viewport[3] != mScissorBox[3];
+        if (scissorBoxDifference)
         {
-            // Should be enable scissor test due the clear region is
-            // relied on scissor box bounds.
-            setScissorTest(true, vpRect);
+            OGRE_CHECK_GL_ERROR(glScissor(viewport[0], viewport[1], viewport[2], viewport[3]));
         }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -1474,11 +1612,14 @@ namespace Ogre {
         // Clear buffers
         OGRE_CHECK_GL_ERROR(glClear(flags));
 
-        // Restore scissor test
-        if (needScissorBox)
+        // Restore scissor box
+        if (scissorBoxDifference)
         {
-            setScissorTest(false);
+            OGRE_CHECK_GL_ERROR(glScissor(mScissorBox[0], mScissorBox[1], mScissorBox[2], mScissorBox[3]));
         }
+
+        // Restore scissor test
+        mStateCacheManager->setDisabled(GL_SCISSOR_TEST);
 
         // Reset buffer write state
         if (!mStateCacheManager->getDepthMask() && (buffers & FBT_DEPTH))
@@ -1826,6 +1967,11 @@ namespace Ogre {
         }
     }
 
+    unsigned int GLES2RenderSystem::getDisplayMonitorCount() const
+    {
+        return 1;
+    }
+
     //---------------------------------------------------------------------
     void GLES2RenderSystem::beginProfileEvent( const String &eventName )
     {
@@ -1894,7 +2040,7 @@ namespace Ogre {
         VertexElementSemantic sem = elem.getSemantic();
         unsigned short elemIndex = elem.getIndex();
 
-        const GLES2HardwareBuffer* hwGlBuffer = vertexBuffer->_getImpl<GLES2HardwareBuffer>();
+        const GLES2HardwareVertexBuffer* hwGlBuffer = static_cast<const GLES2HardwareVertexBuffer*>(vertexBuffer.get());
 
         mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER, hwGlBuffer->getGLBufferId());
         void* pBufferData = VBO_BUFFER_OFFSET(elem.getOffset() + vertexStart * vertexBuffer->getVertexSize());
@@ -1909,9 +2055,9 @@ namespace Ogre {
         {
             if (mCurrentVertexProgram)
             {
-                if (vertexBuffer->isInstanceData())
+                if (hwGlBuffer->isInstanceData())
                 {
-                    OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(attrib, static_cast<GLuint>(vertexBuffer->getInstanceDataStepRate())));
+                    OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(attrib, static_cast<GLuint>(hwGlBuffer->getInstanceDataStepRate())));
                     mRenderInstanceAttribsBound.push_back(attrib);
                 }
             }
@@ -2021,7 +2167,7 @@ namespace Ogre {
         const GLubyte* pcVendor = glGetString(GL_VENDOR);
         tmpStr = (const char*)pcVendor;
         LogManager::getSingleton().logMessage("GL_VENDOR = " + tmpStr);
-        mVendor = RenderSystemCapabilities::vendorFromString(tmpStr.substr(0, tmpStr.find(' ')));
+        mVendor = tmpStr.substr(0, tmpStr.find(' '));
 
         // Get renderer
         const GLubyte* pcRenderer = glGetString(GL_RENDERER);

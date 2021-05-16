@@ -68,11 +68,6 @@ namespace Ogre {
         typedef SharedPtr<RenderSystemData> RenderSystemDataPtr;
         
     public:
-        enum
-        {
-            DEFAULT_PRIORITY = 100
-        };
-
         Renderable() : mPolygonModeOverrideable(true), mUseIdentityProjection(false), mUseIdentityView(false){}
         /** Virtual destructor needed as class has virtual methods. */
         virtual ~Renderable() {}
@@ -198,10 +193,10 @@ namespace Ogre {
         */
         bool getUseIdentityView(void) const { return mUseIdentityView; }
 
-        /** Returns the squared distance between the camera and this renderable.
-
-            Used to sort transparent objects. Squared distance is used
-            to avoid having to perform a square root on the result.
+        /** Returns the camera-relative squared depth of this renderable.
+        @remarks
+            Used to sort transparent objects. Squared depth is used rather than
+            actual depth to avoid having to perform a square root on the result.
         */
         virtual Real getSquaredViewDepth(const Camera* cam) const = 0;
 
@@ -234,25 +229,47 @@ namespace Ogre {
             two is performed by the ACT_CUSTOM entry, if that is used.
         @param value The value to associate.
         */
-        void setCustomParameter(size_t index, const Vector4& value);
+        void setCustomParameter(size_t index, const Vector4& value) 
+        {
+            mCustomParameters[index] = value;
+        }
 
         /** Removes a custom value which is associated with this Renderable at the given index.
         @param index Index of the parameter to remove.
             @see setCustomParameter for full details.
         */
-        void removeCustomParameter(size_t index);
+        void removeCustomParameter(size_t index)
+        {
+            mCustomParameters.erase(index);
+        }
 
         /** Checks whether a custom value is associated with this Renderable at the given index.
         @param index Index of the parameter to check for existence.
             @see setCustomParameter for full details.
         */
-        bool hasCustomParameter(size_t index) const;
+        bool hasCustomParameter(size_t index) const
+        {
+            return mCustomParameters.find(index) != mCustomParameters.end();
+        }
 
         /** Gets the custom value associated with this Renderable at the given index.
         @param index Index of the parameter to retrieve.
             @see setCustomParameter for full details.
         */
-        const Vector4& getCustomParameter(size_t index) const;
+        const Vector4& getCustomParameter(size_t index) const
+        {
+            CustomParameterMap::const_iterator i = mCustomParameters.find(index);
+            if (i != mCustomParameters.end())
+            {
+                return i->second;
+            }
+            else
+            {
+                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                    "Parameter at the given index was not found.",
+                    "Renderable::getCustomParameter");
+            }
+        }
 
         /** Update a custom GpuProgramParameters constant which is derived from 
             information only this Renderable knows.
@@ -278,8 +295,17 @@ namespace Ogre {
         @param params The parameters object which this method should call to 
             set the updated parameters.
         */
-        virtual void _updateCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry,
-                                               GpuProgramParameters* params) const;
+        virtual void _updateCustomGpuParameter(
+            const GpuProgramParameters::AutoConstantEntry& constantEntry,
+            GpuProgramParameters* params) const
+        {
+            CustomParameterMap::const_iterator i = mCustomParameters.find(constantEntry.data);
+            if (i != mCustomParameters.end())
+            {
+                params->_writeRawConstant(constantEntry.physicalIndex, i->second, 
+                    constantEntry.elementCount);
+            }
+        }
 
         /** Sets whether this renderable's chosen detail level can be
             overridden (downgraded) by the camera setting. 

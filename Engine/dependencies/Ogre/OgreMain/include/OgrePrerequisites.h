@@ -38,8 +38,6 @@ namespace Ogre {
 
     #define OGRE_VERSION    ((OGRE_VERSION_MAJOR << 16) | (OGRE_VERSION_MINOR << 8) | OGRE_VERSION_PATCH)
 
-    #define OGRE_MIN_VERSION(MAJOR, MINOR, PATCH) OGRE_VERSION >= ((MAJOR << 16) | (MINOR << 8) | PATCH)
-
     // define the real number values to be used
     // default to use 'float' unless precompiler option set
     #if OGRE_DOUBLE_PRECISION == 1
@@ -99,7 +97,6 @@ namespace Ogre {
     class ControllerManager;
     template <typename T> class ControllerValue;
     class DataStream;
-    class DebugDrawer;
     class DefaultWorkQueue;
     class Degree;
     class DepthBuffer;
@@ -173,8 +170,7 @@ namespace Ogre {
     class ParticleSystem;
     class ParticleSystemManager;
     class ParticleSystemRenderer;
-    template<typename T> class FactoryObj;
-    typedef FactoryObj<ParticleSystemRenderer> ParticleSystemRendererFactory;
+    class ParticleSystemRendererFactory;
     class ParticleVisualData;
     class Pass;
     class PatchMesh;
@@ -255,7 +251,6 @@ namespace Ogre {
     typedef Vector<2, Real> Vector2;
     typedef Vector<2, int> Vector2i;
     typedef Vector<3, Real> Vector3;
-    typedef Vector<3, float> Vector3f;
     typedef Vector<3, int> Vector3i;
     typedef Vector<4, Real> Vector4;
     typedef Vector<4, float> Vector4f;

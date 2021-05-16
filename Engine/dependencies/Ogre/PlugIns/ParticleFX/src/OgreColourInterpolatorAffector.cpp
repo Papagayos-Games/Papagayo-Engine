@@ -76,8 +76,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ColourInterpolatorAffector::_affectParticles(ParticleSystem* pSystem, Real timeElapsed)
     {
-        for (auto p : pSystem->_getActiveParticles())
+        Particle*           p;
+        ParticleIterator    pi              = pSystem->_getIterator();
+
+
+        while (!pi.end())
         {
+            p = pi.getNext();
             const Real      life_time       = p->mTotalTimeToLive;
             Real            particle_time   = 1.0f - (p->mTimeToLive / life_time);
 
@@ -96,8 +101,10 @@ namespace Ogre {
                     {
                         particle_time -= mTimeAdj[i];
                         particle_time /= (mTimeAdj[i+1]-mTimeAdj[i]);
-
-                        p->mColour = Math::lerp(mColourAdj[i], mColourAdj[i+1], particle_time);
+                        p->mColour.r = ((mColourAdj[i+1].r * particle_time) + (mColourAdj[i].r * (1.0f - particle_time)));
+                        p->mColour.g = ((mColourAdj[i+1].g * particle_time) + (mColourAdj[i].g * (1.0f - particle_time)));
+                        p->mColour.b = ((mColourAdj[i+1].b * particle_time) + (mColourAdj[i].b * (1.0f - particle_time)));
+                        p->mColour.a = ((mColourAdj[i+1].a * particle_time) + (mColourAdj[i].a * (1.0f - particle_time)));
                         break;
                     }
                 }

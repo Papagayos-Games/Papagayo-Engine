@@ -73,7 +73,7 @@ namespace Ogre
                 curLod->indexCount = indexCount;
             }
 
-            curLod->indexBuffer = mMesh->getHardwareBufferManager()->createIndexBuffer(
+            curLod->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
                 data->mIndexBufferInfoList[i].indexSize == 2 ?
                 HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
                 curLod->indexCount, mMesh->getIndexBufferUsage(), mMesh->isIndexBufferShadowed());

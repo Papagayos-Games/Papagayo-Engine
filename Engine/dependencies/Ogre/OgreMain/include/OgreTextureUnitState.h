@@ -381,7 +381,11 @@ namespace Ogre {
         /**
         @deprecated use setLayerArrayNames()
          */
-        OGRE_DEPRECATED void setCubicTextureName( const String* const names, bool forUVW = false );
+        OGRE_DEPRECATED void setCubicTextureName( const String* const names, bool forUVW = false )
+        {
+            setLayerArrayNames(TEX_TYPE_CUBE_MAP,
+                               std::vector<String>(names, names + 6));
+        }
 
         /**
         @deprecated use setTexture()
@@ -413,6 +417,7 @@ namespace Ogre {
         void setAnimatedTextureName( const String& name, size_t numFrames, Real duration = 0 );
 
         /// @overload
+        /// @param names Pointer to array of names of the textures to use, in frame order.
         /// @deprecated use setAnimatedTextureName( const std::vector<String>&, Real )
         void setAnimatedTextureName( const String* const names, size_t numFrames, Real duration = 0 );
 
@@ -547,11 +552,11 @@ namespace Ogre {
         */
         int getNumMipmaps(void) const;
 
-        /// @deprecated use setDesiredFormat(PF_A8)
-        OGRE_DEPRECATED void setIsAlpha(bool isAlpha);
+        /// @copydoc Texture::setTreatLuminanceAsAlpha
+        void setIsAlpha(bool isAlpha);
 
-        /// @deprecated do not use
-        OGRE_DEPRECATED bool getIsAlpha(void) const;
+        /// @copydoc Texture::getTreatLuminanceAsAlpha
+        bool getIsAlpha(void) const;
 
         /// @copydoc Texture::getGamma
         float getGamma() const;
@@ -1058,12 +1063,17 @@ namespace Ogre {
         /// Get the name of the Texture Unit State.
         const String& getName(void) const { return mName; }
 
-        /// @deprecated use setName()
-        OGRE_DEPRECATED void setTextureNameAlias(const String& name);
-        /// @deprecated use getName()
-        OGRE_DEPRECATED const String& getTextureNameAlias(void) const { return mTextureNameAlias;}
-        /// @deprecated use setTextureName()
-        OGRE_DEPRECATED bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true);
+        /** Set the alias name used for texture frame names.
+        @param name
+            Can be any sequence of characters and does not have to be unique.
+        */
+        void setTextureNameAlias(const String& name);
+        /** Gets the Texture Name Alias of the Texture Unit.
+        */
+        const String& getTextureNameAlias(void) const { return mTextureNameAlias;}
+
+        /// @deprecated do not use
+        bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true);
 
         /** Notify this object that its parent has changed. */
         void _notifyParent(Pass* parent);

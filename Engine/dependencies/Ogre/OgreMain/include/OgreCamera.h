@@ -50,7 +50,7 @@ namespace Ogre {
     */
 
     /** A viewpoint from which the scene will be rendered.
-
+    @remarks
         OGRE renders scenes from a camera viewpoint into a buffer of
         some sort, normally a window or a texture (a subclass of
         RenderTarget). OGRE cameras support both perspective projection (the default,
@@ -63,21 +63,10 @@ namespace Ogre {
         one camera can point at a single render target if required,
         each rendering to a subset of the target, allowing split screen
         and picture-in-picture views.
-
-        At render time, all Scene Objects will be transformed in the camera space,
-        which is defined as:
-        - \f$+x\f$ is right
-        - \f$+y\f$ is up
-        - \f$-z\f$ is away
-
+    @par
         Cameras maintain their own aspect ratios, field of view, and frustum,
-        and project co-ordinates into normalised device coordinates measured from -1 to 1 in x and y,
-        and 0 to 1 in z, where
-        - \f$+x\f$ is right
-        - \f$+y\f$ is up
-        - \f$+z\f$ is away
-
-        At render time, the camera will be rendering to a
+        and project co-ordinates into a space measured from -1 to 1 in x and y,
+        and 0 to 1 in z. At render time, the camera will be rendering to a
         Viewport which will translate these parametric co-ordinates into real screen
         co-ordinates. Obviously it is advisable that the viewport has the same
         aspect ratio as the camera to avoid distortion (unless you want it!).
@@ -120,6 +109,9 @@ namespace Ogre {
         bool mUseRenderingDistance;
         /// Whether or not the minimum display size of objects should take effect for this camera
         bool mUseMinPixelSize;
+
+        /// Scene manager responsible for the scene
+        SceneManager *mSceneMgr;
 
         /// Derived orientation/position of the camera, including reflection
         mutable Quaternion mDerivedOrientation;
@@ -179,8 +171,6 @@ namespace Ogre {
 
         typedef std::vector<Listener*> ListenerList;
         ListenerList mListeners;
-
-        SortMode mSortMode;
 
         // Internal functions for calcs
         bool isViewOutOfDate(void) const;
@@ -265,7 +255,7 @@ namespace Ogre {
 
         /// @overload
         /// @deprecated attach to SceneNode and use SceneNode::setDirection
-        OGRE_DEPRECATED void setDirection(const Vector3& vec);
+        void setDirection(const Vector3& vec);
 
         /** Gets the camera's direction.
         @deprecated attach to SceneNode and use SceneNode::getOrientation().zAxis() * -1
@@ -291,7 +281,7 @@ namespace Ogre {
             targetPoint A vector specifying the look at point.
         @deprecated attach to SceneNode and use SceneNode::lookAt
         */
-        OGRE_DEPRECATED void lookAt( const Vector3& targetPoint );
+        void lookAt( const Vector3& targetPoint );
         /// @overload
         /// @deprecated attach to SceneNode and use SceneNode::lookAt
         OGRE_DEPRECATED void lookAt(Real x, Real y, Real z);
@@ -314,11 +304,11 @@ namespace Ogre {
         /** Rotate the camera around an arbitrary axis.
         @deprecated attach to SceneNode and use SceneNode::rotate
         */
-        OGRE_DEPRECATED void rotate(const Vector3& axis, const Radian& angle);
+        void rotate(const Vector3& axis, const Radian& angle);
 
         /// @overload
         /// @deprecated attach to SceneNode and use SceneNode::rotate
-        OGRE_DEPRECATED void rotate(const Quaternion& q);
+        void rotate(const Quaternion& q);
 
         /** Tells the camera whether to yaw around it's own local Y axis or a 
             fixed axis of choice.
@@ -354,7 +344,7 @@ namespace Ogre {
         OGRE_DEPRECATED void setOrientation(const Quaternion& q);
 
         /** Internal method used by OGRE to update auto-tracking cameras. */
-        OGRE_DEPRECATED void _autoTrack(void);
+        void _autoTrack(void);
 
         /** Get the auto tracking target for this camera, if any. */
         OGRE_DEPRECATED SceneNode* getAutoTrackTarget(void) const { return mAutoTrackTarget; }
@@ -659,11 +649,7 @@ namespace Ogre {
             This parameter is used in min display size calculations.
         */
         Real getPixelDisplayRatio() const { return mPixelDisplayRatio; }
-
-        /// Set the function used to compute the camera-distance for sorting Renderables
-        void setSortMode(SortMode sm) { mSortMode = sm; }
-        /// get the currently used @ref SortMode
-        SortMode getSortMode() const { return mSortMode; }
+        
     };
     /** @} */
     /** @} */

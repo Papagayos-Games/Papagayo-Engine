@@ -75,3 +75,8 @@ MovableObject* PortalFactory::createInstanceImpl(const String& name, const NameV
 {
     return OGRE_NEW Portal(name, getPortalType(params));
 }
+
+void PortalFactory::destroyInstance(MovableObject* obj)
+{
+    OGRE_DELETE obj;
+}

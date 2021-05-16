@@ -104,6 +104,11 @@ namespace Ogre {
         mTexUnitsMap.clear();
         mTextureCoordGen.clear();
 
+        mViewport[0] = 0.0f;
+        mViewport[1] = 0.0f;
+        mViewport[2] = 0.0f;
+        mViewport[3] = 0.0f;
+
         mPointSize = 1.0f;
 
         mActiveDrawFrameBuffer=0;
@@ -459,14 +464,20 @@ namespace Ogre {
         }
     }
 
-    void GL3PlusStateCacheManager::setViewport(const Rect& r)
+    void GL3PlusStateCacheManager::setViewport(GLint x, GLint y, GLsizei width, GLsizei height)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
-        if(mViewport != r)
+        if((mViewport[0] != x) ||
+           (mViewport[1] != y) ||
+           (mViewport[2] != width) ||
+           (mViewport[3] != height))
 #endif
         {
-            mViewport = r;
-            OGRE_CHECK_GL_ERROR(glViewport(r.left, r.top, r.width(), r.height()));
+            mViewport[0] = x;
+            mViewport[1] = y;
+            mViewport[2] = width;
+            mViewport[3] = height;
+            OGRE_CHECK_GL_ERROR(glViewport(x, y, width, height));
         }
     }
 

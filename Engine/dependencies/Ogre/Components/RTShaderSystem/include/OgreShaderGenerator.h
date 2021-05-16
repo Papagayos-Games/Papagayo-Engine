@@ -165,7 +165,7 @@ public:
     const String& getShaderCachePath() const { return mShaderCachePath; }
 
     /** 
-    Flush the shader cache. This operation will cause all active schemes to be invalidated and will
+    Flush the shader cache. This operation will cause all active sachems to be invalidated and will
     destroy any CPU/GPU program that created by this shader generator.
     */
     void flushShaderCache();
@@ -204,12 +204,6 @@ public:
      @param passIndex The pass index.
      */
     RenderState* getRenderState(const String& schemeName, const String& materialName, const String& groupName, unsigned short passIndex);
-
-    /// @overload
-    RenderState* getRenderState(const String& schemeName, const Material& mat, uint16 passIndex = 0)
-    {
-        return getRenderState(schemeName, mat.getName(), mat.getGroup(), passIndex);
-    }
 
     /** 
     Add sub render state factory. Plugins or 3d party applications may implement sub classes of
@@ -260,6 +254,16 @@ public:
     */
     void destroySubRenderState(SubRenderState* subRenderState);
 
+
+    /** 
+    Checks if a shader based technique has been created for a given technique. 
+    Return true if exist. False if not.
+    @param materialName The source material name.
+    @param srcTechniqueSchemeName The source technique scheme name.
+    @param dstTechniqueSchemeName The destination shader based technique scheme name.
+    */
+    bool hasShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const;
+
     /**
      Checks if a shader based technique has been created for a given technique.
      Return true if exist. False if not.
@@ -269,18 +273,6 @@ public:
      @param dstTechniqueSchemeName The destination shader based technique scheme name.
      */
     bool hasShaderBasedTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const;
-
-    /// @overload
-    bool hasShaderBasedTechnique(const Material& mat, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const
-    {
-        return hasShaderBasedTechnique(mat.getName(), mat.getGroup(), srcTechniqueSchemeName, dstTechniqueSchemeName);
-    }
-
-    /// @deprecated
-    OGRE_DEPRECATED bool hasShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const
-    {
-        return hasShaderBasedTechnique(materialName, RGN_AUTODETECT, srcTechniqueSchemeName, dstTechniqueSchemeName);
-    }
 
     /**
     Create shader based technique from a given technique.
@@ -313,24 +305,17 @@ public:
     */
     bool removeAllShaderBasedTechniques(const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
 
-    /// @overload
-    bool removeAllShaderBasedTechniques(const Material& mat)
-    {
-        return removeAllShaderBasedTechniques(mat.getName(), mat.getGroup());
-    }
-
     /** 
     Clone all shader based techniques from one material to another.
     This function can be used in conjunction with the Material::clone() function to copy 
     both material properties and RTSS state from one material to another.
-    @param srcMat The source material
-    @param dstMat The destination material
+    @param srcMaterialName The source material name.    
+    @param srcGroupName The source group name.  
+    @param dstMaterialName The destination material name.   
+    @param dstGroupName The destination group name. 
     @return True if successful
     */
-    bool cloneShaderBasedTechniques(const Material& srcMat, Material& dstMat);
-
-    /// @deprecated
-    OGRE_DEPRECATED bool cloneShaderBasedTechniques(const String& srcMaterialName,
+    bool cloneShaderBasedTechniques(const String& srcMaterialName, 
         const String& srcGroupName, const String& dstMaterialName, const String& dstGroupName);
 
     /** 
@@ -367,12 +352,6 @@ public:
     */
     void invalidateMaterial(const String& schemeName, const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
 
-    /// @overload
-    void invalidateMaterial(const String& schemeName, const Material& mat)
-    {
-        invalidateMaterial(schemeName, mat.getName(), mat.getGroup());
-    }
-
     /** 
     Validate specific material scheme. This action will generate shader programs for the technique of the
     given scheme name.
@@ -381,12 +360,6 @@ public:
     @param groupName The source group name. 
     */
     bool validateMaterial(const String& schemeName, const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
-
-    /// @overload
-    void validateMaterial(const String& schemeName, const Material& mat)
-    {
-        validateMaterial(schemeName, mat.getName(), mat.getGroup());
-    }
 
 	/**
 	Invalidate specific material scheme. This action will lead to shader regeneration of the technique belongs to the
@@ -508,8 +481,14 @@ protected:
 		SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPass, IlluminationStage stage);
         ~SGPass();
     
-        /** Build the render state and acquire the CPU/GPU programs */
+        /** Build the render state. */
         void buildTargetRenderState();
+
+        /** Acquire the CPU/GPU programs for this pass. */
+        void acquirePrograms();
+
+        /** Release the CPU/GPU programs of this pass. */
+        void releasePrograms();
 
         /** Get source pass. */
         Pass* getSrcPass() { return mSrcPass; }
@@ -541,6 +520,8 @@ protected:
 		IlluminationStage mStage;
         // Custom render state.
         RenderState* mCustomRenderState;
+        // The compiled render state.
+        std::unique_ptr<TargetRenderState> mTargetRenderState;
     };
 
     
@@ -567,8 +548,14 @@ protected:
         /** Build the render state. */
         void buildTargetRenderState();
 
+        /** Acquire the CPU/GPU programs for this technique. */
+        void acquirePrograms();
+
 		/** Build the render state for illumination passes. */
 		void buildIlluminationTargetRenderState();
+
+		/** Acquire the CPU/GPU programs for illumination passes of this technique. */
+		void acquireIlluminationPrograms();
 
 		/** Destroy the illumination passes entries. */
 		void destroyIlluminationSGPasses();
@@ -750,7 +737,7 @@ protected:
     typedef SubRenderStateFactoryMap::const_iterator        SubRenderStateFactoryConstIterator;
 
     //-----------------------------------------------------------------------------
-    typedef std::set<SceneManager*>                         SceneManagerMap;
+    typedef std::map<String, SceneManager*>                SceneManagerMap;
     typedef SceneManagerMap::iterator                       SceneManagerIterator;
     typedef SceneManagerMap::const_iterator                 SceneManagerConstIterator;
 

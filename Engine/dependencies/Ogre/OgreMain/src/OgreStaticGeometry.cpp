@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreEntity.h"
 #include "OgreEdgeListBuilder.h"
 #include "OgreLodStrategy.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreSubEntity.h"
 
 namespace Ogre {
@@ -909,6 +910,11 @@ namespace Ogre {
         return mLodBucketList[mCurrentLod]->getEdgeList();
     }
     //--------------------------------------------------------------------------
+    bool StaticGeometry::Region::hasEdgeList(void)
+    {
+        return getEdgeList() != 0;
+    }
+    //--------------------------------------------------------------------------
     void StaticGeometry::Region::dump(std::ofstream& of) const
     {
         of << "Region " << mRegionID << std::endl;
@@ -1168,7 +1174,7 @@ namespace Ogre {
         // We need to search the edge list for silhouette edges
         if (!mEdgeList)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "You enabled stencil shadows after the build process!");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "You enabled stencil shadows after the buid process!");
         }
 
         // Init shadow renderable list if required

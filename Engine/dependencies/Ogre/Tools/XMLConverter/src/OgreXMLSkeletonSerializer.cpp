@@ -409,12 +409,15 @@ namespace Ogre {
         }
 
         // Write links
-        if (!pSkeleton->getLinkedSkeletonAnimationSources().empty())
+        Skeleton::LinkedSkeletonAnimSourceIterator linkIt = 
+            pSkeleton->getLinkedSkeletonAnimationSourceIterator();
+        if (linkIt.hasMoreElements())
         {
             LogManager::getSingleton().logMessage("Exporting animation links.");
             pugi::xml_node linksNode = rootNode.append_child("animationlinks");
-            for(const auto& link : pSkeleton->getLinkedSkeletonAnimationSources())
+            while(linkIt.hasMoreElements())
             {
+                const LinkedSkeletonAnimationSource& link = linkIt.getNext();
                 writeSkeletonAnimationLink(linksNode, link);
             }
         }
@@ -547,9 +550,10 @@ namespace Ogre {
         // Write all tracks
         pugi::xml_node tracksNode = animNode.append_child("tracks");
 
-        for (const auto& it : anim->_getNodeTrackList())
+        Animation::NodeTrackIterator trackIt = anim->getNodeTrackIterator();
+        while (trackIt.hasMoreElements())
         {
-            writeAnimationTrack(tracksNode, it.second);
+            writeAnimationTrack(tracksNode, trackIt.getNext());
         }
 
     }

@@ -115,8 +115,8 @@ namespace Ogre {
         mLoadingState.store(LOADSTATE_LOADED);
 
         // Notify manager
-        if(getCreator())
-            getCreator()->_notifyResourceLoaded(this);
+        if(mCreator)
+            mCreator->_notifyResourceLoaded(this);
 
         // No deferred loading events since this method is not called in background
 
@@ -127,6 +127,7 @@ namespace Ogre {
     {
         mFormat = pf;
         mDesiredFormat = pf;
+        mSrcFormat = pf;
     }
     //--------------------------------------------------------------------------
     bool Texture::hasAlpha(void) const
@@ -190,13 +191,16 @@ namespace Ogre {
         mSrcWidth = mWidth = images[0]->getWidth();
         mSrcHeight = mHeight = images[0]->getHeight();
         mSrcDepth = mDepth = images[0]->getDepth();
-        mSrcFormat = images[0]->getFormat();
 
         if(!mLayerNames.empty() && mTextureType != TEX_TYPE_CUBE_MAP)
             mDepth = mLayerNames.size();
 
-        if(mTreatLuminanceAsAlpha && mSrcFormat == PF_L8)
-            mDesiredFormat = PF_A8;
+        // Get source image format and adjust if required
+        mSrcFormat = images[0]->getFormat();
+        if (mTreatLuminanceAsAlpha && mSrcFormat == PF_L8)
+        {
+            mSrcFormat = PF_A8;
+        }
 
         if (mDesiredFormat != PF_UNKNOWN)
         {
@@ -302,20 +306,21 @@ namespace Ogre {
                     // Load from faces of images[0]
                     src = images[0]->getPixelBox(i, mip);
                 }
-
-                // Allow reinterpreting luminance as alpha
-                if (mDesiredFormat == PF_A8 && (src.format == PF_L8 || src.format == PF_R8))
-                    src.format = PF_A8;
+    
+                // Sets to treated format in case is difference
+                src.format = mSrcFormat;
 
                 if(mGamma != 1.0f) {
                     // Apply gamma correction
                     // Do not overwrite original image but do gamma correction in temporary buffer
-                    Image tmp(src.format, src.getWidth(), getHeight(), src.getDepth());
-                    PixelBox corrected = tmp.getPixelBox();
+                    MemoryDataStream buf(src.getConsecutiveSize());
+
+                    PixelBox corrected = PixelBox(src.getWidth(), src.getHeight(), src.getDepth(), src.format, buf.getPtr());
                     PixelUtil::bulkPixelConversion(src, corrected);
-
-                    Image::applyGamma(corrected.data, mGamma, tmp.getSize(), tmp.getBPP());
-
+                    
+                    Image::applyGamma(corrected.data, mGamma, corrected.getConsecutiveSize(),
+                        static_cast<uchar>(PixelUtil::getNumElemBits(src.format)));
+    
                     // Destination: entire texture. blitFromMemory does the scaling to
                     // a power of two for us when needed
                     buffer->blitFromMemory(corrected, dst);
@@ -424,16 +429,41 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Texture::convertToImage(Image& destImage, bool includeMipMaps)
     {
-        uint32 numMips = includeMipMaps? getNumMipmaps() + 1 : 1;
-        destImage.create(getFormat(), getWidth(), getHeight(), getDepth(), getNumFaces(), numMips);
 
+        uint32 numMips = includeMipMaps? getNumMipmaps() + 1 : 1;
+        size_t dataSize = Image::calculateSize(numMips,
+            getNumFaces(), getWidth(), getHeight(), getDepth(), getFormat());
+
+        void* pixData = OGRE_MALLOC(dataSize, Ogre::MEMCATEGORY_GENERAL);
+        // if there are multiple faces and mipmaps we must pack them into the data
+        // faces, then mips
+        void* currentPixData = pixData;
         for (size_t face = 0; face < getNumFaces(); ++face)
         {
+            uint32 width = getWidth();
+            uint32 height = getHeight();
+            uint32 depth = getDepth();
             for (uint32 mip = 0; mip < numMips; ++mip)
             {
-                getBuffer(face, mip)->blitToMemory(destImage.getPixelBox(face, mip));
+                size_t mipDataSize = PixelUtil::getMemorySize(width, height, depth, getFormat());
+
+                Ogre::PixelBox pixBox(width, height, depth, getFormat(), currentPixData);
+                getBuffer(face, mip)->blitToMemory(pixBox);
+
+                currentPixData = (void*)((char*)currentPixData + mipDataSize);
+
+                if(width != 1)
+                    width /= 2;
+                if(height != 1)
+                    height /= 2;
+                if(depth != 1)
+                    depth /= 2;
             }
         }
+
+        // load, and tell Image to delete the memory when it's done.
+        destImage.loadDynamicImage((Ogre::uchar*)pixData, getWidth(), getHeight(), getDepth(), getFormat(), true, 
+            getNumFaces(), numMips - 1);
     }
 
     //--------------------------------------------------------------------------

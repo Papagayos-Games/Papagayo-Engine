@@ -76,7 +76,7 @@ namespace Ogre {
     */
     class _OgreExport BillboardChain : public MovableObject, public Renderable
     {
-        bool getCastsShadows(void) const override { return getCastShadows(); }
+
     public:
 
         /** Contains the data of an element of the BillboardChain.
@@ -373,6 +373,8 @@ namespace Ogre {
         static String FACTORY_TYPE_NAME;
 
         const String& getType(void) const;
+        void destroyInstance( MovableObject* obj);  
+
     };
 
     /** @} */

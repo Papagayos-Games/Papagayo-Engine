@@ -34,7 +34,8 @@ THE SOFTWARE.
 #include "OgreLight.h"
 #include "OgreCamera.h"
 #include "OgreGLTextureManager.h"
-#include "OgreGLHardwareBuffer.h"
+#include "OgreGLHardwareVertexBuffer.h"
+#include "OgreGLHardwareIndexBuffer.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreGLUtil.h"
 #include "OgreGLGpuProgram.h"
@@ -152,9 +153,11 @@ namespace Ogre {
     }
 
     GLRenderSystem::GLRenderSystem()
-    :   mFixedFunctionTextureUnits(0),
+    :   mStopRendering(false),
+        mFixedFunctionTextureUnits(0),
         mStencilWriteMask(0xFFFFFFFF),
         mDepthWrite(true),
+        mScissorsEnabled(false),
         mUseAutoTextureMatrix(false),
         mHardwareBufferManager(0),
         mGpuProgramManager(0),
@@ -178,6 +181,8 @@ namespace Ogre {
 
         initConfigOptions();
 
+        mColourWrite[0] = mColourWrite[1] = mColourWrite[2] = mColourWrite[3] = true;
+
         for (i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
         {
             // Dummy value
@@ -190,7 +195,6 @@ namespace Ogre {
         mMainContext = 0;
 
         mGLInitialised = false;
-        mEnableFixedPipeline = true;
 
         mCurrentLights = 0;
         mMinFilter = FO_LINEAR;
@@ -349,19 +353,6 @@ namespace Ogre {
         mTextureManager = new GLTextureManager(this);
     }
 
-    void GLRenderSystem::initConfigOptions()
-    {
-        GLRenderSystemCommon::initConfigOptions();
-
-        ConfigOption opt;
-        opt.name = "Fixed Pipeline Enabled";
-        opt.possibleValues = {"Yes", "No"};
-        opt.currentValue = opt.possibleValues[0];
-        opt.immutable = false;
-
-        mOptions[opt.name] = opt;
-    }
-
     RenderSystemCapabilities* GLRenderSystem::createRenderSystemCapabilities() const
     {
         RenderSystemCapabilities* rsc = new RenderSystemCapabilities();
@@ -369,15 +360,24 @@ namespace Ogre {
         rsc->setCategoryRelevant(CAPS_CATEGORY_GL, true);
         rsc->setDriverVersion(mDriverVersion);
         const char* deviceName = (const char*)glGetString(GL_RENDERER);
+        const char* vendorName = (const char*)glGetString(GL_VENDOR);
         rsc->setDeviceName(deviceName);
         rsc->setRenderSystemName(getName());
-        rsc->setVendor(mVendor);
 
-        if (mEnableFixedPipeline)
-        {
-            // Supports fixed-function
-            rsc->setCapability(RSC_FIXED_FUNCTION);
-        }
+        // determine vendor
+        if (strstr(vendorName, "NVIDIA"))
+            rsc->setVendor(GPU_NVIDIA);
+        else if (strstr(vendorName, "ATI"))
+            rsc->setVendor(GPU_AMD);
+        else if (strstr(vendorName, "AMD"))
+            rsc->setVendor(GPU_AMD);
+        else if (strstr(vendorName, "Intel"))
+            rsc->setVendor(GPU_INTEL);
+        else
+            rsc->setVendor(GPU_UNKNOWN);
+
+        // Supports fixed-function
+        rsc->setCapability(RSC_FIXED_FUNCTION);
 
         rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
 
@@ -651,9 +651,6 @@ namespace Ogre {
         // 3D textures should be supported by GL 1.2, which is our minimum version
         rsc->setCapability(RSC_TEXTURE_1D);
         rsc->setCapability(RSC_TEXTURE_3D);
-
-        if(GLEW_VERSION_3_0 || GLEW_EXT_texture_array)
-            rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
 
         // Check for framebuffer object extension
         if(GLEW_EXT_framebuffer_object)
@@ -959,6 +956,13 @@ namespace Ogre {
             caps->setNumMultiRenderTargets(1);
         }
 
+
+        Log* defaultLog = LogManager::getSingleton().getDefaultLog();
+        if (defaultLog)
+        {
+            caps->log(defaultLog);
+        }
+
         mGLInitialised = true;
     }
 
@@ -995,6 +999,7 @@ namespace Ogre {
         mRTTManager = 0;
 
         mGLSupport->stop();
+        mStopRendering = true;
 
         delete mTextureManager;
         mTextureManager = 0;
@@ -1018,12 +1023,62 @@ namespace Ogre {
             break;
         }
     }
+
+    //---------------------------------------------------------------------
+    bool GLRenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
+                                              RenderWindowList& createdWindows)
+    {
+        // Call base render system method.
+        if (false == RenderSystem::_createRenderWindows(renderWindowDescriptions, createdWindows))
+            return false;
+
+        // Simply call _createRenderWindow in a loop.
+        for (size_t i = 0; i < renderWindowDescriptions.size(); ++i)
+        {
+            const RenderWindowDescription& curRenderWindowDescription = renderWindowDescriptions[i];
+            RenderWindow* curWindow = NULL;
+
+            curWindow = _createRenderWindow(curRenderWindowDescription.name,
+                                            curRenderWindowDescription.width,
+                                            curRenderWindowDescription.height,
+                                            curRenderWindowDescription.useFullScreen,
+                                            &curRenderWindowDescription.miscParams);
+
+            createdWindows.push_back(curWindow);
+        }
+
+        return true;
+    }
     //---------------------------------------------------------------------
     RenderWindow* GLRenderSystem::_createRenderWindow(const String &name,
                                                       unsigned int width, unsigned int height, bool fullScreen,
                                                       const NameValuePairList *miscParams)
     {
-        RenderSystem::_createRenderWindow(name, width, height, fullScreen, miscParams);
+        if (mRenderTargets.find(name) != mRenderTargets.end())
+        {
+            OGRE_EXCEPT(
+                Exception::ERR_INVALIDPARAMS,
+                "Window with name '" + name + "' already exists",
+                "GLRenderSystem::_createRenderWindow" );
+        }
+        // Log a message
+        StringStream ss;
+        ss << "GLRenderSystem::_createRenderWindow \"" << name << "\", " <<
+            width << "x" << height << " ";
+        if(fullScreen)
+            ss << "fullscreen ";
+        else
+            ss << "windowed ";
+        if(miscParams)
+        {
+            ss << " miscParams: ";
+            NameValuePairList::const_iterator it;
+            for(it=miscParams->begin(); it!=miscParams->end(); ++it)
+            {
+                ss << it->first << "=" << it->second << " ";
+            }
+            LogManager::getSingleton().logMessage(ss.str());
+        }
 
         // Create the window
         RenderWindow* win = mGLSupport->newWindow(name, width, height,
@@ -1039,12 +1094,6 @@ namespace Ogre {
             const char* shadingLangVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
             StringVector tokens = StringUtil::split(shadingLangVersion, ". ");
             mNativeShadingLanguageVersion = (StringConverter::parseUnsignedInt(tokens[0]) * 100) + StringConverter::parseUnsignedInt(tokens[1]);
-
-            auto it = mOptions.find("Fixed Pipeline Enabled");
-            if (it != mOptions.end())
-            {
-                mEnableFixedPipeline = StringConverter::parseBool(it->second.currentValue);
-            }
 
             // Initialise GL after the first window has been created
             // TODO: fire this from emulation options, and don't duplicate Real and Current capabilities
@@ -1733,6 +1782,70 @@ namespace Ogre {
         return GL_ONE;
     }
     //-----------------------------------------------------------------------------
+    void GLRenderSystem::_setSeparateSceneBlending(
+        SceneBlendFactor sourceFactor, SceneBlendFactor destFactor,
+        SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha,
+        SceneBlendOperation op, SceneBlendOperation alphaOp )
+    {
+        GLint sourceBlend = getBlendMode(sourceFactor);
+        GLint destBlend = getBlendMode(destFactor);
+        GLint sourceBlendAlpha = getBlendMode(sourceFactorAlpha);
+        GLint destBlendAlpha = getBlendMode(destFactorAlpha);
+
+        if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO &&
+           sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
+        {
+            mStateCacheManager->setEnabled(GL_BLEND, false);
+        }
+        else
+        {
+            mStateCacheManager->setEnabled(GL_BLEND, true);
+            mStateCacheManager->setBlendFunc(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
+        }
+
+        GLint func = GL_FUNC_ADD, alphaFunc = GL_FUNC_ADD;
+
+        switch(op)
+        {
+        case SBO_ADD:
+            func = GL_FUNC_ADD;
+            break;
+        case SBO_SUBTRACT:
+            func = GL_FUNC_SUBTRACT;
+            break;
+        case SBO_REVERSE_SUBTRACT:
+            func = GL_FUNC_REVERSE_SUBTRACT;
+            break;
+        case SBO_MIN:
+            func = GL_MIN;
+            break;
+        case SBO_MAX:
+            func = GL_MAX;
+            break;
+        }
+
+        switch(alphaOp)
+        {
+        case SBO_ADD:
+            alphaFunc = GL_FUNC_ADD;
+            break;
+        case SBO_SUBTRACT:
+            alphaFunc = GL_FUNC_SUBTRACT;
+            break;
+        case SBO_REVERSE_SUBTRACT:
+            alphaFunc = GL_FUNC_REVERSE_SUBTRACT;
+            break;
+        case SBO_MIN:
+            alphaFunc = GL_MIN;
+            break;
+        case SBO_MAX:
+            alphaFunc = GL_MAX;
+            break;
+        }
+
+        mStateCacheManager->setBlendEquation(func, alphaFunc);
+    }
+    //-----------------------------------------------------------------------------
     void GLRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
         bool enable = func != CMPF_ALWAYS_PASS;
@@ -1766,24 +1879,50 @@ namespace Ogre {
             _setRenderTarget(target);
             mActiveViewport = vp;
 
+            GLsizei x, y, w, h;
+
             // Calculate the "lower-left" corner of the viewport
-            Rect vpRect = vp->getActualDimensions();
+            w = vp->getActualWidth();
+            h = vp->getActualHeight();
+            x = vp->getActualLeft();
+            y = vp->getActualTop();
             if (!target->requiresTextureFlipping())
             {
                 // Convert "upper-left" corner to "lower-left"
-                std::swap(vpRect.top, vpRect.bottom);
-                vpRect.top = target->getHeight() - vpRect.top;
-                vpRect.bottom = target->getHeight() - vpRect.bottom;
+                y = target->getHeight() - h - y;
             }
-            mStateCacheManager->setViewport(vpRect);
+            mStateCacheManager->setViewport(x, y, w, h);
+
+            // Configure the viewport clipping
+            glScissor(x, y, w, h);
+            mScissorBox[0] = x;
+            mScissorBox[1] = y;
+            mScissorBox[2] = w;
+            mScissorBox[3] = h;
 
             vp->_clearUpdatedFlag();
         }
     }
 
     //-----------------------------------------------------------------------------
+    void GLRenderSystem::_beginFrame(void)
+    {
+        if (!mActiveViewport)
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                        "Cannot begin frame - no viewport selected.",
+                        "GLRenderSystem::_beginFrame");
+
+        // Activate the viewport clipping
+        mScissorsEnabled = true;
+        mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
+    }
+
+    //-----------------------------------------------------------------------------
     void GLRenderSystem::_endFrame(void)
     {
+        // Deactivate the viewport clipping.
+        mScissorsEnabled = false;
+        mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
         // unbind GPU programs at end of frame
         // this is mostly to avoid holding bound programs that might get deleted
         // outside via the resource manager
@@ -1881,42 +2020,14 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------------
-    static GLenum getBlendOp(SceneBlendOperation op)
+    void GLRenderSystem::_setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha)
     {
-        switch (op)
-        {
-        case SBO_ADD:
-            return GL_FUNC_ADD;
-        case SBO_SUBTRACT:
-            return GL_FUNC_SUBTRACT;
-        case SBO_REVERSE_SUBTRACT:
-            return GL_FUNC_REVERSE_SUBTRACT;
-        case SBO_MIN:
-            return GL_MIN;
-        case SBO_MAX:
-            return GL_MAX;
-        }
-        return GL_FUNC_ADD;
-    }
-    void GLRenderSystem::setColourBlendState(const ColourBlendState& state)
-    {
+        mStateCacheManager->setColourMask(red, green, blue, alpha);
         // record this
-        mCurrentBlend = state;
-
-        if (state.blendingEnabled())
-        {
-            mStateCacheManager->setEnabled(GL_BLEND, true);
-            mStateCacheManager->setBlendFunc(
-                getBlendMode(state.sourceFactor), getBlendMode(state.destFactor),
-                getBlendMode(state.sourceFactorAlpha), getBlendMode(state.destFactorAlpha));
-        }
-        else
-        {
-            mStateCacheManager->setEnabled(GL_BLEND, false);
-        }
-
-        mStateCacheManager->setBlendEquation(getBlendOp(state.operation), getBlendOp(state.alphaOperation));
-        mStateCacheManager->setColourMask(state.writeR, state.writeG, state.writeB, state.writeA);
+        mColourWrite[0] = red;
+        mColourWrite[1] = green;
+        mColourWrite[2] = blue;
+        mColourWrite[3] = alpha;
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::setLightingEnabled(bool enabled)
@@ -2272,7 +2383,8 @@ namespace Ogre {
             cmd = GL_INTERPOLATE;
             break;
         case LBX_DOTPRODUCT:
-            cmd = GL_DOT3_RGB;
+            cmd = mCurrentCapabilities->hasCapability(RSC_DOT3)
+                ? GL_DOT3_RGB : GL_MODULATE;
             break;
         default:
             cmd = 0;
@@ -2457,7 +2569,8 @@ namespace Ogre {
         {
             void* pBufferData = 0;
             mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB,
-                                op.indexData->indexBuffer->_getImpl<GLHardwareBuffer>()->getGLBufferId());
+                            static_cast<GLHardwareIndexBuffer*>(
+                                op.indexData->indexBuffer.get())->getGLBufferId());
 
             pBufferData = VBO_BUFFER_OFFSET(
                 op.indexData->indexStart * op.indexData->indexBuffer->getIndexSize());
@@ -2466,6 +2579,13 @@ namespace Ogre {
 
             do
             {
+                // Update derived depth bias
+                if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
+                {
+                    _setDepthBias(mDerivedDepthBiasBase +
+                                  mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
+                                  mDerivedDepthBiasSlopeScale);
+                }
                 if(hasInstanceData)
                 {
                     glDrawElementsInstancedARB(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances);
@@ -2481,6 +2601,14 @@ namespace Ogre {
         {
             do
             {
+                // Update derived depth bias
+                if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
+                {
+                    _setDepthBias(mDerivedDepthBiasBase +
+                                  mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
+                                  mDerivedDepthBiasSlopeScale);
+                }
+
                 if(hasInstanceData)
                 {
                     glDrawArraysInstancedARB(primType, 0, op.vertexData->vertexCount, numberOfInstances);
@@ -2713,27 +2841,57 @@ namespace Ogre {
         glPopMatrix();
     }
     //---------------------------------------------------------------------
-    void GLRenderSystem::setScissorTest(bool enabled, const Rect& rect)
+    void GLRenderSystem::setScissorTest(bool enabled, size_t left,
+                                        size_t top, size_t right, size_t bottom)
     {
-        mStateCacheManager->setEnabled(GL_SCISSOR_TEST, enabled);
-
-        if (!enabled)
-            return;
-
+        mScissorsEnabled = enabled;
         // If request texture flipping, use "upper-left", otherwise use "lower-left"
         bool flipping = mActiveRenderTarget->requiresTextureFlipping();
         //  GL measures from the bottom, not the top
-        long targetHeight = mActiveRenderTarget->getHeight();
-        long top = flipping ? rect.top : targetHeight - rect.bottom;
-        // NB GL uses width / height rather than right / bottom
-        glScissor(rect.left, top, rect.width(), rect.height());
+        size_t targetHeight = mActiveRenderTarget->getHeight();
+        // Calculate the "lower-left" corner of the viewport
+        GLsizei x = 0, y = 0, w = 0, h = 0;
+
+        if (enabled)
+        {
+            mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
+            // NB GL uses width / height rather than right / bottom
+            x = left;
+            if (flipping)
+                y = top;
+            else
+                y = targetHeight - bottom;
+            w = right - left;
+            h = bottom - top;
+            glScissor(x, y, w, h);
+            mScissorBox[0] = x;
+            mScissorBox[1] = y;
+            mScissorBox[2] = w;
+            mScissorBox[3] = h;
+        }
+        else
+        {
+            // GL requires you to reset the scissor when disabling
+            w = mActiveViewport->getActualWidth();
+            h = mActiveViewport->getActualHeight();
+            x = mActiveViewport->getActualLeft();
+            if (flipping)
+                y = mActiveViewport->getActualTop();
+            else
+                y = targetHeight - mActiveViewport->getActualTop() - h;
+            glScissor(x, y, w, h);
+            mScissorBox[0] = x;
+            mScissorBox[1] = y;
+            mScissorBox[2] = w;
+            mScissorBox[3] = h;
+        }
     }
     //---------------------------------------------------------------------
     void GLRenderSystem::clearFrameBuffer(unsigned int buffers,
                                           const ColourValue& colour, Real depth, unsigned short stencil)
     {
-        bool colourMask =
-            !(mCurrentBlend.writeR && mCurrentBlend.writeG && mCurrentBlend.writeB && mCurrentBlend.writeA);
+        bool colourMask = !mColourWrite[0] || !mColourWrite[1]
+            || !mColourWrite[2] || !mColourWrite[3];
 
         if(mCurrentContext)
 			mCurrentContext->setCurrent();
@@ -2768,23 +2926,37 @@ namespace Ogre {
             glClearStencil(stencil);
         }
 
-        Rect vpRect = mActiveViewport->getActualDimensions();
-        bool needScissorBox =
-            vpRect != Rect(0, 0, mActiveRenderTarget->getWidth(), mActiveRenderTarget->getHeight());
-        if (needScissorBox)
+        // Should be enable scissor test due the clear region is
+        // relied on scissor box bounds.
+        if (!mScissorsEnabled)
         {
-            // Should be enable scissor test due the clear region is
-            // relied on scissor box bounds.
-            setScissorTest(true, vpRect);
+            mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
+        }
+
+        // Sets the scissor box as same as viewport
+        GLint viewport[4];
+        mStateCacheManager->getViewport(viewport);
+        bool scissorBoxDifference =
+            viewport[0] != mScissorBox[0] || viewport[1] != mScissorBox[1] ||
+            viewport[2] != mScissorBox[2] || viewport[3] != mScissorBox[3];
+        if (scissorBoxDifference)
+        {
+            glScissor(viewport[0], viewport[1], viewport[2], viewport[3]);
         }
 
         // Clear buffers
         glClear(flags);
 
-        // Restore scissor test
-        if (needScissorBox)
+        // Restore scissor box
+        if (scissorBoxDifference)
         {
-            setScissorTest(false);
+            glScissor(mScissorBox[0], mScissorBox[1], mScissorBox[2], mScissorBox[3]);
+        }
+
+        // Restore scissor test
+        if (!mScissorsEnabled)
+        {
+           mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
         }
 
         // Reset buffer write state
@@ -2794,8 +2966,7 @@ namespace Ogre {
         }
         if (colourMask && (buffers & FBT_COLOUR))
         {
-            mStateCacheManager->setColourMask(mCurrentBlend.writeR, mCurrentBlend.writeG,
-                                              mCurrentBlend.writeB, mCurrentBlend.writeA);
+            mStateCacheManager->setColourMask(mColourWrite[0], mColourWrite[1], mColourWrite[2], mColourWrite[3]);
         }
         if (buffers & FBT_STENCIL)
         {
@@ -2894,8 +3065,7 @@ namespace Ogre {
         // clearFrameBuffer would be wrong because the value we are recorded may be
         // difference with the really state stored in GL context.
         mStateCacheManager->setDepthMask(mDepthWrite);
-        mStateCacheManager->setColourMask(mCurrentBlend.writeR, mCurrentBlend.writeG,
-                                          mCurrentBlend.writeB, mCurrentBlend.writeA);
+        mStateCacheManager->setColourMask(mColourWrite[0], mColourWrite[1], mColourWrite[2], mColourWrite[3]);
         mStateCacheManager->setStencilMask(mStencilWriteMask);
 
     }
@@ -2958,6 +3128,11 @@ namespace Ogre {
             }
         }
     }
+    //---------------------------------------------------------------------
+    unsigned int GLRenderSystem::getDisplayMonitorCount() const
+    {
+        return mGLSupport->getDisplayMonitorCount();
+    }
 
     //---------------------------------------------------------------------
     void GLRenderSystem::beginProfileEvent( const String &eventName )
@@ -2987,7 +3162,7 @@ namespace Ogre {
                                                 const size_t vertexStart)
     {
         void* pBufferData = 0;
-        const GLHardwareBuffer* hwGlBuffer = vertexBuffer->_getImpl<GLHardwareBuffer>();
+        const GLHardwareVertexBuffer* hwGlBuffer = static_cast<const GLHardwareVertexBuffer*>(vertexBuffer.get());
 
         mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER_ARB, 
                         hwGlBuffer->getGLBufferId());
@@ -3004,12 +3179,12 @@ namespace Ogre {
         bool isCustomAttrib = false;
         if (mCurrentVertexProgram)
         {
-            isCustomAttrib = !mEnableFixedPipeline || mCurrentVertexProgram->isAttributeValid(sem, elem.getIndex());
+            isCustomAttrib = mCurrentVertexProgram->isAttributeValid(sem, elem.getIndex());
 
-            if (vertexBuffer->isInstanceData())
+            if (hwGlBuffer->isInstanceData())
             {
                 GLint attrib = GLSLProgramCommon::getFixedAttributeIndex(sem, elem.getIndex());
-                glVertexAttribDivisorARB(attrib, vertexBuffer->getInstanceDataStepRate() );
+                glVertexAttribDivisorARB(attrib, hwGlBuffer->getInstanceDataStepRate() );
                 mRenderInstanceAttribsBound.push_back(attrib);
             }
         }
@@ -3219,7 +3394,7 @@ namespace Ogre {
         const GLubyte* pcVendor = glGetString(GL_VENDOR);
         tmpStr = (const char*)pcVendor;
         LogManager::getSingleton().logMessage("GL_VENDOR = " + tmpStr);
-        mVendor = RenderSystemCapabilities::vendorFromString(tmpStr.substr(0, tmpStr.find(' ')));
+        mVendor = tmpStr.substr(0, tmpStr.find(' '));
 
         // Get renderer
         const GLubyte* pcRenderer = glGetString(GL_RENDERER);

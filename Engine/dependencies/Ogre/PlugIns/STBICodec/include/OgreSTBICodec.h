@@ -53,16 +53,18 @@ namespace Ogre {
         STBIImageCodec(const String &type);
         virtual ~STBIImageCodec() { }
 
-        using ImageCodec::decode;
-        using ImageCodec::encode;
-        using ImageCodec::encodeToFile;
+        /// @copydoc Codec::encode
+        DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const;
+        /// @copydoc Codec::encodeToFile
+        void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const;
+        /// @copydoc Codec::decode
+        DecodeResult decode(const DataStreamPtr& input) const;
 
-        DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const override;
-        void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const  override;
-        DecodeResult decode(const DataStreamPtr& input) const  override;
+        
+        virtual String getType() const;        
 
-        String getType() const  override;
-        String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const override;
+        /// @copydoc Codec::magicNumberToFileExt
+        String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
 
         /// Static method to startup and register the codecs
         _OgreSTBICodecExport static void startup(void);

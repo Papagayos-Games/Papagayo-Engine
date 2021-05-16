@@ -39,7 +39,8 @@ THE SOFTWARE.
 #include "OgreMath.h"
 #include "OgreViewport.h"
 #include "OgreD3D9HardwareBufferManager.h"
-#include "OgreD3D9HardwareBuffer.h"
+#include "OgreD3D9HardwareIndexBuffer.h"
+#include "OgreD3D9HardwareVertexBuffer.h"
 #include "OgreD3D9VertexDeclaration.h"
 #include "OgreD3D9GpuProgram.h"
 #include "OgreD3D9GpuProgramManager.h"
@@ -116,6 +117,10 @@ namespace Ogre
 
         // set config options defaults
         initConfigOptions();
+
+        // fsaa options
+        mFSAAHint = "";
+        mFSAASamples = 0;
         
         // set stages desc. to defaults
         for (size_t n = 0; n < OGRE_MAX_TEXTURE_LAYERS; n++)
@@ -330,6 +335,7 @@ namespace Ogre
         ConfigOption optAllowDirectX9Ex;
         ConfigOption optVideoMode;
         ConfigOption optMultihead;
+        ConfigOption optVSyncInterval;
 		ConfigOption optBackBufferCount;
         ConfigOption optAA;
         ConfigOption optFPUMode;
@@ -383,6 +389,14 @@ namespace Ogre
                 optDevice.currentValue = driver->DriverDescription();
         }
 
+        optVSyncInterval.name = "VSync Interval";
+        optVSyncInterval.immutable = false;
+        optVSyncInterval.possibleValues.push_back( "1" );
+        optVSyncInterval.possibleValues.push_back( "2" );
+        optVSyncInterval.possibleValues.push_back( "3" );
+        optVSyncInterval.possibleValues.push_back( "4" );
+        optVSyncInterval.currentValue = "1";
+
 		optBackBufferCount.name = "Backbuffer Count";
 		optBackBufferCount.immutable = false;
 		optBackBufferCount.possibleValues.push_back( "Auto" );
@@ -416,7 +430,7 @@ namespace Ogre
         optMultiDeviceMemHint.name = "Multi device memory hint";
         optMultiDeviceMemHint.possibleValues.push_back("Use minimum system memory");
         optMultiDeviceMemHint.possibleValues.push_back("Auto hardware buffers management");
-        optMultiDeviceMemHint.currentValue = optMultiDeviceMemHint.possibleValues[1];
+        optMultiDeviceMemHint.currentValue = "Use minimum system memory";
         optMultiDeviceMemHint.immutable = false;
 
         optEnableFixedPipeline.name = "Fixed Pipeline Enabled";
@@ -429,6 +443,7 @@ namespace Ogre
         mOptions[optAllowDirectX9Ex.name] = optAllowDirectX9Ex;
         mOptions[optVideoMode.name] = optVideoMode;
         mOptions[optMultihead.name] = optMultihead;
+        mOptions[optVSyncInterval.name] = optVSyncInterval;
 		mOptions[optBackBufferCount.name] = optBackBufferCount;
         mOptions[optAA.name] = optAA;
         mOptions[optFPUMode.name] = optFPUMode;
@@ -566,6 +581,40 @@ namespace Ogre
             else mMultiheadUse = mutAuto;
         }
 
+		if (name == "VSync Interval")
+		{
+			mVSyncInterval = StringConverter::parseUnsignedInt(value);
+		}
+
+		if( name == "VSync" )
+		{
+			if (value == "Yes")
+				mVSync = true;
+			else
+				mVSync = false;
+		}
+		
+        if( name == "FSAA" )
+        {
+            StringVector values = StringUtil::split(value, " ", 1);
+            mFSAASamples = StringConverter::parseUnsignedInt(values[0]);
+            if (values.size() > 1)
+                mFSAAHint = values[1];
+
+        }
+		
+		if (name == "Backbuffer Count")
+		{
+			if (value == "Auto")
+			{
+				mBackBufferCount = -1;
+			}
+			else
+			{
+				mBackBufferCount = StringConverter::parseUnsignedInt(value);
+			}
+		}
+
         if( name == "Allow NVPerfHUD" )
         {
             if (value == "Yes")
@@ -623,11 +672,11 @@ namespace Ogre
             D3D9VideoMode *videoMode = driver->getVideoModeList()->item(it->second.currentValue);
             if (videoMode)
             {
+                DWORD numLevels = 0;
                 bool bOK;
 
                 for (unsigned int n = (unsigned int)D3DMULTISAMPLE_2_SAMPLES; n <= (unsigned int)D3DMULTISAMPLE_16_SAMPLES; n++)
                 {
-                    DWORD numLevels = 2;
                     bOK = this->_checkMultiSampleQuality(
                         (D3DMULTISAMPLE_TYPE)n, 
                         &numLevels, 
@@ -637,10 +686,9 @@ namespace Ogre
                         TRUE);
                     if (bOK)
                     {
-                        // CSAA modes supported by both AMD and Nvidia
-                        if (n == 8 && numLevels > 2) optFSAA->possibleValues.push_back("4f8");
-                        if (n == 16 && numLevels > 2) optFSAA->possibleValues.push_back("8f16");
                         optFSAA->possibleValues.push_back(StringConverter::toString(n));
+                        if (n >= 8)
+                            optFSAA->possibleValues.push_back(StringConverter::toString(n) + " [Quality]");
                     }
                 }
 
@@ -687,6 +735,12 @@ namespace Ogre
             return "Your DirectX driver name has changed since the last time you ran OGRE; "
                 "the 'Rendering Device' has been changed.";
         }
+
+		it = mOptions.find( "VSync" );
+		if( it->second.currentValue == "Yes" )
+			mVSync = true;
+		else
+			mVSync = false;
 
         return BLANKSTRING;
     }
@@ -738,6 +792,13 @@ namespace Ogre
         LogManager::getSingleton().logMessage("***************************************");
     }
     //---------------------------------------------------------------------
+    void D3D9RenderSystem::reinitialise()
+    {
+        LogManager::getSingleton().logMessage( "D3D9 : Reinitialising" );
+        this->shutdown();
+        this->_initialise();
+    }
+    //---------------------------------------------------------------------
     void D3D9RenderSystem::shutdown()
     {
         RenderSystem::shutdown();
@@ -779,8 +840,38 @@ namespace Ogre
     RenderWindow* D3D9RenderSystem::_createRenderWindow(const String &name, 
         unsigned int width, unsigned int height, bool fullScreen,
         const NameValuePairList *miscParams)
-    {
-        RenderSystem::_createRenderWindow(name, width, height, fullScreen, miscParams);
+    {       
+        // Log a message
+        StringStream ss;
+        ss << "D3D9RenderSystem::_createRenderWindow \"" << name << "\", " <<
+            width << "x" << height << " ";
+
+        if(fullScreen)
+            ss << "fullscreen ";
+        else
+            ss << "windowed ";
+
+        if(miscParams)
+        {
+            ss << " miscParams: ";
+            NameValuePairList::const_iterator it;
+            for(it=miscParams->begin(); it!=miscParams->end(); ++it)
+            {
+                ss << it->first << "=" << it->second << " ";
+            }
+            LogManager::getSingleton().logMessage(ss.str());
+        }
+
+        String msg;
+
+        // Make sure we don't already have a render target of the 
+        // same name as the one supplied
+        if( mRenderTargets.find( name ) != mRenderTargets.end() )
+        {
+            msg = "A render target of the same name '" + name + "' already "
+                "exists.  You cannot create a new window with this name.";
+            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, msg, "D3D9RenderSystem::_createRenderWindow" );
+        }
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
         // Stereo driver must be created before device is created
@@ -822,7 +913,33 @@ namespace Ogre
 #endif
 
         return renderWindow;
+    }   
+    //---------------------------------------------------------------------
+    bool D3D9RenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
+        RenderWindowList& createdWindows)
+    {
+        // Call base render system method.
+        if (false == RenderSystem::_createRenderWindows(renderWindowDescriptions, createdWindows))
+            return false;
+
+        // Simply call _createRenderWindow in a loop.
+        for (size_t i = 0; i < renderWindowDescriptions.size(); ++i)
+        {
+            const RenderWindowDescription& curRenderWindowDescription = renderWindowDescriptions[i];            
+            RenderWindow* curWindow = NULL;
+
+            curWindow = _createRenderWindow(curRenderWindowDescription.name, 
+                curRenderWindowDescription.width, 
+                curRenderWindowDescription.height, 
+                curRenderWindowDescription.useFullScreen, 
+                &curRenderWindowDescription.miscParams);
+                            
+            createdWindows.push_back(curWindow);                                            
+        }
+        
+        return true;
     }
+
     //---------------------------------------------------------------------
     RenderSystemCapabilities* D3D9RenderSystem::updateRenderSystemCapabilities(D3D9RenderWindow* renderWindow)
     {           
@@ -1055,7 +1172,19 @@ namespace Ogre
         // Non-vertex program capable hardware does not appear to support it
         if (rsc->hasCapability(RSC_VERTEX_PROGRAM))
         {
-            rsc->setCapability(RSC_INFINITE_FAR_PLANE);
+            // GeForce4 Ti (and presumably GeForce3) does not
+            // render infinite projection properly, even though it does in GL
+            // So exclude all cards prior to the FX range from doing infinite
+            if (rsc->getVendor() != GPU_NVIDIA || // not nVidia
+                !((adapterID.DeviceId >= 0x200 && adapterID.DeviceId <= 0x20F) || //gf3
+                (adapterID.DeviceId >= 0x250 && adapterID.DeviceId <= 0x25F) || //gf4ti
+                (adapterID.DeviceId >= 0x280 && adapterID.DeviceId <= 0x28F) || //gf4ti
+                (adapterID.DeviceId >= 0x170 && adapterID.DeviceId <= 0x18F) || //gf4 go
+                (adapterID.DeviceId >= 0x280 && adapterID.DeviceId <= 0x28F)))  //gf4ti go
+            {
+                rsc->setCapability(RSC_INFINITE_FAR_PLANE);
+            }
+
         }
     
         // We always support rendertextures bigger than the frame buffer
@@ -1152,7 +1281,7 @@ namespace Ogre
         return rsc;
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::convertVertexShaderCaps(RenderSystemCapabilities* rsc)
+    void D3D9RenderSystem::convertVertexShaderCaps(RenderSystemCapabilities* rsc) const
     {
         ushort major = 0xFF;
         ushort minor = 0xFF;
@@ -1248,8 +1377,6 @@ namespace Ogre
             rsc->addShaderProfile("vs_1_1");
             rsc->setCapability(RSC_VERTEX_PROGRAM);
         }
-
-        mNativeShadingLanguageVersion = major;
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::convertPixelShaderCaps(RenderSystemCapabilities* rsc) const
@@ -1397,6 +1524,12 @@ namespace Ogre
         }
         if (caps->isShaderProfileSupported("hlsl"))
             HighLevelGpuProgramManager::getSingleton().addFactory(mHLSLProgramFactory);
+
+        Log* defaultLog = LogManager::getSingleton().getDefaultLog();
+        if (defaultLog)
+        {
+            caps->log(defaultLog);
+        }
     }
 
     //-----------------------------------------------------------------------
@@ -2220,6 +2353,38 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
+    void D3D9RenderSystem::_setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, 
+        SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp )
+    {
+        HRESULT hr;
+        if( sourceFactor == SBF_ONE && destFactor == SBF_ZERO && 
+            sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
+        {
+            if (FAILED(hr = __SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE)))
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha blending option", "D3D9RenderSystem::_setSceneBlending" );
+        }
+        else
+        {
+            if (FAILED(hr = __SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE)))
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha blending option", "D3D9RenderSystem::_setSeperateSceneBlending" );
+            if (FAILED(hr = __SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, TRUE)))
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set separate alpha blending option", "D3D9RenderSystem::_setSeperateSceneBlending" );
+            if( FAILED( hr = __SetRenderState( D3DRS_SRCBLEND, D3D9Mappings::get(sourceFactor) ) ) )
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set source blend", "D3D9RenderSystem::_setSeperateSceneBlending" );
+            if( FAILED( hr = __SetRenderState( D3DRS_DESTBLEND, D3D9Mappings::get(destFactor) ) ) )
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set destination blend", "D3D9RenderSystem::_setSeperateSceneBlending" );
+            if( FAILED( hr = __SetRenderState( D3DRS_SRCBLENDALPHA, D3D9Mappings::get(sourceFactorAlpha) ) ) )
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha source blend", "D3D9RenderSystem::_setSeperateSceneBlending" );
+            if( FAILED( hr = __SetRenderState( D3DRS_DESTBLENDALPHA, D3D9Mappings::get(destFactorAlpha) ) ) )
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha destination blend", "D3D9RenderSystem::_setSeperateSceneBlending" );
+        }
+
+        if (FAILED(hr = __SetRenderState(D3DRS_BLENDOP, D3D9Mappings::get(op))))
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set scene blending operation option", "D3D9RenderSystem::_setSceneBlendingOperation" );
+        if (FAILED(hr = __SetRenderState(D3DRS_BLENDOPALPHA, D3D9Mappings::get(alphaOp))))
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha scene blending operation option", "D3D9RenderSystem::_setSceneBlendingOperation" );
+    }
+    //---------------------------------------------------------------------
     void D3D9RenderSystem::_setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage )
     {
         HRESULT hr;
@@ -2356,47 +2521,22 @@ namespace Ogre
             "D3D9RenderSystem::_setDepthBias");
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::setColourBlendState(const ColourBlendState& state)
+    void D3D9RenderSystem::_setColourBufferWriteEnabled(bool red, bool green, 
+        bool blue, bool alpha)
     {
-        HRESULT hr;
-        if (state.blendingEnabled())
-        {
-            if (FAILED(hr = __SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE)))
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha blending option");
-            if (FAILED(hr = __SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, TRUE)))
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set separate alpha blending option");
-            if( FAILED( hr = __SetRenderState( D3DRS_SRCBLEND, D3D9Mappings::get(state.sourceFactor) ) ) )
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set source blend" );
-            if( FAILED( hr = __SetRenderState( D3DRS_DESTBLEND, D3D9Mappings::get(state.destFactor) ) ) )
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set destination blend" );
-            if( FAILED( hr = __SetRenderState( D3DRS_SRCBLENDALPHA, D3D9Mappings::get(state.sourceFactorAlpha) ) ) )
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha source blend" );
-            if( FAILED( hr = __SetRenderState( D3DRS_DESTBLENDALPHA, D3D9Mappings::get(state.destFactorAlpha) ) ) )
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha destination blend" );
-        }
-        else
-        {
-            if (FAILED(hr = __SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE)))
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha blending option" );
-        }
-
-        if (FAILED(hr = __SetRenderState(D3DRS_BLENDOP, D3D9Mappings::get(state.operation))))
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set scene blending operation option");
-        if (FAILED(hr = __SetRenderState(D3DRS_BLENDOPALPHA, D3D9Mappings::get(state.alphaOperation))))
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha scene blending operation option");
-
         DWORD val = 0;
-        if (state.writeR)
+        if (red) 
             val |= D3DCOLORWRITEENABLE_RED;
-        if (state.writeG)
+        if (green)
             val |= D3DCOLORWRITEENABLE_GREEN;
-        if (state.writeB)
+        if (blue)
             val |= D3DCOLORWRITEENABLE_BLUE;
-        if (state.writeA)
+        if (alpha)
             val |= D3DCOLORWRITEENABLE_ALPHA;
-
-        if (FAILED(hr = __SetRenderState(D3DRS_COLORWRITEENABLE, val)))
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting colour write enable flags");
+        HRESULT hr = __SetRenderState(D3DRS_COLORWRITEENABLE, val); 
+        if (FAILED(hr))
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting colour write enable flags", 
+            "D3D9RenderSystem::_setColourBufferWriteEnabled");
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::_setFog( FogMode mode)
@@ -2953,9 +3093,11 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D9RenderSystem::_beginFrame()
     {
-        RenderSystem::_beginFrame();
-
         HRESULT hr;
+
+        if( !mActiveViewport )
+            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Cannot begin frame - no viewport selected.", "D3D9RenderSystem::_beginFrame" );
+
         if( FAILED( hr = getActiveD3D9Device()->BeginScene() ) )
         {
             String msg = DXGetErrorDescription(hr);
@@ -3061,7 +3203,8 @@ namespace Ogre
         iend = binds.end();
         for (i = binds.begin(); i != iend; ++i, ++source)
         {
-            D3D9HardwareBuffer* d3d9buf = i->second->_getImpl<D3D9HardwareBuffer>();
+            D3D9HardwareVertexBuffer* d3d9buf = 
+                static_cast<D3D9HardwareVertexBuffer*>(i->second.get());
 
             // Unbind gap sources
             for ( ; source < i->first; ++source)
@@ -3076,9 +3219,9 @@ namespace Ogre
 
             hr = getActiveD3D9Device()->SetStreamSource(
                     static_cast<UINT>(source),
-                    (IDirect3DVertexBuffer9*)d3d9buf->getD3D9Resource(),
+                    d3d9buf->getD3D9VertexBuffer(),
                     0, // no stream offset, this is handled in _render instead
-                    static_cast<UINT>(i->second->getVertexSize()) // stride
+                    static_cast<UINT>(d3d9buf->getVertexSize()) // stride
                     );
 
             if (FAILED(hr))
@@ -3090,9 +3233,9 @@ namespace Ogre
             // SetStreamSourceFreq
             if ( hasInstanceData ) 
             {
-                if ( i->second->isInstanceData() )
+                if ( d3d9buf->isInstanceData() )
                 {
-                    hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | i->second->getInstanceDataStepRate() );
+                    hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | d3d9buf->getInstanceDataStepRate() );
                 }
                 else
                 {
@@ -3132,13 +3275,14 @@ namespace Ogre
                     "D3D9RenderSystem::setVertexBufferBinding");
             }
 
-            D3D9HardwareBuffer* d3d9buf = globalInstanceVertexBuffer->_getImpl<D3D9HardwareBuffer>();
+            D3D9HardwareVertexBuffer * d3d9buf = 
+                static_cast<D3D9HardwareVertexBuffer*>(globalInstanceVertexBuffer.get());
 
             hr = getActiveD3D9Device()->SetStreamSource(
                     static_cast<UINT>(source),
-                    (IDirect3DVertexBuffer9*)d3d9buf->getD3D9Resource(),
+                    d3d9buf->getD3D9VertexBuffer(),
                     0, // no stream offset, this is handled in _render instead
-                    static_cast<UINT>(i->second->getVertexSize()) // stride
+                    static_cast<UINT>(d3d9buf->getVertexSize()) // stride
                     );
 
             if (FAILED(hr))
@@ -3147,7 +3291,7 @@ namespace Ogre
                     "D3D9RenderSystem::setVertexBufferBinding");
             }
 
-            hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | i->second->getInstanceDataStepRate() );
+            hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | d3d9buf->getInstanceDataStepRate() );
             if (FAILED(hr))
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D9 stream source Freq", 
@@ -3250,8 +3394,9 @@ namespace Ogre
         HRESULT hr;
         if( op.useIndexes )
         {
-            D3D9HardwareBuffer* d3dIdxBuf = op.indexData->indexBuffer->_getImpl<D3D9HardwareBuffer>();
-            hr = getActiveD3D9Device()->SetIndices( (IDirect3DIndexBuffer9*)d3dIdxBuf->getD3D9Resource() );
+            D3D9HardwareIndexBuffer* d3dIdxBuf = 
+                static_cast<D3D9HardwareIndexBuffer*>(op.indexData->indexBuffer.get());
+            hr = getActiveD3D9Device()->SetIndices( d3dIdxBuf->getD3DIndexBuffer() );
             if (FAILED(hr))
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set index buffer", "D3D9RenderSystem::_render" );
@@ -3259,6 +3404,13 @@ namespace Ogre
 
             do
             {
+                // Update derived depth bias
+                if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
+                {
+                    _setDepthBias(mDerivedDepthBiasBase + 
+                        mDerivedDepthBiasMultiplier * mCurrentPassIterationNum, 
+                        mDerivedDepthBiasSlopeScale);
+                }
                 // do indexed draw operation
                 hr = getActiveD3D9Device()->DrawIndexedPrimitive(
                     primType, 
@@ -3276,6 +3428,13 @@ namespace Ogre
             // nfz: gpu_iterate
             do
             {
+                // Update derived depth bias
+                if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
+                {
+                    _setDepthBias(mDerivedDepthBiasBase + 
+                        mDerivedDepthBiasMultiplier * mCurrentPassIterationNum, 
+                        mDerivedDepthBiasSlopeScale);
+                }
                 // Unindexed, a little simpler!
                 hr = getActiveD3D9Device()->DrawPrimitive(
                     primType, 
@@ -3327,8 +3486,6 @@ namespace Ogre
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error calling SetPixelShader", "D3D9RenderSystem::bindGpuProgram");
             }
-            // disable FFP fog, as it gets still applied even in presence of shader. Matching other render-systems here.
-            hr = __SetRenderState(D3DRS_FOGENABLE, FALSE);
             break;
         };
 
@@ -3553,7 +3710,8 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::setScissorTest(bool enabled, const Rect& _rect)
+    void D3D9RenderSystem::setScissorTest(bool enabled, size_t left, size_t top, size_t right,
+        size_t bottom)
     {
         HRESULT hr;
         if (enabled)
@@ -3564,10 +3722,10 @@ namespace Ogre
                     "D3D9RenderSystem::setScissorTest");
             }
             RECT rect;
-            rect.left = _rect.left;
-            rect.top = _rect.top;
-            rect.bottom = _rect.bottom;
-            rect.right = _rect.right;
+            rect.left = static_cast<LONG>(left);
+            rect.top = static_cast<LONG>(top);
+            rect.bottom = static_cast<LONG>(bottom);
+            rect.right = static_cast<LONG>(right);
             if (FAILED(hr = getActiveD3D9Device()->SetScissorRect(&rect)))
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set scissor rectangle; " + getErrorDescription(hr), 
@@ -3813,6 +3971,26 @@ namespace Ogre
         return dsfmt;
     }
     //---------------------------------------------------------------------
+    void D3D9RenderSystem::registerThread()
+    {
+        // nothing to do - D3D9 shares rendering context already
+    }
+    //---------------------------------------------------------------------
+    void D3D9RenderSystem::unregisterThread()
+    {
+        // nothing to do - D3D9 shares rendering context already
+    }
+    //---------------------------------------------------------------------
+    void D3D9RenderSystem::preExtraThreadsStarted()
+    {
+        // nothing to do - D3D9 shares rendering context already
+    }
+    //---------------------------------------------------------------------
+    void D3D9RenderSystem::postExtraThreadsStarted()
+    {
+        // nothing to do - D3D9 shares rendering context already
+    }
+    //---------------------------------------------------------------------
     D3D9ResourceManager* D3D9RenderSystem::getResourceManager()
     {
         return msD3D9RenderSystem->mResourceManager;
@@ -3927,7 +4105,8 @@ namespace Ogre
         bool fullScreen, D3DMULTISAMPLE_TYPE *outMultisampleType, DWORD *outMultisampleQuality)
     {
         bool ok = false;
-        bool useCSAA = !fsaaHint.empty() && fsaaHint.front() == 'f';
+        bool qualityHint = fsaaHint.find("Quality") != String::npos;
+        size_t origFSAA = fsaa;
 
         D3D9DriverList* driverList = getDirect3DDrivers();
         D3D9Driver* deviceDriver = mActiveD3DDriver;
@@ -3944,30 +4123,47 @@ namespace Ogre
             }
         }
 
-        // http://developer.download.nvidia.com/assets/gamedev/docs/CSAA_Tutorial.pdf
-        // http://developer.amd.com/wordpress/media/2012/10/EQAA%20Modes%20for%20AMD%20HD%206900%20Series%20Cards.pdf
+        bool tryCSAA = false;
+        // NVIDIA, prefer CSAA if available for 8+
         // it would be tempting to use getCapabilities()->getVendor() == GPU_NVIDIA but
         // if this is the first window, caps will not be initialised yet
-        if (deviceDriver->getAdapterIdentifier().VendorId != 0x10DE &&
-            deviceDriver->getAdapterIdentifier().VendorId != 0x1002)
+        if (deviceDriver->getAdapterIdentifier().VendorId == 0x10DE && 
+            fsaa >= 8)
         {
-            useCSAA  = false;
+            tryCSAA  = true;
         }
 
         while (!ok)
         {
             // Deal with special cases
-            if (useCSAA)
+            if (tryCSAA)
             {
+                // see http://developer.nvidia.com/object/coverage-sampled-aa.html
                 switch(fsaa)
                 {
-                case 8: // 8f16
-                    *outMultisampleType = D3DMULTISAMPLE_8_SAMPLES;
-                    *outMultisampleQuality = 2;
+                case 8:
+                    if (qualityHint)
+                    {
+                        *outMultisampleType = D3DMULTISAMPLE_8_SAMPLES;
+                        *outMultisampleQuality = 0;
+                    }
+                    else
+                    {
+                        *outMultisampleType = D3DMULTISAMPLE_4_SAMPLES;
+                        *outMultisampleQuality = 2;
+                    }
                     break;
-                case 4: // 4f8
-                    *outMultisampleType = D3DMULTISAMPLE_4_SAMPLES;
-                    *outMultisampleQuality = 2;
+                case 16:
+                    if (qualityHint)
+                    {
+                        *outMultisampleType = D3DMULTISAMPLE_8_SAMPLES;
+                        *outMultisampleQuality = 2;
+                    }
+                    else
+                    {
+                        *outMultisampleType = D3DMULTISAMPLE_4_SAMPLES;
+                        *outMultisampleQuality = 4;
+                    }
                     break;
                 }
             }
@@ -3989,16 +4185,29 @@ namespace Ogre
                 &outQuality);
 
             if (SUCCEEDED(hr) && 
-                (!useCSAA || outQuality > *outMultisampleQuality))
+                (!tryCSAA || outQuality > *outMultisampleQuality))
             {
                 ok = true;
             }
             else
             {
                 // downgrade
-                if (useCSAA)
+                if (tryCSAA && fsaa == 8)
                 {
-                    useCSAA = false;
+                    // for CSAA, we'll try downgrading with quality mode at all samples.
+                    // then try without quality, then drop CSAA
+                    if (qualityHint)
+                    {
+                        // drop quality first
+                        qualityHint = false;
+                    }
+                    else
+                    {
+                        // drop CSAA entirely 
+                        tryCSAA = false;
+                    }
+                    // return to original requested samples
+                    fsaa = origFSAA;
                 }
                 else
                 {

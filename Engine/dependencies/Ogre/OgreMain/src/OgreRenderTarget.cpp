@@ -509,12 +509,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderTarget::writeContentsToFile(const String& filename)
     {
-        Image img(suggestPixelFormat(), mWidth, mHeight);
+        PixelFormat pf = suggestPixelFormat();
 
-        PixelBox pb = img.getPixelBox();
+        uchar *data = OGRE_ALLOC_T(uchar, mWidth * mHeight * PixelUtil::getNumElemBytes(pf), MEMCATEGORY_RENDERSYS);
+        PixelBox pb(mWidth, mHeight, 1, pf, data);
+
         copyContentsToMemory(pb, pb);
 
-        img.save(filename);
+        Image().loadDynamicImage(data, mWidth, mHeight, 1, pf, false, 1, 0).save(filename);
+
+        OGRE_FREE(data, MEMCATEGORY_RENDERSYS);
     }
     //-----------------------------------------------------------------------
     void RenderTarget::_notifyCameraRemoved(const Camera* cam)

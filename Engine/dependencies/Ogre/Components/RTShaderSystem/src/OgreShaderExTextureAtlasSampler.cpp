@@ -166,7 +166,7 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
 
     groupOrder = (FFP_PS_SAMPLING + FFP_PS_TEXTURING) / 2;
 
-    ParameterPtr psAtlasTextureCoord = psMain->resolveLocalParameter(GCT_FLOAT2, "atlasCoord");
+    ParameterPtr psAtlasTextureCoord = psMain->resolveLocalParameter("atlasCoord", GCT_FLOAT2);
 
     for(ushort j = 0 ; j <  TAS_MAX_TEXTURES; ++j)
     {
@@ -507,7 +507,7 @@ void TextureAtlasSamplerFactory::setMaterialAtlasingAttributes(Ogre::Material* m
     if ((material) && (material->getNumTechniques()))
     {
         material->getTechnique(0)->getUserObjectBindings().setUserAny(c_RTAtlasKey, 
-            TextureAtlasAttib(mode, offset, autoAdjustBorders));
+            Ogre::Any(TextureAtlasAttib(mode, offset, autoAdjustBorders)));
     }
 }
 

@@ -50,24 +50,22 @@ namespace Ogre {
 
             ::EGLSurface createSurfaceFromWindow(::EGLDisplay display, NativeWindowType win);
 
-            virtual void switchFullScreen(bool fullscreen) {}
-            EGLContext * createEGLContext(::EGLContext external = NULL) const {
-                return new EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface, external);
+            virtual void switchFullScreen(bool fullscreen) = 0;
+            EGLContext * createEGLContext() const {
+                return new EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
             }
 
-            virtual void windowMovedOrResized() {}
-
-            void finaliseWindow();
+            virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height) = 0;
+            virtual void initNativeCreatedWindow(const NameValuePairList *miscParams) = 0;
+            virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title ) = 0;
+            virtual void windowMovedOrResized() = 0;
     public:
             EGLWindow(EGLSupport* glsupport);
             virtual ~EGLWindow();
 
-            // default, PBuffer based, implementation
-            void create(const String& name, unsigned int width, unsigned int height, bool fullScreen,
-                        const NameValuePairList* miscParams);
-
-            void reposition(int left, int top) {}
-            void resize(unsigned int width, unsigned int height) {}
+//      Moved create to native source because it has native calls in it.
+//            void create(const String& name, unsigned int width, unsigned int height,
+//                        bool fullScreen, const NameValuePairList *miscParams);
 
             virtual void setFullscreen (bool fullscreen, uint width, uint height);
             void destroy(void);

@@ -259,6 +259,9 @@ namespace Ogre {
                 PT_BOOL), &msCmdColumnMajorMatrices);
         }
 
+        mType = GPT_VERTEX_PROGRAM; // default value, to be corrected after the constructor with GpuProgram::setType()
+        mSyntaxCode = "glsl" + StringConverter::toString(Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion());
+        
         // There is nothing to load
         mLoadFromFile = false;
     }
@@ -289,15 +292,17 @@ namespace Ogre {
             rsc->getVendor() == GPU_INTEL;
 
         size_t versionPos = mSource.find("#version");
+        int shaderVersion = 100;
         size_t belowVersionPos = 0;
 
         if(versionPos != String::npos)
         {
+            shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
             belowVersionPos = mSource.find('\n', versionPos) + 1;
         }
 
         // OSX driver only supports glsl150+ in core profile
-        bool shouldUpgradeToVersion150 = !rsc->isShaderProfileSupported("glsl130") && mShaderVersion < 150;
+        bool shouldUpgradeToVersion150 = !rsc->isShaderProfileSupported("glsl130") && shaderVersion < 150;
 
         // Add standard shader input and output blocks, if missing.
         // Assume blocks are missing if gl_Position is missing.
@@ -312,7 +317,7 @@ namespace Ogre {
                 String inBlock = "in gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\n"+clipDistDecl+"\n} gl_in[];\n\n";
                 String outBlock = "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\n"+clipDistDecl+"\n};\n\n";
 
-                if (mShaderVersion >= 150 || shouldUpgradeToVersion150)
+                if (shaderVersion >= 150 || shouldUpgradeToVersion150)
                 {
                     switch (mType)
                     {
@@ -338,7 +343,7 @@ namespace Ogre {
                         break;
                     }
                 }
-                else if(mType == GPT_VERTEX_PROGRAM && mShaderVersion >= 130) // shaderVersion < 150, means we only have vertex shaders
+                else if(mType == GPT_VERTEX_PROGRAM && shaderVersion >= 130) // shaderVersion < 150, means we only have vertex shaders
                 {
                 	// TODO: can we have SSO with GLSL < 130?
                     mSource.insert(belowVersionPos, "out vec4 gl_Position;\nout float gl_PointSize;\nout "+clipDistDecl+"\n\n");
@@ -360,7 +365,6 @@ namespace Ogre {
                     "#define texture3D texture\n"
                     "#define textureCube texture\n"
                     "#define texture2DLod textureLod\n"
-                    "#define texture2DProj textureProj\n"
                     "#define textureCubeLod textureLod\n"
                     "#define shadow2DProj textureProj\n"
                     "#define gl_FragColor FragColor\n"
@@ -368,8 +372,7 @@ namespace Ogre {
             const char* prefixVp =
                     "#version 150\n"
                     "#define attribute in\n"
-                    "#define varying out\n"
-                    "#define texture2D texture\n";
+                    "#define varying out\n";
 
             mSource.insert(0, mType == GPT_FRAGMENT_PROGRAM ? prefixFp : prefixVp);
         }
@@ -590,11 +593,11 @@ namespace Ogre {
                     hwGlBuffer = hbm.createShaderStorageBuffer(values[2]);
                 }
 
-                hwGlBuffer->_getImpl<GL3PlusHardwareBuffer>()->setGLBufferBinding(int(binding));
+                static_cast<GL3PlusHardwareUniformBuffer*>(hwGlBuffer.get())->setGLBufferBinding(int(binding));
                 blockSharedParams->_setHardwareBuffer(hwGlBuffer);
             }
 
-            int binding = hwGlBuffer->_getImpl<GL3PlusHardwareBuffer>()->getGLBufferBinding();
+            int binding = static_cast<GL3PlusHardwareUniformBuffer*>(hwGlBuffer.get())->getGLBufferBinding();
 
             if(type == GL_UNIFORM_BLOCK)
             {

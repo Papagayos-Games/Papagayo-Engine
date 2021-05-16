@@ -36,7 +36,7 @@ THE SOFTWARE.
 
     #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         #include <cpu-features.h>
-    #elif OGRE_CPU == OGRE_CPU_ARM && OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    #elif OGRE_CPU == OGRE_CPU_ARM 
         #include <sys/sysctl.h>
         #if __MACH__
             #include <mach/machine.h>

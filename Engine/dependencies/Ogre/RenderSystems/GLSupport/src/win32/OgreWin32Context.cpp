@@ -33,14 +33,12 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreGLRenderSystemCommon.h"
 #include "OgreRoot.h"
-#include "OgreWin32GLSupport.h"
 
 namespace Ogre {
 
-    Win32Context::Win32Context(HDC HDC, HGLRC Glrc, Win32GLSupport &glsupport):
+    Win32Context::Win32Context(HDC HDC, HGLRC Glrc):
         mHDC(HDC),
-        mGlrc(Glrc),
-        mGLSupport(glsupport)
+        mGlrc(Glrc)
     {
     }
     
@@ -63,16 +61,30 @@ namespace Ogre {
 
     GLContext* Win32Context::clone() const
     {
-        HGLRC oldrc = wglGetCurrentContext();
         // Create new context based on own HDC
-        HGLRC newCtx = mGLSupport.createNewContext(mHDC, oldrc);
+        HGLRC newCtx = wglCreateContext(mHDC);
         
-        HDC oldhdc = wglGetCurrentDC();
+        if (!newCtx)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                "Error calling wglCreateContext", "Win32Context::clone");
+        }
 
+        HGLRC oldrc = wglGetCurrentContext();
+        HDC oldhdc = wglGetCurrentDC();
+        wglMakeCurrent(NULL, NULL);
+        // Share lists with old context
+        if (!wglShareLists(mGlrc, newCtx))
+        {
+            String errorMsg = translateWGLError();
+            wglDeleteContext(newCtx);
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("wglShareLists() failed: ") + errorMsg, "Win32Context::clone");
+        }
         // restore old context
         wglMakeCurrent(oldhdc, oldrc);
+        
 
-        return new Win32Context(mHDC, newCtx, mGLSupport);
+        return new Win32Context(mHDC, newCtx);
     }
 
     void Win32Context::releaseContext()

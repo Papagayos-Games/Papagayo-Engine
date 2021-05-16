@@ -5,6 +5,7 @@ Manual {#manual}
 - @subpage The-Core-Objects
 - @subpage Resource-Management
 - @subpage Scripts
+- @subpage High-level-Programs
 - @subpage Runtime-Shader-Generation
 - @subpage Mesh-Tools
 - @subpage Hardware-Buffers
@@ -27,37 +28,52 @@ I’m not going to teach you OO here, that’s a subject for many other books, b
 
 In summary, here’s the benefits an object-oriented approach brings to OGRE:
 
+<dl compact="compact">
+<dt>Abstraction</dt> <dd>
 
-@par Abstraction
 Common interfaces hide the nuances between different implementations of 3D API and operating systems
 
-@par Encapsulation
+</dd> <dt>Encapsulation</dt> <dd>
+
 There is a lot of state management and context-specific actions to be done in a graphics engine - encapsulation allows me to put the code and data nearest to where it is used which makes the code cleaner and easier to understand, and more reliable because duplication is avoided
 
-@par Polymorphism
+</dd> <dt>Polymorphism</dt> <dd>
+
 The behaviour of methods changes depending on the type of object you are using, even if you only learn one interface, e.g. a class specialised for managing indoor levels behaves completely differently from the standard scene manager, but looks identical to other classes in the system and has the same methods called on it
+
+</dd> </dl>
+
+
 
 <a name="Multi_002deverything"></a> <a name="Multi_002deverything-1"></a>
 
 # Multi-everything
 
-OGRE is more than a 3D engine that runs on one 3D API, on one platform, with one type of scene (indoor levels are most popular). OGRE is able to extend to any kind of scene (but yet still implements scene-specific optimisations under the surface), any platform and any 3D API.
+I wanted to do more than create a 3D engine that ran on one 3D API, on one platform, with one type of scene (indoor levels are most popular). I wanted OGRE to be able to extend to any kind of scene (but yet still implement scene-specific optimisations under the surface), any platform and any 3D API.
 
 Therefore all the ’visible’ parts of OGRE are completely independent of platform, 3D API and scene type. There are no dependencies on Windows types, no assumptions about the type of scene you are creating, and the principles of the 3D aspects are based on core maths texts rather than one particular API implementation.
 
 Now of course somewhere OGRE has to get down to the nitty-gritty of the specifics of the platform, API and scene, but it does this in subclasses specially designed for the environment in question, but which still expose the same interface as the abstract versions.
 
-For example, there is a @c Win32Window class which handles all the details about rendering windows on a Win32 platform - however the application designer only has to manipulate it via the superclass interface Ogre::RenderWindow, which will be the same across all platforms.
+For example, there is a ’Win32Window’ class which handles all the details about rendering windows on a Win32 platform - however the application designer only has to manipulate it via the superclass interface ’RenderWindow’, which will be the same across all platforms.
 
-Similarly the Ogre::SceneManager class looks after the arrangement of objects in the scene and their rendering sequence. Applications only have to use this interface, but there is a Ogre::OctreeSceneManager class which optimises the scene management for outdoor levels, meaning you get both performance and an easy to learn interface. All applications have to do is hint about the kind of scene they will be creating and let OGRE choose the most appropriate implementation - this is covered in a later tutorial.
+Similarly the ’SceneManager’ class looks after the arrangement of objects in the scene and their rendering sequence. Applications only have to use this interface, but there is a ’BspSceneManager’ class which optimises the scene management for indoor levels, meaning you get both performance and an easy to learn interface. All applications have to do is hint about the kind of scene they will be creating and let OGRE choose the most appropriate implementation - this is covered in a later tutorial.
 
-OGRE’s object-oriented nature makes all this possible. Currently OGRE runs on different platforms using plugins to drive the underlying rendering API. Applications use OGRE at the abstract level, thus ensuring that they automatically operate on all platforms and rendering subsystems that OGRE provides without any need for platform or API specific code.
+OGRE’s object-oriented nature makes all this possible. Currently OGRE runs on Windows, Linux and Mac OSX using plugins to drive the underlying rendering API (currently Direct3D or OpenGL). Applications use OGRE at the abstract level, thus ensuring that they automatically operate on all platforms and rendering subsystems that OGRE provides without any need for platform or API specific code.
 
 @page The-Core-Objects The Core Objects
 
 @tableofcontents
 
 This tutorial gives you a quick summary of the core objects that you will use in OGRE and what they are used for.
+
+<a name="A-Word-About-Namespaces"></a>
+
+# A Word About Namespaces
+
+OGRE uses a C++ feature called namespaces. This lets you put classes, enums, structures, anything really within a ’namespace’ scope which is an easy way to prevent name clashes, i.e. situations where you have 2 things called the same thing. Since OGRE is designed to be used inside other applications, I wanted to be sure that name clashes would not be a problem. Some people prefix their classes/types with a short code because some compilers don’t support namespaces, but I chose to use them because they are the ’right’ way to do it. Sorry if you have a non-compliant compiler, but hey, the C++ standard has been defined for years, so compiler writers really have no excuse anymore. If your compiler doesn’t support namespaces then it’s probably because it’s sh\*t - get a better one. ;)
+
+This means every class, type etc should be prefixed with Ogre, e.g. Ogre::Camera, Ogre::Vector3 etc which means if elsewhere in your application you have used a Vector3 type you won’t get name clashes. To avoid lots of extra typing you can add a ’using namespace Ogre;’ statement to your code which means you don’t have to type the Ogre prefix unless there is ambiguity (in the situation where you have another definition with the same name).
 
 <a name="Overview-from-10_002c000-feet"></a>
 
@@ -69,14 +85,20 @@ At the very top of the diagram is the Root object. This is your ’way in’ to 
 
 The majority of rest of OGRE’s classes fall into one of 3 roles:
 
-@par Scene Management
+<dl compact="compact">
+<dt>Scene Management</dt> <dd>
+
 This is about the contents of your scene, how it’s structured, how it’s viewed from cameras, etc. Objects in this area are responsible for giving you a natural declarative interface to the world you’re building; i.e. you don’t tell OGRE "set these render states and then render 3 polygons", you tell it "I want an object here, here and here, with these materials on them, rendered from this view", and let it get on with it.
 
-@par Resource Management
+</dd> <dt>Resource Management</dt> <dd>
+
 All rendering needs resources, whether it’s geometry, textures, fonts, whatever. It’s important to manage the loading, re-use and unloading of these things carefully, so that’s what classes in this area do.
 
-@par Rendering
+</dd> <dt>Rendering</dt> <dd>
+
 Finally, there’s getting the visuals on the screen - this is about the lower-level end of the rendering pipeline, the specific rendering system API objects like buffers, render states and the like and pushing it all down the pipeline. Classes in the Scene Management subsystem use this to get their higher-level scene information onto the screen.
+
+</dd> </dl>
 
 You’ll notice that scattered around the edge are a number of plugins. OGRE is designed to be extended, and plugins are the usual way to go about it. Many of the classes in OGRE can be subclassed and extended, whether it’s changing the scene organisation through a custom SceneManager, adding a new render system implementation (e.g. Direct3D or OpenGL), or providing a way to load resources from another source (say from a web location or a database). Again this is just a small smattering of the kinds of things plugins can do, but as you can see they can plug in to almost any aspect of the system. This way, OGRE isn’t just a solution for one narrowly defined problem, it can extend to pretty much anything you need it to do.
 
@@ -106,13 +128,13 @@ Apart from the Ogre::Root object, this is probably the most critical part of the
 
 It is to the SceneManager that you go when you want to create a camera for the scene. It’s also where you go to retrieve or to remove a light from the scene. There is no need for your application to keep lists of objects, the SceneManager keeps a named set of all of the scene objects for you to access, should you need them. Look in the main documentation under the getCamera, getLight, getEntity etc methods.
 
-The SceneManager also sends the scene to the RenderSystem object when it is time to render the scene. You never have to call the Ogre::SceneManager::_renderScene method directly though - it is called automatically whenever a rendering target is asked to update (see Ogre::Root::renderOneFrame for details).
+The SceneManager also sends the scene to the RenderSystem object when it is time to render the scene. You never have to call the Ogre::SceneManager::\_renderScene method directly though - it is called automatically whenever a rendering target is asked to update.
 
 So most of your interaction with the SceneManager is during scene setup. You’re likely to call a great number of methods (perhaps driven by some input file containing the scene data) in order to set up your scene. You can also modify the contents of the scene dynamically during the rendering cycle if you create your own FrameListener object (see later).
 
-Because different scene types require very different algorithmic approaches to deciding which objects get sent to the RenderSystem in order to attain good rendering performance, the SceneManager class is designed to be subclassed for different scene types. The default SceneManager object will render a scene, but it does little or no scene organisation and you should not expect the results to be high performance in the case of large scenes. The intention is that specialisations will be created for each type of scene such that under the surface the subclass will optimise the scene organisation for best performance given assumptions which can be made for that scene type. An example is the @c OctreeSceneManager which optimises rendering for large levels based on the Octree partitioning scheme.
+Because different scene types require very different algorithmic approaches to deciding which objects get sent to the RenderSystem in order to attain good rendering performance, the SceneManager class is designed to be subclassed for different scene types. The default SceneManager object will render a scene, but it does little or no scene organisation and you should not expect the results to be high performance in the case of large scenes. The intention is that specialisations will be created for each type of scene such that under the surface the subclass will optimise the scene organisation for best performance given assumptions which can be made for that scene type. An example is the BspSceneManager which optimises rendering for large indoor levels based on a Binary Space Partition (BSP) tree.
 
-You can specify the SceneManager type you want as the parameter of Ogre::Root::createSceneManager. If you do not specify any parameter, OGRE will use to the default SceneManager, which is well suited for small and moderate sized scenes.
+The application using OGRE does not have to know which subclasses are available. The application simply calls Ogre::Root::createSceneManager(..) passing as a parameter one of a number of scene types (e.g. Ogre::ST_GENERIC, Ogre::ST_INTERIOR etc). OGRE will automatically use the best SceneManager subclass available for that scene type, or default to the basic SceneManager if a specialist one is not available. This allows the developers of OGRE to add new scene specialisations later and thus optimise previously unoptimised scene types without the user applications having to change any code.
 
 # The ResourceGroupManager Object {#The-ResourceGroupManager-Object}
 
@@ -289,9 +311,10 @@ Full documentation for each exporter is provided along with the exporter itself,
 
 # XMLConverter {#XMLConverter}
 
-The OgreXMLConverter tool can converter binary .mesh and .skeleton files to XML and back again - this is a very useful tool for debugging the contents of meshes, or for exchanging mesh data easily - many of the modeller mesh exporters export to XML because it is simpler to do, and OgreXMLConverter can then produce a binary from it.
+The OgreXMLConverter tool can converter binary .mesh and .skeleton files to XML and back again - this is a very useful tool for debugging the contents of meshes, or for exchanging mesh data easily - many of the modeller mesh exporters export to XML because it is simpler to do, and OgreXMLConverter can then produce a binary from it. Other than simplicity, the other advantage is that OgreXMLConverter can generate additional information for the mesh, like bounding regions and level-of-detail reduction. 
 
-@par Syntax
+Syntax:
+
 ```
 OgreXMLConverter [options] sourcefile [destfile] 
 ```
@@ -303,20 +326,19 @@ and the XML contents if the source is XML. For example
 test.mesh becomes test.xml, test.xml becomes test.mesh
 if the XML document root is mesh etc.
 
+When converting XML to .mesh, you will be prompted to (re)generate level-of-detail(LOD) information for the mesh - you can choose to skip this part if you wish, but doing it will allow you to make your mesh reduce in detail automatically when it is loaded into the engine. The engine uses a complex algorithm to determine the best parts of the mesh to reduce in detail depending on many factors such as the curvature of the surface, the edges of the mesh and seams at the edges of textures and smoothing groups - taking advantage of it is advised to make your meshes more scalable in real scenes.
+
+
+
 # MeshUpgrader {#MeshUpgrader}
 
-This tool is provided to allow you to upgrade your meshes when the binary format changes - sometimes we alter it to add new features and as such you need to keep your own assets up to date.
-Furthermore, OgreMeshUpgrader can generate additional information for the mesh, like bounding regions and level-of-detail reduction.
+This tool is provided to allow you to upgrade your meshes when the binary format changes - sometimes we alter it to add new features and as such you need to keep your own assets up to date. This tools has a very simple syntax:
 
-@par Syntax
 ```
 OgreMeshUpgrader [options] sourcefile [destfile]
 ```
 
-@note
-The OGRE release notes will notify you when meshes should be upgraded with a new release.
-
-When specifying the `-i` option, you will be prompted to (re)generate level-of-detail(LOD) information for the mesh - you can choose to skip this part if you wish, but doing it will allow you to make your mesh reduce in detail automatically when it is loaded into the engine. The engine uses a complex algorithm to determine the best parts of the mesh to reduce in detail depending on many factors such as the curvature of the surface, the edges of the mesh and seams at the edges of textures and smoothing groups - taking advantage of it is advised to make your meshes more scalable in real scenes.
+The OGRE release notes will notify you when this is necessary with a new release.
 
 @page Shadows Shadows
 

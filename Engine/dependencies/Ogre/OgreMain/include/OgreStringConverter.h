@@ -115,8 +115,7 @@ namespace Ogre {
             unsigned short width, char fill = ' ',
             std::ios::fmtflags flags = std::ios::fmtflags(0));
 
-        /** Converts a boolean to a String.
-        @param val
+        /** Converts a boolean to a String. 
         @param yesNo If set to true, result is 'yes' or 'no' instead of 'true' or 'false'
         */
         static String toString(bool val, bool yesNo = false);
@@ -349,16 +348,9 @@ namespace Ogre {
         template<typename T>
         static String _toString(T val, uint16 width, char fill, std::ios::fmtflags flags);
     };
+    /** @} */
+    /** @} */
 
-    inline String to_string(const Quaternion& v) { return StringConverter::toString(v); }
-    inline String to_string(const ColourValue& v) { return StringConverter::toString(v); }
-    inline String to_string(const Vector2& v) { return StringConverter::toString(v); }
-    inline String to_string(const Vector3& v) { return StringConverter::toString(v); }
-    inline String to_string(const Vector4& v) { return StringConverter::toString(v); }
-    inline String to_string(const Matrix3& v) { return StringConverter::toString(v); }
-    inline String to_string(const Matrix4& v) { return StringConverter::toString(v); }
-    /** @} */
-    /** @} */
 }
 
 

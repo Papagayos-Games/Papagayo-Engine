@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreController.h"
 #include "OgreControllerManager.h"
-#include "OgreIteratorWrapper.h"
+#include "OgreIteratorWrappers.h"
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
@@ -298,7 +298,10 @@ namespace Ogre {
          * @param targetAnimationState
          * @param addTime if true, increment time instead of setting to an absolute position
          */
-        static ControllerValueRealPtr create(AnimationState* targetAnimationState, bool addTime = false);
+        static ControllerValueRealPtr create(AnimationState* targetAnimationState, bool addTime = false)
+        {
+            return std::make_shared<AnimationStateControllerValue>(targetAnimationState, addTime);
+        }
 
         /** ControllerValue implementation. */
         Real getValue(void) const

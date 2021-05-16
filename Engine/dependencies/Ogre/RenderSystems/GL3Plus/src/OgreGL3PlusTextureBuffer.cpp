@@ -50,7 +50,7 @@ namespace Ogre {
                                                GLint face, GLint level, uint32 width, uint32 height,
                                                uint32 depth)
         : GL3PlusHardwarePixelBuffer(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
-          mTarget(parent->getGL3PlusTextureTarget()), mTextureID(parent->getGLID()), mLevel(level), mSliceTRT(0)
+          mTarget(parent->getGL3PlusTextureTarget()), mTextureID(parent->getGLID()), mFace(face), mLevel(level), mSliceTRT(0)
     {
         // Get face identifier
         mFaceTarget = mTarget;
@@ -59,6 +59,11 @@ namespace Ogre {
 
         // Get format
         mGLInternalFormat = GL3PlusPixelUtil::getGLInternalFormat(mFormat, parent->isHardwareGammaEnabled());
+
+        // Default
+        mRowPitch = mWidth;
+        mSlicePitch = mHeight*mWidth;
+        mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
 
         // Log a message
         //        std::stringstream str;
@@ -281,7 +286,7 @@ namespace Ogre {
                         "GL3PlusTextureBuffer::download");
 
         // Download data to PBO
-        GL3PlusHardwareBuffer buffer(GL_PIXEL_PACK_BUFFER, data.getConsecutiveSize(), HBU_GPU_TO_CPU);
+        GL3PlusHardwareBuffer buffer(GL_PIXEL_PACK_BUFFER, data.getConsecutiveSize(), HBU_DISCARDABLE);
 
         //        std::stringstream str;
         //        str << "GL3PlusHardwarePixelBuffer::download: " << mTextureID

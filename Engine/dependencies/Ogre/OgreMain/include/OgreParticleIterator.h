@@ -40,7 +40,8 @@ namespace Ogre {
     /** \addtogroup Effects
     *  @{
     */
-    /// @deprecated do not use
+    /** Convenience class to make it easy to step through all particles in a ParticleSystem.
+    */
     class _OgreExport ParticleIterator
     {
         friend class ParticleSystem;

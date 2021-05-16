@@ -472,8 +472,17 @@ namespace Ogre {
         }
         if (mOwnsGLContext)
         {
-            // New context is shared with previous one
-            mGlrc = mGLSupport.createNewContext(mHDC, old_context);
+            mGlrc = wglCreateContext(mHDC);
+            if (!mGlrc)
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                "wglCreateContext failed: " + translateWGLError(), "Win32Window::create");
+        }
+
+        if (old_context && old_context != mGlrc)
+        {
+            // Share lists with old context
+            if (!wglShareLists(old_context, mGlrc))
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "wglShareLists() failed", " Win32Window::create");
         }
 
         if (!wglMakeCurrent(mHDC, mGlrc))
@@ -496,7 +505,7 @@ namespace Ogre {
         }
 
         // Create RenderSystem context
-        mContext = new Win32Context(mHDC, mGlrc, mGLSupport);
+        mContext = new Win32Context(mHDC, mGlrc);
 
         mActive = true;
         setHidden(hidden);
@@ -746,10 +755,7 @@ namespace Ogre {
 
     void Win32Window::resize(unsigned int width, unsigned int height)
     {
-        if (!isVisible())
-            return;
-
-        if (!mIsExternal && !mIsFullScreen && width > 0 && height > 0)
+        if (mHWnd && !mIsFullScreen)
         {
             RECT rc = { 0, 0, int(width), int(height) };
             AdjustWindowRect(&rc, getWindowStyle(mIsFullScreen), false);
@@ -757,15 +763,12 @@ namespace Ogre {
             height = rc.bottom - rc.top;
             SetWindowPos(mHWnd, 0, 0, 0, width, height,
                 SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
-            return;
         }
-
-        updateWindowRect();
     }
 
     void Win32Window::windowMovedOrResized()
     {
-        if (!isVisible())
+        if (!mHWnd || IsIconic(mHWnd))
             return;
 
         updateWindowRect();     

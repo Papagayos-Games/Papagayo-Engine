@@ -232,13 +232,6 @@ namespace Ogre
         mEmitted = emitted;
     }
     //-----------------------------------------------------------------------
-    static float sampleSphereUniform(const float& maxAngle)
-    {
-        float cosMax = -std::cos(maxAngle) + 1; // for maxAngle = pi, cosMax = 2
-        // see https://corysimon.github.io/articles/uniformdistn-on-sphere/
-        return std::acos(1 - cosMax * Math::UnitRandom());
-    }
-
     void ParticleEmitter::genEmissionDirection( const Vector3 &particlePos, Vector3& destVector )
     {
         if( mUseDirPositionRef )
@@ -249,7 +242,7 @@ namespace Ogre
             if (mAngle != Radian(0))
             {
                 // Randomise angle
-                Radian angle(sampleSphereUniform(mAngle.valueRadians()));
+                Radian angle = Math::UnitRandom() * mAngle;
 
                 // Randomise direction
                 destVector = particleDir.randomDeviant( angle );
@@ -265,7 +258,7 @@ namespace Ogre
             if (mAngle != Radian(0))
             {
                 // Randomise angle
-                Radian angle(sampleSphereUniform(mAngle.valueRadians()));
+                Radian angle = Math::UnitRandom() * mAngle;
 
                 // Randomise direction
                 destVector = mDirection.randomDeviant(angle, mUp);
@@ -360,8 +353,11 @@ namespace Ogre
         if (mColourRangeStart != mColourRangeEnd)
         {
             // Randomise
-            ColourValue t(Math::UnitRandom(), Math::UnitRandom(), Math::UnitRandom(), Math::UnitRandom());
-            destColour = mColourRangeStart + t * (mColourRangeEnd - mColourRangeStart);
+            //Real t = Math::UnitRandom();
+            destColour.r = mColourRangeStart.r + (Math::UnitRandom() * (mColourRangeEnd.r - mColourRangeStart.r));
+            destColour.g = mColourRangeStart.g + (Math::UnitRandom() * (mColourRangeEnd.g - mColourRangeStart.g));
+            destColour.b = mColourRangeStart.b + (Math::UnitRandom() * (mColourRangeEnd.b - mColourRangeStart.b));
+            destColour.a = mColourRangeStart.a + (Math::UnitRandom() * (mColourRangeEnd.a - mColourRangeStart.a));
         }
         else
         {

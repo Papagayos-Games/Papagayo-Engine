@@ -38,12 +38,16 @@ struct FIBITMAP;
 
 namespace Ogre {
 
-    /** \addtogroup Plugins Plugins
+    /** \addtogroup Core
     *  @{
     */
-    /** \defgroup FreeImageCodec FreeImageCodec
-    * %Codec specialized in images loaded using [FreeImage](https://freeimage.sourceforge.io/)
+    /** \addtogroup Image
     *  @{
+    */
+    /** Codec specialized in images loaded using FreeImage.
+        @remarks
+            The users implementing subclasses of ImageCodec are required to return
+            a valid pointer to a ImageData class from the decode(...) function.
     */
     class FreeImageCodec : public ImageCodec
     {
@@ -61,16 +65,18 @@ namespace Ogre {
         FreeImageCodec(const String &type, unsigned int fiType);
         virtual ~FreeImageCodec() { }
 
-        using ImageCodec::decode;
-        using ImageCodec::encode;
-        using ImageCodec::encodeToFile;
+        /// @copydoc Codec::encode
+        DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const;
+        /// @copydoc Codec::encodeToFile
+        void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const;
+        /// @copydoc Codec::decode
+        DecodeResult decode(const DataStreamPtr& input) const;
 
-        DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const override;
-        void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const  override;
-        DecodeResult decode(const DataStreamPtr& input) const  override;
+        
+        virtual String getType() const;        
 
-        String getType() const override;
-        String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const override;
+        /// @copydoc Codec::magicNumberToFileExt
+        String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
 
         /// Static method to startup FreeImage and register the FreeImage codecs
         _OgreFreeImageCodecExport static void startup(void);

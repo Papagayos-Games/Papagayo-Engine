@@ -372,11 +372,11 @@ With minimal effort one can match the shader equations with those
 presented earlier. The code is presented here mostly to demonstrate how
 things fit together.
 
-@include Samples/Media/materials/programs/GLSL/pssmCasterVp.glsl
+@include Samples/Media/materials/programs/GLSL/DepthShadowmapCasterVp.glsl
 
 This is a pretty standard vertex shader.
 
-@include Samples/Media/materials/programs/GLSL/pssmCasterFp.glsl
+@include Samples/Media/materials/programs/GLSL/DepthShadowmapCasterFp.glsl
 
 Just write out the depth values here. We compute the bias and derivatives in the receiver.
 

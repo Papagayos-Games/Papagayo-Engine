@@ -124,9 +124,16 @@ namespace Ogre {
         }
         if (mLinked)
         {
+            GLenum glErr = glGetError();
+            if(glErr != GL_NO_ERROR)
+            {
+                reportGLSLError( glErr, "GLSLLinkProgram::Activate",
+                    "Error prior to using GLSL Program Object : ", mGLProgramHandle, false, false);
+            }
+
             glUseProgramObjectARB( mGLProgramHandle );
 
-            GLenum glErr = glGetError();
+            glErr = glGetError();
             if(glErr != GL_NO_ERROR)
             {
                 reportGLSLError( glErr, "GLSLLinkProgram::Activate",

@@ -31,9 +31,15 @@ public:
      */
     ThingRenderable(float radius, size_t count, float qsize);
     ~ThingRenderable();
-
-    Ogre::Real getBoundingRadius() const override;
-    Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const override;
+    /**
+     * Retrieves ratios of the origin-centered bounding sphere for this
+     * object.
+     */
+    Ogre::Real getBoundingRadius() const;
+    /**
+     * Returns the camera-relative squared depth of this renderable.
+     */
+    Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const;
     /**
      * Notify that t seconds have elapsed.
      */

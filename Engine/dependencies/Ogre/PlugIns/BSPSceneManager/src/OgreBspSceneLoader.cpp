@@ -26,16 +26,43 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreBspSceneLoader.h"
-#include "OgreCodec.h"
+#include "OgreBspLevel.h"
+#include "OgreQuake3ShaderManager.h"
+#include "OgreSceneLoaderManager.h"
+#include "OgreBspSceneManager.h"
+#include "OgreSceneNode.h"
 
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    BspSceneLoader::BspSceneLoader() {}
-    BspSceneLoader::~BspSceneLoader() {}
-    //-----------------------------------------------------------------------
-    void BspSceneLoader::load(DataStreamPtr& stream, const String& group, SceneNode* rootNode)
+    BspSceneLoader::BspSceneLoader()
     {
-        Codec::getCodec("bsp")->decode(stream, rootNode);
+        // Also create related shader manager (singleton managed)
+        mShaderMgr = OGRE_NEW Quake3ShaderManager();
+
+        std::vector<String> exts = {".bsp"};
+        SceneLoaderManager::getSingleton().registerSceneLoader("Q3BSP", exts, this);
     }
+    //-----------------------------------------------------------------------
+    BspSceneLoader::~BspSceneLoader()
+    {
+        OGRE_DELETE mShaderMgr;
+        SceneLoaderManager::getSingleton().unregisterSceneLoader("Q3BSP");
+    }
+    //-----------------------------------------------------------------------
+    void BspSceneLoader::load(DataStreamPtr& stream,
+        const String& group, SceneNode *rootNode)
+    {
+        BspSceneManager* mgr = dynamic_cast<BspSceneManager*>(rootNode->getCreator());
+
+        OgreAssert(mgr, "only loading into a BspSceneManager supported");
+
+        mgr->setLevel(BspLevelPtr()); // clear
+
+        BspLevelPtr bspLevel(new BspLevel(NULL, "bsplevel", 0, group, false, NULL));
+        bspLevel->load(stream);
+
+        mgr->setLevel(bspLevel);
+    }
+
 }

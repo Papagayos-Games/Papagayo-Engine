@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 
 #include "OgrePrerequisites.h"
+#include "OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK
 #include "OgreComPtr.h"       // too much resource leaks were caused without it by throwing constructors
 
 #include "OgreException.h"
@@ -40,16 +41,6 @@ THE SOFTWARE.
 #endif
 
 #define OGRE_EXCEPT_EX(code, num, desc, src) throw Ogre::D3D11RenderingAPIException(num, desc, src, __FILE__, __LINE__)
-
-#define OGRE_CHECK_DX_ERROR(dxcall) \
-{ \
-    HRESULT hr = dxcall; \
-    if (FAILED(hr) || mDevice.isError()) \
-    { \
-        String desc = mDevice.getErrorDescription(hr); \
-        throw Ogre::D3D11RenderingAPIException(hr, desc, __FUNCTION__, __FILE__, __LINE__); \
-    } \
-}
 
 // some D3D commonly used macros
 #define SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
@@ -150,8 +141,8 @@ namespace Ogre
         int getHResult() const { return hresult; }
 
         const String& getFullDescription(void) const {
-            StringStream ss;
-            ss << RenderingAPIException::getFullDescription() << " HRESULT=0x" << std::hex << hresult;
+            StringStream ss(RenderingAPIException::getFullDescription());
+            ss << " HRESULT=" << hresult;
             fullDesc = ss.str();
             return fullDesc;
         }

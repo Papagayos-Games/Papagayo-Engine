@@ -91,17 +91,10 @@ namespace Ogre {
         mSkeleton->removeAllLinkedSkeletonAnimationSources();
     }
     //-------------------------------------------------------------------------
-    const Skeleton::LinkedSkeletonAnimSourceList&
-    SkeletonInstance::getLinkedSkeletonAnimationSources() const
-    {
-        return mSkeleton->getLinkedSkeletonAnimationSources();
-    }
     Skeleton::LinkedSkeletonAnimSourceIterator 
     SkeletonInstance::getLinkedSkeletonAnimationSourceIterator(void) const
     {
-        return Skeleton::LinkedSkeletonAnimSourceIterator(
-            mSkeleton->getLinkedSkeletonAnimationSources().begin(),
-            mSkeleton->getLinkedSkeletonAnimationSources().end());
+        return mSkeleton->getLinkedSkeletonAnimationSourceIterator();
     }
     //-------------------------------------------------------------------------
     void SkeletonInstance::_initAnimationState(AnimationStateSet* animSet)
@@ -144,7 +137,7 @@ namespace Ogre {
         }
     }
     //-------------------------------------------------------------------------
-    void SkeletonInstance::prepareImpl(void)
+    void SkeletonInstance::loadImpl(void)
     {
         mNextAutoHandle = mSkeleton->mNextAutoHandle;
         mNextTagPointAutoHandle = 0;
@@ -161,9 +154,9 @@ namespace Ogre {
         setBindingPose();
     }
     //-------------------------------------------------------------------------
-    void SkeletonInstance::unprepareImpl(void)
+    void SkeletonInstance::unloadImpl(void)
     {
-        Skeleton::unprepareImpl();
+        Skeleton::unloadImpl();
 
         // destroy TagPoints
         for (TagPointList::const_iterator it = mActiveTagPoints.begin(); it != mActiveTagPoints.end(); ++it)

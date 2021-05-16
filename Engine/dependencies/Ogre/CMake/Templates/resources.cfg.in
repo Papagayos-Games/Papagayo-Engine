@@ -18,17 +18,11 @@ FileSystem=@OGRE_MEDIA_DIR_REL@/thumbnails
 [General]
 # Bites uses the next entry to discover the platform shaders
 FileSystem=@OGRE_MEDIA_DIR_REL@
-
-# PBR media must come before the scripts that reference it
-FileSystem=@OGRE_MEDIA_DIR_REL@/PBR
-FileSystem=@OGRE_MEDIA_DIR_REL@/PBR/filament
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/PBR
-
 FileSystem=@OGRE_MEDIA_DIR_REL@/fonts
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/scripts
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/terrain
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/nvidia
 FileSystem=@OGRE_MEDIA_DIR_REL@/models
 FileSystem=@OGRE_MEDIA_DIR_REL@/particle
 FileSystem=@OGRE_MEDIA_DIR_REL@/DeferredShadingMedia
@@ -37,7 +31,6 @@ FileSystem=@OGRE_MEDIA_DIR_REL@/PCZAppMedia
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/scripts/SSAO
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/SSAO
 FileSystem=@OGRE_MEDIA_DIR_REL@/volumeTerrain
-FileSystem=@OGRE_MEDIA_DIR_REL@/CSMShadows
 Zip=@OGRE_MEDIA_DIR_REL@/packs/cubemap.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/cubemapsJS.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/dragon.zip
@@ -48,8 +41,9 @@ Zip=@OGRE_MEDIA_DIR_REL@/packs/Sinbad.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/skybox.zip
 Zip=@OGRE_MEDIA_DIR_REL@/volumeTerrain/volumeTerrainBig.zip
 
+FileSystem=@OGRE_MEDIA_DIR_REL@/PBR
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/glTF2_IBL
 Zip=@OGRE_MEDIA_DIR_REL@/packs/DamagedHelmet.zip
-Zip=@OGRE_MEDIA_DIR_REL@/packs/filament_shaders.zip
 
 FileSystem=@OGRE_CORE_MEDIA_DIR@/HLMS
 

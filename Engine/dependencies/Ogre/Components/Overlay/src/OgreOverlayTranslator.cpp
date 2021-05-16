@@ -124,8 +124,6 @@ void FontTranslator::parseAttribute(ScriptCompiler* compiler, FontPtr& pFont,
             }
         }
     }
-    else if(attrib == "character_spacer")
-        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line, attrib);
     else if (prop->values.empty() || !getString(prop->values.front(), &val) ||
              !pFont->setParameter(attrib, val))
     {
@@ -191,7 +189,7 @@ void ElementTranslator::translate(ScriptCompiler* compiler, const AbstractNodePt
     }
 
     if(newElement->isContainer())
-        obj->context = (OverlayContainer*)newElement;
+        obj->context = Any((OverlayContainer*)newElement);
 
     String val;
     for (auto& c : obj->children)
@@ -240,7 +238,7 @@ void OverlayTranslator::translate(ScriptCompiler* compiler, const AbstractNodePt
     Overlay* overlay = OverlayManager::getSingleton().create(name);
     overlay->_notifyOrigin(obj->file);
 
-    obj->context = overlay;
+    obj->context = Any(overlay);
 
     for (auto& c : obj->children)
     {

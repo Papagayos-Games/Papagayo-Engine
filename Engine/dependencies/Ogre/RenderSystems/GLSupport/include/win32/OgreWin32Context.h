@@ -37,8 +37,7 @@ namespace Ogre {
     {
     public:
         Win32Context(HDC     HDC,
-                     HGLRC   Glrc,
-                     Win32GLSupport &glsupport);
+                     HGLRC   Glrc);
         virtual ~Win32Context();
 
         /** See GLContext */
@@ -53,7 +52,6 @@ namespace Ogre {
     protected:
         HDC     mHDC;
         HGLRC   mGlrc;
-        Win32GLSupport &mGLSupport;
     };
 }
 

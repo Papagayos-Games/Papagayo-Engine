@@ -51,9 +51,10 @@ namespace Ogre
         if( technique )
         {
             GpuProgramParametersSharedPtr vertexParam = technique->getPass(0)->getVertexProgramParameters();
-            for(auto& it : vertexParam->getConstantDefinitions().map)
+            GpuConstantDefinitionIterator itor = vertexParam->getConstantDefinitionIterator();
+            while( itor.hasMoreElements() )
             {
-                const GpuConstantDefinition &constDef = it.second;
+                const GpuConstantDefinition &constDef = itor.getNext();
                 if(((constDef.constType == GCT_MATRIX_3X4 ||
                     constDef.constType == GCT_MATRIX_4X3 ||             //OGL GLSL bitches without this
                     constDef.constType == GCT_MATRIX_2X4 ||

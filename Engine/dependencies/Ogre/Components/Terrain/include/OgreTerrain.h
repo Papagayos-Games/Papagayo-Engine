@@ -45,7 +45,7 @@ namespace Ogre
     *  @{
     */
     /** \defgroup Terrain Terrain
-    *   Editable %Terrain System with LOD @cite de2000fast, serialization and \ref Paging support
+    *   Editable %Terrain System with LOD, serialization and \ref Paging support
     *  @{
     */
 
@@ -119,7 +119,8 @@ namespace Ogre
     <tr>
         <td>Packed blend texture data</td>
         <td>uint8*</td>
-        <td>layerCount-1 sets of blend texture data interleaved as RGBA</td>
+        <td>layerCount-1 sets of blend texture data interleaved as either RGB or RGBA 
+            depending on layer count</td>
     </tr>
     <tr>
         <td>Optional derived map data</td>
@@ -535,8 +536,7 @@ namespace Ogre
             GpuBufferAllocator() {}
             virtual ~GpuBufferAllocator() {}
 
-            /** Allocate (or reuse) vertex buffers for a terrain LOD.
-            @param forTerrain
+            /** Allocate (or reuse) vertex buffers for a terrain LOD. 
             @param numVertices The total number of vertices
             @param destPos Pointer to a vertex buffer for positions, to be bound
             @param destDelta Pointer to a vertex buffer for deltas, to be bound
@@ -852,10 +852,7 @@ namespace Ogre
         /** Get a transform which converts Vector4(xindex, yindex, height, 1) into 
             an object-space position including scalings and alignment.
         */
-        Affine3 getPointTransform() const;
-
-        /// @deprecated
-        OGRE_DEPRECATED void getPointTransform(Matrix4* outXform) const { *outXform = getPointTransform(); }
+        void getPointTransform(Matrix4* outXform) const;
         /** Translate a vector from world space to local terrain space based on the alignment options.
         @param inVec The vector in basis space, where x/y represents the 
         terrain plane and z represents the up vector
@@ -958,8 +955,6 @@ namespace Ogre
         */
         void setWorldSize(Real newWorldSize);
 
-        /// @name Layers
-        /// @{
         /** Get the number of layers in this terrain. */
         uint8 getLayerCount() const { return static_cast<uint8>(mLayers.size()); }
 
@@ -1046,7 +1041,6 @@ namespace Ogre
             terrain is created.
         */
         uint16 getLayerBlendMapSize() const { return mLayerBlendMapSize; }
-        /// @}
 
         /** Get the requested size of lightmap for this terrain. 
         Note that where hardware limits this, the actual lightmap may be lower
@@ -1364,20 +1358,17 @@ namespace Ogre
         */
         uint8 getBlendTextureIndex(uint8 layerIndex) const;
 
-        /// @deprecated use getBlendTextures()
-        OGRE_DEPRECATED uint8 getBlendTextureCount() const;
+        /// Get the number of blend textures in use
+        uint8 getBlendTextureCount() const;
         /// Get the number of blend textures needed for a given number of layers
-        static uint8 getBlendTextureCount(uint8 numLayers) { return ((numLayers - 2) / 4) + 1; }
+        uint8 getBlendTextureCount(uint8 numLayers) const;
 
 
-        /** Get the packed blend textures.
-        @note These are indexed by the blend texture index, not the layer index
+        /** Get the name of the packed blend texture at a specific index.
+        @param textureIndex This is the blend texture index, not the layer index
             (multiple layers will share a blend texture)
         */
-        const std::vector<TexturePtr>& getBlendTextures() const { return mBlendTextureList; }
-
-        /// @deprecated use getBlendTextures()
-        OGRE_DEPRECATED const String& getBlendTextureName(uint8 textureIndex) const;
+        const String& getBlendTextureName(uint8 textureIndex) const;
 
         /** Set whether a global colour map is enabled. 
         @remarks
@@ -1441,30 +1432,41 @@ namespace Ogre
         */
         std::pair<uint8,uint8> getLayerBlendTextureIndex(uint8 layerIndex) const;
 
-        /** @name Internal implementation options for the terrain material
-
-        The TerrainMaterialGenerator should call this methods to specify the
+        /** Request internal implementation options for the terrain material to use, 
+            in this case vertex morphing information. 
+        The TerrainMaterialGenerator should call this method to specify the 
         options it would like to use when creating a material. Not all the data
-        is guaranteed to be up to date on return from this method - for example some
+        is guaranteed to be up to date on return from this method - for example som
         maps may be generated in the background. However, on return from this method
         all the features that are requested will be referenceable by materials, the
         data may just take a few frames to be fully populated.
-        */
-        /// @{
-        /** Request vertex morphing information.
         @param morph Whether LOD morphing information is required to be calculated
         */
         void _setMorphRequired(bool morph) { mLodMorphRequired = morph; }
         /// Get whether LOD morphing is needed
         bool _getMorphRequired() const { return mLodMorphRequired; }
 
-        /** Request a terrain-wide normal map.
+        /** Request internal implementation options for the terrain material to use, 
+        in this case a terrain-wide normal map. 
+        The TerrainMaterialGenerator should call this method to specify the 
+        options it would like to use when creating a material. Not all the data
+        is guaranteed to be up to date on return from this method - for example some
+        maps may be generated in the background. However, on return from this method
+        all the features that are requested will be referenceable by materials, the
+        data may just take a few frames to be fully populated.
         @param normalMap Whether a terrain-wide normal map is requested. This is usually
             mutually exclusive with the lightmap option.
         */
         void _setNormalMapRequired(bool normalMap);
 
-        /** Request a terrain-wide light map.
+        /** Request internal implementation options for the terrain material to use, 
+        in this case a terrain-wide normal map. 
+        The TerrainMaterialGenerator should call this method to specify the 
+        options it would like to use when creating a material. Not all the data
+        is guaranteed to be up to date on return from this method - for example some
+        maps may be generated in the background. However, on return from this method
+        all the features that are requested will be referenceable by materials, the
+        data may just take a few frames to be fully populated.
         @param lightMap Whether a terrain-wide lightmap including precalculated 
             lighting is required (light direction in TerrainGlobalOptions)
         @param shadowsOnly If true, the lightmap contains only shadows, 
@@ -1472,20 +1474,25 @@ namespace Ogre
         */
         void _setLightMapRequired(bool lightMap, bool shadowsOnly = false);
 
-        /** Request a terrain-wide composite map.
-
-        A composite map is a texture with all of the blending and lighting baked in, such that
+        /** Request internal implementation options for the terrain material to use, 
+        in this case a terrain-wide composite map. 
+        The TerrainMaterialGenerator should call this method to specify the 
+        options it would like to use when creating a material. Not all the data
+        is guaranteed to be up to date on return from this method - for example some
+        maps may be generated in the background. However, on return from this method
+        all the features that are requested will be referenceable by materials, the
+        data may just take a few frames to be fully populated.
+        @param compositeMap Whether a terrain-wide composite map is needed. A composite
+        map is a texture with all of the blending and lighting baked in, such that
         at distance this texture can be used as an approximation of the multi-layer
         blended material. It is actually up to the material generator to render this
         composite map, because obviously precisely what it looks like depends on what
         the main material looks like. For this reason, the composite map is one piece
         of derived terrain data that is always calculated in the render thread, and
-        usually on the GPU. It is expected that if this option is requested,
+        usually on the GPU. It is expected that if this option is requested, 
         the material generator will use it to construct distant LOD techniques.
-        @param compositeMap Whether a terrain-wide composite map is needed.
         */
         void _setCompositeMapRequired(bool compositeMap);
-        /// @}
 
         /// Whether we're using vertex compression or not
         bool _getUseVertexCompression() const; 
@@ -1664,6 +1671,7 @@ namespace Ogre
         void checkLayers(bool includeGPUResources);
         void checkDeclaration();
         void deriveUVMultipliers();
+        PixelFormat getBlendTextureFormat(uint8 textureIndex, uint8 numLayers) const;
 
         void updateDerivedDataImpl(const Rect& rect, const Rect& lightmapExtraRect, bool synchronous, uint8 typeMask);
 
@@ -1732,7 +1740,7 @@ namespace Ogre
             uint8 typeMask;
             Rect dirtyRect;
             Rect lightmapExtraDirtyRect;
-            OGRE_DEPRECATED _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const DerivedDataRequest& r)
+            _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const DerivedDataRequest& r)
             { return o; }       
         };
 
@@ -1751,7 +1759,7 @@ namespace Ogre
             /// All CPU-side data, independent of textures; to be blitted in main thread
             PixelBox* normalMapBox;
             PixelBox* lightMapBox;
-            OGRE_DEPRECATED _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const DerivedDataResponse& r)
+            _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const DerivedDataResponse& r)
             { return o; }       
         };
 
@@ -1766,7 +1774,7 @@ namespace Ogre
             unsigned long startTime;
             GenerateMaterialStage stage;
             bool synchronous;
-            OGRE_DEPRECATED _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const GenerateMaterialRequest& r)
+            _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const GenerateMaterialRequest& r)
             { return o; }       
         };
 
@@ -1779,6 +1787,9 @@ namespace Ogre
 
         uint16 mLayerBlendMapSize;
         uint16 mLayerBlendMapSizeActual;
+        typedef std::vector<uint8*> BytePointerList;
+        /// Staging post for blend map data
+        BytePointerList mCpuBlendMapStorage;
         typedef std::vector<TexturePtr> TexturePtrList;
         TexturePtrList mBlendTextureList;
         TerrainLayerBlendMapList mLayerBlendMapList;
@@ -1786,14 +1797,17 @@ namespace Ogre
         uint16 mGlobalColourMapSize;
         bool mGlobalColourMapEnabled;
         TexturePtr mColourMap;
+        uint8* mCpuColourMapStorage;
 
         uint16 mLightmapSize;
         uint16 mLightmapSizeActual;
         TexturePtr mLightmap;
+        uint8* mCpuLightmapStorage;
 
         uint16 mCompositeMapSize;
         uint16 mCompositeMapSizeActual;
         TexturePtr mCompositeMap;
+        uint8* mCpuCompositeMapStorage;
         Rect mCompositeMapDirtyRect;
         unsigned long mCompositeMapUpdateCountdown;
         unsigned long mLastMillis;
@@ -1801,13 +1815,6 @@ namespace Ogre
         bool mCompositeMapDirtyRectLightmapUpdate;
         mutable MaterialPtr mCompositeMapMaterial;
 
-        /// staging images read in prepere
-        typedef std::vector<Image> ImageList;
-        ImageList mCpuBlendMapStorage;
-        Image mCpuColourMap;
-        Image mCpuLightmap;
-        Image mCpuCompositeMap;
-        Image mCpuTerrainNormalMap;
 
         static NameGenerator msBlendTextureGenerator;
         static NameGenerator msNormalMapNameGenerator;
@@ -1819,8 +1826,11 @@ namespace Ogre
         bool mLightMapRequired;
         bool mLightMapShadowsOnly;
         bool mCompositeMapRequired;
-        /// Texture storing normals for the whole terrain
+        /// Texture storing normals for the whole terrrain
         TexturePtr mTerrainNormalMap;
+
+        /// Pending data 
+        PixelBox* mCpuTerrainNormalMap;
 
         const Camera* mLastLODCamera;
         unsigned long mLastLODFrame;

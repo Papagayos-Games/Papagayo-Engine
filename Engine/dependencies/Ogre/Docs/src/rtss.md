@@ -156,7 +156,7 @@ Example: `source_modifier src1_inverse_modulate custom 2`
 # System overview {#rtss_overview}
 
 The RTSS manages a set of opaque isolated components (SubRenderStates) where each implements a specific effect.
-These "effects" include Fixed Function transformation and lighting. At the core these components are plain shader files providing a set of functions; e.g. @c SGX_Light_Directional_Diffuse(), @c SGX_Light_Point_Diffuse().
+These "effects" include Fixed Function transformation and lighting. At the core these components are plain shader files providing a set of functions; e.g. @ref SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, @ref SGX_FUNC_LIGHT_POINT_DIFFUSE.
 
 Correctly ordering these functions, providing them with the right input values and interconnecting them is the main purpose of the RTSS.
 
@@ -179,12 +179,12 @@ void main() {
 	$FFP_VS_TEXTURING
 }
 ```
-and `$FFP_VS_TRANSFORM = [FFP_Transform()]`, `$FFP_VS_TEXTURING = [FFP_TransformTexCoord()]`, it generates
+and `$FFP_VS_TRANSFORM = [FFP_FUNC_TRANSFORM]`, `$FFP_VS_TEXTURING = [FFP_FUNC_TRANSFORM_TEXCOORD]`, it generates
 
 ```cpp
-// PROGRAM DEPENDENCIES
-#include <FFPLib_Transform.glsl>
-#include <FFPLib_Texturing.glsl>
+// FORWARD DECLARATIONS
+void FFP_Transform(in mat4, in vec4, out vec4);
+void FFP_TransformTexCoord(in mat4, in vec2, out vec2);
 // GLOBAL PARAMETERS
 uniform	mat4	worldviewproj_matrix;
 uniform	mat4	texture_matrix1;
@@ -319,17 +319,15 @@ mViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAM
 
 @note you can automate the shader generation process for all materials. First set the viewport scheme to the destination scheme of the RTSS shaders. Second register to the `Ogre::MaterialManager::Listener` implementing `handleSchemeNotFound()` - e.g. OgreBites::SGTechniqueResolverListener
 
-## Shader generation at runtime {#rtssGenerate}
-During the application runtime the @c ShaderGenerator instance receives notifications on per frame basis from its target @c SceneManager.
+## Runtime shader generation {#rtssGenerate}
+During the application runtime the ShaderGenerator instance receives notifications on per frame basis from its target SceneManager.
 At this point it checks the material scheme in use. In case the current scheme has representations in the manager, it executes its validate method.
-The @c SGScheme validation includes synchronization with scene light and fog settings. In case it is out of date it will rebuild all shader generated techniques.
-1. The first step is to loop over every @c SGTechnique associated with this @c SGScheme and build its @c RenderStates - one for each pass.
-2. The second step is to loop again on every @c SGTechnique and acquire a program set for each @c SGPass.
+The SGScheme validation includes synchronization with scene light and fog settings. In case it is out of date it will rebuild all shader generated techniques.
+1. The first step is to loop over every SGTechnique associated with this SGScheme and build its RenderStates - one for each pass.
+2. The second step is to loop again on every SGTechnique and acquire a program set for each SGPass.
 
-@note The shaders are only automatically updated for lights and fog changes. If you change the source pass after initial shader creation, you must call Ogre::RTShader::ShaderGenerator::invalidateMaterial manually.
-
-The actual acquiring process is done by the @c TargetRenderState that generates CPU program representation, send them to a matching @c ProgramWriter that is chosen by the active target language, the writer generates source code that is the basis for the GPU programs.
-The result of this entire process is that each technique associated with the @c SGScheme has vertex and pixel shaders applied to all its passes. These shaders are synchronized with scene lights and fog settings.
+The actual acquiring process is done by the TargetRenderState that generates CPU program representation, send them to a matching ProgramWriter that is chosen by the active target language, the writer generates source code that is the basis for the GPU programs.
+The result of this entire process is that each technique associated with the SGScheme has vertex and pixel shaders applied to all its passes. These shaders are synchronized with scene lights and fog settings.
 
 ![](RuntimeShaderGeneration.svg)
 
@@ -391,7 +389,7 @@ Implementing the Ogre::RTShader::SubRenderStateFactory is much simpler and invol
 
 ## Tips for debugging shaders {#debugging}
 A couple of notes on debugging shaders coming from the RTSS:
-* Call OgreBites::ApplicationContext::setRTSSWriteShadersToDisk. This will cache the generated shaders onto the disk under the directory [WRITABLE_PATH](@ref Ogre::FileSystemLayer::getWritablePath)`/RTShaderLib/cache`. This is important for 2 reasons:
+* Call OgreBites::ApplicationContext::setRTSSWriteShadersToDisk. This will cache the generated shaders onto the disk under the directory [OGRE_MEDIA_DIR](@ref cmake)`/RTShaderLib/cache`. This is important for 2 reasons:
   * It will make compilation problems easier to detect.
   * Once a shader is written to the disk, as long as you don't change the code behind it, the same shader will be picked up in the next application run even if its content has changed. If you have compilation or visual problems with the shader you can try to manually tinker with it without compiling the code again and again.
 * Add a breakpoint in OgreShaderProgramManager.cpp at

@@ -379,6 +379,14 @@ namespace Ogre {
         needUpdate();
     }
 
+
+    //-----------------------------------------------------------------------
+    void Node::setPosition(Real x, Real y, Real z)
+    {
+        Vector3 v(x,y,z);
+        setPosition(v);
+    }
+
     //-----------------------------------------------------------------------
     Matrix3 Node::getLocalAxes(void) const
     {
@@ -414,6 +422,48 @@ namespace Ogre {
         needUpdate();
 
     }
+    //-----------------------------------------------------------------------
+    void Node::translate(Real x, Real y, Real z, TransformSpace relativeTo)
+    {
+        Vector3 v(x,y,z);
+        translate(v, relativeTo);
+    }
+    //-----------------------------------------------------------------------
+    void Node::translate(const Matrix3& axes, const Vector3& move, TransformSpace relativeTo)
+    {
+        Vector3 derived = axes * move;
+        translate(derived, relativeTo);
+    }
+    //-----------------------------------------------------------------------
+    void Node::translate(const Matrix3& axes, Real x, Real y, Real z, TransformSpace relativeTo)
+    {
+        Vector3 d(x,y,z);
+        translate(axes,d,relativeTo);
+    }
+    //-----------------------------------------------------------------------
+    void Node::roll(const Radian& angle, TransformSpace relativeTo)
+    {
+        rotate(Vector3::UNIT_Z, angle, relativeTo);
+    }
+    //-----------------------------------------------------------------------
+    void Node::pitch(const Radian& angle, TransformSpace relativeTo)
+    {
+        rotate(Vector3::UNIT_X, angle, relativeTo);
+    }
+    //-----------------------------------------------------------------------
+    void Node::yaw(const Radian& angle, TransformSpace relativeTo)
+    {
+        rotate(Vector3::UNIT_Y, angle, relativeTo);
+
+    }
+    //-----------------------------------------------------------------------
+    void Node::rotate(const Vector3& axis, const Radian& angle, TransformSpace relativeTo)
+    {
+        Quaternion q;
+        q.FromAngleAxis(angle,axis);
+        rotate(q, relativeTo);
+    }
+
     //-----------------------------------------------------------------------
     void Node::rotate(const Quaternion& q, TransformSpace relativeTo)
     {
@@ -570,6 +620,12 @@ namespace Ogre {
         needUpdate();
     }
     //-----------------------------------------------------------------------
+    void Node::setScale(Real x, Real y, Real z)
+    {
+        setScale(Vector3(x, y, z));
+    }
+
+    //-----------------------------------------------------------------------
     void Node::setInheritOrientation(bool inherit)
     {
         mInheritOrientation = inherit;
@@ -672,10 +728,9 @@ namespace Ogre {
     Real Node::getSquaredViewDepth(const Camera* cam) const
     {
         Vector3 diff = _getDerivedPosition() - cam->getDerivedPosition();
-        Vector3 zAxis = cam->getDerivedDirection();
 
-        // NB use squared length to avoid square root
-        return cam->getSortMode() == SM_DISTANCE ? diff.squaredLength() : Math::Sqr(zAxis.dotProduct(diff));
+        // NB use squared length rather than real depth to avoid square root
+        return diff.squaredLength();
     }
     //-----------------------------------------------------------------------
     void Node::needUpdate(bool forceParentUpdate)

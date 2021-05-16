@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreParticleEmitter.h"
 #include "OgreParticleAffector.h"
 #include "OgreParticle.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreParticleAffectorFactory.h"
 #include "OgreParticleSystemRenderer.h"
 #include "OgreControllerManager.h"
@@ -98,7 +99,7 @@ namespace Ogre {
 
         // Default to billboard renderer
         setRenderer("billboard");
-        mCastShadows = false;
+
     }
     //-----------------------------------------------------------------------
     ParticleSystem::ParticleSystem(const String& name, const String& resourceGroup)
@@ -136,7 +137,6 @@ namespace Ogre {
 
         // Default to billboard renderer
         setRenderer("billboard");
-        mCastShadows = false;
     }
     //-----------------------------------------------------------------------
     ParticleSystem::~ParticleSystem()
@@ -156,9 +156,10 @@ namespace Ogre {
         // Deallocate all particles
         destroyVisualParticles(0, mParticlePool.size());
         // Free pool items
-        for (auto p : mParticlePool)
+        ParticlePool::iterator i;
+        for (i = mParticlePool.begin(); i != mParticlePool.end(); ++i)
         {
-            OGRE_DELETE p;
+            OGRE_DELETE *i;
         }
 
         if (mRenderer)
@@ -198,8 +199,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::removeEmitter(ParticleEmitter* emitter)
     {
-        auto ei = std::find(mEmitters.begin(), mEmitters.end(), emitter);
-        OgreAssert(ei != mEmitters.end(), "Emitter is not a part of ParticleSystem!");
+        ParticleEmitterList::iterator ei =
+            std::find(mEmitters.begin(), mEmitters.end(), emitter);
+        assert(
+            ei != mEmitters.end() &&
+            "Emitter is not a part of ParticleSystem!");
         ParticleSystemManager::getSingleton()._destroyEmitter(*ei);
         mEmitters.erase(ei);
     }
@@ -207,9 +211,10 @@ namespace Ogre {
     void ParticleSystem::removeAllEmitters(void)
     {
         // DON'T delete directly, we don't know what heap these have been created on
-        for (auto e : mEmitters)
+        ParticleEmitterList::iterator ei;
+        for (ei = mEmitters.begin(); ei != mEmitters.end(); ++ei)
         {
-            ParticleSystemManager::getSingleton()._destroyEmitter(e);
+            ParticleSystemManager::getSingleton()._destroyEmitter(*ei);
         }
         mEmitters.clear();
     }
@@ -244,9 +249,10 @@ namespace Ogre {
     void ParticleSystem::removeAllAffectors(void)
     {
         // DON'T delete directly, we don't know what heap these have been created on
-        for (auto a : mAffectors)
+        ParticleAffectorList::iterator ai;
+        for (ai = mAffectors.begin(); ai != mAffectors.end(); ++ai)
         {
-            ParticleSystemManager::getSingleton()._destroyAffector(a);
+            ParticleSystemManager::getSingleton()._destroyAffector(*ai);
         }
         mAffectors.clear();
     }
@@ -327,10 +333,11 @@ namespace Ogre {
     void ParticleSystem::setEmittedEmitterQuota(size_t size)
     {
         // Never shrink below size()
+        EmittedEmitterPool::iterator i;
         size_t currSize = 0;
-        for (auto& kv : mEmittedEmitterPool)
+        for (i = mEmittedEmitterPool.begin(); i != mEmittedEmitterPool.end(); ++i)
         {
-            currSize += kv.second.size();
+            currSize += i->second.size();
         }
 
         if( currSize < size )
@@ -549,6 +556,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::_executeTriggerEmitters(ParticleEmitter* emitter, unsigned requested, Real timeElapsed)
     {
+        ParticleAffectorList::iterator  itAff, itAffEnd;
         Real timePoint = 0.0f;
 
 
@@ -586,11 +594,21 @@ namespace Ogre {
             p->mPosition += (p->mDirection * timePoint);
 
             // apply particle initialization by the affectors
-            for (auto a : mAffectors)
-                a->_initParticle(p);
+            itAffEnd = mAffectors.end();
+            for (itAff = mAffectors.begin(); itAff != itAffEnd; ++itAff)
+                (*itAff)->_initParticle(p);
 
             // Increment time fragment
             timePoint += timeInc;
+
+            if (p->mParticleType == Particle::Emitter)
+            {
+                // If the particle is an emitter, the position on the emitter side must also be initialised
+                // Note, that position of the emitter becomes a position in worldspace if mLocalSpace is set 
+                // to false (will this become a problem?)
+                ParticleEmitter* pParticleEmitter = static_cast<ParticleEmitter*>(p);
+                pParticleEmitter->setPosition(p->mPosition);
+            }
 
             // Notify renderer
             mRenderer->_notifyParticleEmitted(p);
@@ -599,9 +617,24 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::_applyMotion(Real timeElapsed)
     {
-        for (auto pParticle : mActiveParticles)
+        ActiveParticleList::iterator i, itEnd;
+        Particle* pParticle;
+        ParticleEmitter* pParticleEmitter;
+
+        itEnd = mActiveParticles.end();
+        for (i = mActiveParticles.begin(); i != itEnd; ++i)
         {
+            pParticle = static_cast<Particle*>(*i);
             pParticle->mPosition += (pParticle->mDirection * timeElapsed);
+
+            if (pParticle->mParticleType == Particle::Emitter)
+            {
+                // If it is an emitter, the emitter position must also be updated
+                // Note, that position of the emitter becomes a position in worldspace if mLocalSpace is set 
+                // to false (will this become a problem?)
+                pParticleEmitter = static_cast<ParticleEmitter*>(*i);
+                pParticleEmitter->setPosition(pParticle->mPosition);
+            }
         }
 
         // Notify renderer
@@ -610,10 +643,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::_triggerAffectors(Real timeElapsed)
     {
-        for (auto a : mAffectors)
+        ParticleAffectorList::iterator i, itEnd;
+        
+        itEnd = mAffectors.end();
+        for (i = mAffectors.begin(); i != itEnd; ++i)
         {
-            a->_affectParticles(this, timeElapsed);
+            (*i)->_affectParticles(this, timeElapsed);
         }
+
     }
     //-----------------------------------------------------------------------
     void ParticleSystem::increasePool(size_t size)
@@ -621,6 +658,7 @@ namespace Ogre {
         size_t oldSize = mParticlePool.size();
 
         // Increase size
+        mParticlePool.reserve(size);
         mParticlePool.resize(size);
 
         // Create new particles
@@ -658,6 +696,8 @@ namespace Ogre {
             // Fast creation (don't use superclass since emitter will init)
             p = mFreeParticles.front();
             mActiveParticles.splice(mActiveParticles.end(), mFreeParticles, mFreeParticles.begin());
+
+            p->_notifyOwner(this);
         }
 
         return p;
@@ -680,6 +720,8 @@ namespace Ogre {
             // that are emitted. Don't use mActiveParticles for that (although they are added to
             // mActiveParticles also), because it would take too long to traverse.
             mActiveEmittedEmitters.push_back(static_cast<ParticleEmitter*>(p));
+            
+            p->_notifyOwner(this);
         }
 
         return p;
@@ -698,7 +740,6 @@ namespace Ogre {
     {
         if (mRenderer)
         {
-            mRenderer->_notifyCastShadows(mCastShadows);
             mRenderer->visitRenderables(visitor, debugRenderables);
         }
     }
@@ -798,20 +839,23 @@ namespace Ogre {
                     min.x = min.y = min.z = Math::POS_INFINITY;
                     max.x = max.y = max.z = Math::NEG_INFINITY;
                 }
+                ActiveParticleList::iterator p;
                 Vector3 halfScale = Vector3::UNIT_SCALE * 0.5;
-                Vector3 defaultPadding = halfScale * std::max(mDefaultHeight, mDefaultWidth);
-                for (auto p : mActiveParticles)
+                Vector3 defaultPadding = 
+                    halfScale * std::max(mDefaultHeight, mDefaultWidth);
+                for (p = mActiveParticles.begin(); p != mActiveParticles.end(); ++p)
                 {
-                    if (p->mOwnDimensions)
+                    if ((*p)->mOwnDimensions)
                     {
-                        Vector3 padding = halfScale * std::max(p->mWidth, p->mHeight);
-                        min.makeFloor(p->mPosition - padding);
-                        max.makeCeil(p->mPosition + padding);
+                        Vector3 padding = 
+                            halfScale * std::max((*p)->mWidth, (*p)->mHeight);
+                        min.makeFloor((*p)->mPosition - padding);
+                        max.makeCeil((*p)->mPosition + padding);
                     }
                     else
                     {
-                        min.makeFloor(p->mPosition - defaultPadding);
-                        max.makeCeil(p->mPosition + defaultPadding);
+                        min.makeFloor((*p)->mPosition - defaultPadding);
+                        max.makeCeil((*p)->mPosition + defaultPadding);
                     }
                 }
                 mWorldAABB.setExtents(min, max);
@@ -820,11 +864,8 @@ namespace Ogre {
 
             if (mLocalSpace)
             {
-                if (mBoundsAutoUpdate)
-                    mAABB = mWorldAABB;
-                else
-                    // Merge calculated box with current AABB to preserve any user-set AABB
-                    mAABB.merge(mWorldAABB);
+                // Merge calculated box with current AABB to preserve any user-set AABB
+                mAABB.merge(mWorldAABB);
             }
             else
             {
@@ -834,17 +875,11 @@ namespace Ogre {
                 AxisAlignedBox newAABB(mWorldAABB);
                 newAABB.transform(mParentNode->_getFullTransform().inverse());
 
-                if (mBoundsAutoUpdate)
-                    mAABB = newAABB;
-                else
-                    // Merge calculated box with current AABB to preserve any user-set AABB
-                    mAABB.merge(newAABB);
+                // Merge calculated box with current AABB to preserve any user-set AABB
+                mAABB.merge(newAABB);
             }
 
             mParentNode->needUpdate();
-
-            if (mRenderer)
-                mRenderer->_notifyBoundingBox(mAABB);
         }
     }
     //-----------------------------------------------------------------------
@@ -871,6 +906,22 @@ namespace Ogre {
     const String& ParticleSystem::getMovableType(void) const
     {
         return ParticleSystemFactory::FACTORY_TYPE_NAME;
+    }
+    //-----------------------------------------------------------------------
+    void ParticleSystem::_notifyParticleResized(void)
+    {
+        if (mRenderer)
+        {
+            mRenderer->_notifyParticleResized();
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ParticleSystem::_notifyParticleRotated(void)
+    {
+        if (mRenderer)
+        {
+            mRenderer->_notifyParticleRotated();
+        }
     }
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultDimensions( Real width, Real height )
@@ -968,15 +1019,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
-        mMaterial = MaterialManager::getSingleton().getByName(name, groupName);
-        if (!mMaterial)
-        {
-            LogManager::getSingleton().logError("Can't assign material " + name +
-                " to ParticleSystem " + mName + " because this "
-                "Material does not exist in group "+groupName+". Have you forgotten to define it in a "
-                ".material script?");
-            mMaterial = MaterialManager::getSingleton().getDefaultMaterial(false);
-        }
+        mMaterial = static_pointer_cast<Material>(MaterialManager::getSingleton().load(name, mResourceGroupName));
         if (mIsRendererConfigured)
         {
             mMaterial->load();
@@ -997,10 +1040,8 @@ namespace Ogre {
             mRenderer->_notifyParticleCleared(mActiveParticles);
         }
 
-        // reset active and free lists
-        mActiveParticles.clear();
-        mFreeParticles.clear();
-        mFreeParticles.insert(mFreeParticles.end(), mParticlePool.begin(), mParticlePool.end());
+        // Move actives to free list
+        mFreeParticles.splice(mFreeParticles.end(), mActiveParticles);
 
         // Add active emitted emitters to free list
         addActiveEmittedEmittersToFreeList();
@@ -1038,9 +1079,11 @@ namespace Ogre {
         {
             this->increasePool(size);
 
-            // Add new items to the queue
-            mFreeParticles.insert(mFreeParticles.end(), mParticlePool.begin() + currSize,
-                                  mParticlePool.end());
+            for( size_t i = currSize; i < size; ++i )
+            {
+                // Add new items to the queue
+                mFreeParticles.push_back( mParticlePool[i] );
+            }
 
             // Tell the renderer, if already configured
             if (mRenderer && mIsRendererConfigured)
@@ -1093,24 +1136,26 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::createVisualParticles(size_t poolstart, size_t poolend)
     {
-        ParticlePool::iterator i = mParticlePool.begin() + poolstart;
-        ParticlePool::iterator iend = mParticlePool.begin() + poolend;
+        ParticlePool::iterator i = mParticlePool.begin();
+        ParticlePool::iterator iend = mParticlePool.begin();
+        std::advance(i, poolstart);
+        std::advance(iend, poolend);
         for (; i != iend; ++i)
         {
-            (*i)->_notifyOwner(this);
-            (*i)->_notifyVisualData(mRenderer->_createVisualData());
+            (*i)->_notifyVisualData(
+                mRenderer->_createVisualData());
         }
     }
     //-----------------------------------------------------------------------
     void ParticleSystem::destroyVisualParticles(size_t poolstart, size_t poolend)
     {
-        ParticlePool::iterator i = mParticlePool.begin() + poolstart;
-        ParticlePool::iterator iend = mParticlePool.begin() + poolend;
+        ParticlePool::iterator i = mParticlePool.begin();
+        ParticlePool::iterator iend = mParticlePool.begin();
+        std::advance(i, poolstart);
+        std::advance(iend, poolend);
         for (; i != iend; ++i)
         {
-            OGRE_IGNORE_DEPRECATED_BEGIN
             mRenderer->_destroyVisualData((*i)->getVisualData());
-            OGRE_IGNORE_DEPRECATED_END
             (*i)->_notifyVisualData(0);
         }
     }
@@ -1159,9 +1204,7 @@ namespace Ogre {
     {
         if (mRenderer)
         {
-            SortMode sortMode =
-                cam->getSortMode() == SM_DIRECTION ? SM_DIRECTION : mRenderer->_getSortMode();
-
+            SortMode sortMode = mRenderer->_getSortMode();
             if (sortMode == SM_DIRECTION)
             {
                 Vector3 camDir = cam->getDerivedDirection();
@@ -1225,9 +1268,10 @@ namespace Ogre {
         }
         else
         {
-            for (auto& kv : mEmittedEmitterPool)
+            EmittedEmitterPool::iterator i;
+            for (i = mEmittedEmitterPool.begin(); i != mEmittedEmitterPool.end(); ++i)
             {
-                currSize += kv.second.size();
+                currSize += i->second.size();
             }
         }
 
@@ -1249,19 +1293,27 @@ namespace Ogre {
             return;
 
         // Run through mEmitters and add keys to the pool
-        for (ParticleEmitter* emitter : mEmitters)
+        ParticleEmitterList::iterator emitterIterator;
+        ParticleEmitterList::iterator emitterIteratorInner;
+        ParticleEmitter* emitterInner = 0;
+        for (emitterIterator = mEmitters.begin(); emitterIterator != mEmitters.end(); ++emitterIterator)
         {
             // Determine the names of all emitters that are emitted
+            ParticleEmitter* emitter = *emitterIterator ;
             if (emitter && !emitter->getEmittedEmitter().empty())
             {
                 // This one will be emitted, register its name and leave the vector empty!
-                mEmittedEmitterPool[emitter->getEmittedEmitter()];
+                EmittedEmitterList empty;
+                mEmittedEmitterPool.insert(make_pair(emitter->getEmittedEmitter(), empty));
             }
 
             // Determine whether the emitter itself will be emitted and set the 'mEmitted' attribute
-            for (ParticleEmitter* emitterInner : mEmitters)
+            for (emitterIteratorInner = mEmitters.begin(); emitterIteratorInner != mEmitters.end(); ++emitterIteratorInner)
             {
-                if (emitter && emitterInner && !emitter->getName().empty() &&
+                emitterInner = *emitterIteratorInner;
+                if (emitter && 
+                    emitterInner && 
+                    !emitter->getName().empty() &&
                     emitter->getName() == emitterInner->getEmittedEmitter())
                 {
                     emitter->setEmitted(true);
@@ -1284,28 +1336,35 @@ namespace Ogre {
         if (mEmittedEmitterPool.empty())
             return;
 
+        EmittedEmitterPool::iterator emittedEmitterPoolIterator;
+        ParticleEmitterList::iterator emitterIterator;
         ParticleEmitter* clonedEmitter = 0;
+        String name = BLANKSTRING;
+        EmittedEmitterList* e = 0;
         size_t maxNumberOfEmitters = size / mEmittedEmitterPool.size(); // equally distribute the number for each emitted emitter list
+        size_t oldSize = 0;
     
         // Run through mEmittedEmitterPool and search for every key (=name) its corresponding emitter in mEmitters
-        for (auto& kv : mEmittedEmitterPool)
+        for (emittedEmitterPoolIterator = mEmittedEmitterPool.begin(); emittedEmitterPoolIterator != mEmittedEmitterPool.end(); ++emittedEmitterPoolIterator)
         {
-            const auto& name = kv.first;
-            auto& e = kv.second;
+            name = emittedEmitterPoolIterator->first;
+            e = &emittedEmitterPoolIterator->second;
 
             // Search the correct emitter in the mEmitters vector
-            for (ParticleEmitter* emitter : mEmitters)
+            for (emitterIterator = mEmitters.begin(); emitterIterator != mEmitters.end(); ++emitterIterator)
             {
-                if (emitter && !name.empty() && name == emitter->getName())
-                {
+                ParticleEmitter* emitter = *emitterIterator;
+                if (emitter && 
+                    name != BLANKSTRING && 
+                    name == emitter->getName())
+                {       
                     // Found the right emitter, clone each emitter a number of times
-                    size_t oldSize = e.size();
+                    oldSize = e->size();
                     for (size_t t = oldSize; t < maxNumberOfEmitters; ++t)
                     {
                         clonedEmitter = ParticleSystemManager::getSingleton()._createEmitter(emitter->getType(), this);
                         emitter->copyParametersTo(clonedEmitter);
                         clonedEmitter->setEmitted(emitter->isEmitted()); // is always 'true' by the way, but just in case
-                        clonedEmitter->_notifyOwner(this);
 
                         // Initially deactivate the emitted emitter if duration/repeat_delay are set
                         if (clonedEmitter->getDuration() > 0.0f && 
@@ -1313,7 +1372,7 @@ namespace Ogre {
                             clonedEmitter->setEnabled(false);
 
                         // Add cloned emitters to the pool
-                        e.push_back(clonedEmitter);
+                        e->push_back(clonedEmitter);
                     }
                 }
             }
@@ -1327,19 +1386,24 @@ namespace Ogre {
             return;
 
         // Copy all pooled emitters to the free list
+        EmittedEmitterPool::iterator emittedEmitterPoolIterator;
+        EmittedEmitterList::iterator emittedEmitterIterator;
+        EmittedEmitterList* emittedEmitters = 0;
         std::list<ParticleEmitter*>* fee = 0;
+        String name = BLANKSTRING;
 
         // Run through the emittedEmitterPool map
-        for (auto& kv : mEmittedEmitterPool)
+        for (emittedEmitterPoolIterator = mEmittedEmitterPool.begin(); emittedEmitterPoolIterator != mEmittedEmitterPool.end(); ++emittedEmitterPoolIterator)
         {
-            const auto& name = kv.first;
-            auto& emittedEmitters = kv.second;
+            name = emittedEmitterPoolIterator->first;
+            emittedEmitters = &emittedEmitterPoolIterator->second;
             fee = findFreeEmittedEmitter(name);
 
             // If its not in the map, create an empty one
             if (!fee)
             {
-                mFreeEmittedEmitters[name];
+                FreeEmittedEmitterList empty;
+                mFreeEmittedEmitters.insert(make_pair(name, empty));
                 fee = findFreeEmittedEmitter(name);
             }
 
@@ -1348,22 +1412,26 @@ namespace Ogre {
                 return; // forget it!
 
             // Add all emitted emitters from the pool to the free list
-            for(ParticleEmitter* emitter : emittedEmitters)
+            for(emittedEmitterIterator = emittedEmitters->begin(); emittedEmitterIterator != emittedEmitters->end(); ++emittedEmitterIterator)
             {
-                fee->push_back(emitter);
+                fee->push_back(*emittedEmitterIterator);
             }
         }
     }
     //-----------------------------------------------------------------------
     void ParticleSystem::removeAllEmittedEmitters(void)
     {
-        for (auto& kv : mEmittedEmitterPool)
+        EmittedEmitterPool::iterator emittedEmitterPoolIterator;
+        EmittedEmitterList::iterator emittedEmitterListIterator;
+        EmittedEmitterList* e = 0;
+        for (emittedEmitterPoolIterator = mEmittedEmitterPool.begin(); emittedEmitterPoolIterator != mEmittedEmitterPool.end(); ++emittedEmitterPoolIterator)
         {
-            for (ParticleEmitter* emitter : kv.second)
+            e = &emittedEmitterPoolIterator->second;
+            for (emittedEmitterListIterator = e->begin(); emittedEmitterListIterator != e->end(); ++emittedEmitterListIterator)
             {
-                ParticleSystemManager::getSingleton()._destroyEmitter(emitter);
+                ParticleSystemManager::getSingleton()._destroyEmitter(*emittedEmitterListIterator);
             }
-            kv.second.clear();
+            e->clear();
         }
 
         // Don't leave any references behind

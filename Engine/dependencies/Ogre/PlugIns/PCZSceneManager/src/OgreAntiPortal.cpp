@@ -56,3 +56,8 @@ MovableObject* AntiPortalFactory::createInstanceImpl(const String& name, const N
 {
     return OGRE_NEW AntiPortal(name, getPortalType(params));
 }
+
+void AntiPortalFactory::destroyInstance(MovableObject* obj)
+{
+    OGRE_DELETE obj;
+}

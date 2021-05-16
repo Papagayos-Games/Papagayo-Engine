@@ -43,18 +43,14 @@
 
 #include <iomanip>
 
+/** \addtogroup Optional
+*  @{
+*/
+/** \addtogroup Bites
+*  @{
+*/
 namespace OgreBites
 {
-    /** \addtogroup Optional
-    *  @{
-    */
-    /** \addtogroup Bites
-    *  @{
-    */
-    /** @defgroup Trays Trays
-     * Simplistic GUI System build with Overlays
-     * @{
-     */
     enum TrayLocation   /// enumerator values for widget tray anchoring locations
     {
         TL_TOPLEFT,
@@ -1159,8 +1155,6 @@ namespace OgreBites
         */
         bool mouseMoved(const MouseMotionEvent& evt);
 
-        bool mouseWheelRolled(const MouseWheelEvent& evt);
-
     protected:
 
         /**
@@ -1204,8 +1198,8 @@ namespace OgreBites
         Ogre::Vector2 mCursorPos;             // current cursor position
 
     };
-    /** @} */
-    /** @} */
-    /** @} */
 }
+
+/** @} */
+/** @} */
 #endif

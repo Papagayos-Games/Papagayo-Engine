@@ -306,21 +306,12 @@ namespace Ogre {
         TVC_EMISSIVE    = 0x8
     };
 
-    /** Function used compute the camera-distance for sorting objects */
+    /** Sort mode for billboard-set and particle-system */
     enum SortMode
     {
-
-        /** Sort by direction of the camera
-         *
-         * The distance along the camera view as in `cam->getDerivedDirection().dotProduct(diff)`
-         * Best for @ref PT_ORTHOGRAPHIC
-         */
+        /** Sort by direction of the camera */
         SM_DIRECTION,
-        /** Sort by distance from the camera
-         *
-         * The euclidean distance as in `diff.squaredLength()`
-         * Best for @ref PT_PERSPECTIVE
-         */
+        /** Sort by distance from the camera */
         SM_DISTANCE
     };
 
@@ -684,7 +675,6 @@ namespace Ogre {
           {
               return left == rhs.left && right == rhs.right && top == rhs.top && bottom == rhs.bottom;
           }
-          bool operator!=(const TRect& rhs) const { return !(*this == rhs); }
         };
         template<typename T>
         std::ostream& operator<<(std::ostream& o, const TRect<T>& r)
@@ -736,10 +726,6 @@ namespace Ogre {
             {
                 assert(right >= left && bottom >= top && back >= front);
             }
-
-            /// @overload
-            template <typename T> explicit Box(const TRect<T>& r) : Box(r.left, r.top, r.right, r.bottom) {}
-
             /** Define a box from left, top, front, right, bottom and back
                 coordinates.
                 @param  l   x value of left edge

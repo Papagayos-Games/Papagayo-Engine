@@ -132,7 +132,7 @@ namespace Ogre {
     GLES2TextureBuffer::GLES2TextureBuffer(GLES2Texture* parent, GLint face, GLint level,
                                            GLint width, GLint height, GLint depth)
         : GLES2HardwarePixelBuffer(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
-          mTarget(parent->getGLES2TextureTarget()), mTextureID(parent->getGLID()),
+          mTarget(parent->getGLES2TextureTarget()), mTextureID(parent->getGLID()), mFace(face),
           mLevel(level)
     {
         // Get face identifier
@@ -143,11 +143,15 @@ namespace Ogre {
         mGLInternalFormat =
             GLES2PixelUtil::getGLInternalFormat(mFormat, parent->isHardwareGammaEnabled());
 
+        mRowPitch = mWidth;
+        mSlicePitch = mHeight*mWidth;
+        mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
+
 #if OGRE_DEBUG_MODE
         // Log a message
         std::stringstream str;
         str << "GLES2HardwarePixelBuffer constructed for texture " << parent->getName()
-            << " id " << mTextureID << " face " << face << " level " << mLevel << ":"
+            << " id " << mTextureID << " face " << mFace << " level " << mLevel << ":"
             << " width=" << mWidth << " height="<< mHeight << " depth=" << mDepth
             << " format=" << PixelUtil::getFormatName(mFormat);
         LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
@@ -525,7 +529,7 @@ namespace Ogre {
     //********* GLES2RenderBuffer
     //----------------------------------------------------------------------------- 
     GLES2RenderBuffer::GLES2RenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples):
-    GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format), HBU_GPU_ONLY)
+    GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format), HBU_WRITE_ONLY)
     {
         GLES2RenderSystem* rs = getGLES2RenderSystem();
 

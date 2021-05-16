@@ -25,7 +25,8 @@ PhysicsManager* PhysicsManager::getInstance()
 }
 
 PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {
-	registerComponent("RigidBody", []() -> RigidBody* { return new RigidBody(); });
+	registerComponent("RigidBody", 0, []() -> RigidBody* { return new RigidBody(); });
+
 };
 
 PhysicsManager::~PhysicsManager() {

@@ -232,6 +232,8 @@ namespace Ogre {
         static String FACTORY_TYPE_NAME;
 
         const String& getType(void) const;
+        void destroyInstance( MovableObject* obj);  
+
     };
     /** @} */
     /** @} */

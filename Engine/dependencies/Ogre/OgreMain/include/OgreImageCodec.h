@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgreCodec.h"
 #include "OgrePixelFormat.h"
-#include "OgreBitwise.h"
 
 namespace Ogre {
 
@@ -47,29 +46,7 @@ namespace Ogre {
     */
     class _OgreExport ImageCodec : public Codec
     {
-    protected:
-        static void flipEndian(void* pData, size_t size, size_t count)
-        {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-            Bitwise::bswapChunks(pData, size, count);
-#endif
-        }
-        static void flipEndian(void* pData, size_t size)
-        {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-            Bitwise::bswapBuffer(pData, size);
-#endif
-        }
-
     public:
-        using Codec::decode;
-        using Codec::encode;
-        using Codec::encodeToFile;
-
-        void decode(const DataStreamPtr& input, const Any& output) const override;
-        DataStreamPtr encode(const Any& input) const override;
-        void encodeToFile(const Any& input, const String& outFileName) const override;
-
         virtual ~ImageCodec();
         /** Codec return class for images. Has information about the size and the
             pixel format of the image. */

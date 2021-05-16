@@ -23,14 +23,19 @@ if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
     PROPERTIES COMPILE_DEFINITIONS OGRE_ENABLE_STATE_CACHE)
 endif()
 add_library(RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_HEADERS} ${GLSL_SOURCE} ${SOURCE_FILES})
-target_link_libraries(RenderSystem_GL3Plus PUBLIC OgreMain ${OPENGL_gl_LIBRARY} ${CMAKE_DL_LIBS} PRIVATE OgreGLSupport)
+target_link_libraries(RenderSystem_GL3Plus OgreMain OgreGLSupport ${OPENGL_gl_LIBRARY} ${CMAKE_DL_LIBS})
 target_include_directories(RenderSystem_GL3Plus PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/RenderSystems/GL3Plus>
     PRIVATE
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include>")
 
-target_include_directories(RenderSystem_GL3Plus PUBLIC ${OPENGL_INCLUDE_DIR})
+if (APPLE)
+    set_target_properties(RenderSystem_GL3Plus PROPERTIES
+        LINK_FLAGS "-framework Cocoa -framework OpenGL")
+else()
+    target_include_directories(RenderSystem_GL3Plus PUBLIC ${OPENGL_INCLUDE_DIR})
+endif ()
 
 ogre_config_framework(RenderSystem_GL3Plus)
 ogre_config_plugin(RenderSystem_GL3Plus)

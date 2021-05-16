@@ -27,6 +27,7 @@ using namespace Ogre;
 using namespace OgreBites;
 
 namespace OgreBites {
+const Vector3 GRAVITY_VECTOR = Vector3(0, -9.8, 0);
 
 #ifdef LOG_GENERATED_BUFFER
 struct FireworkParticle
@@ -126,6 +127,8 @@ struct FireworkParticle
 
     void Sample_ParticleGS::setupContent(void)
     {
+        demoTime = 0;
+
         mCameraNode->setPosition(0,35,-100);
         mCameraNode->lookAt(Vector3(0,35,0), Node::TS_PARENT);
 
@@ -165,6 +168,28 @@ struct FireworkParticle
         mProceduralManualObjectFactory = 0;
 
         MeshManager::getSingleton().remove("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    }
+
+    bool Sample_ParticleGS::frameStarted(const FrameEvent& evt)
+    {
+        // Set shader parameters.
+        GpuProgramParametersSharedPtr geomParams = mParticleSystem->
+            getRenderToVertexBuffer()->getRenderToBufferMaterial()->
+            getBestTechnique()->getPass(0)->getGeometryProgramParameters();
+        if (geomParams->_findNamedConstantDefinition("elapsedTime"))
+        {
+            geomParams->setNamedConstant("elapsedTime", evt.timeSinceLastFrame);
+        }
+        demoTime += evt.timeSinceLastFrame;
+        if (geomParams->_findNamedConstantDefinition("globalTime"))
+        {
+            geomParams->setNamedConstant("globalTime", demoTime);
+        }
+        if (geomParams->_findNamedConstantDefinition("frameGravity"))
+        {
+            geomParams->setNamedConstant("frameGravity", GRAVITY_VECTOR * evt.timeSinceLastFrame);
+        }
+        return SdkSample::frameStarted(evt);
     }
 
 #ifdef LOG_GENERATED_BUFFER

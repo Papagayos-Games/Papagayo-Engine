@@ -287,6 +287,16 @@ namespace Ogre {
         return true;
     }
     //-----------------------------------------------------------------------
+    /*
+    PyramidSceneQuery::PyramidSceneQuery(SceneManager* mgr) : RegionSceneQuery(mgr)
+    {
+    }
+    //-----------------------------------------------------------------------
+    PyramidSceneQuery::~PyramidSceneQuery()
+    {
+    }
+    */
+    //-----------------------------------------------------------------------
     IntersectionSceneQuery::IntersectionSceneQuery(SceneManager* mgr)
     : SceneQuery(mgr), mLastResult(NULL)
     {

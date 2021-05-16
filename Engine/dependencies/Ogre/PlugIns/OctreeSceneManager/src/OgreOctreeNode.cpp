@@ -61,7 +61,7 @@ OctreeNode::~OctreeNode()
 {}
 void OctreeNode::_removeNodeAndChildren( )
 {
-    static_cast< OctreeSceneManager * > ( getCreator() ) -> _removeOctreeNode( this );
+    static_cast< OctreeSceneManager * > ( mCreator ) -> _removeOctreeNode( this ); 
     //remove all the children nodes as well from the octree.
     ChildNodeMap::iterator it = mChildren.begin();
     while( it != mChildren.end() )
@@ -111,20 +111,28 @@ void OctreeNode::_updateBounds( void )
     mLocalAABB.setNull();
 
     // Update bounds from own attached objects
-    for ( auto o : getAttachedObjects() )
+    ObjectMap::iterator i = mObjectsByName.begin();
+    AxisAlignedBox bx;
+
+    while ( i != mObjectsByName.end() )
     {
+
         // Get local bounds of object
-        mLocalAABB.merge( o->getBoundingBox() );
-        mWorldAABB.merge( o->getWorldBoundingBox(true) );
+        bx = (*i)->getBoundingBox();
+
+        mLocalAABB.merge( bx );
+
+        mWorldAABB.merge( (*i)->getWorldBoundingBox(true) );
+        ++i;
     }
 
 
     //update the OctreeSceneManager that things might have moved.
     // if it hasn't been added to the octree, add it, and if has moved
     // enough to leave it's current node, we'll update it.
-    if ( !_getWorldAABB().isNull() && isInSceneGraph() )
+    if ( ! mWorldAABB.isNull() && mIsInSceneGraph )
     {
-        static_cast < OctreeSceneManager * > ( getCreator() ) -> _updateOctreeNode( this );
+        static_cast < OctreeSceneManager * > ( mCreator ) -> _updateOctreeNode( this );
     }
 
 }
@@ -134,13 +142,13 @@ void OctreeNode::_updateBounds( void )
 bool OctreeNode::_isIn( AxisAlignedBox &box )
 {
     // Always fail if not in the scene graph or box is null
-    if (!isInSceneGraph() || box.isNull()) return false;
+    if (!mIsInSceneGraph || box.isNull()) return false;
 
     // Always succeed if AABB is infinite
     if (box.isInfinite())
         return true;
 
-    Vector3 center = _getWorldAABB().getMaximum().midPoint( _getWorldAABB().getMinimum() );
+    Vector3 center = mWorldAABB.getMaximum().midPoint( mWorldAABB.getMinimum() );
 
     Vector3 bmin = box.getMinimum();
     Vector3 bmax = box.getMaximum();
@@ -154,7 +162,7 @@ bool OctreeNode::_isIn( AxisAlignedBox &box )
     // end up in parent due to cascade but when updating need to deal with
     // bbox growing too large for this child
     Vector3 octreeSize = bmax - bmin;
-    Vector3 nodeSize = _getWorldAABB().getMaximum() - _getWorldAABB().getMinimum();
+    Vector3 nodeSize = mWorldAABB.getMaximum() - mWorldAABB.getMinimum();
     return nodeSize < octreeSize;
 
 }
@@ -163,10 +171,17 @@ bool OctreeNode::_isIn( AxisAlignedBox &box )
 void OctreeNode::_addToRenderQueue( Camera* cam, RenderQueue *queue, 
     bool onlyShadowCasters, VisibleObjectsBoundsInfo* visibleBounds )
 {
-    for ( auto mo : getAttachedObjects() )
+    ObjectMap::iterator mit = mObjectsByName.begin();
+
+    while ( mit != mObjectsByName.end() )
     {
+        MovableObject * mo = *mit;
+        
         queue->processVisibleObject(mo, cam, onlyShadowCasters, visibleBounds);
+
+        ++mit;
     }
+
 }
 
 

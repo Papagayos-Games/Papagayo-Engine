@@ -96,8 +96,6 @@ public:
     */
     void setSplitPoints(const SplitPointList& newSplitPoints);
 
-    void setDebug(bool enable) { mDebug = enable; }
-
     static String Type;
 
     // Protected types:
@@ -187,7 +185,6 @@ protected:
     UniformParameterPtr mPSDerivedSceneColour;
 
     bool mUseTextureCompare;
-    bool mDebug;
 };
 
 

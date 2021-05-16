@@ -410,11 +410,6 @@ namespace Ogre {
         }
     }
 
-    void TextureUnitState::setCubicTextureName(const String* const names, bool forUVW)
-    {
-        setLayerArrayNames(TEX_TYPE_CUBE_MAP, std::vector<String>(names, names + 6));
-    }
-
     //-----------------------------------------------------------------------
     void TextureUnitState::setAnimatedTextureName( const String& name, size_t numFrames, Real duration)
     {
@@ -570,17 +565,13 @@ namespace Ogre {
     void TextureUnitState::setIsAlpha(bool isAlpha)
     {
         OgreAssert(mFramePtrs[0], "frame must not be blank");
-        OGRE_IGNORE_DEPRECATED_BEGIN
         for(auto& frame : mFramePtrs)
             frame->setTreatLuminanceAsAlpha(isAlpha);
-        OGRE_IGNORE_DEPRECATED_END
     }
     //-----------------------------------------------------------------------
     bool TextureUnitState::getIsAlpha(void) const
     {
-        OGRE_IGNORE_DEPRECATED_BEGIN
         return mFramePtrs[0] && mFramePtrs[0]->getTreatLuminanceAsAlpha();
-        OGRE_IGNORE_DEPRECATED_END
     }
     float TextureUnitState::getGamma() const
     {
