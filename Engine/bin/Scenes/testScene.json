@@ -13,11 +13,12 @@
         ]
       },
       {
-        "Prefab" : "DefaultLight"
+        "Prefab": "DefaultLight"
       },
       {
+        "Name" : "pepito",
         "Prefab": "Penguin",
-        "Components" : [
+        "Components": [
           {
             "Component": "Transform",
             "Type": "Common",
@@ -33,11 +34,8 @@
             }
           },
           {
-            "Component": "LuaComponent",
-            "Type": "LUA",
-            "Parameters": {
-              "Class": "default"
-            }
+            "Component": "",
+            "Type": "LUA"
           }
         ]
       }

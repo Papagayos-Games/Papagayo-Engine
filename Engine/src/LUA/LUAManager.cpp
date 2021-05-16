@@ -270,6 +270,14 @@ Entity* LUAManager::instantiate(std::string prefabName)
 	return e;
 }
 
+void LUAManager::addRegistry(const std::string& compName)
+{
+	enum_map_[compName] = registeredFiles;
+	int id = registeredFiles;
+	registerComponent(compName, enum_map_[compName], [compName, id]() -> LuaComponent* { return new LuaComponent(compName, id); });
+	registeredFiles++;
+}
+
 lua_State* LUAManager::getLuaState() const
 {
 	return L;
@@ -285,10 +293,10 @@ void LUAManager::buildLuaEngine(const std::string& file) {
 	}
 }
 
-LUAManager::LUAManager() : Manager(ManID::LUA)
+LUAManager::LUAManager() : Manager(ManID::LUA), registeredFiles(0)
 {
 	//Registro de componentes
-	registerComponent("LuaComponent", 0,[]() -> LuaComponent* { return new LuaComponent(); });
+	registerComponent("default", registeredFiles++, []() -> LuaComponent* { return new LuaComponent(); });
 
 	//Inicializacion del estado de LUA
 	L = luaL_newstate();
@@ -298,4 +306,5 @@ LUAManager::LUAManager() : Manager(ManID::LUA)
 	if (L) {
 		registerClassAndFunctions(L);
 	}
+	else throw std::exception("ERROR: LUA is not compiling correctly\n");
 }

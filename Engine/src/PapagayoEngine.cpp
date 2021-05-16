@@ -138,14 +138,14 @@ void PapagayoEngine::update()
 			phys->update();
 			render->update();
 
+			lua->update();
+			++timer_;
+
 			if (timer_ == 1000) {
 				std::cout << "Cambio de escena\n";
 				mSM->changeScene("test2");
 			}
-
 			mSM->update();
-			++timer_;
-			lua->update();
 		}
 	}
 	catch (const std::exception& e)

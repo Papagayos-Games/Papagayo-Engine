@@ -29,6 +29,8 @@ private:
 	
 	LUAManager();
 	static LUAManager* instance_;
+
+	int registeredFiles = 0;
 	
 	bool CheckLua(lua_State* L, int r);
 	void buildLuaEngine(const std::string& file);
@@ -50,6 +52,8 @@ public:
 	Camera* getCamera(Entity* ent);
 	Transform* getTransform(Entity* ent);
 	Entity* instantiate(std::string prefabName);
+
+	void addRegistry(const std::string& compName);
 
 	//Obtener el estado de LUA
 	lua_State* getLuaState()const;
