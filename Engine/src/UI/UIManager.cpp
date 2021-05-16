@@ -12,6 +12,12 @@ UIManager* UIManager::instance_ = nullptr;
 
 UIManager::UIManager() : Manager(ManID::UI)
 {
+	//registerComponent("Button", 0, []() -> UIButton* { return new UIButton(); });
+	//registerComponent("Slider", 0, []() -> UISlider* { return new UISlider(); });
+	//registerComponent("Label", 0, []() -> UILabel* { return new UILabel(); });
+	//registerComponent("Image", 0, []() -> UIImage* { return new UIImage(); });
+	//registerComponent("Pointer", 0, []() -> UIPointer* { return new UIPointer(); });
+
 	//Ogre
 	oRoot = OgreContext::getInstance()->getOgreRoot();
 	oWindow = OgreContext::getInstance()->getRenderWindow();
