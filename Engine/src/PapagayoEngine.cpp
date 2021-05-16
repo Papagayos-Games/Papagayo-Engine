@@ -57,18 +57,29 @@ bool PapagayoEngine::setupInstance(const std::string& appName)
 	return false;
 }
 
-void PapagayoEngine::clean()
+void PapagayoEngine::destroy()
 {
-	// se borrarian todos los managers del motor
+	// se borran todos los managers del motor
+	// sistemas
+	input->destroy();
+	audio->destroy();
+
+	// render
+	render->destroy();
+	gui->destroy();
+	ogre->destroy();
 	
-	delete mSM;
-	input->clean();
-	gui->clean();
-	ogre->clean();
-	phys->clean();
-	//render->clean();
-	//common->clean();
-	//lua->clean(); 
+	// fisicas
+	phys->destroy();
+
+	// common
+	common->destroy();
+	
+	// logica
+	//lua->clean();
+
+	// escena
+	mSM->destroy();
 	
 	delete instance_;
 }
@@ -101,15 +112,22 @@ void PapagayoEngine::init()
 	gui->setMouseImage("TaharezLook/MouseArrow");
 	gui->loadFont("DejaVuSans-12.font"); 
 
+	if (!AudioSystem::setupInstance()) {
+		throw std::exception("ERROR: Couldn't load the AudioSystem\n");
+	}
+	audio = AudioSystem::getInstance();
+	audio->init();
+	audio->playSound("Assets/badbunny.mp3", {0,0,0});
+
 #pragma region TOERASE
 	gui->createButton("Probando_boton", glm::vec2(0, 0), glm::vec2(200, 200), "Prueba");
 	//ui->createLabel("Probando_boton", glm::vec2(100, 100), glm::vec2(10, 10), "Prueba");
 
 	ogre->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
 	//Audio de bad bunny metido 
-	AudioEngine* au = new AudioEngine();
-	au->Init();
-	au->PlaySound("Assets/badbunny.mp3", {0,0,0});
+	//AudioEngine* au = new AudioEngine();
+	//au->init();
+	//au->PlaySound("Assets/badbunny.mp3", {0,0,0});
 
 #pragma endregion
 

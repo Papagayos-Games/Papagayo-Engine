@@ -46,7 +46,7 @@ private:
 	std::vector<btMotionState*> states_;*/
 
 	PhysicsManager();
-	~PhysicsManager();
+	virtual ~PhysicsManager();
 
 	//TO ERASE
 	bool applyTorque = true;
@@ -76,6 +76,7 @@ public:
 	virtual void update();
 	
 	static void clean();
+	static void destroy();
 
 	virtual void destroyAllComponents();
 	virtual bool destroyComponent(Entity* ent, int compId);

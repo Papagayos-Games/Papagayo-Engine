@@ -204,6 +204,16 @@ void OgreContext::setupRTShaderGenerator()
 
 void OgreContext::clean()
 {
+	//Destruir SceneManager
+	instance_->mShaderGenerator_->removeSceneManager(instance_->mSM);
+	//instance_->mShaderGenerator_->addSceneManager(instance_->mSM); // TO DO: Devolverselo en el cambio de escena
+	instance_->ogreRoot_->destroySceneManager(instance_->mSM);
+	OgreContext::getInstance()->getRenderWindow()->removeAllViewports();
+}
+
+void OgreContext::destroy()
+{
+	clean();
 	delete instance_;
 }
 
@@ -223,7 +233,6 @@ OgreContext::~OgreContext()
 
 	// destroy RTShader system.
 	if (mShaderGenerator_ != nullptr) {
-		mShaderGenerator_->removeSceneManager(mSM);
 		Ogre::RTShader::ShaderGenerator::getSingleton().destroy();
 		mShaderGenerator_ = nullptr;
 	}
@@ -242,15 +251,11 @@ OgreContext::~OgreContext()
 	//Destruir FileSystemLayer
 	//delete mFSLayer_;
 
-	//Destruir SceneManager
-	ogreRoot_->destroySceneManager(mSM);
-
 	delete ogreRoot_;
 	ogreRoot_ = nullptr;
 
-
 	//Destruir RTShaderSystem;
-	delete  mMaterialListener_;
+	delete mMaterialListener_;
 
 	Ogre::STBIImageCodec::shutdown();
 }

@@ -19,6 +19,9 @@ public:
 
 	static CommonManager* getInstance();
 
+	static void clean();
+	static void destroy();
+
 	void addComponent(Entity* ent, int compId);
 	void start();
 	void update();

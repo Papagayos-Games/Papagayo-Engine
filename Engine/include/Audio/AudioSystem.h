@@ -1,60 +1,74 @@
 #pragma once
 
+#ifndef AUDIO_AUDIOSYS
+#define AUDIO_AUDIOSYS
+
 #include <map>
 #include <string>
-class Vector3;
-class vector;
 
 #include "fmod.hpp"
 #include "fmod_errors.h"
-struct AudioSystem {
 
+class Vector3;
+
+class AudioSystem {
+public:
+    typedef std::map<std::string, FMOD::Sound*> SoundMap;
+    typedef std::map<int, FMOD::Channel*> ChannelMap;
+    typedef std::map<const char*, FMOD::ChannelGroup*> ChannelGroupMap;
+private:
     AudioSystem();
-
     ~AudioSystem();
-    static AudioSystem* getInstance();
-    static bool setupInstance();
-    static void clean();
-    void Update();
+
+    SoundMap mSounds;
+    ChannelMap mChannels;
+    ChannelGroupMap mGroup;
 
     FMOD::System* mpSystem;
 
     int mnNextChannelId = 0;
 
-    typedef std::map<std::string, FMOD::Sound*> SoundMap;
-    typedef std::map<int, FMOD::Channel*> ChannelMap;
-    typedef std::map<const char*, FMOD::ChannelGroup*> ChannelGroupMap;
-
-    SoundMap mSounds;
-    ChannelMap mChannels;
-    ChannelGroupMap mGroup;
     static AudioSystem* instance_;
-
-};
-
-
-class AudioEngine {
 public:
-    static void Init();
-    static void Update();
-    static void Shutdown();
-    static int ErrorCheck(FMOD_RESULT result);
+    static AudioSystem* getInstance();
+    static bool setupInstance();
+    static void init();
+    static void update();
+    static void clean();
+    static void destroy();
 
-    void LoadSound(const std::string& strSoundName, bool b3d = true, bool bLooping = false, bool bStream = false);
-    void UnLoadSound(const std::string& strSoundName);
-    void Set3dListenerAndOrientation(const Vector3& vPos, float fVolumedB = 0.0f);
-    int  PlaySound(const std::string& strSoundName, const Vector3& vPos ,const char* groupName = nullptr, float fVolumedB = 0.0f);
-    void StopChannel(int nChannelId);
-    void StopAllChannels();
-    void SetChannel3dPosition(int nChannelId, const Vector3& vPosition);
-    void SetChannelvolume(int nChannelId, float fVolumedB);
-    bool IsPlaying(int nChannelId) const;
-    void Pause_Resume_Channel(int nChannelId);
+    SoundMap& getSoundMap();
+    const SoundMap& getSoundMap() const;
+
+    ChannelMap& getSoundChannels();
+    const ChannelMap& getSoundChannels() const;
+
+    ChannelGroupMap& getChanGroupMap();
+    const ChannelGroupMap& getChanGroupMap() const;
+
+    FMOD::System* getSystem();
+    FMOD::System* getSystem() const;
+
+    int& getNextChannelId();
+    const int& getNextChannelId() const;
+
+    static int errorCheck(FMOD_RESULT result);
+
+    void loadSound(const std::string& strSoundName, bool b3d = true, bool bLooping = false, bool bStream = false);
+    void unloadSound(const std::string& strSoundName);
+    void set3dListenerAndOrientation(const Vector3& vPos, float fVolumedB = 0.0f);
+    int  playSound(const std::string& strSoundName, const Vector3& vPos ,const char* groupName = nullptr, float fVolumedB = 0.0f);
+    void stopChannel(int nChannelId);
+    void stopAllChannels();
+    void setChannel3dPosition(int nChannelId, const Vector3& vPosition);
+    void setChannelvolume(int nChannelId, float fVolumedB);
+    bool isPlaying(int nChannelId) const;
+    void pause_Resume_Channel(int nChannelId);
     float dbToVolume(float db);
-    float VolumeTodb(float volume);
-    FMOD_VECTOR VectorToFmod(const Vector3& vPosition);
+    float volumeTodb(float volume);
+    FMOD_VECTOR& vectorToFmod(const Vector3& vPosition);
     FMOD::ChannelGroup* createChannelGroup(const char* name);
     void muteChannelGroup(const char* name);
-
-
 };
+
+#endif // !AUDIO_AUDIOSYS

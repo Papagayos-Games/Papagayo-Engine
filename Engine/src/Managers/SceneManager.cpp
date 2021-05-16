@@ -11,8 +11,6 @@ Scene* SceneManager::currentScene_ = nullptr;
 
 SceneManager::~SceneManager()
 {
-	instance_->clean();
-	delete instance_->loader_;
 }
 
 SceneManager* SceneManager::getInstance()
@@ -46,6 +44,12 @@ void SceneManager::clean()
 	instance_->cleanupScene();
 }
 
+void SceneManager::destroy() {
+	instance_->clean();
+	delete instance_->loader_;
+	delete instance_;
+}
+
 void SceneManager::loadScene(const std::string& sceneName)
 {
 	//crea escena vacia
@@ -63,7 +67,6 @@ void SceneManager::cleanupScene()
 	currentScene_->clean();
 	delete currentScene_; 
 	currentScene_ = nullptr;
-	OgreContext::getInstance()->getRenderWindow()->removeAllViewports();
 }
 
 SceneManager::SceneManager() {

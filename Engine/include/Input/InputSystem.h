@@ -21,9 +21,9 @@ public:
 		Middle = 2
 	};*/
 
-	virtual ~InputSystem();
 	static InputSystem* getInstance();
 	static void clean();
+	static void destroy();
 
 	bool handleInput(const SDL_Event& e);
 	bool isKeyDown(SDL_Keycode key) const;
@@ -41,6 +41,7 @@ public:
 	
 private:
 	InputSystem();
+	virtual ~InputSystem();
 	static InputSystem* instance_;
 
 	void onMouseMotion(SDL_Event& e) const;

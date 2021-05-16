@@ -37,17 +37,17 @@ private:
 	CEGUI::OgreRenderer* guiRenderer = nullptr;
 
 	UIManager();
-	~UIManager();
+	virtual ~UIManager();
 
 	static void setWidgetDestRect(CEGUI::Window* widget, glm::vec2 position,
 		glm::vec2 size);
 public:
-
 #pragma region Generales
 	//Devuelve el singleton de UIManager
 	static UIManager* getInstance();
 	//Elimina el UIManager y todos sus sistemas internos
 	static void clean();
+	static void destroy();
 
 	virtual void start();
 	virtual void update();

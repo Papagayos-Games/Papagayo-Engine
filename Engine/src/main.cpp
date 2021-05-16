@@ -7,7 +7,7 @@ int main(){
 #endif
 	try {
 		PapagayoEngine::getInstance()->run();
-		PapagayoEngine::getInstance()->clean();
+		PapagayoEngine::getInstance()->destroy();
 	}
 	catch (std::exception e) {
 		std::cout << e.what() << "\n";

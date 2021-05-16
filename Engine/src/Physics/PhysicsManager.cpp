@@ -30,7 +30,6 @@ PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {
 };
 
 PhysicsManager::~PhysicsManager() {
-	destroyAllComponents();
 };
 
 void PhysicsManager::init(const Vector3 gravity) {
@@ -139,6 +138,12 @@ void PhysicsManager::update()
 
 void PhysicsManager::clean()
 {
+	instance_->destroyAllComponents();
+}
+
+void PhysicsManager::destroy()
+{
+	instance_->clean();
 	delete instance_;
 }
 
@@ -147,6 +152,7 @@ void PhysicsManager::destroyAllComponents()
 	while (!_compsList.empty()) {
 		auto i = _compsList.begin();
 		destroyRigidBody(static_cast<RigidBody*>((*i))->getBtRb());
+		delete *i;
 		_compsList.remove((*i));
 	}
 	destroyWorld();

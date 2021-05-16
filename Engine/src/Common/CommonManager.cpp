@@ -1,3 +1,5 @@
+#include "..\..\include\Common\CommonManager.h"
+#include "..\..\include\Common\CommonManager.h"
 #include "Entity.h"
 #include "Transform.h"
 #include "CommonManager.h"
@@ -16,6 +18,17 @@ CommonManager* CommonManager::getInstance() {
 	if (!_instance)
 		_instance = new CommonManager();
 	return _instance;
+}
+
+void CommonManager::clean()
+{
+	_instance->destroyAllComponents();
+}
+
+void CommonManager::destroy()
+{
+	_instance->clean();
+	delete _instance;
 }
 
 void CommonManager::start() {

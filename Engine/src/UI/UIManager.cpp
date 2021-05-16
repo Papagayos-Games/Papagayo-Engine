@@ -55,6 +55,11 @@ UIManager* UIManager::getInstance()
 
 void UIManager::clean()
 {
+}
+
+void UIManager::destroy()
+{
+	clean();
 	CEGUI::OgreRenderer::destroySystem();
 	delete instance_;
 }
