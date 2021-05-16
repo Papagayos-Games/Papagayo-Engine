@@ -240,7 +240,7 @@ OgreContext::~OgreContext()
 	}
 
 	//Destruir FileSystemLayer
-	delete mFSLayer_;
+	//delete mFSLayer_;
 
 	//Destruir SceneManager
 	ogreRoot_->destroySceneManager(mSM);

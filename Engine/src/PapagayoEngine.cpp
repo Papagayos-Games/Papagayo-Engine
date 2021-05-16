@@ -60,11 +60,15 @@ bool PapagayoEngine::setupInstance(const std::string& appName)
 void PapagayoEngine::clean()
 {
 	// se borrarian todos los managers del motor
-	phys->clean();
-	mSM->clean();
-	ogre->clean();
-	//RenderManager::getInstance()->clean();
+	
+	delete mSM;
 	input->clean();
+	gui->clean();
+	ogre->clean();
+	phys->clean();
+	//render->clean();
+	//common->clean();
+	//lua->clean(); 
 	
 	delete instance_;
 }
@@ -86,7 +90,7 @@ void PapagayoEngine::init()
 	manRegistry_["Physics"] = phys;
 	manRegistry_["Common"] = common;
 	manRegistry_["Render"] = render;
-	manRegistry_["LUA"] = LUAManager::getInstance();
+	manRegistry_["LUA"] = lua;
 	mSM->createStartScene();
 
 	//Estas 3 lineas de ui deber�an cargarse en funci�n de 

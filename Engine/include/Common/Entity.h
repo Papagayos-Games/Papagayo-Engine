@@ -23,6 +23,10 @@ public:
 
 	// inicializa las componentes
 	void start();
+
+	// destruye una entidad y sus componentes
+	void destroy();
+
 	// añade un componente
 	void addComponent(Component* comp);
 

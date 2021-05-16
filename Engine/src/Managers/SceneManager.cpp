@@ -11,7 +11,8 @@ Scene* SceneManager::currentScene_ = nullptr;
 
 SceneManager::~SceneManager()
 {
-	clean();
+	instance_->clean();
+	delete instance_->loader_;
 }
 
 SceneManager* SceneManager::getInstance()
@@ -43,8 +44,6 @@ bool SceneManager::setupInstance()
 void SceneManager::clean()
 {
 	instance_->cleanupScene();
-	delete instance_->loader_;
-	delete instance_;
 }
 
 void SceneManager::loadScene(const std::string& sceneName)

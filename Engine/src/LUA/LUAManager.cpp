@@ -272,9 +272,8 @@ Entity* LUAManager::instantiate(std::string prefabName)
 
 void LUAManager::addRegistry(const std::string& compName)
 {
-	enum_map_[compName] = registeredFiles;
 	int id = registeredFiles;
-	registerComponent(compName, enum_map_[compName], [compName, id]() -> LuaComponent* { return new LuaComponent(compName, id); });
+	registerComponent(compName, registeredFiles, [compName, id]() -> LuaComponent* { return new LuaComponent(compName, id); });
 	registeredFiles++;
 }
 

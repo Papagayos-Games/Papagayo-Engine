@@ -12,7 +12,7 @@ Entity::~Entity() {
 		for (auto it2 = it->second.begin(); it2 != it->second.end(); it2 = it->second.begin()) {
 			int id = it2->second->getId();
 			//removeComponent(it->first, id);
-			if (!it2->second->getManager()->destroyComponent(this, id))
+			if (!removeComponent(it2->second->getManager()->getId(), id))
 				throw std::runtime_error("ERROR: Tried to destroy a non existant component while destroying the entity\n");
 		}
 	}
@@ -26,6 +26,10 @@ void Entity::start()
 			it2->second->setUp();
 		}
 	}
+}
+
+void Entity::destroy()
+{
 }
 
 void Entity::addComponent(Component* comp)
