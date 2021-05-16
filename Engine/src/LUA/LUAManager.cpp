@@ -1,3 +1,5 @@
+#include "..\..\include\LUA\LUAManager.h"
+#include "..\..\include\LUA\LUAManager.h"
 #include "LUAManager.h"
 #include <iostream>
 
@@ -55,11 +57,20 @@ LUAManager::~LUAManager()
 
 LUAManager* LUAManager::getInstance()
 {
-	if (instance_ == nullptr) {
-		instance_ = new LUAManager();
-	}
-
 	return instance_;
+}
+
+bool LUAManager::setUpInstance()
+{
+	if (instance_ == nullptr) {
+		try {
+			instance_ = new LUAManager();
+		}
+		catch (...) {
+			return false;
+		}
+	}
+	return true;
 }
 
 void LUAManager::start()
@@ -78,6 +89,15 @@ void LUAManager::update()
 	}
 }
 
+void LUAManager::clean()
+{
+	instance_->destroyAllComponents();
+}
+
+void LUAManager::destroy() {
+	instance_->clean();
+	delete instance_;
+}
 
 //Aqui van todas las funciones y clases correspondientes 
 void LUAManager::registerClassAndFunctions(lua_State* L) {

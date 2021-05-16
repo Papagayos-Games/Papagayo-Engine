@@ -29,6 +29,7 @@ public:
 	void destroy();
 	void start();
 	void run();
+	void closeApp();
 	const std::map<std::string, Manager*>& getManagers();
 	const std::map<std::string, Manager*>& getManagers() const;
 	

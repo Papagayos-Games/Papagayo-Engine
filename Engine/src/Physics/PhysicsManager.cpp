@@ -11,17 +11,21 @@ PhysicsManager* PhysicsManager::instance_ = nullptr;
 
 PhysicsManager* PhysicsManager::getInstance()
 {
+	return instance_;
+}
+
+bool PhysicsManager::setUpInstance() {
 	if (instance_ == nullptr) {
 		try {
 			instance_ = new PhysicsManager();
 			instance_->init(Vector3(0.0, -9.8, 0.0));
 		}
-		catch (std::string msg) {
-			throw "ERROR: PhysicsManager couldn't be created\n";
+		catch (...) {
+			return false;
 		}
 	}
 
-	return instance_;
+	return true;
 }
 
 PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {

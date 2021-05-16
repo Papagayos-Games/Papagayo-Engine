@@ -30,7 +30,7 @@ private:
 	LUAManager();
 	static LUAManager* instance_;
 
-	int registeredFiles = 0;
+	int registeredFiles = 0; // TO DO: reinciamos en la carga de escena?
 	
 	bool CheckLua(lua_State* L, int r);
 	void buildLuaEngine(const std::string& file);
@@ -41,6 +41,7 @@ public:
 	~LUAManager();
 
 	static LUAManager* getInstance();
+	static bool setUpInstance();
 
 	//METODOS DE PRUEBA
 	Entity* getEntity(std::string name);
@@ -60,6 +61,9 @@ public:
 	//Metodos heredados de la clase padre
 	virtual void start() override;
 	virtual void update() override;
+
+	static void clean();
+	static void destroy();
 
 };
 

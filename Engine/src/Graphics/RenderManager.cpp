@@ -29,9 +29,19 @@ RenderManager::~RenderManager()
 
 RenderManager* RenderManager::getInstance()
 {
-	if (!instance_)
-		instance_ = new RenderManager();
 	return instance_;
+}
+
+bool RenderManager::setUpInstance() {
+	if (!instance_) {
+		try {
+			instance_ = new RenderManager();
+		}
+		catch (...) {
+			return false;
+		}
+	}
+	return true;
 }
 
 void RenderManager::clean()

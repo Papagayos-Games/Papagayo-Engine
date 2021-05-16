@@ -55,6 +55,7 @@ public:
 	
 	//nos devuelve la instancia
 	static PhysicsManager* getInstance();
+	static bool setUpInstance();
 
 	//inicializa todas las variables fisicas asi como el "mundo" a partir de dichas variables
 	void init(const Vector3 gravity);

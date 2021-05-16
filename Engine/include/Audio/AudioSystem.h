@@ -8,6 +8,7 @@
 
 #include "fmod.hpp"
 #include "fmod_errors.h"
+#include "checkML.h"
 
 class Vector3;
 
@@ -19,6 +20,7 @@ public:
 private:
     AudioSystem();
     ~AudioSystem();
+    void init();
 
     SoundMap mSounds;
     ChannelMap mChannels;
@@ -32,7 +34,6 @@ private:
 public:
     static AudioSystem* getInstance();
     static bool setupInstance();
-    static void init();
     static void update();
     static void clean();
     static void destroy();

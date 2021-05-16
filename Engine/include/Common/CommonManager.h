@@ -18,6 +18,7 @@ public:
 	};
 
 	static CommonManager* getInstance();
+	static bool setUpInstance();
 
 	static void clean();
 	static void destroy();

@@ -29,6 +29,7 @@ public:
 	};
 
 	static RenderManager* getInstance();
+	static bool setUpInstance();
 	static void clean();
 	static void destroy();
 	virtual void start();
