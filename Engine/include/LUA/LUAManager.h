@@ -21,7 +21,7 @@ class Camera;
 class LightComponent;
 class PlaneComponent;
 class Transform;
-class WindowGenerator;
+class OgreContext;
 
 
 class LUAManager : public Manager {
@@ -51,7 +51,7 @@ public:
 	Camera* getCamera(Entity* ent);
 	Transform* getTransform(Entity* ent);
 	Entity* instantiate(std::string prefabName);
-	WindowGenerator* getWindowGenerator();
+	OgreContext* getOgreContext();
 
 	//Obtener el estado de LUA
 	lua_State* getLuaState()const;

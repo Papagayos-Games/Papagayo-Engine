@@ -24,7 +24,7 @@
 #include <LightComponent.h>
 #include <PlaneComponent.h>
 #include <RenderManager.h>
-#include <WindowGenerator.h>
+#include <OgreContext.h>
 
 //LUA
 #include "LuaComponent.h"
@@ -161,9 +161,9 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("setMaterial", &PlaneComponent::setMaterial)
 		.endClass();
 
-	getGlobalNamespace(L).beginClass<WindowGenerator>("WindowGenerator")
-		.addFunction("getWindowWidth", &WindowGenerator::getWindowWidth)
-		.addFunction("getWindowHeight", &WindowGenerator::getWindowHeight)
+	getGlobalNamespace(L).beginClass<OgreContext>("WindowGenerator")
+		.addFunction("getWindowWidth", &OgreContext::getWindowWidth)
+		.addFunction("getWindowHeight", &OgreContext::getWindowHeight)
 		.endClass();
 
 
@@ -189,7 +189,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getMesh", &LUAManager::getMeshComponent)
 		.addFunction("getTransform", &LUAManager::getTransform)
 		.addFunction("instantiate", &LUAManager::instantiate)
-		.addFunction("getWindowGenerator", &LUAManager::getWindowGenerator)
+		.addFunction("getOgreContext", &LUAManager::getOgreContext)
 		.endClass();
 }
 
@@ -282,9 +282,9 @@ Entity* LUAManager::instantiate(std::string prefabName)
 	return e;
 }
 
-WindowGenerator* LUAManager::getWindowGenerator()
+OgreContext* LUAManager::getOgreContext()
 {
-	return WindowGenerator::getInstance();
+	return OgreContext::getInstance();
 }
 
 lua_State* LUAManager::getLuaState() const
