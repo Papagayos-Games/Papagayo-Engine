@@ -7,15 +7,15 @@
 #include "CEGUI/Window.h"
 
 
-inline glm::vec2 cvt(const std::pair<float, float>& V) {
+inline glm::vec2 cvt(const vector2& V) {
 	return glm::vec2(V.first, V.second);
 }
 
-inline std::pair<float, float> cvt(const glm::vec2& V) {
+inline vector2  cvt(const glm::vec2& V) {
 	return std::pair<float, float>(V.x, V.y);
 }
 
-UIComponent::UIComponent(std::pair<float, float> position_, std::pair<float, float> size_, std::string name_, int id) : Component(UIManager::getInstance(), id),
+UIComponent::UIComponent(vector2  position_, vector2 size_, std::string name_, int id) : Component(UIManager::getInstance(), id),
 	position(position_), size(size_), name(name_)
 {
 }

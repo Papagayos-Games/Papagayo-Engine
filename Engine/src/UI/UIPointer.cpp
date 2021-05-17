@@ -1,5 +1,6 @@
 #include "UIPointer.h"
 #include "UIManager.h"
+#include <glm/glm.hpp>
 
 UIPointer::UIPointer() : Component(UIManager::getInstance(), (int)UIManager::UICmpId::Pointer)
 {

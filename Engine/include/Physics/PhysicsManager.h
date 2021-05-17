@@ -5,9 +5,7 @@
 
 #include <vector>
 #include "Manager.h"
-#ifdef _DEBUG
 
-#endif
 class btDefaultCollisionConfiguration;
 class btCollisionDispatcher;
 class btBroadphaseInterface;

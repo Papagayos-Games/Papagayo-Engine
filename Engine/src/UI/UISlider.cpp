@@ -1,5 +1,6 @@
 #include "UISlider.h"
 #include "UIManager.h"
+#include <glm/glm.hpp>
 
 UISlider::UISlider() : UIComponent((int)UIManager::UICmpId::Slider)
 {
@@ -19,7 +20,7 @@ void UISlider::init()
 
 	name = "SliderDefault";
 
-	uiWindow = UIManager::getInstance()->createSlider(glm::vec2(position.first, position.second), glm::vec2(size.first, size.second), name);
+	uiWindow = UIManager::getInstance()->createSlider(position, size, name);
 }
 
 void UISlider::load(const nlohmann::json& params)
@@ -63,4 +64,6 @@ void UISlider::load(const nlohmann::json& params)
 
 	//	uiWindow->subscribeEvent(*event_, *subscriberEvent);
 	//}
+
+	uiWindow = UIManager::getInstance()->createSlider(position, size, name);
 }

@@ -3,7 +3,8 @@
 #ifndef _COMMON_COMPONENT_H
 #define _COMMON_COMPONENT_H
 
-#include <json.hpp>	//provisional en el .h
+#include <json.hpp>
+
 class Entity;
 class Manager;
 

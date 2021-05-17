@@ -1,6 +1,6 @@
 #include "UILabel.h"
 #include "UIManager.h"
-
+#include <glm/glm.hpp>
 
 UILabel::UILabel() : UIComponent((int)UIManager::UICmpId::Label)
 {
@@ -22,7 +22,7 @@ void UILabel::init()
 
 	name = "LabelDefault";
 
-	uiWindow = UIManager::getInstance()->createLabel(text, glm::vec2(position.first, position.second), glm::vec2(size.first, size.second), name);
+	uiWindow = UIManager::getInstance()->createLabel(text, position, size, name);
 }
 
 void UILabel::load(const nlohmann::json& params)

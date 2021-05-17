@@ -132,7 +132,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)bin</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>CEGUIBase-0_d.lib;CEGUIOgreRenderer-0_d.lib;Common_d.lib;freetype_d.lib;glew_d.lib;glfw_d.lib;Graphics_d.lib;jpeg_d.lib;libexpat_d.lib;libpng_d.lib;LinearMath_Debug.lib;OgreMain_d.lib;OgreRTShaderSystem_d.lib;pcre_d.lib;SDL2.lib;SILLY_d.lib;RenderSystem_Direct3D11_d.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
@@ -153,7 +153,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)bin</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>CEGUIBase-0.lib;CEGUIOgreRenderer-0.lib;</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>

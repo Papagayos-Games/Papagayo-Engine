@@ -84,12 +84,10 @@ void PapagayoEngine::init()
 	}
 
 	manRegistry_["Physics"] = phys;
-	manRegistry_["UI"] = gui;
 	manRegistry_["Common"] = common;
 	manRegistry_["Render"] = render;
 	manRegistry_["LUA"] = LUAManager::getInstance();
-	mSM->createStartScene();
-
+	manRegistry_["UI"] = gui;
 	//Estas 3 lineas de ui deber�an cargarse en funci�n de 
 	//unos string que se reciban como parametro, de manera
 	//que sea el usuario el que decida que configuracion
@@ -97,6 +95,8 @@ void PapagayoEngine::init()
 	gui->loadScheme("TaharezLook", "TaharezLook.scheme");
 	gui->setMouseImage("TaharezLook/MouseArrow");
 	gui->loadFont("DejaVuSans-12.font"); 
+	
+	mSM->createStartScene();
 
 #pragma region TOERASE
 	//gui->createButton("Probando_boton", glm::vec2(0, 0), glm::vec2(200, 200), "Prueba");

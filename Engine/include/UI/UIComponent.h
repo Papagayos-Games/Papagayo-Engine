@@ -4,7 +4,7 @@
 #define _UI_COMPONENT_H
 
 #include "Component.h"
-
+#include <iostream>
 class Transform;
 
 namespace CEGUI {
@@ -13,11 +13,12 @@ namespace CEGUI {
 	class String;
 }
 
+using vector2 = std::pair<float, float>;
 class UIComponent : public Component
 {
 protected:
-	std::pair<float, float> position;
-	std::pair<float, float> size;
+	vector2 position;
+	vector2 size;
 	std::string name;
 	Transform* canvasTR;
 	CEGUI::Window* uiWindow;
@@ -25,7 +26,7 @@ protected:
 												// de todos modos lo dejo comentado porque hay que hablarlo
 	CEGUI::String* event_;
 
-	UIComponent(std::pair<float, float> position_, std::pair<float, float> size_, std::string name_, int id);
+	UIComponent(vector2 position_, vector2 size_, std::string name_, int id);
 	UIComponent(int id);
 	virtual ~UIComponent();
 public:

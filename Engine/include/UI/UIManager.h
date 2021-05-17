@@ -1,9 +1,7 @@
 #pragma once
+#include "Manager.h"
 #include <Ogre.h>
 #include <SDL_events.h>
-#include "Manager.h"
-#include <string.h>
-#include <glm/glm.hpp>
 
 namespace CEGUI {
 	class GUIContext;
@@ -13,6 +11,8 @@ namespace CEGUI {
 	class System;
 } // namespace CEGUI
 
+using vector2 = std::pair<float, float>;
+
 class UIManager : public Ogre::FrameListener, public Manager
 {
 private:
@@ -20,7 +20,6 @@ private:
 
 	//Nombre de la configuracion del GUI
 	std::string schemeName;
-
 
 	//Ventana de ogre
 	Ogre::RenderWindow* oWindow = nullptr;
@@ -39,8 +38,8 @@ private:
 	UIManager();
 	~UIManager();
 
-	static void setWidgetDestRect(CEGUI::Window* widget, glm::vec2 position,
-		glm::vec2 size);
+	static void setWidgetDestRect(CEGUI::Window* widget, vector2 position,
+		vector2 size);
 public:
 
 #pragma region Generales
@@ -97,29 +96,29 @@ public:
 	/// Se le aplica un tamaño 2D y un nombre que lo represente. Termina 
 	/// devolviendo un elemento CEGUI de tipo Window*
 	/// </summary>
-	CEGUI::Window* createButton(const std::string& text, glm::vec2 position,
-		glm::vec2 size, const std::string& name);
+	CEGUI::Window* createButton(const std::string& text, vector2 position,
+		vector2 size, const std::string& name);
 
 	/// <summary>
 	/// Crea un deslizador en una posicion en 2D con un tamaño 2D y 
 	/// un nombre que lo represente. Termina devolviendo un elemento CEGUI
 	/// de tipo Window*
 	/// </summary>
-	CEGUI::Window* createSlider(glm::vec2 position, glm::vec2 size,
+	CEGUI::Window* createSlider(vector2 position, vector2 size,
 		const std::string& name);
 	/// <summary>
 	/// Crea un etiqueta que contiene un texto y se coloca en el canvas en
 	/// una posicion y tamaño en 2D y con un nombre que lo represente
 	/// </summary>
-	CEGUI::Window* createLabel(const std::string& text, glm::vec2 position,
-		glm::vec2 size, const std::string& name = "");
+	CEGUI::Window* createLabel(const std::string& text, vector2 position,
+		vector2 size, const std::string& name = "");
 	/// <summary>
 	/// Crea una imagen a partir de una ruta especifica que le diga dónde 
 	/// se encuentra la fuente. Hace falta una posicion y un tamaño en 2D y tambien
 	/// un nombre que lo represente
 	/// </summary>
-	CEGUI::Window* createImage(const std::string& image, glm::vec2 position,
-		glm::vec2 size, const std::string& name = "");
+	CEGUI::Window* createImage(const std::string& image, vector2 position,
+		vector2 size, const std::string& name = "");
 #pragma endregion
 
 #pragma region INPUT

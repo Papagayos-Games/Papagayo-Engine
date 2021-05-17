@@ -1,5 +1,6 @@
 #include "UIImage.h"
 #include "UIManager.h"
+#include <glm/glm.hpp>
 
 UIImage::UIImage() : UIComponent((int)UIManager::UICmpId::Image)
 {
@@ -21,7 +22,7 @@ void UIImage::init()
 
 	name = "ImageDefault";
 
-	uiWindow = UIManager::getInstance()->createImage(image, glm::vec2(position.first, position.second), glm::vec2(size.first, size.second), name);
+	uiWindow = UIManager::getInstance()->createImage(image, position, size, name);
 }
 
 void UIImage::load(const nlohmann::json& params)
