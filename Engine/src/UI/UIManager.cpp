@@ -5,6 +5,7 @@
 #include <iostream>
 #include "OgreContext.h"
 #include "CEGUI/RendererModules/Ogre/ResourceProvider.h"
+#include "UIButton.h"
 
 #pragma region Generales
 
@@ -12,7 +13,7 @@ UIManager* UIManager::instance_ = nullptr;
 
 UIManager::UIManager() : Manager(ManID::UI)
 {
-	//registerComponent("Button", 0, []() -> UIButton* { return new UIButton(); });
+	registerComponent("Button", 0, []() -> UIButton* { return new UIButton(); });
 	//registerComponent("Slider", 0, []() -> UISlider* { return new UISlider(); });
 	//registerComponent("Label", 0, []() -> UILabel* { return new UILabel(); });
 	//registerComponent("Image", 0, []() -> UIImage* { return new UIImage(); });

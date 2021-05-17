@@ -84,6 +84,7 @@ void PapagayoEngine::init()
 	}
 
 	manRegistry_["Physics"] = phys;
+	manRegistry_["UI"] = gui;
 	manRegistry_["Common"] = common;
 	manRegistry_["Render"] = render;
 	manRegistry_["LUA"] = LUAManager::getInstance();
@@ -98,7 +99,7 @@ void PapagayoEngine::init()
 	gui->loadFont("DejaVuSans-12.font"); 
 
 #pragma region TOERASE
-	gui->createButton("Probando_boton", glm::vec2(0, 0), glm::vec2(200, 200), "Prueba");
+	//gui->createButton("Probando_boton", glm::vec2(0, 0), glm::vec2(200, 200), "Prueba");
 	//ui->createLabel("Probando_boton", glm::vec2(100, 100), glm::vec2(10, 10), "Prueba");
 
 	ogre->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);

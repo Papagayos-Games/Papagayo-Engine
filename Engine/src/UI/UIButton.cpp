@@ -5,6 +5,8 @@
 #include "CEGUI/Window.h"
 #include "CEGUI/CEGUI.h"
 
+#include <iostream>
+
 UIButton::UIButton() : UIComponent((int)UIManager::UICmpId::Button)
 {
 }
@@ -61,7 +63,7 @@ void UIButton::load(const nlohmann::json& params)
 
 	//TODO: a la constructora de subscriberSlot habria que pasarle el metodo de lua que queramos que haga, ¿como? no se sabeh
 
-	auto it = params.find("clickEvent");
+	it = params.find("clickEvent");
 	if (it != params.end()) {
 		auto _event = it->find("event");
 		if (_event != it->end()) {

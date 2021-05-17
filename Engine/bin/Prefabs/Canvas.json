@@ -1,0 +1,15 @@
+{
+  "Components": [
+    {
+      "Component": "Button",
+      "Type": "UI",
+      "Parameters": {
+        "position": [ 0, 10 ],
+        "size": [ 100, 100 ],
+        "name": "BotonPrueba",
+        "text": "Jelouda"
+      }
+    }
+  ]
+
+}
