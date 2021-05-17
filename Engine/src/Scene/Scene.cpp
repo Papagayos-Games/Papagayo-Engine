@@ -1,5 +1,6 @@
 #include "Scene/Scene.h"
 #include "Common/Entity.h"
+#include <algorithm>
 
 Scene::Scene()
 {
@@ -13,11 +14,35 @@ void Scene::clean()
 {
     for (auto it = entities.begin(); it != entities.end(); it++) {
         delete it->second;
-
-        //entities_.popfront();
     }
     entities.clear();
     usedNames.clear();
+}
+
+void Scene::eraseEntities()
+{
+    for (auto it = entities_to_erase.begin(); it != entities_to_erase.end(); ++it) {
+        (*it)->second->destroy();
+        entities.erase(*it);
+    }
+    entities_to_erase.clear();
+}
+
+void Scene::killEntityByName(const std::string& s)
+{
+    auto it = entities.find(s);
+    if (it != entities.end()) {
+        entities_to_erase.push_back(it);
+    }
+}
+
+void Scene::killEntity(Entity* e)
+{
+    auto it = std::find_if(entities.begin(), entities.end(), [e](const auto& mo) {return mo.second == e; });
+    if (it != entities.end()) {
+        entities_to_erase.push_back(it);
+    }
+
 }
 
 

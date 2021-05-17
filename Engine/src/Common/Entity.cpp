@@ -30,6 +30,13 @@ void Entity::start()
 
 void Entity::destroy()
 {
+	for (auto it = _componentMap.begin(); it != _componentMap.end(); ++it)
+	{
+		for (auto it2 = it->second.begin(); it2 != it->second.end(); it2 = it->second.begin()) {	
+			int id = it2->second->getId();
+			it2->second->getManager()->destroyComponent(this, id);
+		}
+	}
 }
 
 void Entity::addComponent(Component* comp)

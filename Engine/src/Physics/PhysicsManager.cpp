@@ -144,6 +144,7 @@ void PhysicsManager::clean()
 void PhysicsManager::destroy()
 {
 	instance_->clean();
+	instance_->destroyWorld();
 	delete instance_;
 }
 
@@ -155,7 +156,6 @@ void PhysicsManager::destroyAllComponents()
 		delete *i;
 		_compsList.remove((*i));
 	}
-	destroyWorld();
 }
 
 bool PhysicsManager::destroyComponent(Entity* ent, int compId)

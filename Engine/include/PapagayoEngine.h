@@ -27,6 +27,7 @@ public:
 	static PapagayoEngine* getInstance();
 	static bool setupInstance(const std::string& appName);
 	void destroy();
+	void clean();
 	void start();
 	void run();
 	const std::map<std::string, Manager*>& getManagers();

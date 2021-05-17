@@ -77,8 +77,10 @@ SceneManager::SceneManager() {
 
 void SceneManager::update()
 {
+	currentScene_->eraseEntities();
 	if (change_) {
-		cleanupScene();
+		//cleanupScene();
+		PapagayoEngine::getInstance()->clean();
 		loadScene(nextScene_);
 		
 		change_ = false;

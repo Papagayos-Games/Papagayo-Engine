@@ -9,6 +9,7 @@
 
 //-------MANAGER/SYSTEM---------//
 #include "Managers/SceneManager.h"
+#include "Scene/Scene.h"
 #include "Graphics/OgreContext.h"
 #include "Input/InputSystem.h"
 #include "CommonManager.h"
@@ -82,6 +83,29 @@ void PapagayoEngine::destroy()
 	mSM->destroy();
 	
 	delete instance_;
+}
+
+void PapagayoEngine::clean()
+{
+	input->clean();
+	audio->clean();
+
+	// render
+	render->clean();
+	gui->clean();
+	ogre->clean();
+
+	// fisicas
+	phys->clean();
+
+	// common
+	common->clean();
+
+	// logica
+	//lua->clean();
+
+	// escena
+	mSM->clean();
 }
 
 void PapagayoEngine::init()
@@ -163,7 +187,8 @@ void PapagayoEngine::update()
 			lua->update();
 			++timer_;
 
-			if (timer_ == 1000) {
+			if (timer_ == 300) {
+				SceneManager::getCurrentScene()->killEntityByName("pepito");
 				std::cout << "Cambio de escena\n";
 				mSM->changeScene("test2");
 			}
