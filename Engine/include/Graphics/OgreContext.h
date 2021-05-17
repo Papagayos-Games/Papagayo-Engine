@@ -57,7 +57,6 @@ private:
 
 	Ogre::FileSystemLayer* mFSLayer_;
 	std::string appName_;
-	const std::string enginePath_ = "../dependencies/Papagayo-Engine/Engine/bin";
 
 	bool grab = false;
 	bool showCursor = false;

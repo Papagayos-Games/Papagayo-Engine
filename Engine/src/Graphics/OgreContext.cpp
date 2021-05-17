@@ -73,13 +73,13 @@ void OgreContext::init()
 void OgreContext::createRoot()
 {
 #ifdef _DEBUG
-	mResourcesCfg =enginePath_ + "OgreD/resources.cfg";
-	mPluginsCfg = enginePath_ +"OgreD/plugins.cfg";
-	mOgreCfg = enginePath_ +"OgreD/ogre.cfg";
+	mResourcesCfg = "OgreD/resources.cfg";
+	mPluginsCfg = "OgreD/plugins.cfg";
+	mOgreCfg = "OgreD/ogre.cfg";
 #else
-	mResourcesCfg =enginePath_ + "Ogre/resources.cfg";
-	mPluginsCfg =enginePath_ + "Ogre/plugins.cfg";
-	mOgreCfg =enginePath_ + "Ogre/ogre.cfg";
+	mResourcesCfg = "Ogre/resources.cfg";
+	mPluginsCfg = "Ogre/plugins.cfg";
+	mOgreCfg =  "Ogre/ogre.cfg";
 #endif
 	ogreRoot_ = new Ogre::Root(mPluginsCfg, mOgreCfg);
 
