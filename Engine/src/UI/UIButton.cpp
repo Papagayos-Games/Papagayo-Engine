@@ -3,6 +3,7 @@
 #include "CEGUI/String.h"
 #include "CEGUI/SubscriberSlot.h"
 #include "CEGUI/Window.h"
+#include "CEGUI/CEGUI.h"
 
 UIButton::UIButton() : UIComponent((int)UIManager::UICmpId::Button)
 {
@@ -25,6 +26,7 @@ void UIButton::init()
 	name = "ButtonDefault";
 
 	uiWindow = UIManager::getInstance()->createButton(text, glm::vec2(position.first, position.second), glm::vec2(size.first, size.second), name);
+	
 }
 
 void UIButton::load(const nlohmann::json& params)
@@ -55,23 +57,58 @@ void UIButton::load(const nlohmann::json& params)
 		text = t;
 	}
 
-	//	//TODO: a la constructora de subscriberSlot habria que pasarle el metodo de lua que queramos que haga, ¿como? no se sabeh
+	
 
-	//auto it = params.find("clickEvent");
-	//if (it != params.end()) {
-	//	auto _event = it->find("event");
-	//	if (_event != it->end()) {
-	//		std::string e = _event->get<std::string>();
-	//		event_ = new CEGUI::String(e);
-	//	}
+	//TODO: a la constructora de subscriberSlot habria que pasarle el metodo de lua que queramos que haga, ¿como? no se sabeh
+
+	auto it = params.find("clickEvent");
+	if (it != params.end()) {
+		auto _event = it->find("event");
+		if (_event != it->end()) {
+			std::string e = _event->get<std::string>();
+			event_ = new CEGUI::String(e);
+
+			if (event_ == &(CEGUI::String)"changeScene") {
+
+				auto scene_ = it->find("scene");
+				if (scene_ != it->end()) {
+					scene = scene_->get<std::string>();
+				}
+
+				uiWindow->subscribeEvent(
+					CEGUI::PushButton::EventClicked,
+					CEGUI::Event::Subscriber(&UIButton::changeScene, this));
+			}
+			
+		}
 
 	//	auto _subs = it->find("subscriber");
 	//	if (_subs != it->end()) {
 	//		std::string sub = _subs->get<std::string>();
 	//		
 	//		//subscriberEvent = new CEGUI::SubscriberSlot();
+
 	//	}
 
 	//	uiWindow->subscribeEvent(*event_, *subscriberEvent);
-	//}
+	}
+}
+
+void UIButton::onClick()
+{
+	//provisional hasta hablarlo
+	if (event_ == &(CEGUI::String)"hola") {
+		//metodo a hacer
+	}
+	/*else if{
+
+	}*/
+	//...
+	//...
+	//...
+}
+
+void UIButton::changeScene()
+{
+	//aqui deberia cambiar a la escena 
 }

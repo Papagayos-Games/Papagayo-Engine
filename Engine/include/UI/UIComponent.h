@@ -21,7 +21,8 @@ protected:
 	std::string name;
 	Transform* canvasTR;
 	CEGUI::Window* uiWindow;
-	CEGUI::SubscriberSlot* subscriberEvent;
+	//CEGUI::SubscriberSlot* subscriberEvent; //no va a hacer falta ya que los eventos se pueden suscribir como uiWindow->subscribeEvent(...)
+												// de todos modos lo dejo comentado porque hay que hablarlo
 	CEGUI::String* event_;
 
 	UIComponent(std::pair<float, float> position_, std::pair<float, float> size_, std::string name_, int id);
