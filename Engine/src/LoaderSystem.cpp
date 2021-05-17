@@ -80,16 +80,19 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 	nlohmann::json component;
 	nlohmann::json params;
 	for (int i = 0; i < compSize; i++) {
+		// Comprueba el tipo de componente
 		auto it = comps[i].find("Type");
 		if (it == comps[i].end() || !it.value().is_string())
 			throw std::exception("ERROR: Component type not found\n");
 		type = it.value();
 
+		// Comprueba el nombre del componente
 		it = comps[i].find("Component");
 		if (it == comps[i].end() || !it.value().is_string())
 			throw std::exception("ERROR: Component name not found\n");
 		component = it.value();
 		Component* c;
+
 		// si no se ha cargado este script de lua, añadelo como posible componente
 		if (type == "LUA") {
 			if (mans[type]->getCompID(component) == -1) {
@@ -105,11 +108,11 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 		else {
 			c = entity->getComponent(mans[type]->getId(), mans[type]->getCompID(component));
 		}
-		//params = comps[i]["Parameters"];
-		auto params = comps[i].find("Parameters");
-		if (params != comps[i].end() && params.value().is_object()) {
+		// TO DO: Cargar LUA components si no tienen "Parameters" en el json
+		it = comps[i].find("Parameters");
+		if (it != comps[i].end() && it.value().is_object()) {
 
-			try { c->load(params.value()); }
+			try { c->load(it.value()); }
 			catch (std::exception e) {
 				//resetear los valores del componente si hay algun parametro con un formato erroneo
 				std::cout << "WARNING: Component " + component.get<std::string>() + " parameters are wrong, reseting to default\n";

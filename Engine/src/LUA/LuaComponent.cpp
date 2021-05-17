@@ -27,7 +27,6 @@ void LuaComponent::load(const nlohmann::json& params)
 {
 	//Cogemos el nombre del metodo al que llamar en el update
 	(*class_) = luabridge::getGlobal(currState, fileName_.c_str());
-	
 	if (class_->isNil()) {
 #ifdef _DEBUG
 		std::cout << "No class found while loading LUAComponent. Assigned default\n";
@@ -49,6 +48,10 @@ void LuaComponent::load(const nlohmann::json& params)
 		fileName_ = "default";
 		throw std::exception("Assigned LUA component to default in loader\n");
 	}
+
+#ifdef _DEBUG
+	std::cout << fileName_ << " loaded correctly\n";
+#endif
 }
 
 void LuaComponent::setUp()
@@ -69,5 +72,10 @@ const std::string& LuaComponent::getFileName()
 const std::string& LuaComponent::getFileName() const
 {
 	return fileName_;
+}
+
+const luabridge::LuaRef& LuaComponent::getClass()
+{
+	return (*class_);
 }
 

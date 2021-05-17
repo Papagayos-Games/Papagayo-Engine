@@ -11,6 +11,10 @@
 #include "Manager.h"
 #include "lua.hpp"
 
+namespace luabridge {
+	class LuaRef;
+}
+
 class Entity;
 class RigidBody;
 class InputSystem;
@@ -51,6 +55,7 @@ public:
 	LightComponent* getLightComponent(Entity* ent);
 	Camera* getCamera(Entity* ent);
 	Transform* getTransform(Entity* ent);
+	luabridge::LuaRef getLuaClass(Entity* ent, const std::string& c_name);
 	Entity* instantiate(std::string prefabName);
 
 	void addRegistry(const std::string& compName);

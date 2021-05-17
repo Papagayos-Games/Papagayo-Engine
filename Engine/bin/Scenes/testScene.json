@@ -32,11 +32,13 @@
             "Parameters": {
               "position": [ 50, 0, 0 ]
             }
+          },
+          {
+            "Component": "printer",
+            "Type": "LUA",
+            "Parameters" : {}
           }
         ]
-      },
-      {
-        "Prefab" : "penguin"
       }
     ]
 }

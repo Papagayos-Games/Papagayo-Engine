@@ -184,6 +184,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getPlane", &LUAManager::getPlaneComponent)
 		.addFunction("getMesh", &LUAManager::getMeshComponent)
 		.addFunction("getTransform", &LUAManager::getTransform)
+		.addFunction("getLuaClass", &LUAManager::getLuaClass)
 		.addFunction("instantiate", &LUAManager::instantiate)
 		.endClass();
 }
@@ -197,7 +198,6 @@ bool LUAManager::reloadLuaScript(lua_State* L, const std::string& luafile) {
 	return true;
 }
 
-
 Entity* LUAManager::getEntity(std::string name)
 {
 	std::error_code errorCode;
@@ -205,10 +205,13 @@ Entity* LUAManager::getEntity(std::string name)
 	return ent;
 }
 
+
 RigidBody* LUAManager::getRigidbody(Entity* ent)
 {
 	std::error_code errorCode;
-	RigidBody* r = static_cast<RigidBody*>(ent->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId));
+	RigidBody* r = nullptr;
+	if(ent->hasComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId))
+		r = static_cast<RigidBody*>(ent->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId));
 	return r;
 }
 
@@ -221,35 +224,54 @@ InputSystem* LUAManager::getInputManager()
 MeshComponent* LUAManager::getMeshComponent(Entity* ent)
 {
 	std::error_code errorCode;
-	MeshComponent* m = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
+	MeshComponent* m = nullptr;
+	if(ent->hasComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh))
+		m = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
 	return m;
 }
 
 PlaneComponent* LUAManager::getPlaneComponent(Entity* ent)
 {
 	std::error_code errorCode;
-	PlaneComponent* m = static_cast<PlaneComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Plane));
+	PlaneComponent* m = nullptr;
+	if(ent->hasComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Plane))
+		m = static_cast<PlaneComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Plane));
 	return m;
 }
 
 LightComponent* LUAManager::getLightComponent(Entity* ent)
 {
 	std::error_code errorCode;
-	LightComponent* m = static_cast<LightComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Light));
+	LightComponent* m = nullptr;
+	if(ent->hasComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Light))
+		m = static_cast<LightComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Light));
 	return m;
 }
 
 Camera* LUAManager::getCamera(Entity* ent)
 {
 	std::error_code errorCode;
-	Camera* m = static_cast<Camera*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Camera));
+	Camera* m = nullptr;
+	if (ent->hasComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Camera))
+		m = static_cast<Camera*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Camera));
 	return m;
 }
 
 Transform* LUAManager::getTransform(Entity* ent)
 {
 	std::error_code errorCode;
-	Transform* m = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
+	Transform* m = nullptr;
+	if (ent->hasComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId))
+		m = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
+	return m;
+}
+
+luabridge::LuaRef LUAManager::getLuaClass(Entity* ent, const std::string& c_name)
+{
+	std::error_code errorCode;
+	luabridge::LuaRef m = luabridge::LuaRef(L);//nil
+	if(ent->hasComponent((int)ManID::LUA, enum_map_[c_name]))
+		m = (static_cast<LuaComponent*>(ent->getComponent((int)ManID::LUA, enum_map_[c_name])))->getClass();
 	return m;
 }
 

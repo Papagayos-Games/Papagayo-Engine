@@ -21,8 +21,11 @@ mi_clase["start"] = function (_self, lua)
     --_self.rb = lua:getRigidbody(lua:getEntity("testScene2"))
     print("Start: mi clase")
     print(_self.entity:getName())
+    local _printer = lua:getLuaClass(_self.entity, "printer")
+    _printer["print"]("probando")
+    -- local _nullCamera = lua:getCamera(_self.entity)
+    -- camera:setNearClipDistance(40) 
 
-    
     --local v3 = lua:getTransform(_self.entity):getPosition()
     --local v4 = Vector3(v3) --Constructor por copia
 

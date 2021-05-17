@@ -34,4 +34,6 @@ public:
 
 	const std::string& getFileName();
 	const std::string& getFileName() const;
+
+	const luabridge::LuaRef& getClass();
 };
