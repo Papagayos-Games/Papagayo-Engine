@@ -79,8 +79,6 @@ PapagayoEngine::PapagayoEngine(const std::string& appName) : appName_(appName) {
 		throw std::exception("ERROR: Couldn't load AudioSystem\n");
 	}
 	audio = AudioSystem::getInstance();
-
-	init();
 }
 
 PapagayoEngine::~PapagayoEngine()
@@ -159,7 +157,7 @@ void PapagayoEngine::init()
 	//desea usuar.
 	//gui->loadScheme("TaharezLook", "TaharezLook.scheme");
 	//gui->setMouseImage("TaharezLook/MouseArrow");
-	//gui->loadFont("DejaVuSans-12.font"); 
+	gui->loadFont("DejaVuSans-12.font"); 
 
 
 #pragma region TOERASE

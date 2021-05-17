@@ -26,6 +26,7 @@ class PapagayoEngine {
 public:
 	static PapagayoEngine* getInstance();
 	static bool setupInstance(const std::string& appName);
+	void init();
 	void destroy();
 	void start();
 	void run();
@@ -55,7 +56,6 @@ private:
 	int timer_ = 0;
 	PapagayoEngine(const std::string& appName);
 	virtual ~PapagayoEngine();
-	void init();
 	void update();
 };
 

@@ -23,7 +23,7 @@ private:
 	//Masa del Rigidbody
 	float mass = 1.0f;
 	//Rigidbody principal
-	btRigidBody* rb = nullptr;
+	btRigidBody* rb;
 	Transform* tr_ = nullptr;
 	bool trigger = false;
 

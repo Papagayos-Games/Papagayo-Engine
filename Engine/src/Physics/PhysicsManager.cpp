@@ -75,6 +75,8 @@ void PhysicsManager::destroyWorld()
 void PhysicsManager::destroyRigidBody(btRigidBody* body)
 {
 	dynamicsWorld->removeCollisionObject(body);
+	delete body->getCollisionShape();
+	delete body->getMotionState();
 	delete body;
 	body = nullptr;
 }
@@ -90,17 +92,17 @@ btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass)
 	transform.setIdentity();
 	transform.setOrigin(btVector3(pos.x, pos.y, pos.z));
 
-	btCollisionShape* shapeColl = nullptr;
-	shapeColl = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
+	//btBoxShape shapeColl = btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
 
-	btMotionState* motion = new btDefaultMotionState(transform);
+	//btDefaultMotionState motion = btDefaultMotionState(transform);
 
-	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, shapeColl);
+	btRigidBody::btRigidBodyConstructionInfo info(mass, new btDefaultMotionState(transform), new btBoxShape(btVector3(1.0f, 1.0f, 1.0f)));
 	btRigidBody* rb = new btRigidBody(info);
 
 	rb->forceActivationState(DISABLE_DEACTIVATION);
 
 	dynamicsWorld->addRigidBody(rb);
+
 	//rbs.push_back(rb);
 	/*shapes_.push_back(box);
 	states_.push_back(motion);*/
@@ -157,7 +159,7 @@ void PhysicsManager::destroyAllComponents()
 		auto i = _compsList.begin();
 		destroyRigidBody(static_cast<RigidBody*>((*i))->getBtRb());
 		delete *i;
-		_compsList.remove((*i));
+		_compsList.erase(i);
 	}
 	destroyWorld();
 }
