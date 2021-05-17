@@ -38,11 +38,11 @@ void LuaComponent::load(const nlohmann::json& params)
 		throw std::exception("Assigned LUA component to default in loader\n");
 	}
 	
-	(*self_) = (*class_)["instantiate"](params.dump())[0];
+	(*self_) = (*class_)["instantiate"](params.dump(), getEntity())[0];
 
 	if (self_->isNil()) {
 #ifdef _DEBUG
-		std::cout << "No class found while loading LUAComponent. Assigned default\n";
+		std::cout << "No table created while loading LUAComponent. Assigned default\n";
 #endif
 		delete class_;
 		delete self_;

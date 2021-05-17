@@ -1,6 +1,6 @@
 local default = {}
 
-default["instantiate"] = function (params)
+default["instantiate"] = function (params, entity)
     --p = JSON:decode(params)
     local self = {}
     return self

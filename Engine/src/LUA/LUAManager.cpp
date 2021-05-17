@@ -83,26 +83,34 @@ void LUAManager::update()
 void LUAManager::registerClassAndFunctions(lua_State* L) {
 
 	getGlobalNamespace(L).beginClass<Entity>("Entity")
+		.addFunction("getName", &Entity::getName)
 		.endClass();
 
 	getGlobalNamespace(L).beginClass<Vector3>("Vector3")
 		.addConstructor<void (*) (float, float, float)>()
+		.addConstructor<void (*) (const Vector3 &)>()
 		.addProperty("x", &Vector3::x)
 		.addProperty("y", &Vector3::y)
 		.addProperty("z", &Vector3::z)
+		.addFunction("add", &Vector3::operator+=)
+		.addFunction("substract", &Vector3::operator-=)
+		.addFunction("multiplyByNumber",&Vector3::operator*=)
+		.addFunction("isEqual", &Vector3::operator==)
 		.endClass();
+	
 	//input
-
 	getGlobalNamespace(L).beginClass<InputSystem>("InputSystem")
 		.addFunction("keyPressed", &InputSystem::isKeyDown)
 		.addFunction("mouseButtonPressed", &InputSystem::clickEvent)
 		.endClass();
 	
+	//common
 	getGlobalNamespace(L).beginClass<Component>("Component")
 		.addFunction("isActive", &Component::isActive)
+		.addFunction("getEntity", &Component::getEntity)
 		.endClass();
 
-	//common
+	
 	getGlobalNamespace(L).deriveClass<Transform, Component>("Transform")
 		.addFunction("getPosition", &Transform::getPos)
 		.addFunction("setPosition", &Transform::setPos)
@@ -111,6 +119,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getDimensions", &Transform::getDimensions)
 		.addFunction("setDimensions", &Transform::setDimensions)
 		.endClass();
+
 	//phisics
 	getGlobalNamespace(L).deriveClass<RigidBody, Component>("Rigidbody")
 		.addFunction("setPosition", &RigidBody::setPosition)
@@ -163,9 +172,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("setName", &Scene::setName)
 		.addFunction("getName", &Scene::getName)
 		.addFunction("getEntity", &Scene::getEntity)
-		.endClass();
-
-		
+		.endClass();		
 
 
 	getGlobalNamespace(L).beginClass<LUAManager>("LuaManager")
@@ -185,37 +192,29 @@ bool LUAManager::reloadLuaScript(lua_State* L, const std::string& luafile) {
 	int state = luaL_dofile(L, luafile.c_str());
 	
 	if (state != LUA_OK) {
-		// std::cout << "ok";
 		return false;
 	}
 	return true;
 }
 
-//TEMPORAL
+
 Entity* LUAManager::getEntity(std::string name)
 {
 	std::error_code errorCode;
 	Entity* ent = SceneManager::getInstance()->getCurrentScene()->getEntity(name);
-	//push(L, ent, errorCode);
 	return ent;
 }
-
 
 RigidBody* LUAManager::getRigidbody(Entity* ent)
 {
 	std::error_code errorCode;
-	
 	RigidBody* r = static_cast<RigidBody*>(ent->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId));
-	
-	//push(L, r, errorCode);
 	return r;
 }
 
-//TEMPORAL
 InputSystem* LUAManager::getInputManager()
 {
 	std::error_code errorCode;
-	//push(L, InputSystem::getInstance(), errorCode);
 	return InputSystem::getInstance();
 }
 
@@ -223,7 +222,6 @@ MeshComponent* LUAManager::getMeshComponent(Entity* ent)
 {
 	std::error_code errorCode;
 	MeshComponent* m = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
-	//push(L, m, errorCode);
 	return m;
 }
 
@@ -231,7 +229,6 @@ PlaneComponent* LUAManager::getPlaneComponent(Entity* ent)
 {
 	std::error_code errorCode;
 	PlaneComponent* m = static_cast<PlaneComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Plane));
-	//push(L, m, errorCode);
 	return m;
 }
 
@@ -239,7 +236,6 @@ LightComponent* LUAManager::getLightComponent(Entity* ent)
 {
 	std::error_code errorCode;
 	LightComponent* m = static_cast<LightComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Light));
-	//push(L, m, errorCode);
 	return m;
 }
 
@@ -247,7 +243,6 @@ Camera* LUAManager::getCamera(Entity* ent)
 {
 	std::error_code errorCode;
 	Camera* m = static_cast<Camera*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Camera));
-	//push(L, m, errorCode);
 	return m;
 }
 
@@ -255,7 +250,6 @@ Transform* LUAManager::getTransform(Entity* ent)
 {
 	std::error_code errorCode;
 	Transform* m = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
-	//push(L, m, errorCode);
 	return m;
 }
 

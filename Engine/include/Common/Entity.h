@@ -30,7 +30,6 @@ public:
 	// añade un componente
 	void addComponent(Component* comp);
 
-	std::string& getName();
 	const std::string& getName() const;
 
 	void setName(const std::string& name);

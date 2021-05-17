@@ -23,6 +23,13 @@ Vector3::Vector3(const std::vector<float>& pos)
 		x = y = z = 0.0f;
 }
 
+Vector3::Vector3(const Vector3& other)
+{
+	x = other.x;
+	y = other.y;
+	z = other.z;
+}
+
 // string format"[0.0, 0.0, 0.0]"
 /*Vector3::Vector3(std::string s)
 {
@@ -74,7 +81,7 @@ void Vector3::operator*=(const float k)
 {
 	x *= k;
 	y *= k;
-	z = k;
+	z *= k;
 }
 
 Vector3 Vector3::operator*(const float k)

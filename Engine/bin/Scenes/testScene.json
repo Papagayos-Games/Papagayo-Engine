@@ -32,12 +32,11 @@
             "Parameters": {
               "position": [ 50, 0, 0 ]
             }
-          },
-          {
-            "Component": "",
-            "Type": "LUA"
           }
         ]
+      },
+      {
+        "Prefab" : "penguin"
       }
     ]
 }
