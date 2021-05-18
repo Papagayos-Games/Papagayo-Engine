@@ -114,8 +114,8 @@ void PapagayoEngine::destroy()
 
 	// render
 	render->destroy();
-	gui->destroy();
 	ogre->destroy();
+	gui->destroy();
 	
 	// fisicas
 	phys->destroy();
@@ -179,9 +179,7 @@ void PapagayoEngine::init()
 	//que sea el usuario el que decida que configuracion
 	//desea usuar.
 	gui->loadScheme("TaharezLook", "TaharezLook.scheme");
-	gui->setMouseImage("TaharezLook/MouseArrow");
-	gui->loadFont("DejaVuSans-12.font"); 
-	
+
 	mSM->createStartScene();
 
 

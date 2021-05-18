@@ -20,6 +20,34 @@
       }
     },
     {
+      "Component": "Image",
+      "Type": "UI",
+      "Parameters": {
+        "position": [ 0.5, 0.5 ],
+        "size": [ 300, 300 ],
+        "image": "ClientBrush/StaticImage",
+        "name": "peblo"
+      }
+    },
+    {
+      "Component": "Label",
+      "Type": "UI",
+      "Parameters": {
+        "position": [ 0, 0.75 ],
+        "size": [ 100, 100 ],
+        "name": "labelito",
+        "text": "Puto Rulo"
+      }
+    },
+    {
+      "Component": "Pointer",
+      "Type": "UI",
+      "Parameters": {
+        "pointerImage": "TaharezLook/MouseArrow",
+        "visible": true
+      }
+    },
+    {
       "Component": "UIclase",
       "Type": "LUA",
       "Parameters": {

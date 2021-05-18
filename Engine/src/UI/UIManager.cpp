@@ -296,4 +296,9 @@ CEGUI::GUIContext* UIManager::getContext() const
 	return guiContext;
 }
 
+CEGUI::WindowManager* UIManager::getWindowMngr() const
+{
+	return guiWinMng;
+}
+
 #pragma endregion

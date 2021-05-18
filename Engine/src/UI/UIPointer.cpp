@@ -38,4 +38,7 @@ void UIPointer::load(const nlohmann::json& params)
 			visible = false;
 		}
 	}
+
+	UIManager::getInstance()->setMouseImage(pointer);
+	UIManager::getInstance()->setMouseVisibility(visible);
 }

@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include <glm/glm.hpp>
-#include "..\..\include\UI\UIButton.h"
 
 UIButton::UIButton() : UIComponent((int)UIManager::UICmpId::Button)
 {
@@ -19,8 +18,8 @@ UIButton::~UIButton()
 
 void UIButton::init()
 {
-	position.first = 0;
-	position.second = 0;
+	pos.first = 0;
+	pos.second = 0;
 
 	size.first = 100;
 	size.second = 50;
@@ -29,7 +28,7 @@ void UIButton::init()
 
 	name = "ButtonDefault";
 
-	uiWindow = UIManager::getInstance()->createButton(text, position, size, name);
+	uiWindow = UIManager::getInstance()->createButton(text, pos, size, name);
 	
 }
 
@@ -37,9 +36,9 @@ void UIButton::load(const nlohmann::json& params)
 {
 	auto it = params.find("position");
 	if (it != params.end()) {
-		std::vector<float> pos = it->get<std::vector<float>>();
-		position.first = pos[0];
-		position.second = pos[1];
+		std::vector<float> p = it->get<std::vector<float>>();
+		pos.first = p[0];
+		pos.second = p[1];
 	}
 
 	it = params.find("size");
@@ -60,35 +59,28 @@ void UIButton::load(const nlohmann::json& params)
 		std::string t = it->get<std::string>();
 		text = t;
 	}
-	
+
+	it = params.find("active");
+	if (it != params.end()) {
+		bool ac = it->get<bool>();
+		_active = ac;
+	}
 
 	//Reposicionamiento para que parezca que el pivote esta
 	//en el centro del boton (esto se puede meter en el resto de Widgets)
-	//position.first -= size.first / 2;
-	//position.second -= size.second/ 2;
-	uiWindow = UIManager::getInstance()->createButton(text, position, size, name);
+	//vector2 sizeN = normalizeVector2(size);
+	
+	//position.first -= sizeN.first / 2;
+	//position.second -= sizeN.second/ 2;
+
+	uiWindow = UIManager::getInstance()->createButton(text, pos, size, name);
 	uiWindow->subscribeEvent(
 		CEGUI::PushButton::EventClicked,
 		CEGUI::Event::Subscriber(&UIButton::buttonWasPressed, this));
-}
 
-void UIButton::onClick()
-{
-	////provisional hasta hablarlo
-	//if (event_ == &(CEGUI::String)"hola") {
-	//	//metodo a hacer
-	//}
-	///*else if{
-	//
-	//}*/
-	////...
-	////...
-	////...
-}
-
-void UIButton::changeScene()
-{
-	//aqui deberia cambiar a la escena 
+	if (!_active) {
+		uiWindow->hide();
+	}
 }
 
 void UIButton::buttonWasPressed()
@@ -104,4 +96,10 @@ void UIButton::buttonNotPressed()
 bool UIButton::getButtonPressed()
 {
 	return buttonPressed;
+}
+
+void UIButton::setText(std::string t)
+{
+	text = t;
+	uiWindow->setText(text);
 }

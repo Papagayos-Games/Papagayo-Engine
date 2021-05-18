@@ -37,7 +37,7 @@ private:
 	CEGUI::OgreRenderer* guiRenderer = nullptr;
 	//Referencia al scheme actual
 	CEGUI::Scheme* sch = nullptr;
-	
+
 	UIManager();
 	virtual ~UIManager();
 
@@ -138,7 +138,7 @@ public:
 
 	CEGUI::OgreRenderer* getRenderer() const;
 	CEGUI::GUIContext* getContext() const;
-
+	CEGUI::WindowManager* getWindowMngr() const;
 #pragma endregion
 
 };

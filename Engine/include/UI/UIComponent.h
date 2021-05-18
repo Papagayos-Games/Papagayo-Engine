@@ -17,27 +17,33 @@ using vector2 = std::pair<float, float>;
 class UIComponent : public Component
 {
 protected:
-	vector2 position;
+	vector2 pos;
 	vector2 size;
 	std::string name;
-	Transform* canvasTR;
-	CEGUI::Window* uiWindow;
+	CEGUI::Window* uiWindow = nullptr;
 
-	CEGUI::String* event_;
+	//Normaliza el vector size del objeto para poder 
+	//usar en el posicionamiento
+	vector2 normalizeVector2(const vector2& v);
 
 	UIComponent(vector2 position_, vector2 size_, std::string name_, int id);
 	UIComponent(int id);
 	virtual ~UIComponent();
 public:
 
-	virtual void setUp();
 	virtual void init() = 0;
 	virtual void update() {};
+	virtual void setActive(bool act);
 
 	/// <summary>
 	/// Carga datos a partir de un json
 	/// </summary>
 	virtual void load(const nlohmann::json& params) = 0;
+
+	// Setters
+	void setPosition(vector2 p);
+	void setSize(vector2 s);
+	void setName(std::string n);
 };
 
 #endif
