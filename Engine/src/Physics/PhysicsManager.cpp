@@ -128,11 +128,11 @@ void PhysicsManager::update()
 	dynamicsWorld->stepSimulation(1.f / 60.f, 10);
 
 	for (auto it = _compsList.begin(); it != _compsList.end(); ++it) {
-		if (applyTorque) {
-			applyTorque = false;
-			static_cast<RigidBody*>(*it)->addTorque(Vector3(0.0f, 0.0, -5.0), Forces::IMPULSE);
-			//static_cast<RigidBody*>(*it)->addForce(Vector3(0.0f, 1, 0.0f), Vector3(1.0f, 0.0, 1.0), Forces::IMPULSE);
-		}
+		//if (applyTorque) {
+		//	applyTorque = false;
+		//	static_cast<RigidBody*>(*it)->addTorque(Vector3(0.0f, 0.0, -5.0), Forces::IMPULSE);
+		//	//static_cast<RigidBody*>(*it)->addForce(Vector3(0.0f, 1, 0.0f), Vector3(1.0f, 0.0, 1.0), Forces::IMPULSE);
+		//}
 		(*it)->update();
 	}
 

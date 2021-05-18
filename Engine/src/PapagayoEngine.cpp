@@ -172,16 +172,17 @@ void PapagayoEngine::init()
 	manRegistry_["Physics"] = phys;
 	manRegistry_["Common"] = common;
 	manRegistry_["Render"] = render;
-	manRegistry_["LUA"] = lua;
-	mSM->createStartScene();
-
+	manRegistry_["LUA"] = LUAManager::getInstance();
+	manRegistry_["UI"] = gui;
 	//Estas 3 lineas de ui deber�an cargarse en funci�n de 
 	//unos string que se reciban como parametro, de manera
 	//que sea el usuario el que decida que configuracion
 	//desea usuar.
-	//gui->loadScheme("TaharezLook", "TaharezLook.scheme");
-	//gui->setMouseImage("TaharezLook/MouseArrow");
+	gui->loadScheme("TaharezLook", "TaharezLook.scheme");
+	gui->setMouseImage("TaharezLook/MouseArrow");
 	gui->loadFont("DejaVuSans-12.font"); 
+	
+	mSM->createStartScene();
 
 
 #pragma region TOERASE

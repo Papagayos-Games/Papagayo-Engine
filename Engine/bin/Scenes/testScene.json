@@ -1,47 +1,48 @@
 {
-    "Entities": [
-      {
-        "Prefab" : "DefaultCamera",
-        "Components" : [
-          {
-            "Component": "Transform",
-            "Type": "Common",
-            "Parameters" : {
-              "position" : [0,100,500]
-            }
+  "Entities": [
+    {
+      "Prefab": "DefaultCamera",
+      "Components": [
+        {
+          "Component": "Transform",
+          "Type": "Common",
+          "Parameters": {
+            "position": [ 0, 100, 500 ]
           }
-        ]
-      },
-      {
-        "Prefab": "DefaultLight"
-      },
-      {
-        "Name" : "pepito",
-        "Prefab": "Penguin",
-        "Components": [
-          {
-            "Component": "Transform",
-            "Type": "Common",
-            "Parameters": {
-              "position": [ 10, 0, 0 ]
-            }
-          },
-          {
-            "Component": "Transform",
-            "Type": "Common",
-            "Parameters": {
-              "position": [ 50, 0, 0 ]
-            }
-          },
-          {
-            "Component": "printer",
-            "Type": "LUA",
-            "Parameters" : {}
+        }
+      ]
+    },
+    {
+      "Prefab":  "Canvas"
+    },
+    {
+      "Prefab": "DefaultLight"
+    },
+    {
+      "Prefab": "Penguin",
+      "Components": [
+        {
+          "Component": "Transform",
+          "Type": "Common",
+          "Parameters": {
+            "position": [ 10, 0, 0 ]
           }
-        ]
-      },
-      {
-        "Prefab" : "Penguin"
-      }
-    ]
+        },
+        {
+          "Component": "Transform",
+          "Type": "Common",
+          "Parameters": {
+            "position": [ 50, 0, 0 ]
+          }
+        },
+        {
+          "Component": "LuaComponent",
+          "Type": "LUA",
+          "Parameters": {
+            "Class": "default"
+          }
+        }
+      ]
+    }
+  ]
 }
