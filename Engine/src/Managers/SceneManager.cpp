@@ -15,28 +15,26 @@ SceneManager::~SceneManager()
 
 SceneManager* SceneManager::getInstance()
 {
-	if (instance_ == nullptr)
-		return new SceneManager();
-	
-		return instance_;
+	return instance_;
 }
 
 Scene* SceneManager::getCurrentScene()
 {
-	if (currentScene_ == nullptr)
-		return nullptr;
-
 	return currentScene_;
 }
 
 bool SceneManager::setupInstance()
 {
 	if (instance_ == nullptr) {
-		instance_ = new SceneManager();
-		return true;
+		try {
+			instance_ = new SceneManager();
+		}
+		catch (...) {
+			return false;
+		}
 	}
 
-	return false;
+	return true;
 }
 
 void SceneManager::clean()

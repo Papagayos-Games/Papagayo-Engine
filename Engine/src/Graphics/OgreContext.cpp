@@ -31,21 +31,21 @@ OgreContext::OgreContext(const std::string& appName) :
 
 OgreContext* OgreContext::getInstance()
 {
-	if (instance_ == nullptr)
-		if (!setupInstance("PAPAGAYO ENGINE"))
-			throw "ERROR: OgreContext couldn't be created\n";
-
 	return instance_;
 }
 
-bool OgreContext::setupInstance(const std::string& appName)
+bool OgreContext::setUpInstance(const std::string& appName)
 {
 	if (instance_ == nullptr) {
-		instance_ = new OgreContext(appName);
-		return true;
+		try {
+			instance_ = new OgreContext(appName);
+		}
+		catch (...){
+			return false;
+		}
 	}
 
-	return false;
+	return true;
 }
 
 #pragma region INIT_OGRE

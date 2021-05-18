@@ -10,23 +10,22 @@ AudioSystem* AudioSystem::instance_ = nullptr;
 
 AudioSystem* AudioSystem::getInstance()
 {
-    if (instance_ == nullptr)
-        return nullptr;
-
     return instance_;
 }
 
 bool AudioSystem::setupInstance()
 {
     if (instance_ == nullptr) {
-        instance_ = new AudioSystem();
-        return true;
+        try {
+            instance_ = new AudioSystem();
+        }
+        catch (...) {
+            return false;
+        }
     }
 
-    return false;
+    return true;
 }
-
-
 
 void AudioSystem::clean()
 {
@@ -42,6 +41,7 @@ AudioSystem::AudioSystem()
     mpSystem = NULL;
     errorCheck(FMOD::System_Create(&mpSystem));
     errorCheck(mpSystem->init(512, FMOD_INIT_NORMAL, nullptr));
+    init();
 }
 
 AudioSystem::~AudioSystem()
@@ -120,7 +120,6 @@ const int& AudioSystem::getNextChannelId() const
 }
 
 void AudioSystem::init() {
-    //AudioSystem::setupInstance(); // TO DO
 }
 
 //Comprueba si hay un error en la ejecucion de comando fmod

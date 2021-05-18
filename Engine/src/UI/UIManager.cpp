@@ -41,16 +41,19 @@ UIManager::~UIManager()
 
 UIManager* UIManager::getInstance()
 {
+	return instance_;
+}
+
+bool UIManager::setUpInstance() {
 	if (instance_ == nullptr) {
 		try {
 			instance_ = new UIManager();
 		}
-		catch (std::string msg) {
-			throw "ERROR: UIManager couldn't be created\n";
+		catch (...) {
+			return false;
 		}
 	}
-
-	return instance_;
+	return true;
 }
 
 void UIManager::clean()

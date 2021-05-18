@@ -73,7 +73,7 @@ private:
 	void init();
 	void loadFromResourceFile();
 public:
-	static bool setupInstance(const std::string& appName);
+	static bool setUpInstance(const std::string& appName);
 	static void clean();
 	static void destroy();
 	//Hay que poner en el material un lighting off

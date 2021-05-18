@@ -3,6 +3,7 @@
 #include <SDL_events.h>
 #include "Manager.h"
 #include <string.h>
+#include "checkML.h"
 #include <glm/glm.hpp>
 
 namespace CEGUI {
@@ -45,6 +46,7 @@ public:
 #pragma region Generales
 	//Devuelve el singleton de UIManager
 	static UIManager* getInstance();
+	static bool setUpInstance();
 	//Elimina el UIManager y todos sus sistemas internos
 	static void clean();
 	static void destroy();

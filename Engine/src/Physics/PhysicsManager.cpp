@@ -11,17 +11,21 @@ PhysicsManager* PhysicsManager::instance_ = nullptr;
 
 PhysicsManager* PhysicsManager::getInstance()
 {
+	return instance_;
+}
+
+bool PhysicsManager::setUpInstance() {
 	if (instance_ == nullptr) {
 		try {
 			instance_ = new PhysicsManager();
 			instance_->init(Vector3(0.0, -9.8, 0.0));
 		}
-		catch (std::string msg) {
-			throw "ERROR: PhysicsManager couldn't be created\n";
+		catch (...) {
+			return false;
 		}
 	}
 
-	return instance_;
+	return true;
 }
 
 PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {
@@ -71,6 +75,8 @@ void PhysicsManager::destroyWorld()
 void PhysicsManager::destroyRigidBody(btRigidBody* body)
 {
 	dynamicsWorld->removeCollisionObject(body);
+	delete body->getCollisionShape();
+	delete body->getMotionState();
 	delete body;
 	body = nullptr;
 }
@@ -86,17 +92,17 @@ btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass)
 	transform.setIdentity();
 	transform.setOrigin(btVector3(pos.x, pos.y, pos.z));
 
-	btCollisionShape* shapeColl = nullptr;
-	shapeColl = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
+	//btBoxShape shapeColl = btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
 
-	btMotionState* motion = new btDefaultMotionState(transform);
+	//btDefaultMotionState motion = btDefaultMotionState(transform);
 
-	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, shapeColl);
+	btRigidBody::btRigidBodyConstructionInfo info(mass, new btDefaultMotionState(transform), new btBoxShape(btVector3(1.0f, 1.0f, 1.0f)));
 	btRigidBody* rb = new btRigidBody(info);
 
 	rb->forceActivationState(DISABLE_DEACTIVATION);
 
 	dynamicsWorld->addRigidBody(rb);
+
 	//rbs.push_back(rb);
 	/*shapes_.push_back(box);
 	states_.push_back(motion);*/
@@ -154,7 +160,7 @@ void PhysicsManager::destroyAllComponents()
 		auto i = _compsList.begin();
 		destroyRigidBody(static_cast<RigidBody*>((*i))->getBtRb());
 		delete *i;
-		_compsList.remove((*i));
+		_compsList.erase(i);
 	}
 }
 

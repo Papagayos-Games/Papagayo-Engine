@@ -1,6 +1,7 @@
 {
     "SceneFiles" :  [
         "testScene",
+        "test3",
         "test2"
     ]
 }

@@ -39,6 +39,9 @@
             "Parameters" : {}
           }
         ]
+      },
+      {
+        "Prefab" : "Penguin"
       }
     ]
 }

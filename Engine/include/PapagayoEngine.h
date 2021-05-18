@@ -26,10 +26,12 @@ class PapagayoEngine {
 public:
 	static PapagayoEngine* getInstance();
 	static bool setupInstance(const std::string& appName);
+	void init();
 	void destroy();
 	void clean();
 	void start();
 	void run();
+	void closeApp();
 	const std::map<std::string, Manager*>& getManagers();
 	const std::map<std::string, Manager*>& getManagers() const;
 	
@@ -55,7 +57,6 @@ private:
 	int timer_ = 0;
 	PapagayoEngine(const std::string& appName);
 	virtual ~PapagayoEngine();
-	void init();
 	void update();
 };
 
