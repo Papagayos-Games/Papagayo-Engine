@@ -32,8 +32,9 @@
 #include "LuaComponent.h"
 #include <LuaBridge.h>
 
-//
+//Papagayo
 #include "LoaderSystem.h"
+#include "Managers/SceneManager.h"
 
 using namespace luabridge;
 
@@ -105,11 +106,11 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 
 	getGlobalNamespace(L).beginClass<Entity>("Entity")
 		.addFunction("getName", &Entity::getName)
+		.addFunction("start", &Entity::start)
 		.endClass();
 
 	getGlobalNamespace(L).beginClass<Vector3>("Vector3")
-		.addConstructor<void (*) (float, float, float)>()
-		.addConstructor<void (*) (const Vector3 &)>()
+		.addConstructor<void (*) (const float, const float, const float)>()
 		.addProperty("x", &Vector3::x)
 		.addProperty("y", &Vector3::y)
 		.addProperty("z", &Vector3::z)
@@ -126,6 +127,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("mouseButtonPressed", &InputSystem::clickEvent)
 		.addFunction("getMouseX", &InputSystem::getMouseX)
 		.addFunction("getMouseY", &InputSystem::getMouseY)
+		.addFunction("getTicks", &InputSystem::getTicks)
 		.endClass();
 	
 	//common
@@ -190,7 +192,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("setMaterial", &PlaneComponent::setMaterial)
 		.endClass();
 
-	getGlobalNamespace(L).beginClass<OgreContext>("WindowGenerator")
+	getGlobalNamespace(L).beginClass<OgreContext>("OgreContext")
 		.addFunction("getWindowWidth", &OgreContext::getWindowWidth)
 		.addFunction("getWindowHeight", &OgreContext::getWindowHeight)
 		.endClass();
@@ -202,6 +204,8 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("setName", &Scene::setName)
 		.addFunction("getName", &Scene::getName)
 		.addFunction("getEntity", &Scene::getEntity)
+		.addFunction("destroyEntity", &Scene::killEntity)
+		.addFunction("destroyEntityByName", &Scene::killEntityByName)
 		.endClass();		
 
 	getGlobalNamespace(L).beginClass<LUAManager>("LuaManager")
@@ -216,6 +220,8 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getLuaClass", &LUAManager::getLuaClass)
 		.addFunction("instantiate", &LUAManager::instantiate)
 		.addFunction("getOgreContext", &LUAManager::getOgreContext)
+		.addFunction("getCurrentScene", &LUAManager::getCurrentScene)
+
 		.endClass();
 }
 
@@ -312,7 +318,7 @@ Entity* LUAManager::instantiate(std::string prefabName)
 
 	s.loadPrefabByName(prefabName, e);
 	SceneManager::getCurrentScene()->addEntity(prefabName, e);
-	e->start();
+	//e->start();
 	return e;
 }
 
@@ -326,6 +332,11 @@ void LUAManager::addRegistry(const std::string& compName)
 OgreContext* LUAManager::getOgreContext()
 {
 	return OgreContext::getInstance();
+}
+
+Scene* LUAManager::getCurrentScene()
+{
+	return SceneManager::getInstance()->getCurrentScene();
 }
 
 lua_State* LUAManager::getLuaState() const

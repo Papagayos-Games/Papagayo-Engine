@@ -26,6 +26,7 @@ class LightComponent;
 class PlaneComponent;
 class Transform;
 class OgreContext;
+class Scene;
 
 
 class LUAManager : public Manager {
@@ -60,6 +61,7 @@ public:
 	luabridge::LuaRef getLuaClass(Entity* ent, const std::string& c_name);
 	Entity* instantiate(std::string prefabName);
 	OgreContext* getOgreContext();
+	Scene* getCurrentScene();
 
 	void addRegistry(const std::string& compName);
 

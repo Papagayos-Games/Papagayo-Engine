@@ -144,6 +144,11 @@ int InputSystem::clickEvent() const
 	return clickEvent_;
 }
 
+uint32_t InputSystem::getTicks()const
+{
+	return SDL_GetTicks();
+}
+
 void InputSystem::onMouseMotion(SDL_Event& e) const
 {
 }
