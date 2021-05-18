@@ -36,11 +36,8 @@
           }
         },
         {
-          "Component": "LuaComponent",
-          "Type": "LUA",
-          "Parameters": {
-            "Class": "default"
-          }
+          "Component": "miclase",
+          "Type": "LUA"
         }
       ]
     },

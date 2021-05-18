@@ -94,9 +94,16 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 		Component* c;
 
 		// si no se ha cargado este script de lua, añadelo como posible componente
+		std::string name = component;
 		if (type == "LUA") {
 			if (mans[type]->getCompID(component) == -1) {
-				LUAManager::getInstance()->addRegistry(component);
+				try {
+					LUAManager::getInstance()->addRegistry(component);
+				}
+				catch (std::exception& e) {
+					std::cout << "ERROR: " << e.what() << "\n----> SETTING COMPONENT TO DEFAULT\n";
+					name = "default";
+				}
 			}
 		}
 		if (!entity->hasComponent(mans[type]->getId(), mans[type]->getCompID(component))){

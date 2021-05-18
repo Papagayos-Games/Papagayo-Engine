@@ -2,9 +2,9 @@
 local JSON = assert(loadfile "LuaScripts/json.lua")()
 local keys = assert(loadfile "LuaScripts/keycode.lua")()
 
-local mi_clase = {}
+local miclase = {}
 
-mi_clase["instantiate"] = function (params, entity)
+miclase["instantiate"] = function (params, entity)
     p = JSON:decode(params)
     local self = {}
     self.hp = p.hp
@@ -14,7 +14,7 @@ mi_clase["instantiate"] = function (params, entity)
     return self
 end
 
-mi_clase["start"] = function (_self, lua)
+miclase["start"] = function (_self, lua)
     --local p = lua:instantiate("penguin2")
     --local pRB = lua:getRigidbody(p)
     --pRB:setGravity(Vector3(10, 0, 0))
@@ -40,7 +40,7 @@ mi_clase["start"] = function (_self, lua)
 	--print(_self.hp)
 end
 
-mi_clase["update"] = function (_self, lua)
+miclase["update"] = function (_self, lua)
 
     _self.hp = _self.hp - 10
     -- if lua:getInputManager():keyPressed(Keycode.A) == true then
@@ -53,4 +53,4 @@ mi_clase["update"] = function (_self, lua)
     --end 
 end
 
-return mi_clase
+return miclase
