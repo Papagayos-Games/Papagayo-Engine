@@ -54,7 +54,7 @@ void LoaderSystem::loadEntities(const std::string& fileName, Scene* scene)
 		Entity* ent = new Entity();
 		auto pref = entities[i].find("Prefab");
 		if (pref != entities[i].end() && pref.value().is_string()) {
-			loadPrefabs(entities[i], ent, fileName);
+			loadPrefabs(entities[i], ent, name);
 		}
 		if(!entities[i]["Components"].is_null() && entities[i]["Components"].is_array())
 			loadComponents(entities[i]["Components"], ent);
@@ -148,7 +148,7 @@ void LoaderSystem::readParameters(std::string& dump, std::map<std::string, std::
 	}
 }
 
-void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent, std::string entName) {
+void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent, std::string& entName) {
 	if (pref.is_null() || !pref.is_object())
 		throw std::exception("ERROR: Prefab not found\n");
 
