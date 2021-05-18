@@ -36,11 +36,19 @@
           }
         },
         {
-          "Component": "LuaComponent",
-          "Type": "LUA",
-          "Parameters": {
-            "Class": "default"
-          }
+          "Component": "miclase",
+          "Type": "LUA"
+        }
+      ]
+    },
+    {
+      "Prefab" : "Penguin",
+      "Components" : [
+        {
+          "Component" : "Transform",
+          "Type" : "Common",
+          "Parameters" :{
+            "position" : [10,0,0]}
         }
       ]
     }
