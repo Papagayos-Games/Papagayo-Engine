@@ -5,9 +5,7 @@
 
 #include <vector>
 #include "Manager.h"
-#ifdef _DEBUG
 
-#endif
 class btDefaultCollisionConfiguration;
 class btCollisionDispatcher;
 class btBroadphaseInterface;
@@ -46,7 +44,7 @@ private:
 	std::vector<btMotionState*> states_;*/
 
 	PhysicsManager();
-	~PhysicsManager();
+	virtual ~PhysicsManager();
 
 	//TO ERASE
 	bool applyTorque = true;
@@ -55,6 +53,7 @@ public:
 	
 	//nos devuelve la instancia
 	static PhysicsManager* getInstance();
+	static bool setUpInstance();
 
 	//inicializa todas las variables fisicas asi como el "mundo" a partir de dichas variables
 	void init(const Vector3 gravity);
@@ -76,6 +75,7 @@ public:
 	virtual void update();
 	
 	static void clean();
+	static void destroy();
 
 	virtual void destroyAllComponents();
 	virtual bool destroyComponent(Entity* ent, int compId);

@@ -20,15 +20,18 @@ class SceneManager;
 class CommonManager;
 class LUAManager;
 class OgreContext;
+class AudioSystem;
 
 class PapagayoEngine {
 public:
-	~PapagayoEngine();
 	static PapagayoEngine* getInstance();
 	static bool setupInstance(const std::string& appName);
+	void init();
+	void destroy();
 	void clean();
 	void start();
 	void run();
+	void closeApp();
 	const std::map<std::string, Manager*>& getManagers();
 	const std::map<std::string, Manager*>& getManagers() const;
 	
@@ -45,6 +48,7 @@ private:
 	CommonManager* common;
 	LUAManager* lua;
 	OgreContext* ogre;
+	AudioSystem* audio;
 
 	static PapagayoEngine* instance_;
 	std::string appName_;
@@ -52,7 +56,7 @@ private:
 	bool running_ = true;
 	int timer_ = 0;
 	PapagayoEngine(const std::string& appName);
-	void init();
+	virtual ~PapagayoEngine();
 	void update();
 };
 

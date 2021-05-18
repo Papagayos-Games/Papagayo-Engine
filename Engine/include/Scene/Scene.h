@@ -6,6 +6,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include <iterator>
 
 //#include "json.hpp"
 
@@ -23,7 +24,9 @@ public:
     ~Scene();
 
     void clean();
-
+    void eraseEntities();
+    void killEntityByName(const std::string& s);
+    void killEntity(Entity* e);
     void addEntity(const std::string& name, Entity* ent);
     void setName(const std::string& s);
     const std::string& getName() const;
@@ -35,6 +38,7 @@ private:
 
     //std::list<Entity> entities_;
     std::map<std::string, Entity*> entities;
+    std::list<std::map<std::string, Entity*>::iterator> entities_to_erase;
     std::map<std::string, int> usedNames;
     std::string name;
 };

@@ -42,7 +42,12 @@ RigidBody::RigidBody() : Component(PhysicsManager::getInstance(), 0)
 
 RigidBody::~RigidBody()
 {
-	//delete rb;
+	//if (rb) {
+	//	delete rb;
+	//}
+	//delete rb->getCollisionShape();
+	//delete rb->getMotionState();
+	//PhysicsManager::getInstance()->destroyRigidBody(rb);
 }
 
 #pragma region Generales
@@ -63,11 +68,10 @@ void RigidBody::setUp()
 		//float z = meshPtr.getPointer()->getBounds().getSize().z;
 		//rb->getCollisionShape()->setLocalScaling(btVector3(x, y, z));
 
-		MeshStrider* strider = new MeshStrider(meshPtr.get());
+		MeshStrider strider = MeshStrider(meshPtr.get());
 		//btCollisionShape* newShape = new btBvhTriangleMeshShape(strider, true, true);
-		btConvexTriangleMeshShape* a = new btConvexTriangleMeshShape(strider, true);
-		rb->setCollisionShape(a);
-
+		//btConvexTriangleMeshShape* a = new btConvexTriangleMeshShape(strider, true);
+		setCollisionShape(new btConvexTriangleMeshShape(&strider, true));
 	}
 }
 
@@ -306,6 +310,7 @@ void RigidBody::setFriction(float friction)
 
 void RigidBody::setCollisionShape(btCollisionShape* newShape)
 {
+	delete rb->getCollisionShape();
 	rb->setCollisionShape(newShape);
 }
 #pragma endregion

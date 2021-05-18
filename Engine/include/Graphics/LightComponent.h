@@ -30,6 +30,7 @@ private:
 public:
 	//Constructora
 	LightComponent();
+	virtual ~LightComponent();
 	//	Enciende la luz
 	inline void turnOn();
 	//	Apaga la luz

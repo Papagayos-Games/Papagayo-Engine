@@ -66,6 +66,7 @@ private:
 
 
 	OgreContext(const std::string& appName);
+	virtual ~OgreContext();
 
 //------INIT OGRE--------//
 
@@ -75,9 +76,9 @@ private:
 	void init();
 	void loadFromResourceFile();
 public:
-	~OgreContext();
-	static bool setupInstance(const std::string& appName);
+	static bool setUpInstance(const std::string& appName);
 	static void clean();
+	static void destroy();
 	//Hay que poner en el material un lighting off
 	void setSkyPlane(const std::string& materialName, const Ogre::Plane& plane, int width, int height, float bow);
 	void setupRTShaderGenerator();

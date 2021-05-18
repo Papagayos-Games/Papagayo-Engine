@@ -36,7 +36,6 @@ std::vector<std::string> LoaderSystem::loadScenes(const std::string& fileName)
 
 void LoaderSystem::loadEntities(const std::string& fileName, Scene* scene)
 {
-
 	std::fstream i(SCENES_FILE_PATH + fileName + FILE_EXTENSION);	// TO DO: poner la ruta definitiva cuando este la carpeta final
 	if (!i.is_open()) {
 		throw std::runtime_error("ERROR: Loading scene " + fileName + " failed, file missing\n");
@@ -51,13 +50,20 @@ void LoaderSystem::loadEntities(const std::string& fileName, Scene* scene)
 	size_t entSize = entities.size();
 
 	for (int i = 0; i < entSize; i++) {
+		std::string name = fileName;
 		Entity* ent = new Entity();
-		nlohmann::json prefab = entities[i]["Prefab"];
-		if (!prefab.is_null() && prefab.is_string())
-			loadPrefabs(entities[i], ent);
+		auto pref = entities[i].find("Prefab");
+		if (pref != entities[i].end() && pref.value().is_string()) {
+			loadPrefabs(entities[i], ent, fileName);
+		}
 		if(!entities[i]["Components"].is_null() && entities[i]["Components"].is_array())
 			loadComponents(entities[i]["Components"], ent);
-		scene->addEntity(fileName, ent);	// TO DO: procesar el nombre de las entidades desde json
+
+		auto it = entities[i].find("Name");
+		if (it != entities[i].end() && it.value().is_string()) {
+			name = it.value();
+		}
+		scene->addEntity(name, ent);
 	}
 
 	i.close();
@@ -74,16 +80,25 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 	nlohmann::json component;
 	nlohmann::json params;
 	for (int i = 0; i < compSize; i++) {
-		//std::map<std::string, std::string> p;
-		//readParameters(comps[i]["Parameters"].dump(), p);
-		type = comps[i]["Type"];
-		if (type.is_null() || !type.is_string())
+		// Comprueba el tipo de componente
+		auto it = comps[i].find("Type");
+		if (it == comps[i].end() || !it.value().is_string())
 			throw std::exception("ERROR: Component type not found\n");
+		type = it.value();
 
-		component = comps[i]["Component"];
-		if (component.is_null() || !component.is_string())
+		// Comprueba el nombre del componente
+		it = comps[i].find("Component");
+		if (it == comps[i].end() || !it.value().is_string())
 			throw std::exception("ERROR: Component name not found\n");
+		component = it.value();
 		Component* c;
+
+		// si no se ha cargado este script de lua, añadelo como posible componente
+		if (type == "LUA") {
+			if (mans[type]->getCompID(component) == -1) {
+				LUAManager::getInstance()->addRegistry(component);
+			}
+		}
 		if (!entity->hasComponent(mans[type]->getId(), mans[type]->getCompID(component))){
 			c = mans[type]->create(component, entity);
 				if (c == nullptr)
@@ -93,10 +108,11 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 		else {
 			c = entity->getComponent(mans[type]->getId(), mans[type]->getCompID(component));
 		}
-		params = comps[i]["Parameters"];
-		if (!params.is_null() && params.is_object()) {
+		// TO DO: Cargar LUA components si no tienen "Parameters" en el json
+		it = comps[i].find("Parameters");
+		if (it != comps[i].end() && it.value().is_object()) {
 
-			try { c->load(params); }
+			try { c->load(it.value()); }
 			catch (std::exception e) {
 				//resetear los valores del componente si hay algun parametro con un formato erroneo
 				std::cout << "WARNING: Component " + component.get<std::string>() + " parameters are wrong, reseting to default\n";
@@ -132,14 +148,16 @@ void LoaderSystem::readParameters(std::string& dump, std::map<std::string, std::
 	}
 }
 
-void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent) {
+void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent, std::string entName) {
 	if (pref.is_null() || !pref.is_object())
 		throw std::exception("ERROR: Prefab not found\n");
 
-	if (pref["Prefab"].is_null() || !pref["Prefab"].is_string())
+	auto it = pref.find("Prefab");
+
+	if (it == pref.end() || !it.value().is_string())
 		throw std::exception("ERROR: Prefab files not found\n");
 
-	std::string fileName = pref["Prefab"].get<std::string>();
+	std::string fileName = it.value().get<std::string>();
 	std::fstream i(PREFAB_FILE_PATH + fileName + FILE_EXTENSION);
 
 	if (!i.is_open()) {
@@ -149,36 +167,14 @@ void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent) {
 	nlohmann::json prefJson;
 	i >> prefJson;
 
-	/*if (!pref["Arguments"].is_null() && pref["Arguments"].is_array()) {
-		nlohmann::json args = pref["Arguments"];
-		int argSize = args.size();
+	it = prefJson.find("Components");
 
-		for (int i = 0; i < argSize; i++) {
-			nlohmann::json type = args[i]["Type"];
-			if (type.is_null() || !type.is_string())
-				throw std::exception("ERROR: Component type not found\n");
+	if(it != prefJson.end() && it.value().is_array())
+		loadComponents(it.value(), ent);
 
-			nlohmann::json component = args[i]["Component"];
-			if (component.is_null() || !component.is_string())
-				throw std::exception("ERROR: Component name not found\n");
-
-			for (nlohmann::json::iterator it = prefJson["Components"].begin(); it != prefJson["Components"].end(); ++it) {
-				
-				if (it.value()["Type"] == type && it.value()["Component"] == component) {
-
-					for (auto p : args[i]["Parameters"].items())
-					{
-						it.value()["Parameters"][p.key()] = p.value();
-					}
-					break;
-				}
-				std::cout << *it << '\n';
-			}
-		}
-	}*/
-	if(!prefJson["Components"].is_null() && prefJson["Components"].is_array())
-		loadComponents(prefJson["Components"], ent);
-	// ya funciona sin parametros individuales
+	it = prefJson.find("Name");
+	if (it != prefJson.end() && it.value().is_string())
+		entName = it.value();
 
 	i.close();
 }
@@ -195,7 +191,6 @@ void LoaderSystem::loadPrefabByName(std::string fileName, Entity* ent)
 	i >> prefJson;
 
 	loadComponents(prefJson["Components"], ent);
-	// ya funciona sin parametros individuales
 
 	i.close();
 }

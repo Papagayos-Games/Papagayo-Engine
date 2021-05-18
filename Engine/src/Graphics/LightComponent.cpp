@@ -15,6 +15,14 @@ LightComponent::LightComponent(): Component(RenderManager::getInstance(), (int)R
 	init();
 }
 
+LightComponent::~LightComponent()
+{
+	if (ogreLight_ != nullptr)
+		OgreContext::getInstance()->getSceneManager()->destroyLight(ogreLight_);
+	if (mNode_ != nullptr)
+		OgreContext::getInstance()->getSceneManager()->destroySceneNode(mNode_);
+}
+
 void LightComponent::turnOn()
 {
 	ogreLight_->setVisible(true);

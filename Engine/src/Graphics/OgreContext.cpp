@@ -30,21 +30,21 @@ OgreContext::OgreContext(const std::string& appName) :
 
 OgreContext* OgreContext::getInstance()
 {
-	if (instance_ == nullptr)
-		if (!setupInstance("PAPAGAYO ENGINE"))
-			throw "ERROR: OgreContext couldn't be created\n";
-
 	return instance_;
 }
 
-bool OgreContext::setupInstance(const std::string& appName)
+bool OgreContext::setUpInstance(const std::string& appName)
 {
 	if (instance_ == nullptr) {
-		instance_ = new OgreContext(appName);
-		return true;
+		try {
+			instance_ = new OgreContext(appName);
+		}
+		catch (...){
+			return false;
+		}
 	}
 
-	return false;
+	return true;
 }
 
 #pragma region INIT_OGRE
@@ -202,6 +202,19 @@ void OgreContext::setupRTShaderGenerator()
 
 void OgreContext::clean()
 {
+	//Destruir SceneManager
+	//intance_->mShaderGenerator_->removeSceneManager(instance_->mSM);
+	//instance_->mShaderGenerator_->addSceneManager(instance_->mSM); // TO DO: Devolverselo en el cambio de escena
+	//instance_->ogreRoot_->destroySceneManager(instance_->mSM);
+	OgreContext::getInstance()->getRenderWindow()->removeAllViewports();
+}
+
+void OgreContext::destroy()
+{
+	clean();
+	instance_->mShaderGenerator_->removeSceneManager(instance_->mSM);
+	//instance_->mShaderGenerator_->addSceneManager(instance_->mSM); // TO DO: Devolverselo en el cambio de escena
+	instance_->ogreRoot_->destroySceneManager(instance_->mSM);
 	delete instance_;
 }
 
@@ -221,7 +234,6 @@ OgreContext::~OgreContext()
 
 	// destroy RTShader system.
 	if (mShaderGenerator_ != nullptr) {
-		mShaderGenerator_->removeSceneManager(mSM);
 		Ogre::RTShader::ShaderGenerator::getSingleton().destroy();
 		mShaderGenerator_ = nullptr;
 	}
@@ -238,17 +250,13 @@ OgreContext::~OgreContext()
 	}
 
 	//Destruir FileSystemLayer
-	delete mFSLayer_;
-
-	//Destruir SceneManager
-	ogreRoot_->destroySceneManager(mSM);
+	//delete mFSLayer_;
 
 	delete ogreRoot_;
 	ogreRoot_ = nullptr;
 
-
 	//Destruir RTShaderSystem;
-	delete  mMaterialListener_;
+	delete mMaterialListener_;
 
 	Ogre::STBIImageCodec::shutdown();
 }

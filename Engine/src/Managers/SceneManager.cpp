@@ -11,38 +11,39 @@ Scene* SceneManager::currentScene_ = nullptr;
 
 SceneManager::~SceneManager()
 {
-	clean();
 }
 
 SceneManager* SceneManager::getInstance()
 {
-	if (instance_ == nullptr)
-		return new SceneManager();
-	
-		return instance_;
+	return instance_;
 }
 
 Scene* SceneManager::getCurrentScene()
 {
-	if (currentScene_ == nullptr)
-		return nullptr;
-
 	return currentScene_;
 }
 
 bool SceneManager::setupInstance()
 {
 	if (instance_ == nullptr) {
-		instance_ = new SceneManager();
-		return true;
+		try {
+			instance_ = new SceneManager();
+		}
+		catch (...) {
+			return false;
+		}
 	}
 
-	return false;
+	return true;
 }
 
 void SceneManager::clean()
 {
 	instance_->cleanupScene();
+}
+
+void SceneManager::destroy() {
+	instance_->clean();
 	delete instance_->loader_;
 	delete instance_;
 }
@@ -64,7 +65,6 @@ void SceneManager::cleanupScene()
 	currentScene_->clean();
 	delete currentScene_; 
 	currentScene_ = nullptr;
-	OgreContext::getInstance()->getRenderWindow()->removeAllViewports();
 }
 
 SceneManager::SceneManager() {
@@ -75,8 +75,10 @@ SceneManager::SceneManager() {
 
 void SceneManager::update()
 {
+	currentScene_->eraseEntities();
 	if (change_) {
-		cleanupScene();
+		//cleanupScene();
+		PapagayoEngine::getInstance()->clean();
 		loadScene(nextScene_);
 		
 		change_ = false;

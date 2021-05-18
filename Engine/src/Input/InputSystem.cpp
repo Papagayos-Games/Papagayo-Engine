@@ -13,7 +13,6 @@ InputSystem* InputSystem::instance_ = nullptr;
 
 InputSystem::InputSystem()
 {
-
 }
 
 /*void InputSystem::update()
@@ -64,18 +63,26 @@ InputSystem::InputSystem()
 
 InputSystem::~InputSystem()
 {
-
 }
 
 InputSystem* InputSystem::getInstance()
 {
+	return instance_;
+}
+
+bool InputSystem::setUpInstance() {
 	if (instance_ == nullptr)
 		instance_ = new InputSystem();
-	return instance_;
+	return true;
 }
 
 void InputSystem::clean()
 {
+}
+
+void InputSystem::destroy()
+{
+	instance_->clean();
 	delete instance_;
 }
 

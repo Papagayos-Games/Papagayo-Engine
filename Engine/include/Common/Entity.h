@@ -23,10 +23,13 @@ public:
 
 	// inicializa las componentes
 	void start();
+
+	// destruye una entidad y sus componentes
+	void destroy();
+
 	// añade un componente
 	void addComponent(Component* comp);
 
-	std::string& getName();
 	const std::string& getName() const;
 
 	void setName(const std::string& name);

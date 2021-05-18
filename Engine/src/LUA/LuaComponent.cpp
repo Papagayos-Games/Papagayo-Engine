@@ -3,8 +3,7 @@
 #include <LuaBridge.h>
 #include "lua.hpp"
 
-
-LuaComponent::LuaComponent():Component(LUAManager::getInstance(), 0)
+LuaComponent::LuaComponent(const std::string& fileName, int id) : Component(LUAManager::getInstance(), id), fileName_(fileName)
 {
 	init();
 }
@@ -20,32 +19,39 @@ void LuaComponent::init()
 	currState = LUAManager::getInstance()->getLuaState();
 	class_ = new luabridge::LuaRef(currState);
 	self_ = new luabridge::LuaRef(currState);
+	(*class_) = luabridge::getGlobal(currState, "default");
+	(*self_) = (*class_)["instantiate"]()[0];
 }
 
 void LuaComponent::load(const nlohmann::json& params)
 {
-	auto it = params.find("Class");
-	std::string className;
-
 	//Cogemos el nombre del metodo al que llamar en el update
-	if (it != params.end()) 
-		className = it->get<std::string>();
-	else {
-		className = "default";
+	(*class_) = luabridge::getGlobal(currState, fileName_.c_str());
+	if (class_->isNil()) {
 #ifdef _DEBUG
 		std::cout << "No class found while loading LUAComponent. Assigned default\n";
 #endif
+		delete class_;
+		delete self_;
+		fileName_ = "default";
+		throw std::exception("Assigned LUA component to default in loader\n");
 	}
-	(*class_) = luabridge::getGlobal(currState, className.c_str());
+	
+	(*self_) = (*class_)["instantiate"](params.dump(), getEntity())[0];
 
-	it = params.find("Parameters");
-	if (it != params.end()) {
-		(*self_) = (*class_)["instantiate"]((*it).dump())[0];
-		std::cout << (*self_)["hp"] << '\n';
-		if (self_->isTable()) {
-			std::cout << "tabla\n";
-		}
+	if (self_->isNil()) {
+#ifdef _DEBUG
+		std::cout << "No table created while loading LUAComponent. Assigned default\n";
+#endif
+		delete class_;
+		delete self_;
+		fileName_ = "default";
+		throw std::exception("Assigned LUA component to default in loader\n");
 	}
+
+#ifdef _DEBUG
+	std::cout << fileName_ << " loaded correctly\n";
+#endif
 }
 
 void LuaComponent::setUp()
@@ -57,3 +63,19 @@ void LuaComponent::update()
 {
 	(*class_)["update"](self_, LUAManager::getInstance());
 }
+
+const std::string& LuaComponent::getFileName()
+{
+	return fileName_;
+}
+
+const std::string& LuaComponent::getFileName() const
+{
+	return fileName_;
+}
+
+const luabridge::LuaRef& LuaComponent::getClass()
+{
+	return (*class_);
+}
+

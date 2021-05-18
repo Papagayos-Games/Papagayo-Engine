@@ -9,6 +9,7 @@
 
 //-------MANAGER/SYSTEM---------//
 #include "Managers/SceneManager.h"
+#include "Scene/Scene.h"
 #include "Graphics/OgreContext.h"
 #include "Input/InputSystem.h"
 #include "CommonManager.h"
@@ -25,14 +26,60 @@
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
 
 PapagayoEngine::PapagayoEngine(const std::string& appName) : appName_(appName) {
+	
+	// OGRE CONTEXT
+	if (!OgreContext::setUpInstance(appName_)) {
+		throw std::exception("ERROR: Couldn't load OgreContext\n");
+	}
 	ogre = OgreContext::getInstance();
+
+	// INPUT SYSTEM
+	if (!InputSystem::setUpInstance()) {
+		throw std::exception("ERROR: Couldn't load InputSystem\n");
+	}
 	input = InputSystem::getInstance();
+
+	// UI MANAGER
+	if (!UIManager::setUpInstance()) {
+		throw std::exception("ERROR: Couldn't load UIManager\n");
+	}
 	gui = UIManager::getInstance();
+
+	// PHYSICS
+	if (!PhysicsManager::setUpInstance()) {
+		throw std::exception("ERROR: Couldn't load PhysicsManager\n");
+	}
 	phys = PhysicsManager::getInstance();
+
+	// RENDER
+	if (!RenderManager::setUpInstance()) {
+		throw std::exception("ERROR: Couldn't load RenderManager\n");
+	}
 	render = RenderManager::getInstance();
+
+	// SCENE MANAGER
+	if (!SceneManager::setupInstance()) {
+		throw std::exception("ERROR: Couldn't load SceneManager\n");
+	}
 	mSM = SceneManager::getInstance();
+
+	// COMMON MANAGER
+	if (!CommonManager::setUpInstance()) {
+		throw std::exception("ERROR: Couldn't load CommonManager\n");
+	}
 	common = CommonManager::getInstance();
+
+	// LUA MANAGER
+	if (!LUAManager::setUpInstance()) {
+		throw std::exception("ERROR: Couldn't load LuaManager\n");
+	}
 	lua = LUAManager::getInstance();
+
+	// AUDIO
+	if (!AudioSystem::setupInstance()) {
+		throw std::exception("ERROR: Couldn't load AudioSystem\n");
+	}
+	audio = AudioSystem::getInstance();
 }
 
 PapagayoEngine::~PapagayoEngine()
@@ -41,37 +88,76 @@ PapagayoEngine::~PapagayoEngine()
 
 PapagayoEngine* PapagayoEngine::getInstance()
 {
-	if (instance_ == nullptr)
-		if (!setupInstance("PAPAGAYO ENGINE"))
-			throw "ERROR: PapagayoEngine couldn't be created\n";
 	return instance_;
 }
 
 bool PapagayoEngine::setupInstance(const std::string& appName)
 {
 	if (instance_ == nullptr) {
-		instance_ = new PapagayoEngine(appName);
-		return true;
+		try {
+			instance_ = new PapagayoEngine(appName);
+		}
+		catch (...) {
+			return false;
+		}
 	}
 
-	return false;
+	return true;
 }
 
-void PapagayoEngine::clean()
+void PapagayoEngine::destroy()
 {
-	// se borrarian todos los managers del motor
-	phys->clean();
-	mSM->clean();
-	ogre->clean();
-	//RenderManager::getInstance()->clean();
-	input->clean();
+	// se borran todos los managers del motor
+	// sistemas
+	input->destroy();
+	audio->destroy();
+
+	// render
+	render->destroy();
+	gui->destroy();
+	ogre->destroy();
+	
+	// fisicas
+	phys->destroy();
+
+	// common
+	common->destroy();
+	
+	// logica
+	lua->destroy();
+
+	// escena
+	mSM->destroy();
 	
 	delete instance_;
 }
 
+void PapagayoEngine::clean()
+{
+	input->clean();
+	audio->clean();
+
+	// render
+	render->clean();
+	gui->clean();
+	ogre->clean();
+
+	// fisicas
+	phys->clean();
+
+	// common
+	common->clean();
+
+	// logica
+	//lua->clean();
+
+	// escena
+	mSM->clean();
+}
+
 void PapagayoEngine::init()
 {
-	try { ogre->setupInstance("PAPAGAYO ENGINE"); }
+	try { ogre->setUpInstance("PAPAGAYO ENGINE"); }
 	catch (const std::exception & e)
 	{
 		throw std::runtime_error("OgreContext init fail \n" + (std::string)e.what() + "\n");
@@ -87,8 +173,7 @@ void PapagayoEngine::init()
 	manRegistry_["Common"] = common;
 	manRegistry_["Render"] = render;
 	manRegistry_["LUA"] = LUAManager::getInstance();
-	mSM->createStartScene();
-
+	manRegistry_["UI"] = gui;
 	//Estas 3 lineas de ui deber�an cargarse en funci�n de 
 	//unos string que se reciban como parametro, de manera
 	//que sea el usuario el que decida que configuracion
@@ -96,16 +181,18 @@ void PapagayoEngine::init()
 	gui->loadScheme("TaharezLook", "TaharezLook.scheme");
 	gui->setMouseImage("TaharezLook/MouseArrow");
 	gui->loadFont("DejaVuSans-12.font"); 
+	
+	mSM->createStartScene();
+
 
 #pragma region TOERASE
-	gui->createButton("Probando_boton", glm::vec2(0, 0), glm::vec2(200, 200), "Prueba");
+	//gui->createButton("Probando_boton", glm::vec2(0, 0), glm::vec2(200, 200), "Prueba");
 	//ui->createLabel("Probando_boton", glm::vec2(100, 100), glm::vec2(10, 10), "Prueba");
 
 	ogre->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
+
 	//Audio de bad bunny metido 
-	AudioEngine* au = new AudioEngine();
-	au->Init();
-	au->PlaySound("Assets/badbunny.mp3", {0,0,0});
+	audio->playSound("Assets/badbunny.mp3", {0,0,0});
 
 #pragma endregion
 
@@ -116,7 +203,7 @@ void PapagayoEngine::start()
 {
 	render->start();
 	phys->start();
-	LUAManager::getInstance()->start();
+	lua->start();
 }
 
 void PapagayoEngine::update()
@@ -138,14 +225,15 @@ void PapagayoEngine::update()
 			phys->update();
 			render->update();
 
-			if (timer_ == 1000) {
+			lua->update();
+			++timer_;
+
+			if (timer_ == 300) {
+				SceneManager::getCurrentScene()->killEntityByName("pepito");
 				std::cout << "Cambio de escena\n";
 				mSM->changeScene("test2");
 			}
-
 			mSM->update();
-			++timer_;
-			lua->update();
 		}
 	}
 	catch (const std::exception& e)
@@ -156,7 +244,6 @@ void PapagayoEngine::update()
 }
 
 void PapagayoEngine::run() {
-	init();
 	//running_ = false;
 	// ciclo principal de juego
 	startTime = SDL_GetTicks();
@@ -174,6 +261,11 @@ void PapagayoEngine::run() {
 
 		update();
 	}
+}
+
+void PapagayoEngine::closeApp()
+{
+	running_ = false;
 }
 
 const std::map<std::string, Manager*>& PapagayoEngine::getManagers()

@@ -1,3 +1,5 @@
+#include "..\..\include\Graphics\RenderManager.h"
+#include "..\..\include\Graphics\RenderManager.h"
 #include "RenderManager.h"
 #include "OgreContext.h"
 #include <checkML.h>
@@ -27,9 +29,30 @@ RenderManager::~RenderManager()
 
 RenderManager* RenderManager::getInstance()
 {
-	if (!instance_)
-		instance_ = new RenderManager();
 	return instance_;
+}
+
+bool RenderManager::setUpInstance() {
+	if (!instance_) {
+		try {
+			instance_ = new RenderManager();
+		}
+		catch (...) {
+			return false;
+		}
+	}
+	return true;
+}
+
+void RenderManager::clean()
+{
+	instance_->destroyAllComponents();
+}
+
+void RenderManager::destroy()
+{
+	instance_->clean();
+	delete instance_;
 }
 
 void RenderManager::start()

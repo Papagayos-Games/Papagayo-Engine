@@ -11,6 +11,10 @@
 #include "Manager.h"
 #include "lua.hpp"
 
+namespace luabridge {
+	class LuaRef;
+}
+
 class Entity;
 class RigidBody;
 class InputSystem;
@@ -30,6 +34,8 @@ private:
 	
 	LUAManager();
 	static LUAManager* instance_;
+
+	int registeredFiles = 0; // TO DO: reinciamos en la carga de escena?
 	
 	bool CheckLua(lua_State* L, int r);
 	void buildLuaEngine(const std::string& file);
@@ -40,6 +46,7 @@ public:
 	~LUAManager();
 
 	static LUAManager* getInstance();
+	static bool setUpInstance();
 
 	//METODOS DE PRUEBA
 	Entity* getEntity(std::string name);
@@ -50,8 +57,11 @@ public:
 	LightComponent* getLightComponent(Entity* ent);
 	Camera* getCamera(Entity* ent);
 	Transform* getTransform(Entity* ent);
+	luabridge::LuaRef getLuaClass(Entity* ent, const std::string& c_name);
 	Entity* instantiate(std::string prefabName);
 	OgreContext* getOgreContext();
+
+	void addRegistry(const std::string& compName);
 
 	//Obtener el estado de LUA
 	lua_State* getLuaState()const;
@@ -59,6 +69,9 @@ public:
 	//Metodos heredados de la clase padre
 	virtual void start() override;
 	virtual void update() override;
+
+	static void clean();
+	static void destroy();
 
 };
 

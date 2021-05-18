@@ -17,8 +17,10 @@ private:
 	//Gestión de errores
 	std::error_code errorCode;
 
+	std::string fileName_;
+
 public:
-	LuaComponent();
+	LuaComponent(const std::string& fileName = "default", int id = 0);
 	virtual ~LuaComponent();
 
 	//Inicialización del componente
@@ -30,4 +32,8 @@ public:
 	//Llamada a funciones de LUA
 	virtual void update() override;
 
+	const std::string& getFileName();
+	const std::string& getFileName() const;
+
+	const luabridge::LuaRef& getClass();
 };

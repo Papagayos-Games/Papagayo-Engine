@@ -1,17 +1,43 @@
 #include "UIManager.h"
+//INCLUDE COMPONENTS
+#include "UIButton.h"
+#include "UISlider.h"
+#include "UILabel.h"
+#include "UIImage.h"
+#include "UIPointer.h"
+
+//INCLUDE CEGUI
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/MouseCursor.h>
 #include <CEGUI/RendererModules/Ogre/Renderer.h>
-#include <iostream>
-#include "OgreContext.h"
 #include "CEGUI/RendererModules/Ogre/ResourceProvider.h"
+#include <glm/glm.hpp>
+
+//ADDITIONAL INCLUDES
+#include "OgreContext.h"
+#include <iostream>
+
 
 #pragma region Generales
+
+inline glm::vec2 cvt(const vector2& V) {
+	return glm::vec2(V.first, V.second);
+}
+
+inline vector2 cvt(const glm::vec2& V) {
+	return vector2(V.x, V.y);
+}
 
 UIManager* UIManager::instance_ = nullptr;
 
 UIManager::UIManager() : Manager(ManID::UI)
 {
+	registerComponent("Button", (int)UIManager::UICmpId::Button, []() -> UIButton* { return new UIButton(); });
+	registerComponent("Slider", (int)UIManager::UICmpId::Slider, []() -> UISlider* { return new UISlider(); });
+	registerComponent("Label", (int)UIManager::UICmpId::Label, []() -> UILabel* { return new UILabel(); });
+	registerComponent("Image", (int)UIManager::UICmpId::Image, []() -> UIImage* { return new UIImage(); });
+	registerComponent("Pointer", (int)UIManager::UICmpId::Pointer, []() -> UIPointer* { return new UIPointer(); });
+
 	//Ogre
 	oRoot = OgreContext::getInstance()->getOgreRoot();
 	oWindow = OgreContext::getInstance()->getRenderWindow();
@@ -41,20 +67,32 @@ UIManager::~UIManager()
 
 UIManager* UIManager::getInstance()
 {
+	return instance_;
+}
+
+bool UIManager::setUpInstance() {
 	if (instance_ == nullptr) {
 		try {
 			instance_ = new UIManager();
 		}
-		catch (std::string msg) {
-			throw "ERROR: UIManager couldn't be created\n";
+		catch (...) {
+			return false;
 		}
 	}
-
-	return instance_;
+	return true;
 }
 
 void UIManager::clean()
 {
+	//if (instance_->sch != nullptr)
+	//	delete instance_->sch;
+
+	instance_->destroyAllComponents();
+}
+
+void UIManager::destroy()
+{
+	clean();
 	CEGUI::OgreRenderer::destroySystem();
 	delete instance_;
 }
@@ -80,7 +118,11 @@ void UIManager::windowResized(Ogre::RenderWindow* rw)
 void UIManager::loadScheme(const std::string& schemeName_, const std::string& schemeFile)
 {
 	schemeName = schemeName_;
-	CEGUI::SchemeManager::getSingleton().createFromFile(schemeFile);
+	
+	//if (sch != nullptr)
+	//	delete sch;
+	
+	sch = &CEGUI::SchemeManager::getSingleton().createFromFile(schemeFile);
 }
 
 void UIManager::loadFont(const std::string& filename)
@@ -131,8 +173,8 @@ void UIManager::setMouseVisibility(bool b)
 
 #pragma region Widget
 
-CEGUI::Window* UIManager::createButton(const std::string& text, glm::vec2 position,
-	glm::vec2 size, const std::string& name)
+CEGUI::Window* UIManager::createButton(const std::string& text, vector2 position,
+	vector2 size, const std::string& name)
 {
 	CEGUI::Window* button = NULL;
 	button = guiWinMng->createWindow(schemeName + "/Button", name);  // Create Window
@@ -144,7 +186,7 @@ CEGUI::Window* UIManager::createButton(const std::string& text, glm::vec2 positi
 	return button;
 }
 
-CEGUI::Window* UIManager::createSlider(glm::vec2 position, glm::vec2 size, const std::string& name)
+CEGUI::Window* UIManager::createSlider(vector2 position, vector2 size, const std::string& name)
 {
 	CEGUI::Window* slider = CEGUI::WindowManager::getSingleton().createWindow(
 		schemeName + "/Slider");
@@ -156,7 +198,7 @@ CEGUI::Window* UIManager::createSlider(glm::vec2 position, glm::vec2 size, const
 	return slider;
 }
 
-CEGUI::Window* UIManager::createLabel(const std::string& text, glm::vec2 position, glm::vec2 size, const std::string& name)
+CEGUI::Window* UIManager::createLabel(const std::string& text, vector2 position, vector2 size, const std::string& name)
 {
 	CEGUI::Window* label = CEGUI::WindowManager::getSingleton().createWindow(
 		schemeName + "/Label", name);
@@ -172,7 +214,7 @@ CEGUI::Window* UIManager::createLabel(const std::string& text, glm::vec2 positio
 	return label;
 }
 
-CEGUI::Window* UIManager::createImage(const std::string& image, glm::vec2 position, glm::vec2 size, const std::string& name)
+CEGUI::Window* UIManager::createImage(const std::string& image, vector2 position, vector2 size, const std::string& name)
 {
 	CEGUI::Window* staticImage =
 		CEGUI::WindowManager::getSingleton().createWindow(
@@ -188,12 +230,12 @@ CEGUI::Window* UIManager::createImage(const std::string& image, glm::vec2 positi
 	return staticImage;
 }
 
-void UIManager::setWidgetDestRect(CEGUI::Window* widget, glm::vec2 position, glm::vec2 size)
+void UIManager::setWidgetDestRect(CEGUI::Window* widget, vector2 position, vector2 size)
 {
-	widget->setPosition(CEGUI::UVector2(CEGUI::UDim(position.x, 0),
-		CEGUI::UDim(position.y, 0)));
+	widget->setPosition(CEGUI::UVector2(CEGUI::UDim(cvt(position).x, 0),
+		CEGUI::UDim(cvt(position).y, 0)));
 	widget->setSize(
-		CEGUI::USize(CEGUI::UDim(0, size.x), CEGUI::UDim(0, size.y)));
+		CEGUI::USize(CEGUI::UDim(0, cvt(size).x), CEGUI::UDim(0, cvt(size).y)));
 }
 
 #pragma endregion

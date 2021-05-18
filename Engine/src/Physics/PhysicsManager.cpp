@@ -11,17 +11,21 @@ PhysicsManager* PhysicsManager::instance_ = nullptr;
 
 PhysicsManager* PhysicsManager::getInstance()
 {
+	return instance_;
+}
+
+bool PhysicsManager::setUpInstance() {
 	if (instance_ == nullptr) {
 		try {
 			instance_ = new PhysicsManager();
 			instance_->init(Vector3(0.0, -9.8, 0.0));
 		}
-		catch (std::string msg) {
-			throw "ERROR: PhysicsManager couldn't be created\n";
+		catch (...) {
+			return false;
 		}
 	}
 
-	return instance_;
+	return true;
 }
 
 PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {
@@ -30,7 +34,6 @@ PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {
 };
 
 PhysicsManager::~PhysicsManager() {
-	destroyAllComponents();
 };
 
 void PhysicsManager::init(const Vector3 gravity) {
@@ -72,6 +75,8 @@ void PhysicsManager::destroyWorld()
 void PhysicsManager::destroyRigidBody(btRigidBody* body)
 {
 	dynamicsWorld->removeCollisionObject(body);
+	delete body->getCollisionShape();
+	delete body->getMotionState();
 	delete body;
 	body = nullptr;
 }
@@ -87,17 +92,17 @@ btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass)
 	transform.setIdentity();
 	transform.setOrigin(btVector3(pos.x, pos.y, pos.z));
 
-	btCollisionShape* shapeColl = nullptr;
-	shapeColl = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
+	//btBoxShape shapeColl = btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
 
-	btMotionState* motion = new btDefaultMotionState(transform);
+	//btDefaultMotionState motion = btDefaultMotionState(transform);
 
-	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, shapeColl);
+	btRigidBody::btRigidBodyConstructionInfo info(mass, new btDefaultMotionState(transform), new btBoxShape(btVector3(1.0f, 1.0f, 1.0f)));
 	btRigidBody* rb = new btRigidBody(info);
 
 	rb->forceActivationState(DISABLE_DEACTIVATION);
 
 	dynamicsWorld->addRigidBody(rb);
+
 	//rbs.push_back(rb);
 	/*shapes_.push_back(box);
 	states_.push_back(motion);*/
@@ -123,11 +128,6 @@ void PhysicsManager::update()
 	dynamicsWorld->stepSimulation(1.f / 60.f, 10);
 
 	for (auto it = _compsList.begin(); it != _compsList.end(); ++it) {
-		if (applyTorque) {
-			applyTorque = false;
-			static_cast<RigidBody*>(*it)->addTorque(Vector3(0.0f, 0.0, -5.0), Forces::IMPULSE);
-			//static_cast<RigidBody*>(*it)->addForce(Vector3(0.0f, 1, 0.0f), Vector3(1.0f, 0.0, 1.0), Forces::IMPULSE);
-		}
 		(*it)->update();
 	}
 
@@ -139,6 +139,13 @@ void PhysicsManager::update()
 
 void PhysicsManager::clean()
 {
+	instance_->destroyAllComponents();
+}
+
+void PhysicsManager::destroy()
+{
+	instance_->clean();
+	instance_->destroyWorld();
 	delete instance_;
 }
 
@@ -147,9 +154,9 @@ void PhysicsManager::destroyAllComponents()
 	while (!_compsList.empty()) {
 		auto i = _compsList.begin();
 		destroyRigidBody(static_cast<RigidBody*>((*i))->getBtRb());
-		_compsList.remove((*i));
+		delete *i;
+		_compsList.erase(i);
 	}
-	destroyWorld();
 }
 
 bool PhysicsManager::destroyComponent(Entity* ent, int compId)
