@@ -7,7 +7,7 @@ class LuaRef;
 
 class LuaComponent : public Component {
 private:
-	luabridge::LuaRef* class_;
+	//luabridge::LuaRef* class_;
 	luabridge::LuaRef* self_;
 
 	//Referencia al LUASTATE
@@ -34,6 +34,4 @@ public:
 
 	const std::string& getFileName();
 	const std::string& getFileName() const;
-
-	const luabridge::LuaRef& getClass();
 };

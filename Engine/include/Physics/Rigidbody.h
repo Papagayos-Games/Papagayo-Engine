@@ -11,6 +11,7 @@ class Vector3;
 class Entity;
 class btRigidBody;
 class Transform;
+class MeshStrider;
 
 enum class Forces {
 	NORMAL = 0,
@@ -24,6 +25,7 @@ private:
 	float mass = 1.0f;
 	//Rigidbody principal
 	btRigidBody* rb;
+	MeshStrider* st;
 	Transform* tr_ = nullptr;
 	bool trigger = false;
 

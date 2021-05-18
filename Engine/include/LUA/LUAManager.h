@@ -36,10 +36,14 @@ private:
 	LUAManager();
 	static LUAManager* instance_;
 
+	const std::string SCRIPTS_FILE_PATH = "LuaScripts/";
+	const std::string FILE_EXTENSION = ".lua";
+
+	std::map<std::string, luabridge::LuaRef> classes_;
+
 	int registeredFiles = 0; // TO DO: reinciamos en la carga de escena?
 	
 	bool CheckLua(lua_State* L, int r);
-	void buildLuaEngine(const std::string& file);
 	void registerClassAndFunctions(lua_State* L);
 	bool reloadLuaScript(lua_State* L, const std::string& luafile);
 
@@ -58,7 +62,7 @@ public:
 	LightComponent* getLightComponent(Entity* ent);
 	Camera* getCamera(Entity* ent);
 	Transform* getTransform(Entity* ent);
-	luabridge::LuaRef getLuaClass(Entity* ent, const std::string& c_name);
+	luabridge::LuaRef getLuaClass(const std::string& c_name);
 	Entity* instantiate(std::string prefabName);
 	OgreContext* getOgreContext();
 	Scene* getCurrentScene();

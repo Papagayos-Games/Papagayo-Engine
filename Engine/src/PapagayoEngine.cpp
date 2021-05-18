@@ -149,7 +149,7 @@ void PapagayoEngine::clean()
 	common->clean();
 
 	// logica
-	//lua->clean();
+	lua->clean();
 
 	// escena
 	mSM->clean();
