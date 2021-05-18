@@ -16,8 +16,12 @@
             "Prefab": "DefaultLight"
         },
         {
-          "Name" : "pepito",
-          "Prefab": "penguinTest"
+            "Name" : "pepito",
+            "Prefab": "penguin"
+        },
+        {
+            "Name" : "pepito",
+            "Prefab": "penguin"
         }
     ]
 }

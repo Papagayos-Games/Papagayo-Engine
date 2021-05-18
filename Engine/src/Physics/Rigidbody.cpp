@@ -42,6 +42,9 @@ RigidBody::RigidBody() : Component(PhysicsManager::getInstance(), 0)
 
 RigidBody::~RigidBody()
 {
+	if(st)
+		delete st;
+	st = nullptr;
 	//if (rb) {
 	//	delete rb;
 	//}
@@ -68,10 +71,12 @@ void RigidBody::setUp()
 		//float z = meshPtr.getPointer()->getBounds().getSize().z;
 		//rb->getCollisionShape()->setLocalScaling(btVector3(x, y, z));
 
-		MeshStrider strider = MeshStrider(meshPtr.get());
+		if (st)
+			delete st;
+		st = new MeshStrider(meshPtr.get());
 		//btCollisionShape* newShape = new btBvhTriangleMeshShape(strider, true, true);
 		//btConvexTriangleMeshShape* a = new btConvexTriangleMeshShape(strider, true);
-		setCollisionShape(new btConvexTriangleMeshShape(&strider, true));
+		setCollisionShape(new btConvexTriangleMeshShape(st, true));
 	}
 }
 

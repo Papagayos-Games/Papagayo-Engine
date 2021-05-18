@@ -149,7 +149,7 @@ void PapagayoEngine::clean()
 	common->clean();
 
 	// logica
-	//lua->clean();
+	lua->clean();
 
 	// escena
 	mSM->clean();
@@ -231,7 +231,7 @@ void PapagayoEngine::update()
 			if (timer_ == 300) {
 				SceneManager::getCurrentScene()->killEntityByName("pepito");
 				std::cout << "Cambio de escena\n";
-				mSM->changeScene("test2");
+				mSM->changeScene("test3");
 			}
 			mSM->update();
 		}
