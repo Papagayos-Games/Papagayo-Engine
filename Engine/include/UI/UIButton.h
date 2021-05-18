@@ -6,11 +6,15 @@
 
 #include "UIComponent.h"
 
+
 class UIButton:public UIComponent
 {
 private:
 	std::string text;
 	std::string scene;
+
+	bool buttonPressed = false;
+
 public:
 	UIButton();
 	virtual ~UIButton();
@@ -32,6 +36,12 @@ public:
 	/// Metodo encargado de hacer el cambio de escena cuando el boton es clickado
 	/// </summary>
 	void changeScene();
+
+	void buttonWasPressed();
+
+	void buttonNotPressed();
+
+	bool getButtonPressed();
 };
 
 #endif

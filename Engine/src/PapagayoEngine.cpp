@@ -228,7 +228,7 @@ void PapagayoEngine::update()
 			lua->update();
 			++timer_;
 
-			if (timer_ == 300) {
+			if (timer_ == 3000) {
 				SceneManager::getCurrentScene()->killEntityByName("pepito");
 				std::cout << "Cambio de escena\n";
 				mSM->changeScene("test2");

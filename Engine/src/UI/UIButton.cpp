@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <glm/glm.hpp>
+#include "..\..\include\UI\UIButton.h"
 
 UIButton::UIButton() : UIComponent((int)UIManager::UICmpId::Button)
 {
@@ -59,48 +60,16 @@ void UIButton::load(const nlohmann::json& params)
 		std::string t = it->get<std::string>();
 		text = t;
 	}
-
 	
-
-	//TODO: a la constructora de subscriberSlot habria que pasarle el metodo de lua que queramos que haga, ¿como? no se sabeh
-
-	//it = params.find("clickEvent");
-	//if (it != params.end()) {
-	//	auto _event = it->find("event");
-	//	if (_event != it->end()) {
-	//		std::string e = _event->get<std::string>();
-	//		event_ = new CEGUI::String(e);
-	//
-	//		if (event_ == &(CEGUI::String)"changeScene") {
-	//
-	//			auto scene_ = it->find("scene");
-	//			if (scene_ != it->end()) {
-	//				scene = scene_->get<std::string>();
-	//			}
-	//
-				//uiWindow->subscribeEvent(
-				//	CEGUI::PushButton::EventClicked,
-				//	CEGUI::Event::Subscriber("Hola"));
-	//			}
-	//		
-	//	}
-	//
-	////	auto _subs = it->find("subscriber");
-	////	if (_subs != it->end()) {
-	////		std::string sub = _subs->get<std::string>();
-	////		
-	////		//subscriberEvent = new CEGUI::SubscriberSlot();
-	//
-	////	}
-	//
-	//uiWindow->subscribeEvent(*event_, *subscriberEvent);
-	//}
 
 	//Reposicionamiento para que parezca que el pivote esta
 	//en el centro del boton (esto se puede meter en el resto de Widgets)
 	//position.first -= size.first / 2;
 	//position.second -= size.second/ 2;
 	uiWindow = UIManager::getInstance()->createButton(text, position, size, name);
+	uiWindow->subscribeEvent(
+		CEGUI::PushButton::EventClicked,
+		CEGUI::Event::Subscriber(&UIButton::buttonWasPressed, this));
 }
 
 void UIButton::onClick()
@@ -120,4 +89,19 @@ void UIButton::onClick()
 void UIButton::changeScene()
 {
 	//aqui deberia cambiar a la escena 
+}
+
+void UIButton::buttonWasPressed()
+{
+	buttonPressed = true;
+}
+
+void UIButton::buttonNotPressed()
+{
+	buttonPressed = false;
+}
+
+bool UIButton::getButtonPressed()
+{
+	return buttonPressed;
 }
