@@ -54,7 +54,7 @@ private:
 	std::string appName_;
 	std::map<std::string, Manager*> manRegistry_;
 	bool running_ = true;
-	int timer_ = 0;
+
 	PapagayoEngine(const std::string& appName);
 	virtual ~PapagayoEngine();
 	void update();
