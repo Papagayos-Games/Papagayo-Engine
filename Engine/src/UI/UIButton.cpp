@@ -78,10 +78,10 @@ void UIButton::load(const nlohmann::json& params)
 	//				scene = scene_->get<std::string>();
 	//			}
 	//
-	//			uiWindow->subscribeEvent(
-	//				CEGUI::PushButton::EventClicked,
-	//				CEGUI::Event::Subscriber(&UIButton::changeScene, this));
-	//		}
+				//uiWindow->subscribeEvent(
+				//	CEGUI::PushButton::EventClicked,
+				//	CEGUI::Event::Subscriber("Hola"));
+	//			}
 	//		
 	//	}
 	//

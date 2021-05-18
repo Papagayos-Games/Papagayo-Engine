@@ -48,9 +48,9 @@ void PhysicsManager::init(const Vector3 gravity) {
 	dynamicsWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
 
 #ifdef _DEBUG
-	//mDebugDrawer_ = new OgreDebugDrawer(OgreContext::getInstance()->getSceneManager());
-	//mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	//dynamicsWorld->setDebugDrawer(mDebugDrawer_);
+	mDebugDrawer_ = new OgreDebugDrawer(OgreContext::getInstance()->getSceneManager());
+	mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+	dynamicsWorld->setDebugDrawer(mDebugDrawer_);
 #endif // DEBUG
 }
 
@@ -123,16 +123,16 @@ void PhysicsManager::update()
 	dynamicsWorld->stepSimulation(1.f / 60.f, 10);
 
 	for (auto it = _compsList.begin(); it != _compsList.end(); ++it) {
-		if (applyTorque) {
-			applyTorque = false;
-			static_cast<RigidBody*>(*it)->addTorque(Vector3(0.0f, 0.0, -5.0), Forces::IMPULSE);
-			//static_cast<RigidBody*>(*it)->addForce(Vector3(0.0f, 1, 0.0f), Vector3(1.0f, 0.0, 1.0), Forces::IMPULSE);
-		}
+		//if (applyTorque) {
+		//	applyTorque = false;
+		//	static_cast<RigidBody*>(*it)->addTorque(Vector3(0.0f, 0.0, -5.0), Forces::IMPULSE);
+		//	//static_cast<RigidBody*>(*it)->addForce(Vector3(0.0f, 1, 0.0f), Vector3(1.0f, 0.0, 1.0), Forces::IMPULSE);
+		//}
 		(*it)->update();
 	}
 
 #ifdef _DEBUG
-	//dynamicsWorld->debugDrawWorld();
+	dynamicsWorld->debugDrawWorld();
 #endif // _DEBUG
 
 }

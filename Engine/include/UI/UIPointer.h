@@ -15,6 +15,7 @@ public:
 	virtual ~UIPointer();
 
 	virtual void init();
+	virtual void update() {};
 
 	/// <summary>
 	/// Carga datos a partir de un json

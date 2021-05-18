@@ -2,6 +2,9 @@
 //INCLUDE COMPONENTS
 #include "UIButton.h"
 #include "UISlider.h"
+#include "UILabel.h"
+#include "UIImage.h"
+#include "UIPointer.h"
 
 //INCLUDE CEGUI
 #include <CEGUI/CEGUI.h>
@@ -31,9 +34,9 @@ UIManager::UIManager() : Manager(ManID::UI)
 {
 	registerComponent("Button", (int)UIManager::UICmpId::Button, []() -> UIButton* { return new UIButton(); });
 	registerComponent("Slider", (int)UIManager::UICmpId::Slider, []() -> UISlider* { return new UISlider(); });
-	//registerComponent("Label", (int)UIManager::UICmpId::Label, []() -> UILabel* { return new UILabel(); });
-	//registerComponent("Image", (int)UIManager::UICmpId::Image, []() -> UIImage* { return new UIImage(); });
-	//registerComponent("Pointer", (int)UIManager::UICmpId::Pointer, []() -> UIPointer* { return new UIPointer(); });
+	registerComponent("Label", (int)UIManager::UICmpId::Label, []() -> UILabel* { return new UILabel(); });
+	registerComponent("Image", (int)UIManager::UICmpId::Image, []() -> UIImage* { return new UIImage(); });
+	registerComponent("Pointer", (int)UIManager::UICmpId::Pointer, []() -> UIPointer* { return new UIPointer(); });
 
 	//Ogre
 	oRoot = OgreContext::getInstance()->getOgreRoot();
