@@ -91,12 +91,19 @@ namespace Ogre {
     AbsolutePixelCountLodStrategy::AbsolutePixelCountLodStrategy()
         : PixelCountLodStrategyBase("pixel_count")
     { }
-    AbsolutePixelCountLodStrategy::~AbsolutePixelCountLodStrategy() {}
     //-----------------------------------------------------------------------
-    Real PixelCountLodStrategyBase::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
+    Real AbsolutePixelCountLodStrategy::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
     {
+        // Get viewport
+        const Viewport *viewport = camera->getViewport();
+
+        // Get viewport area
+        Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
+
         // Get area of unprojected circle with object bounding radius
-        Real boundingArea = Math::PI * Math::Sqr(movableObject->getBoundingRadiusScaled());
+        const Vector3& scl = movableObject->getParentNode()->_getDerivedScale();
+        Real factor = std::max(std::max(scl.x, scl.y), scl.z);
+        Real boundingArea = Math::PI * Math::Sqr(movableObject->getBoundingRadius() * factor);
 
         // Base computation on projection type
         switch (camera->getProjectionType())
@@ -114,11 +121,7 @@ namespace Ogre {
                 const Matrix4& projectionMatrix = camera->getProjectionMatrix();
 
                 // Estimate pixel count
-                // multiplied out version of $A = pi * r^2$
-                // where r is projected using a gluPerspective matrix as $pr = cot(fovy / 2) * r / z$
-                // and then converted to pixels as $pr * height / 2$
-                return 0.25 * (boundingArea * projectionMatrix[0][0] * projectionMatrix[1][1]) /
-                       distanceSquared;
+                return (boundingArea * viewportArea * projectionMatrix[0][0] * projectionMatrix[1][1]) / distanceSquared;
             }
         case PT_ORTHOGRAPHIC:
             {
@@ -129,8 +132,8 @@ namespace Ogre {
                 if (orthoArea <= std::numeric_limits<Real>::epsilon())
                     return getBaseValue();
 
-                // Estimate covered area
-                return boundingArea / orthoArea;
+                // Estimate pixel count
+                return (boundingArea * viewportArea) / orthoArea;
             }
         default:
             {
@@ -140,18 +143,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    Real AbsolutePixelCountLodStrategy::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
-    {
-        // Get ratio of screen size to absolutely covered pixel count
-        Real absoluteValue = PixelCountLodStrategyBase::getValueImpl(movableObject, camera);
-
-        // Get viewport area
-        const Viewport *viewport = camera->getViewport();
-        Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
-
-        // Return absolute pixel count
-        return absoluteValue * viewportArea;
-    }
 
     /************************************************************************/
     /* ScreenRatioPixelCountLodStrategy                                     */
@@ -171,7 +162,19 @@ namespace Ogre {
     ScreenRatioPixelCountLodStrategy::ScreenRatioPixelCountLodStrategy()
         : PixelCountLodStrategyBase("screen_ratio_pixel_count")
     { }
-    ScreenRatioPixelCountLodStrategy::~ScreenRatioPixelCountLodStrategy() {}
+    //-----------------------------------------------------------------------
+    Real ScreenRatioPixelCountLodStrategy::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
+    {
+        // Get absolute pixel count
+        Real absoluteValue = AbsolutePixelCountLodStrategy::getSingletonPtr()->getValueImpl(movableObject, camera);
+
+        // Get viewport area
+        const Viewport *viewport = camera->getViewport();        
+        Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
+        
+        // Return ratio of screen size to absolutely covered pixel count
+        return absoluteValue / viewportArea;
+    }
     //-----------------------------------------------------------------------
 
 } // namespace

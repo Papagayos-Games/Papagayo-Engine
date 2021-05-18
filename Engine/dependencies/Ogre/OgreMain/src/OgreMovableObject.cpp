@@ -201,12 +201,15 @@ namespace Ogre {
 
             if (cam->getUseRenderingDistance() && mUpperDistance > 0)
             {
-                Real rad = getBoundingRadiusScaled();
-                Real squaredDist = mParentNode->getSquaredViewDepth(cam->getLodCamera());
+                Real rad = getBoundingRadius();
+                Real squaredDepth = mParentNode->getSquaredViewDepth(cam->getLodCamera());
+
+                const Vector3& scl = mParentNode->_getDerivedScale();
+                Real factor = std::max(std::max(scl.x, scl.y), scl.z);
 
                 // Max distance to still render
-                Real maxDist = mUpperDistance + rad;
-                if (squaredDist > Math::Sqr(maxDist))
+                Real maxDist = mUpperDistance + rad * factor;
+                if (squaredDepth > Math::Sqr(maxDist))
                 {
                     mBeyondFarDistance = true;
                 }
@@ -289,14 +292,6 @@ namespace Ogre {
         // fallback
         return Affine3::IDENTITY;
     }
-
-    Real MovableObject::getBoundingRadiusScaled() const
-    {
-        const Vector3& scl = mParentNode->_getDerivedScale();
-        Real factor = std::max(std::max(std::abs(scl.x), std::abs(scl.y)), std::abs(scl.z));
-        return getBoundingRadius() * factor;
-    }
-
     //-----------------------------------------------------------------------
     const AxisAlignedBox& MovableObject::getWorldBoundingBox(bool derive) const
     {
@@ -314,7 +309,9 @@ namespace Ogre {
     {
         if (derive)
         {
-            mWorldBoundingSphere.setRadius(getBoundingRadiusScaled());
+            const Vector3& scl = mParentNode->_getDerivedScale();
+            Real factor = std::max(std::max(scl.x, scl.y), scl.z);
+            mWorldBoundingSphere.setRadius(getBoundingRadius() * factor);
             mWorldBoundingSphere.setCenter(mParentNode->_getDerivedPosition());
         }
         return mWorldBoundingSphere;
@@ -350,7 +347,10 @@ namespace Ogre {
             {
                 mLightListUpdated = frame;
 
-                sn->findLights(mLightList, getBoundingRadiusScaled(), this->getLightMask());
+                const Vector3& scl = mParentNode->_getDerivedScale();
+                Real factor = std::max(std::max(scl.x, scl.y), scl.z);
+
+                sn->findLights(mLightList, this->getBoundingRadius() * factor, this->getLightMask());
             }
         }
         else

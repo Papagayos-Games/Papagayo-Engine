@@ -29,10 +29,7 @@
 #endif
 
 %include std_string.i
-%include exception.i
-#ifdef SWIGPYTHON
-%include factory.i
-#endif
+%include exception.i 
 %import "Ogre.i"
 
 #define _OgreOverlayExport
@@ -41,10 +38,6 @@
 %csmethodmodifiers Ogre::OverlaySystem::eventOccurred "public";
 #endif
 
-// DisplayString is implicitly constructable from String
-// this breaks when using get*, will fix this by switching to String with 1.13
-#define DisplayString String
-
 %include "OgreOverlayPrerequisites.h"
 SHARED_PTR(Font);
 %include "OgreFont.h"
@@ -52,31 +45,10 @@ SHARED_PTR(Font);
 %ignore Ogre::Overlay::get2DElementsIterator;
 %include "OgreOverlay.h"
 SHARED_PTR(OverlayElement);
-%extend Ogre::OverlayElement {
-  OverlayContainer* castOverlayContainer()
-  {
-    return dynamic_cast<Ogre::OverlayContainer*>($self);
-  }
-  Ogre::PanelOverlayElement* castPanelOverlayElement()
-  {
-    return dynamic_cast<Ogre::PanelOverlayElement*>($self);
-  }
-  Ogre::TextAreaOverlayElement* castTextAreaOverlayElement()
-  {
-    return dynamic_cast<Ogre::TextAreaOverlayElement*>($self);
-  }
-}
 %include "OgreOverlayElement.h"
 %include "OgreOverlayElementFactory.h"
 SHARED_PTR(OverlayContainer);
-%ignore Ogre::OverlayContainer::getChildIterator;
-%ignore Ogre::OverlayContainer::getChildContainerIterator;
 %include "OgreOverlayContainer.h"
-#ifdef SWIGPYTHON
-%factory(Ogre::OverlayElement* Ogre::OverlayManager::createOverlayElement, Ogre::OverlayContainer);
-#endif
-%ignore Ogre::OverlayManager::getTemplateIterator;
-%ignore Ogre::OverlayManager::getOverlayIterator;
 %include "OgreOverlayManager.h"
 SHARED_PTR(OverlaySystem);
 %include "OgreOverlaySystem.h"

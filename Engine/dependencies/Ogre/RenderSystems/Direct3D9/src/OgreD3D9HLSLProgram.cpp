@@ -41,6 +41,48 @@ namespace Ogre {
     D3D9HLSLProgram::CmdAssemblerCode D3D9HLSLProgram::msCmdAssemblerCode;
     D3D9HLSLProgram::CmdBackwardsCompatibility D3D9HLSLProgram::msCmdBackwardsCompatibility;
 
+    class _OgreD3D9Export HLSLIncludeHandler : public ID3DXInclude
+    {
+    public:
+        HLSLIncludeHandler(Resource* sourceProgram) 
+            : mProgram(sourceProgram) {}
+        ~HLSLIncludeHandler() {}
+        
+        STDMETHOD(Open)(D3DXINCLUDE_TYPE IncludeType,
+            LPCSTR pFileName,
+            LPCVOID pParentData,
+            LPCVOID *ppData,
+            UINT *pByteLen
+            )
+        {
+            // find & load source code
+            DataStreamPtr stream = 
+                ResourceGroupManager::getSingleton().openResource(
+                String(pFileName), mProgram->getGroup(), true, mProgram);
+
+            String source = stream->getAsString();
+            // copy into separate c-string
+            // Note - must NOT copy the null terminator, otherwise this will terminate
+            // the entire program string!
+            *pByteLen = static_cast<UINT>(source.length());
+            char* pChar = OGRE_ALLOC_T(char, *pByteLen, MEMCATEGORY_RESOURCE);
+            memcpy(pChar, source.c_str(), *pByteLen);
+            *ppData = pChar;
+
+            return S_OK;
+        }
+
+        STDMETHOD(Close)(LPCVOID pData)
+        {           
+            OGRE_FREE(pData, MEMCATEGORY_RESOURCE);
+            return S_OK;
+        }
+    protected:
+        Resource* mProgram;
+
+
+    };
+
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::prepareImpl()
     {
@@ -103,34 +145,26 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    const String& D3D9HLSLProgram::getTarget() const
-    {
-        if(mTarget.empty())
-        {
-            static String vs_2_0 = "vs_2_0", ps_2_0 = "ps_2_0";
-            return mType == GPT_VERTEX_PROGRAM ? vs_2_0 : ps_2_0;
-        }
-
-        return mTarget;
-    }
-
     void D3D9HLSLProgram::compileMicrocode(void)
     {
         // Populate preprocessor defines
         String stringBuffer;
         std::vector<D3DXMACRO> defines;
         const D3DXMACRO* pDefines = 0;
-        stringBuffer = appendBuiltinDefines(mPreprocessorDefines);
-
-        for(const auto& def : parseDefines(stringBuffer))
+        if (!mPreprocessorDefines.empty())
         {
-            defines.push_back({def.first, def.second});
+            stringBuffer = mPreprocessorDefines;
+
+            for(const auto& def : parseDefines(stringBuffer))
+            {
+                defines.push_back({def.first, def.second});
+            }
+
+            // Add NULL terminator
+            defines.push_back({0, 0});
+
+            pDefines = &defines[0];
         }
-
-        // Add NULL terminator
-        defines.push_back({0, 0});
-
-        pDefines = &defines[0];
 
         // Populate compile flags
         DWORD compileFlags = 0;
@@ -169,8 +203,8 @@ namespace Ogre {
 
         LPD3DXBUFFER errors = 0;
 
-        // handle includes
-        mSource = _resolveIncludes(mSource, this, mFilename, true);
+        // include handler
+        HLSLIncludeHandler includeHandler(this);
 
         LPD3DXCONSTANTTABLE pConstTable;
 
@@ -179,9 +213,9 @@ namespace Ogre {
             mSource.c_str(),
             static_cast<UINT>(mSource.length()),
             pDefines,
-            NULL,
+            &includeHandler, 
             mEntryPoint.c_str(),
-            getTarget().c_str(),
+            mTarget.c_str(),
             compileFlags,
             &mMicroCode,
             &errors,
@@ -281,7 +315,7 @@ namespace Ogre {
                     mGroup,
                     "",// dummy source, since we'll be using microcode
                     mType, 
-                    getTarget());
+                    mTarget);
             static_cast<D3D9GpuProgram*>(mAssemblerProgram.get())->setExternalMicrocode(mMicroCode);
         }
 
@@ -599,7 +633,7 @@ namespace Ogre {
         if (mCompileError || !isRequiredCapabilitiesSupported())
             return false;
 
-        return GpuProgramManager::getSingleton().isSyntaxSupported(getTarget());
+        return GpuProgramManager::getSingleton().isSyntaxSupported(mTarget);
     }
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr D3D9HLSLProgram::createParameters(void)

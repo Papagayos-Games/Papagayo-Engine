@@ -1,35 +1,48 @@
 {
   "Entities": [
     {
-      "Prefab" : "DefaultCamera",
-      "Arguments" : [
+      "Prefab": "DefaultCamera",
+      "Components": [
         {
           "Component": "Transform",
           "Type": "Common",
-          "Parameters" : {
-            "position" : [0,100,500]
+          "Parameters": {
+            "position": [ 0, 100, 500 ]
           }
         }
       ]
     },
     {
-      "Prefab" : "DefaultLight"
+      "Prefab":  "Canvas"
     },
     {
-      "Prefab" : "Penguin",
-      "Arguments" : [
+      "Prefab": "DefaultLight"
+    },
+    {
+      "Prefab": "Penguin",
+      "Components": [
         {
           "Component": "Transform",
           "Type": "Common",
-          "Parameters" : {
-            "position": [ 123,45,67 ]
+          "Parameters": {
+            "position": [ 10, 0, 0 ]
+          }
+        },
+        {
+          "Component": "Transform",
+          "Type": "Common",
+          "Parameters": {
+            "position": [ 50, 0, 0 ]
+          }
+        },
+        {
+          "Component": "LuaComponent",
+          "Type": "LUA",
+          "Parameters": {
+            "Class": "default"
           }
         }
       ]
-    },
-    {
-      "Prefab" : "Penguin"
     }
   ]
 }
-

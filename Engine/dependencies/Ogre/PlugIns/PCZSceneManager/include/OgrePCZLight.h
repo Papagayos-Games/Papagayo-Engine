@@ -24,6 +24,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
+PCZLight.h  -  description
+-----------------------------------------------------------------------------
+begin                : Wed May 23 2007
+author               : Eric Cha
+email                : ericc@xenopi.com
+Code Style Update    :
+-----------------------------------------------------------------------------
 */
 
 #ifndef PCZLIGHT_H
@@ -34,12 +41,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    /** \addtogroup Plugins
-    *  @{
-    */
-    /** \addtogroup PCZSceneManager
-    *  @{
-    */
     class PCZone;
 
     typedef std::list<PCZone*> ZoneList;
@@ -130,8 +131,7 @@ namespace Ogre
         void destroyInstance( MovableObject* obj);  
 
     };
-    /** @} */
-    /** @} */
+
 
 } // Namespace
 #endif

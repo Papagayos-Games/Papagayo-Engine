@@ -175,10 +175,13 @@ namespace Ogre
         , mLayerBlendMapSizeActual(0)
         , mGlobalColourMapSize(0)
         , mGlobalColourMapEnabled(false)
+        , mCpuColourMapStorage(0)
         , mLightmapSize(0)
         , mLightmapSizeActual(0)
+        , mCpuLightmapStorage(0)
         , mCompositeMapSize(0)
         , mCompositeMapSizeActual(0)
+        , mCpuCompositeMapStorage(0)
         , mCompositeMapDirtyRect(0, 0, 0, 0)
         , mCompositeMapUpdateCountdown(0)
         , mLastMillis(0)
@@ -188,6 +191,7 @@ namespace Ogre
         , mLightMapRequired(false)
         , mLightMapShadowsOnly(true)
         , mCompositeMapRequired(false)
+        , mCpuTerrainNormalMap(0)
         , mLastLODCamera(0)
         , mLastLODFrame(0)
         , mLastViewportHeight(0)
@@ -239,7 +243,7 @@ namespace Ogre
         if (!mQuadTree)
             return AxisAlignedBox::BOX_NULL;
         else
-            return mQuadTree->getBoundingBox();
+            return mQuadTree->getAABB();
     }
     //---------------------------------------------------------------------
     AxisAlignedBox Terrain::getWorldAABB() const
@@ -323,7 +327,9 @@ namespace Ogre
             // we never reduce them (since that would require re-examining more samples)
             // Since we now save this data in the file though, we need to make sure we've
             // calculated the optimal
-            Rect rect(0, 0, mSize, mSize);
+            Rect rect;
+            rect.top = 0; rect.bottom = mSize;
+            rect.left = 0; rect.right = mSize;
             calculateHeightDeltas(rect);
             finaliseHeightDeltas(rect, false);
         }
@@ -363,7 +369,11 @@ namespace Ogre
             int numBlendTex = getBlendTextureCount(numLayers);
             for (int i = 0; i < numBlendTex; ++i)
             {
-                stream.write(mCpuBlendMapStorage[i].getData(), mCpuBlendMapStorage[i].getSize());
+                PixelFormat fmt = getBlendTextureFormat(i, numLayers);
+                size_t channels = PixelUtil::getNumElemBytes(fmt);
+                size_t dataSz = channels * mLayerBlendMapSize * mLayerBlendMapSize;
+                uint8* pData = mCpuBlendMapStorage[i];
+                stream.write(pData, dataSz);
             }
         }
         else
@@ -375,13 +385,19 @@ namespace Ogre
                     "on this hardware, which means the quality has been degraded");
             }
             stream.write(&mLayerBlendMapSizeActual);
-            Image tmp(PF_BYTE_RGBA, mLayerBlendMapSizeActual, mLayerBlendMapSizeActual);
-            for (const auto& tex : mBlendTextureList)
+            uint8* tmpData = (uint8*)OGRE_MALLOC(mLayerBlendMapSizeActual * mLayerBlendMapSizeActual * 4, MEMCATEGORY_GENERAL);
+            uint8 texIndex = 0;
+            for (TexturePtrList::iterator i = mBlendTextureList.begin(); i != mBlendTextureList.end(); ++i, ++texIndex)
             {
                 // Must blit back in CPU format!
-                tex->getBuffer()->blitToMemory(tmp.getPixelBox());
-                stream.write(tmp.getData(), tmp.getSize());
+                PixelFormat cpuFormat = getBlendTextureFormat(texIndex, getLayerCount());
+                PixelBox dst(mLayerBlendMapSizeActual, mLayerBlendMapSizeActual, 1, cpuFormat, tmpData);
+                (*i)->getBuffer()->blitToMemory(dst);
+                size_t dataSz = PixelUtil::getNumElemBytes((*i)->getFormat()) * 
+                    mLayerBlendMapSizeActual * mLayerBlendMapSizeActual;
+                stream.write(tmpData, dataSz);
             }
+            OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
         }
 
         // other data
@@ -392,16 +408,18 @@ namespace Ogre
 			String normalDataType("normalmap");
 			stream.write(&normalDataType);
 			stream.write(&mSize);
-			if (mCpuTerrainNormalMap.getData())
+			if (mCpuTerrainNormalMap)
 			{
 				// save from CPU data if it's there, it means GPU data was never created
-				stream.write(mCpuTerrainNormalMap.getData(), mCpuTerrainNormalMap.getSize());
+				stream.write((uint8*)mCpuTerrainNormalMap->data, mSize * mSize * 3);
 			}
 			else
 			{
-                Image tmp(PF_BYTE_RGB, mSize, mSize);
-				mTerrainNormalMap->getBuffer()->blitToMemory(tmp.getPixelBox());
-				stream.write(tmp.getData(), tmp.getSize());
+				uint8* tmpData = (uint8*)OGRE_MALLOC(mSize * mSize * 3, MEMCATEGORY_GENERAL);
+				PixelBox dst(mSize, mSize, 1, PF_BYTE_RGB, tmpData);
+				mTerrainNormalMap->getBuffer()->blitToMemory(dst);
+				stream.write(tmpData, mSize * mSize * 3);
+				OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
 			}
 			stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
 		}
@@ -413,16 +431,18 @@ namespace Ogre
             String colourDataType("colourmap");
             stream.write(&colourDataType);
             stream.write(&mGlobalColourMapSize);
-            if (mCpuColourMap.getData())
+            if (mCpuColourMapStorage)
             {
                 // save from CPU data if it's there, it means GPU data was never created
-                stream.write(mCpuColourMap.getData(), mCpuColourMap.getSize());
+                stream.write(mCpuColourMapStorage, mGlobalColourMapSize * mGlobalColourMapSize * 3);
             }
             else
             {
-                Image tmp(PF_BYTE_RGB, mGlobalColourMapSize, mGlobalColourMapSize);
-                mColourMap->getBuffer()->blitToMemory(tmp.getPixelBox());
-                stream.write(tmp.getData(), tmp.getSize());
+                uint8* tmpData = (uint8*)OGRE_MALLOC(mGlobalColourMapSize * mGlobalColourMapSize * 3, MEMCATEGORY_GENERAL);
+                PixelBox dst(mGlobalColourMapSize, mGlobalColourMapSize, 1, PF_BYTE_RGB, tmpData);
+                mColourMap->getBuffer()->blitToMemory(dst);
+                stream.write(tmpData, mGlobalColourMapSize * mGlobalColourMapSize * 3);
+                OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
             }
             stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
 
@@ -435,16 +455,18 @@ namespace Ogre
             String lightmapDataType("lightmap");
             stream.write(&lightmapDataType);
             stream.write(&mLightmapSize);
-            if (mCpuLightmap.getData())
+            if (mCpuLightmapStorage)
             {
                 // save from CPU data if it's there, it means GPU data was never created
-                stream.write(mCpuLightmap.getData(), mCpuLightmap.getSize());
+                stream.write(mCpuLightmapStorage, mLightmapSize * mLightmapSize);
             }
             else
             {
-                Image tmp(PF_L8, mLightmapSize, mLightmapSize);
-                mLightmap->getBuffer()->blitToMemory(tmp.getPixelBox());
-                stream.write(tmp.getData(), tmp.getSize());
+                uint8* tmpData = (uint8*)OGRE_MALLOC(mLightmapSize * mLightmapSize, MEMCATEGORY_GENERAL);
+                PixelBox dst(mLightmapSize, mLightmapSize, 1, PF_L8, tmpData);
+                mLightmap->getBuffer()->blitToMemory(dst);
+                stream.write(tmpData, mLightmapSize * mLightmapSize);
+                OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
             }
             stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
         }
@@ -456,17 +478,19 @@ namespace Ogre
             String compositeMapDataType("compositemap");
             stream.write(&compositeMapDataType);
             stream.write(&mCompositeMapSize);
-            if (mCpuCompositeMap.getData())
+            if (mCpuCompositeMapStorage)
             {
                 // save from CPU data if it's there, it means GPU data was never created
-                stream.write(mCpuCompositeMap.getData(), mCpuCompositeMap.getSize());
+                stream.write(mCpuCompositeMapStorage, mCompositeMapSize * mCompositeMapSize * 4);
             }
             else
             {
                 // composite map is 4 channel, 3x diffuse, 1x specular mask
-                Image tmp(PF_BYTE_RGBA, mCompositeMapSize, mCompositeMapSize);
-                mCompositeMap->getBuffer()->blitToMemory(tmp.getPixelBox());
-                stream.write(tmp.getData(), tmp.getSize());
+                uint8* tmpData = (uint8*)OGRE_MALLOC(mCompositeMapSize * mCompositeMapSize * 4, MEMCATEGORY_GENERAL);
+                PixelBox dst(mCompositeMapSize, mCompositeMapSize, 1, PF_BYTE_RGBA, tmpData);
+                mCompositeMap->getBuffer()->blitToMemory(dst);
+                stream.write(tmpData, mCompositeMapSize * mCompositeMapSize * 4);
+                OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
             }
             stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
         }
@@ -702,8 +726,12 @@ namespace Ogre
         int numBlendTex = getBlendTextureCount(numLayers);
         for (int i = 0; i < numBlendTex; ++i)
         {
-            mCpuBlendMapStorage.emplace_back(PF_BYTE_RGBA, mLayerBlendMapSize, mLayerBlendMapSize);
-            stream.read(mCpuBlendMapStorage.back().getData(), mCpuBlendMapStorage.back().getSize());
+            PixelFormat fmt = getBlendTextureFormat(i, numLayers);
+            size_t channels = PixelUtil::getNumElemBytes(fmt);
+            size_t dataSz = channels * mLayerBlendMapSize * mLayerBlendMapSize;
+            uint8* pData = (uint8*)OGRE_MALLOC(dataSz, MEMCATEGORY_RESOURCE);
+            stream.read(pData, dataSz);
+            mCpuBlendMapStorage.push_back(pData);
         }
 
         // derived data
@@ -719,30 +747,32 @@ namespace Ogre
             if (name == "normalmap")
             {
                 mNormalMapRequired = true;
-                mCpuTerrainNormalMap.create(PF_BYTE_RGB, sz, sz);
-                stream.read(mCpuTerrainNormalMap.getData(), mCpuTerrainNormalMap.getSize());
+                uint8* pData = static_cast<uint8*>(OGRE_MALLOC(sz * sz * 3, MEMCATEGORY_GENERAL));
+                mCpuTerrainNormalMap = OGRE_NEW PixelBox(sz, sz, 1, PF_BYTE_RGB, pData);
+
+                stream.read(pData, sz * sz * 3);
                 
             }
             else if (name == "colourmap")
             {
                 mGlobalColourMapEnabled = true;
                 mGlobalColourMapSize = sz;
-                mCpuColourMap.create(PF_BYTE_RGB, sz, sz);
-                stream.read(mCpuColourMap.getData(), mCpuColourMap.getSize());
+                mCpuColourMapStorage = static_cast<uint8*>(OGRE_MALLOC(sz * sz * 3, MEMCATEGORY_GENERAL));
+                stream.read(mCpuColourMapStorage, sz * sz * 3);
             }
             else if (name == "lightmap")
             {
                 mLightMapRequired = true;
                 mLightmapSize = sz;
-                mCpuLightmap.create(PF_L8, sz, sz);
-                stream.read(mCpuLightmap.getData(), mCpuLightmap.getSize());
+                mCpuLightmapStorage = static_cast<uint8*>(OGRE_MALLOC(sz * sz, MEMCATEGORY_GENERAL));
+                stream.read(mCpuLightmapStorage, sz * sz);
             }
             else if (name == "compositemap")
             {
                 mCompositeMapRequired = true;
                 mCompositeMapSize = sz;
-                mCpuCompositeMap.create(PF_BYTE_RGBA, sz, sz);
-                stream.read(mCpuCompositeMap.getData(), mCpuCompositeMap.getSize());
+                mCpuCompositeMapStorage = static_cast<uint8*>(OGRE_MALLOC(sz * sz * 4, MEMCATEGORY_GENERAL));
+                stream.read(mCpuCompositeMapStorage, sz * sz * 4);
             }
 
             stream.readChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
@@ -854,12 +884,14 @@ namespace Ogre
             // convert image data to floats
             // Do this on a row-by-row basis, because we describe the terrain in
             // a bottom-up fashion (ie ascending world coords), while Image is top-down
+            unsigned char* pSrcBase = img->getData();
             for (size_t i = 0; i < mSize; ++i)
             {
                 size_t srcy = mSize - i - 1;
+                unsigned char* pSrc = pSrcBase + srcy * img->getRowSpan();
                 float* pDst = mHeightData + i * mSize;
-                PixelUtil::bulkPixelConversion(img->getData(0, srcy), img->getFormat(), pDst, PF_FLOAT32_R,
-                                               mSize);
+                PixelUtil::bulkPixelConversion(pSrc, img->getFormat(), 
+                    pDst, PF_FLOAT32_R, mSize);
             }
 
             if (!Math::RealEqual(importData.inputBias, 0.0) || !Math::RealEqual(importData.inputScale, 1.0))
@@ -894,7 +926,9 @@ namespace Ogre
         mQuadTree->prepare();
 
         // calculate entire terrain
-        Rect rect(0, 0, mSize, mSize);
+        Rect rect;
+        rect.top = 0; rect.bottom = mSize;
+        rect.left = 0; rect.right = mSize;
         calculateHeightDeltas(rect);
         finaliseHeightDeltas(rect, true);
 
@@ -1130,7 +1164,7 @@ namespace Ogre
 
         Root::getSingleton().getWorkQueue()->addRequest(
             mWorkQueueChannel, WORKQUEUE_GENERATE_MATERIAL_REQUEST, 
-            req, 0, synchronous);
+            Any(req), 0, synchronous);
     }
     //---------------------------------------------------------------------
     void Terrain::unload()
@@ -1505,43 +1539,43 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    Affine3 Terrain::getPointTransform() const
+    void Terrain::getPointTransform(Matrix4* outXform) const
     {
-        auto outXform = Affine3::ZERO;
+        *outXform = Matrix4::ZERO;
         switch(mAlign)
         {
             case ALIGN_X_Z:
                 //outpos->y = height (z)
-                outXform[1][2] = 1.0f;
+                (*outXform)[1][2] = 1.0f;
                 //outpos->x = x * mScale + mBase;
-                outXform[0][0] = mScale;
-                outXform[0][3] = mBase;
+                (*outXform)[0][0] = mScale;
+                (*outXform)[0][3] = mBase;
                 //outpos->z = y * -mScale - mBase;
-                outXform[2][1] = -mScale;
-                outXform[2][3] = -mBase;
+                (*outXform)[2][1] = -mScale;
+                (*outXform)[2][3] = -mBase;
                 break;
             case ALIGN_Y_Z:
                 //outpos->x = height;
-                outXform[0][2] = 1.0f;
+                (*outXform)[0][2] = 1.0f;
                 //outpos->z = x * -mScale - mBase;
-                outXform[2][0] = -mScale;
-                outXform[2][3] = -mBase;
+                (*outXform)[2][0] = -mScale;
+                (*outXform)[2][3] = -mBase;
                 //outpos->y = y * mScale + mBase;
-                outXform[1][1] = mScale;
-                outXform[1][3] = mBase;
+                (*outXform)[1][1] = mScale;
+                (*outXform)[1][3] = mBase;
                 break;
             case ALIGN_X_Y:
                 //outpos->z = height;
-                outXform[2][2] = 1.0f;
+                (*outXform)[2][2] = 1.0f; // strictly already the case, but..
                 //outpos->x = x * mScale + mBase;
-                outXform[0][0] = mScale;
-                outXform[0][3] = mBase;
+                (*outXform)[0][0] = mScale;
+                (*outXform)[0][3] = mBase;
                 //outpos->y = y * mScale + mBase;
-                outXform[1][1] = mScale;
-                outXform[1][3] = mBase;
+                (*outXform)[1][1] = mScale;
+                (*outXform)[1][3] = mBase;
                 break;
         };
-        return outXform;
+        (*outXform)[3][3] = 1.0f;
     }
     //---------------------------------------------------------------------
     void Terrain::getVector(const Vector3& inVec, Vector3* outVec) const
@@ -1836,7 +1870,10 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Terrain::dirty()
     {
-        dirtyRect(Rect(0, 0, mSize, mSize));
+        Rect rect;
+        rect.top = 0; rect.bottom = mSize;
+        rect.left = 0; rect.right = mSize;
+        dirtyRect(rect);
     }
     //---------------------------------------------------------------------
     void Terrain::dirtyRect(const Rect& rect)
@@ -1867,7 +1904,10 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Terrain::dirtyLightmap()
     {
-        dirtyLightmapRect(Rect(0, 0, mSize, mSize));
+        Rect rect;
+        rect.top = 0; rect.bottom = mSize;
+        rect.left = 0; rect.right = mSize;
+        dirtyLightmapRect(rect);
     }
     //---------------------------------------------------------------------
     void Terrain::update(bool synchronous)
@@ -1945,7 +1985,7 @@ namespace Ogre
 
         Root::getSingleton().getWorkQueue()->addRequest(
             mWorkQueueChannel, WORKQUEUE_DERIVED_DATA_REQUEST, 
-            req, 0, synchronous);
+            Any(req), 0, synchronous);
 
     }
     //---------------------------------------------------------------------
@@ -1971,10 +2011,21 @@ namespace Ogre
         OGRE_DELETE mQuadTree;
         mQuadTree = 0;
 
-        mCpuTerrainNormalMap.freeMemory();
-        mCpuColourMap.freeMemory();
-        mCpuLightmap.freeMemory();
-        mCpuCompositeMap.freeMemory();
+        if (mCpuTerrainNormalMap)
+        {
+            OGRE_FREE(mCpuTerrainNormalMap->data, MEMCATEGORY_GENERAL);
+            OGRE_DELETE mCpuTerrainNormalMap;
+            mCpuTerrainNormalMap = 0;
+        }
+
+        OGRE_FREE(mCpuColourMapStorage, MEMCATEGORY_GENERAL);
+        mCpuColourMapStorage = 0;
+
+        OGRE_FREE(mCpuLightmapStorage, MEMCATEGORY_GENERAL);
+        mCpuLightmapStorage = 0;
+
+        OGRE_FREE(mCpuCompositeMapStorage, MEMCATEGORY_GENERAL);
+        mCpuCompositeMapStorage = 0;
     }
     //---------------------------------------------------------------------
     void Terrain::freeGPUResources()
@@ -2039,7 +2090,12 @@ namespace Ogre
     //---------------------------------------------------------------------
     Rect Terrain::calculateHeightDeltas(const Rect& rect)
     {
-        Rect clampedRect = rect.intersect(Rect(0, 0, mSize, mSize));
+        Rect clampedRect(rect);
+        clampedRect.left = std::max(0L, clampedRect.left);
+        clampedRect.top = std::max(0L, clampedRect.top);
+        clampedRect.right = std::min((long)mSize, clampedRect.right);
+        clampedRect.bottom = std::min((long)mSize, clampedRect.bottom);
+
         Rect finalRect(clampedRect);
 
         mQuadTree->preDeltaCalculation(clampedRect);
@@ -2193,7 +2249,12 @@ namespace Ogre
     void Terrain::finaliseHeightDeltas(const Rect& rect, bool cpuData)
     {
 
-        Rect clampedRect = rect.intersect(Rect(0, 0, mSize, mSize));
+        Rect clampedRect(rect);
+        clampedRect.left = std::max(0L, clampedRect.left);
+        clampedRect.top = std::max(0L, clampedRect.top);
+        clampedRect.right = std::min((long)mSize, clampedRect.right);
+        clampedRect.bottom = std::min((long)mSize, clampedRect.bottom);
+
         // min/max information
         mQuadTree->finaliseDeltaValues(clampedRect);
         // delta vertex data
@@ -2709,9 +2770,27 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
+    uint8 Terrain::getBlendTextureCount(uint8 numLayers) const
+    {
+        return ((numLayers - 2) / 4) + 1;
+    }
+    //---------------------------------------------------------------------
     uint8 Terrain::getBlendTextureCount() const
     {
         return (uint8)mBlendTextureList.size();
+    }
+    //---------------------------------------------------------------------
+    PixelFormat Terrain::getBlendTextureFormat(uint8 textureIndex, uint8 numLayers) const
+    {
+        /*
+        if (numLayers - 1 - (textureIndex * 4) > 3)
+            return PF_BYTE_RGBA;
+        else
+            return PF_BYTE_RGB;
+        */
+        // Always create RGBA; no point trying to create RGB since all cards pad to 32-bit (XRGB)
+        // and it makes it harder to expand layer count dynamically if format has to change
+        return PF_BYTE_RGBA;
     }
     //---------------------------------------------------------------------
     void Terrain::shiftUpGPUBlendChannels(uint8 index)
@@ -2834,7 +2913,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Terrain::createGPUBlendTextures()
     {
-        // Create enough RGBA textures to cope with blend layers
+        // Create enough RGBA/RGB textures to cope with blend layers
         uint8 numTex = getBlendTextureCount(getLayerCount());
         // delete extras
         TextureManager* tmgr = TextureManager::getSingletonPtr();
@@ -2852,28 +2931,31 @@ namespace Ogre
         // create new textures
         for (uint8 i = currentTex; i < numTex; ++i)
         {
+            PixelFormat fmt = getBlendTextureFormat(i, getLayerCount());
             // Use TU_STATIC because although we will update this, we won't do it every frame
             // in normal circumstances, so we don't want TU_DYNAMIC. Also we will 
             // read it (if we've cleared local temp areas) so no WRITE_ONLY
             mBlendTextureList[i] = TextureManager::getSingleton().createManual(
                 msBlendTextureGenerator.generate(), _getDerivedResourceGroup(), 
-                TEX_TYPE_2D, mLayerBlendMapSize, mLayerBlendMapSize, 1, 0, PF_BYTE_RGBA, TU_STATIC);
+                TEX_TYPE_2D, mLayerBlendMapSize, mLayerBlendMapSize, 1, 0, fmt, TU_STATIC);
 
             mLayerBlendMapSizeActual = mBlendTextureList[i]->getWidth();
 
             if (mCpuBlendMapStorage.size() > i)
             {
                 // Load blend data
-                mBlendTextureList[i]->getBuffer()->blitFromMemory(mCpuBlendMapStorage[i].getPixelBox());
+                PixelBox src(mLayerBlendMapSize, mLayerBlendMapSize, 1, fmt, mCpuBlendMapStorage[i]);
+                mBlendTextureList[i]->getBuffer()->blitFromMemory(src);
                 // release CPU copy, don't need it anymore
-                mCpuBlendMapStorage[i].freeMemory();
+                OGRE_FREE(mCpuBlendMapStorage[i], MEMCATEGORY_RESOURCE);
             }
             else
             {
                 // initialise black
-                auto buf = mBlendTextureList[i]->getBuffer();
-                uint8* pInit = buf->lock(Box(buf->getSize()), HardwarePixelBuffer::HBL_DISCARD).data;
-                memset(pInit, 0, buf->getSizeInBytes());
+                Box box(0, 0, mLayerBlendMapSize, mLayerBlendMapSize);
+                HardwarePixelBufferSharedPtr buf = mBlendTextureList[i]->getBuffer();
+                uint8* pInit = buf->lock(box, HardwarePixelBuffer::HBL_DISCARD).data;
+                memset(pInit, 0, PixelUtil::getNumElemBytes(fmt) * mLayerBlendMapSize * mLayerBlendMapSize);
                 buf->unlock();
             }
         }
@@ -2907,11 +2989,14 @@ namespace Ogre
                 TEX_TYPE_2D, mSize, mSize, 1, 0, PF_BYTE_RGB, TU_STATIC);
 
             // Upload loaded normal data if present
-            if (mCpuTerrainNormalMap.getData())
+            if (mCpuTerrainNormalMap)
             {
-                mTerrainNormalMap->getBuffer()->blitFromMemory(mCpuTerrainNormalMap.getPixelBox());
-                mCpuTerrainNormalMap.freeMemory();
+                mTerrainNormalMap->getBuffer()->blitFromMemory(*mCpuTerrainNormalMap);
+                OGRE_FREE(mCpuTerrainNormalMap->data, MEMCATEGORY_GENERAL);
+                OGRE_DELETE mCpuTerrainNormalMap;
+                mCpuTerrainNormalMap = 0;
             }
+
         }
         else if (!mNormalMapRequired && mTerrainNormalMap)
         {
@@ -2925,6 +3010,11 @@ namespace Ogre
     void Terrain::freeTemporaryResources()
     {
         // CPU blend maps
+        for (BytePointerList::iterator i = mCpuBlendMapStorage.begin(); 
+            i != mCpuBlendMapStorage.end(); ++i)
+        {
+            OGRE_FREE(*i, MEMCATEGORY_RESOURCE);
+        }
         mCpuBlendMapStorage.clear();
 
         // Editable structures for blend layers (not needed at runtime,  only blend textures are)
@@ -3108,7 +3198,7 @@ namespace Ogre
         }
 
         ddres.terrain = ddr.terrain;
-        WorkQueue::Response* response = OGRE_NEW WorkQueue::Response(req, true, ddres);
+        WorkQueue::Response* response = OGRE_NEW WorkQueue::Response(req, true, Any(ddres));
         return response;
     }
     //---------------------------------------------------------------------
@@ -3199,7 +3289,7 @@ namespace Ogre
 				gmreq.startTime = currentTime + (gmreq.synchronous ? 0 : TERRAIN_GENERATE_MATERIAL_INTERVAL_MS);
                 Root::getSingleton().getWorkQueue()->addRequest(
                     mWorkQueueChannel, WORKQUEUE_GENERATE_MATERIAL_REQUEST, 
-                    gmreq, 0, gmreq.synchronous);
+                    Any(gmreq), 0, gmreq.synchronous);
                 return;
             }
             break;
@@ -3427,7 +3517,10 @@ namespace Ogre
         widenedRect.bottom = (long)(widenedRect.bottom * terrainToLightmapScale);
 
         // clamp 
-        widenedRect = widenedRect.intersect(Rect(0, 0, mLightmapSizeActual, mLightmapSizeActual));
+        widenedRect.left = std::max(0L, widenedRect.left);
+        widenedRect.top = std::max(0L, widenedRect.top);
+        widenedRect.right = std::min((long)mLightmapSizeActual, widenedRect.right);
+        widenedRect.bottom = std::min((long)mLightmapSizeActual, widenedRect.bottom);
 
         outFinalRect = widenedRect;
 
@@ -3526,7 +3619,10 @@ namespace Ogre
                 Rect widenedRect;
                 widenRectByVector(TerrainGlobalOptions::getSingleton().getLightMapDirection(), mCompositeMapDirtyRect, widenedRect);
                 // clamp
-                widenedRect = widenedRect.intersect(Rect(0, 0, mSize, mSize));
+                widenedRect.left = std::max(widenedRect.left, 0L);
+                widenedRect.top = std::max(widenedRect.top, 0L);
+                widenedRect.right = std::min(widenedRect.right, (long)mSize);
+                widenedRect.bottom = std::min(widenedRect.bottom, (long)mSize);
                 mMaterialGenerator->updateCompositeMap(this, widenedRect);  
             }
             else
@@ -3593,18 +3689,21 @@ namespace Ogre
                 TEX_TYPE_2D, mGlobalColourMapSize, mGlobalColourMapSize, MIP_DEFAULT, 
                 PF_BYTE_RGB, TU_AUTOMIPMAP|TU_STATIC);
 
-            if (mCpuColourMap.getData())
+            if (mCpuColourMapStorage)
             {
                 // Load cached data
-                mColourMap->getBuffer()->blitFromMemory(mCpuColourMap.getPixelBox());
+                PixelBox src(mGlobalColourMapSize, mGlobalColourMapSize, 1, PF_BYTE_RGB, mCpuColourMapStorage);
+                mColourMap->getBuffer()->blitFromMemory(src);
                 // release CPU copy, don't need it anymore
-                mCpuColourMap.freeMemory();
+                OGRE_FREE(mCpuColourMapStorage, MEMCATEGORY_RESOURCE);
+                mCpuColourMapStorage = 0;
+
             }
         }
         else if (!mGlobalColourMapEnabled && mColourMap)
         {
             // destroy
-            TextureManager::getSingleton().remove(mColourMap);
+            TextureManager::getSingleton().remove(mColourMap->getHandle());
             mColourMap.reset();
         }
 
@@ -3621,12 +3720,15 @@ namespace Ogre
 
             mLightmapSizeActual = mLightmap->getWidth();
 
-            if (mCpuLightmap.getData())
+            if (mCpuLightmapStorage)
             {
                 // Load cached data
-                mLightmap->getBuffer()->blitFromMemory(mCpuLightmap.getPixelBox());
+                PixelBox src(mLightmapSize, mLightmapSize, 1, PF_L8, mCpuLightmapStorage);
+                mLightmap->getBuffer()->blitFromMemory(src);
                 // release CPU copy, don't need it anymore
-                mCpuLightmap.freeMemory();
+                OGRE_FREE(mCpuLightmapStorage, MEMCATEGORY_RESOURCE);
+                mCpuLightmapStorage = 0;
+
             }
             else
             {
@@ -3642,7 +3744,7 @@ namespace Ogre
         else if (!mLightMapRequired && mLightmap)
         {
             // destroy
-            TextureManager::getSingleton().remove(mLightmap);
+            TextureManager::getSingleton().remove(mLightmap->getHandle());
             mLightmap.reset();
         }
 
@@ -3659,12 +3761,15 @@ namespace Ogre
 
             mCompositeMapSizeActual = mCompositeMap->getWidth();
 
-            if (mCpuCompositeMap.getData())
+            if (mCpuCompositeMapStorage)
             {
                 // Load cached data
-                mCompositeMap->getBuffer()->blitFromMemory(mCpuCompositeMap.getPixelBox());
+                PixelBox src(mCompositeMapSize, mCompositeMapSize, 1, PF_BYTE_RGBA, mCpuCompositeMapStorage);
+                mCompositeMap->getBuffer()->blitFromMemory(src);
                 // release CPU copy, don't need it anymore
-                mCpuCompositeMap.freeMemory();
+                OGRE_FREE(mCpuCompositeMapStorage, MEMCATEGORY_RESOURCE);
+                mCpuCompositeMapStorage = 0;
+
             }
             else
             {
@@ -3680,7 +3785,7 @@ namespace Ogre
         else if (!mCompositeMapRequired && mCompositeMap)
         {
             // destroy
-            TextureManager::getSingleton().remove(mCompositeMap);
+            TextureManager::getSingleton().remove(mCompositeMap->getHandle());
             mCompositeMap.reset();
         }
 

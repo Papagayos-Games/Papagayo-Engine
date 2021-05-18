@@ -146,7 +146,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     
     // Resolve normal map texture sampler parameter.
     if(!mLightParamsList.empty())
-        mPSNormalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, "gNormalMapSampler", mNormalMapSamplerIndex);
+        mPSNormalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, mNormalMapSamplerIndex, (uint16)GPV_PER_OBJECT, "gNormalMapSampler");
 
     // Get surface ambient colour if need to.
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0)
@@ -182,7 +182,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
         mVSInTangent = vsMain->resolveInputParameter(Parameter::SPC_TANGENT_OBJECT_SPACE);
         
         // Resolve local vertex shader TNB matrix.
-        mVSTBNMatrix = vsMain->resolveLocalParameter(GCT_MATRIX_3X3, "lMatTBN");
+        mVSTBNMatrix = vsMain->resolveLocalParameter("lMatTBN", GCT_MATRIX_3X3);
 
         normalContent = Parameter::SPC_NORMAL_TANGENT_SPACE;
         posContent = Parameter::SPC_POSTOCAMERA_TANGENT_SPACE;
@@ -217,7 +217,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 
         // Resolve camera position world space.
         mCamPosWorldSpace = vsProgram->resolveParameter(GpuProgramParameters::ACT_CAMERA_POSITION);
-        mVSLocalDir = vsMain->resolveLocalParameter(GCT_FLOAT3, "lNormalMapTempDir");
+        mVSLocalDir = vsMain->resolveLocalParameter("lNormalMapTempDir", GCT_FLOAT3);
         mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE);
         // Resolve world matrix.                
         mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
@@ -319,7 +319,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
     {
         mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
         // Resolve local dir.
-        mVSLocalDir = vsMain->resolveLocalParameter(GCT_FLOAT3, "lNormalMapTempDir");
+        mVSLocalDir = vsMain->resolveLocalParameter("lNormalMapTempDir", GCT_FLOAT3);
         mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE);
         mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
         // Resolve inverse world rotation matrix.
@@ -518,45 +518,6 @@ bool NormalMapLighting::preAddToRenderState(const RenderState* renderState, Pass
     return true;
 }
 
-bool NormalMapLighting::setParameter(const String& name, const String& value)
-{
-	if(name == "normalmap_space")
-	{
-        // Normal map defines normals in tangent space.
-        if (value == "tangent_space")
-        {
-            setNormalMapSpace(NMS_TANGENT);
-            return true;
-        }
-        // Normal map defines normals in object space.
-        if (value == "object_space")
-        {
-            setNormalMapSpace(NMS_OBJECT);
-            return true;
-        }
-        if (value == "parallax")
-        {
-            setNormalMapSpace(NMS_PARALLAX);
-            return true;
-        }
-		return false;
-	}
-
-	if(name == "texture")
-	{
-		setNormalMapTextureName(value);
-		return true;
-	}
-
-	if(name == "texcoord_index")
-	{
-		setNormaliseEnabled(StringConverter::parseBool(value));
-		return true;
-	}
-
-	return false;
-}
-
 //-----------------------------------------------------------------------
 const String& NormalMapLightingFactory::getType() const
 {
@@ -608,10 +569,21 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                         return NULL;
                     }
 
-                    if(!normalMapSubRenderState->setParameter("normalmap_space", strValue))
+                    // Normal map defines normals in tangent space.
+                    if (strValue == "tangent_space")
                     {
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        return NULL;
+                        normalMapSubRenderState->setNormalMapSpace(NormalMapLighting::NMS_TANGENT);
+                    }
+
+                    // Normal map defines normals in object space.
+                    if (strValue == "object_space")
+                    {
+                        normalMapSubRenderState->setNormalMapSpace(NormalMapLighting::NMS_OBJECT);
+                    }
+
+                    if (strValue == "parallax")
+                    {
+                        normalMapSubRenderState->setNormalMapSpace(NormalMapLighting::NMS_PARALLAX);
                     }
                 }
 

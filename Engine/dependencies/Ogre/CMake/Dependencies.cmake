@@ -82,8 +82,11 @@ if(CMAKE_CROSSCOMPILING)
     endif()
 endif()
 
-# if we build our own deps, do it static as it generally eases distribution
-set(OGREDEPS_SHARED FALSE)
+set(OGREDEPS_SHARED TRUE)
+if(OGRE_STATIC OR MSVC)
+    # freetype does not like shared build on MSVC and it generally eases distribution there
+    set(OGREDEPS_SHARED FALSE)
+endif()
 
 set(BUILD_COMMAND_OPTS --target install --config ${CMAKE_BUILD_TYPE})
 
@@ -93,7 +96,6 @@ set(BUILD_COMMAND_COMMON ${CMAKE_COMMAND}
   -G ${CMAKE_GENERATOR}
   -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
   -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
-  -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE # allow linking into a shared lib
   ${CROSS})
 
 # Set hardcoded path guesses for various platforms
@@ -126,19 +128,19 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
 
     message(STATUS "Building ZZIPlib")
     file(DOWNLOAD
-        https://github.com/gdraheim/zziplib/archive/v0.13.71.tar.gz
-        ${PROJECT_BINARY_DIR}/zziplib-0.13.71.tar.gz)
+        https://github.com/gdraheim/zziplib/archive/develop.zip
+        ${PROJECT_BINARY_DIR}/zziplib-develop.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf zziplib-0.13.71.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+        -E tar xf zziplib-develop.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
     execute_process(COMMAND ${BUILD_COMMAND_COMMON}
         -DZLIB_ROOT=${OGREDEPS_PATH}
         -DZZIPMMAPPED=OFF -DZZIPCOMPAT=OFF -DZZIPLIBTOOL=OFF -DZZIPFSEEKO=OFF -DZZIPWRAP=OFF -DZZIPSDL=OFF -DZZIPBINS=OFF -DZZIPTEST=OFF -DZZIPDOCS=OFF -DBASH=sh
         -DBUILD_STATIC_LIBS=TRUE
         -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
-        ${PROJECT_BINARY_DIR}/zziplib-0.13.71
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/zziplib-0.13.71)
+        ${PROJECT_BINARY_DIR}/zziplib-develop
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/zziplib-develop)
     execute_process(COMMAND ${CMAKE_COMMAND} 
-        --build ${PROJECT_BINARY_DIR}/zziplib-0.13.71 ${BUILD_COMMAND_OPTS})
+        --build ${PROJECT_BINARY_DIR}/zziplib-develop ${BUILD_COMMAND_OPTS})
 
     message(STATUS "Building pugixml")
     file(DOWNLOAD
@@ -168,9 +170,8 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
         execute_process(COMMAND ${BUILD_COMMAND_COMMON}
             -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
-            -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE # disable third-party deps
-            -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE
-            -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
+            -DWITH_PNG=OFF
+            -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE # tries to use it on iOS otherwise
             # workaround for broken iOS toolchain in freetype
             -DPROJECT_SOURCE_DIR=${PROJECT_BINARY_DIR}/freetype-2.10.1
             ${PROJECT_BINARY_DIR}/freetype-2.10.1
@@ -194,30 +195,6 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/SDL2-build)
         execute_process(COMMAND ${CMAKE_COMMAND}
             --build ${PROJECT_BINARY_DIR}/SDL2-build ${BUILD_COMMAND_OPTS})
-    endif()
-
-    if(MSVC OR MINGW) # other platforms dont need this
-      message(STATUS "Building Assimp")
-      file(DOWNLOAD
-          https://github.com/assimp/assimp/archive/v5.0.1.tar.gz
-          ${PROJECT_BINARY_DIR}/v5.0.1.tar.gz)
-      execute_process(COMMAND ${CMAKE_COMMAND}
-          -E tar xf v5.0.1.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-      execute_process(COMMAND ${BUILD_COMMAND_COMMON}
-          -DZLIB_ROOT=${OGREDEPS_PATH}
-          -DBUILD_SHARED_LIBS=OFF
-          -DASSIMP_BUILD_TESTS=OFF
-          -DASSIMP_NO_EXPORT=TRUE
-          -DASSIMP_BUILD_OGRE_IMPORTER=OFF
-          -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
-          ${PROJECT_BINARY_DIR}/assimp-5.0.1
-          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-5.0.1)
-      execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/assimp-5.0.1 ${BUILD_COMMAND_OPTS})
-      # RelWithDebInfo has Release ABI
-      if(NOT OGRE_DEBUG_MODE)
-        file(REMOVE ${OGREDEPS_PATH}/lib/cmake/assimp-5.0/assimpTargets-debug.cmake)
-      endif()
     endif()
 endif()
 
@@ -303,30 +280,6 @@ find_package(PythonInterp)
 find_package(PythonLibs)
 macro_log_feature(PYTHONLIBS_FOUND "Python" "Language bindings to use OGRE from Python" "http://www.python.org/" FALSE "" "")
 
-# SWIG
-find_package(SWIG 3.0.8 QUIET)
-macro_log_feature(SWIG_FOUND "SWIG" "Language bindings (Python, Java, C#) for OGRE" "http://www.swig.org/" FALSE "" "")
-
-# pugixml
-find_package(pugixml QUIET)
-macro_log_feature(pugixml_FOUND "pugixml" "Needed for XMLConverter and DotScene Plugin" "https://pugixml.org/" FALSE "" "")
-
-# Assimp
-find_package(ASSIMP QUIET)
-macro_log_feature(ASSIMP_FOUND "Assimp" "Needed for the AssimpLoader Plugin" "https://www.assimp.org/" FALSE "" "")
-
-if(ASSIMP_FOUND)
-  # workaround horribly broken assimp cmake
-  add_library(fix::assimp INTERFACE IMPORTED)
-  set_target_properties(fix::assimp PROPERTIES
-      INTERFACE_LINK_LIBRARIES "${ASSIMP_LIBRARIES}"
-      INTERFACE_LINK_DIRECTORIES "${ASSIMP_LIBRARY_DIRS}"
-  )
-  if(EXISTS "${ASSIMP_INCLUDE_DIRS}")
-    set_target_properties(fix::assimp PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${ASSIMP_INCLUDE_DIRS}")
-  endif()
-endif()
-
 #######################################################################
 # Samples dependencies
 #######################################################################
@@ -334,25 +287,19 @@ endif()
 # Find sdl2
 if(NOT ANDROID AND NOT EMSCRIPTEN)
   # find script does not work in cross compilation environment
-  find_package(SDL2 QUIET)
+  find_package(SDL2)
   macro_log_feature(SDL2_FOUND "SDL2" "Simple DirectMedia Library needed for input handling in samples" "https://www.libsdl.org/" FALSE "" "")
-  if(SDL2_FOUND AND NOT TARGET SDL2::SDL2)
-    add_library(SDL2::SDL2 INTERFACE IMPORTED)
-    set_target_properties(SDL2::SDL2 PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIRS}"
-        INTERFACE_LINK_LIBRARIES "${SDL2_LIBRARIES}"
-    )
+  if(SDL2_FOUND AND WIN32 AND NOT SDL2_BINARY)
+    # fix linking static SDL2 on windows
+    set(SDL2_LIBRARY ${SDL2_LIBRARY} winmm.lib imm32.lib version.lib)
   endif()
-
-  find_package(Qt5 COMPONENTS Core Gui QUIET)
-  macro_log_feature(Qt5_FOUND "Qt" "optional integration with the Qt Library for window creation and input" "http://www.qt.io/" FALSE "" "")
 endif()
 
 #######################################################################
 # Tools
 #######################################################################
 
-find_package(Doxygen QUIET)
+find_package(Doxygen)
 macro_log_feature(DOXYGEN_FOUND "Doxygen" "Tool for building API documentation" "http://doxygen.org" FALSE "" "")
 
 # Find Softimage SDK

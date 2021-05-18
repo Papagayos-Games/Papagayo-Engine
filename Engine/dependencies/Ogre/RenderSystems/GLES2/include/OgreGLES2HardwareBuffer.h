@@ -31,24 +31,22 @@ THE SOFTWARE.
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreHardwareBuffer.h"
-#include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
     class GLES2RenderSystem;
-    class GLES2HardwareBuffer : public HardwareBuffer MANAGED_RESOURCE
+    class GLES2HardwareBuffer
     {
         private:
             GLenum mTarget;
+            size_t mSizeInBytes;
+            GLenum mUsage;
+
             GLuint mBufferId;
             GLES2RenderSystem* mRenderSystem;
-
-            // for UBO/ SSBO
-            GLint mBindingPoint;
 
             /// Utility function to get the correct GL usage based on HBU's
             static GLenum getGLUsage(uint32 usage);
 
-            void writeDataImpl(size_t offset, size_t length, const void* pSource, bool discardWholeBuffer);
         public:
             void createBuffer();
 
@@ -58,28 +56,19 @@ namespace Ogre {
 
             void unlockImpl();
 
-            GLES2HardwareBuffer(GLenum target, size_t sizeInBytes, GLenum usage, bool useShadowBuffer);
+            GLES2HardwareBuffer(GLenum target, size_t sizeInBytes, GLenum usage);
             ~GLES2HardwareBuffer();
 
-            void readData(size_t offset, size_t length, void* pDest) override;
+            void readData(size_t offset, size_t length, void* pDest);
 
-            void writeData(size_t offset, size_t length, const void* pSource,
-                           bool discardWholeBuffer = false) override;
+            void writeData(size_t offset, size_t length, 
+                           const void* pSource, bool discardWholeBuffer = false);
 
-            void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, size_t dstOffset, size_t length,
-                          bool discardWholeBuffer) override;
+            void copyData(GLuint srcBufferId, size_t srcOffset, size_t dstOffset, size_t length,
+                          bool discardWholeBuffer);
 
-            void _updateFromShadow() override;
 
             GLuint getGLBufferId(void) const { return mBufferId; }
-
-            void setGLBufferBinding(GLint binding);
-            GLint getGLBufferBinding(void) const { return mBindingPoint; }
-
-#if HANDLE_CONTEXT_LOSS
-            void notifyOnContextLost() override;
-            void notifyOnContextReset() override;
-#endif
     };
 }
 

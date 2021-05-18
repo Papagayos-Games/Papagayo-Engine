@@ -347,16 +347,13 @@ namespace Ogre {
         */
         void _update(Real timeElapsed);
 
-        /** Returns all active particles in this system.
+        /** Returns an iterator for stepping through all particles in this system.
         @remarks
             This method is designed to be used by people providing new ParticleAffector subclasses,
             this is the easiest way to step through all the particles in a system and apply the
             changes the affector wants to make.
         */
-        const std::list<Particle*>& _getActiveParticles() { return mActiveParticles; }
-
-        /// @deprecated use _getActiveParticles()
-        OGRE_DEPRECATED ParticleIterator _getIterator(void);
+        ParticleIterator _getIterator(void);
 
         /** Sets the name of the material to be used for this billboard set.
         */
@@ -465,10 +462,13 @@ namespace Ogre {
 
         const String& getMovableType(void) const override;
 
-        /// @deprecated do not use
-        OGRE_DEPRECATED virtual void _notifyParticleResized() {}
-        /// @deprecated do not use
-        OGRE_DEPRECATED virtual void _notifyParticleRotated() {}
+        /** Internal callback used by Particles to notify their parent that they have been resized.
+        */
+        virtual void _notifyParticleResized(void);
+
+        /** Internal callback used by Particles to notify their parent that they have been rotated.
+        */
+        virtual void _notifyParticleRotated(void);
 
         /** Sets the default dimensions of the particles in this set.
             @remarks

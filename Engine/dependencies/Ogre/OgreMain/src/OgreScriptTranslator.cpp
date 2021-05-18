@@ -1097,7 +1097,7 @@ namespace Ogre{
         }
 
         mMaterial->removeAllTechniques();
-        obj->context = mMaterial;
+        obj->context = Any(mMaterial);
         mMaterial->_notifyOrigin(obj->file);
 
         bool bval;
@@ -1218,7 +1218,6 @@ namespace Ogre{
             }
         }
 
-        OGRE_IGNORE_DEPRECATED_BEGIN
         // Apply the texture aliases
         if(compiler->getListener())
         {
@@ -1227,7 +1226,6 @@ namespace Ogre{
         }
         mMaterial->applyTextureAliases(mTextureAliases);
         mTextureAliases.clear();
-        OGRE_IGNORE_DEPRECATED_END
     }
 
     /**************************************************************************
@@ -1245,7 +1243,7 @@ namespace Ogre{
         // Create the technique from the material
         Ogre::Material *material = Ogre::any_cast<Ogre::Material*>(obj->parent->context);
         mTechnique = material->createTechnique();
-        obj->context = mTechnique;
+        obj->context = Any(mTechnique);
 
         // Get the name of the technique
         if(!obj->name.empty())
@@ -1422,7 +1420,7 @@ namespace Ogre{
 
         Technique *technique = any_cast<Technique*>(obj->parent->context);
         mPass = technique->createPass();
-        obj->context = mPass;
+        obj->context = Any(mPass);
 
         // Get the name of the technique
         if(!obj->name.empty())
@@ -2316,51 +2314,57 @@ namespace Ogre{
         }
     }
 
-    static GpuProgramPtr getProgram(ScriptCompiler* compiler, ObjectAbstractNode* node)
+    static Pass* getPass(ScriptCompiler* compiler, ObjectAbstractNode* node)
     {
         if(node->name.empty())
         {
             compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
-            return nullptr;
+            return NULL;
         }
 
         ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
         compiler->_fireEvent(&evt, 0);
 
-        auto& mgr = GpuProgramManager::getSingleton();
-        if (auto ret = mgr.getByName(evt.mName, compiler->getResourceGroup()))
-            return ret;
+        if (!GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()))
+        {
+            //recheck with auto resource group
+            if (!GpuProgramManager::getSingleton().getByName(
+                    evt.mName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME))
+            {
+                compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file,
+                                   node->line, evt.mName);
+                return NULL;
+            }
+        }
 
-        // recheck with auto resource group
-        if (auto ret = mgr.getByName(evt.mName, RGN_AUTODETECT))
-            return ret;
-
-        compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line,
-                           evt.mName);
-        return nullptr;
+        return any_cast<Pass*>(node->parent->context);
     }
 
     //-------------------------------------------------------------------------
     void PassTranslator::translateProgramRef(GpuProgramType type, ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        auto program = getProgram(compiler, node);
-        if(!program) return;
-        auto pass = any_cast<Pass*>(node->parent->context);
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
+
+        auto program = GpuProgramUsage::_getProgramByName(node->name, pass->getResourceGroup(), type);
+        if (!program) {
+            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file,
+                               node->line, node->name);
+            return;
+        }
 
         pass->setGpuProgram(type, program);
-        if(program->isSupported())
+        if(pass->getGpuProgram(type)->isSupported())
         {
             GpuProgramParametersSharedPtr params = pass->getGpuProgramParameters(type);
             GpuProgramTranslator::translateProgramParameters(compiler, params, node);
         }
     }
     //-------------------------------------------------------------------------
-    OGRE_IGNORE_DEPRECATED_BEGIN
     void PassTranslator::translateShadowCasterVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        auto program = getProgram(compiler, node);
-        if(!program) return;
-        auto pass = any_cast<Pass*>(node->parent->context);
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
 
         compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line,
                            node->cls + ". Use shadow_caster_material instead");
@@ -2374,9 +2378,8 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateShadowCasterFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        auto program = getProgram(compiler, node);
-        if(!program) return;
-        auto pass = any_cast<Pass*>(node->parent->context);
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
 
         compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line,
                            node->cls + ". Use shadow_caster_material instead");
@@ -2390,12 +2393,9 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateShadowReceiverVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        auto program = getProgram(compiler, node);
-        if(!program) return;
-        auto pass = any_cast<Pass*>(node->parent->context);
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
 
-        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line,
-                           node->cls + ". Use shadow_receiver_material instead");
         pass->setShadowReceiverVertexProgram(node->name);
         if(pass->getShadowReceiverVertexProgram()->isSupported())
         {
@@ -2406,12 +2406,9 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateShadowReceiverFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        auto program = getProgram(compiler, node);
-        if(!program) return;
-        auto pass = any_cast<Pass*>(node->parent->context);
+        Pass *pass = getPass(compiler, node);
+        if(!pass) return;
 
-        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line,
-                           node->cls + ". Use shadow_receiver_material instead");
         pass->setShadowReceiverFragmentProgram(node->name);
         if(pass->getShadowReceiverFragmentProgram()->isSupported())
         {
@@ -2419,7 +2416,7 @@ namespace Ogre{
             GpuProgramTranslator::translateProgramParameters(compiler, params, node);
         }
     }
-    OGRE_IGNORE_DEPRECATED_END
+
     /**************************************************************************
      * TextureUnitTranslator
      *************************************************************************/
@@ -2622,7 +2619,7 @@ namespace Ogre{
 
         Pass *pass = any_cast<Pass*>(obj->parent->context);
         mUnit = pass->createTextureUnitState();
-        obj->context = mUnit;
+        obj->context = Any(mUnit);
 
         // Get the name of the technique
         if(!obj->name.empty())
@@ -2664,10 +2661,8 @@ namespace Ogre{
                 case ID_TEXTURE_ALIAS:
                     compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
                         "texture_alias. Use 'texture $variable'");
-                    OGRE_IGNORE_DEPRECATED_BEGIN
                     if(getValue(prop, compiler, sval))
                         mUnit->setTextureNameAlias(sval);
-                    OGRE_IGNORE_DEPRECATED_END
                     break;
                 case ID_TEXTURE:
                     if(prop->values.empty())
@@ -2724,14 +2719,10 @@ namespace Ogre{
                                         sRGBRead = true;
                                         break;
                                     default:
-                                        if(!StringConverter::parse(atom->value, mipmaps))
-                                        {
+                                        if(StringConverter::isNumber(atom->value))
+                                            mipmaps = StringConverter::parseInt(atom->value);
+                                        else
                                             format = PixelUtil::getFormatFromName(atom->value, true);
-
-                                            if (format == PF_UNKNOWN)
-                                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS,
-                                                                   prop->file, prop->line, atom->value);
-                                        }
                                     }
                                 }
                                 else
@@ -2745,18 +2736,9 @@ namespace Ogre{
                             ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, val);
                             compiler->_fireEvent(&evt, 0);
 
-                            if(isAlpha)
-                            {
-                                // format = PF_A8; should only be done, if src is luminance, which we dont know here
-                                compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file,
-                                                   prop->line, "alpha. Use PF_A8 instead");
-                            }
-
                             mUnit->setTextureName(evt.mName, texType);
                             mUnit->setDesiredFormat(format);
-                            OGRE_IGNORE_DEPRECATED_BEGIN
                             mUnit->setIsAlpha(isAlpha);
-                            OGRE_IGNORE_DEPRECATED_END
                             mUnit->setNumMipmaps(mipmaps);
                             mUnit->setHardwareGammaEnabled(sRGBRead);
                         }
@@ -3544,18 +3526,10 @@ namespace Ogre{
 
         // Get the language
         String language;
-        for(const auto& lnode : obj->values)
+        if(!getString(obj->values.front(), &language))
         {
-            if(!getString(lnode, &language))
-            {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line);
-                return;
-            }
-
-            if (language == "asm")
-                break; // always supported
-            if (HighLevelGpuProgramManager::getSingleton().isLanguageSupported(language))
-                break;
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line);
+            return;
         }
 
         translateGpuProgram(compiler, obj, language);
@@ -3644,10 +3618,8 @@ namespace Ogre{
         bool isHighLevel = language != "asm";
         CreateGpuProgramScriptCompilerEvent evt(obj->file, obj->name, compiler->getResourceGroup(), source, syntax,
                                                 gpt);
-        OGRE_IGNORE_DEPRECATED_BEGIN
         CreateHighLevelGpuProgramScriptCompilerEvent evtHL(obj->file, obj->name, compiler->getResourceGroup(), source,
                                                          language, gpt);
-        OGRE_IGNORE_DEPRECATED_END
         bool processed = compiler->_fireEvent(isHighLevel ? &evt : &evtHL, &prog);
         if(!processed)
         {
@@ -3668,7 +3640,7 @@ namespace Ogre{
             return;
         }
 
-        obj->context = prog;
+        obj->context = Any(prog);
 
         prog->setMorphAnimationIncluded(false);
         prog->setPoseAnimationIncluded(0);
@@ -4098,12 +4070,6 @@ namespace Ogre{
                                 switch(def->dataType)
                                 {
                                 case GpuProgramParameters::ACDT_NONE:
-                                    if (i2 != prop->values.end())
-                                    {
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file,
-                                                           prop->line, "unexpected <extraInfo> parameter");
-                                    }
-
                                     // Set the auto constant
                                     try
                                     {
@@ -4162,7 +4128,7 @@ namespace Ogre{
                                             else
                                             {
                                                 compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                                   "<extraInfo> parameter required by constant definition " + atom1->value);
+                                                                   "extra parameters required by constant definition " + atom1->value);
                                             }
                                         }
                                         else
@@ -4204,7 +4170,7 @@ namespace Ogre{
                                             else
                                             {
                                                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                   "invalid auto constant <extraInfo> parameter");
+                                                                   "invalid auto constant extra info parameter");
                                             }
                                         }
                                     }
@@ -4253,13 +4219,13 @@ namespace Ogre{
                                             else
                                             {
                                                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                   "incorrect float argument definition in <extraInfo> parameter");
+                                                                   "incorrect float argument definition in extra parameters");
                                             }
                                         }
                                         else
                                         {
                                             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                               "<extraInfo> parameter required by constant definition " + atom1->value);
+                                                               "extra parameters required by constant definition " + atom1->value);
                                         }
                                     }
                                     break;
@@ -4517,7 +4483,7 @@ namespace Ogre{
         mSystem->removeAllEmitters();
         mSystem->removeAllAffectors();
 
-        obj->context = mSystem;
+        obj->context = Any(mSystem);
 
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -4763,7 +4729,7 @@ namespace Ogre{
         // Prepare the compositor
         mCompositor->removeAllTechniques();
         mCompositor->_notifyOrigin(obj->file);
-        obj->context = mCompositor;
+        obj->context = Any(mCompositor);
 
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -4793,7 +4759,7 @@ namespace Ogre{
 
         Compositor *compositor = any_cast<Compositor*>(obj->parent->context);
         mTechnique = compositor->createTechnique();
-        obj->context = mTechnique;
+        obj->context = Any(mTechnique);
 
         String sval;
 
@@ -5061,7 +5027,7 @@ namespace Ogre{
         {
             mTarget = technique->getOutputTargetPass();
         }
-        obj->context = mTarget;
+        obj->context = Any(mTarget);
 
         bool bval;
         Real fval;
@@ -5161,7 +5127,7 @@ namespace Ogre{
 
         CompositionTargetPass *target = any_cast<CompositionTargetPass*>(obj->parent->context);
         mPass = target->createPass(ptype);
-        obj->context = mPass;
+        obj->context = Any(mPass);
 
         if(mPass->getType() == CompositionPass::PT_RENDERCUSTOM) 
         {

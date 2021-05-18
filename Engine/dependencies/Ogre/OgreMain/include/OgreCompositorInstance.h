@@ -42,6 +42,7 @@ namespace Ogre {
     /** \addtogroup Effects
     *  @{
     */
+    const size_t RENDER_QUEUE_COUNT = RENDER_QUEUE_MAX+1;       
             
     /** An instance of a Compositor object for one Viewport. It is part of the CompositorChain
         for a Viewport.
@@ -216,7 +217,7 @@ namespace Ogre {
         @return
             The texture pointer, corresponds to a real texture.
         */
-        const TexturePtr& getTextureInstance(const String& name, size_t mrtIndex);
+        TexturePtr getTextureInstance(const String& name, size_t mrtIndex);
 
         /** Get the render target for a given render texture name. 
         @remarks
@@ -374,7 +375,7 @@ namespace Ogre {
         @param mrtIndex
             For MRTs, which attached surface to retrieve.
         */
-        const TexturePtr &getSourceForTex(const String &name, size_t mrtIndex = 0);
+        const String &getSourceForTex(const String &name, size_t mrtIndex = 0);
 
         /** Queue a render system operation.
         */

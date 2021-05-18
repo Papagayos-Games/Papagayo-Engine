@@ -323,8 +323,6 @@ namespace Ogre
                 Root::createRenderWindow). The window will be
                 created based on the options currently set on the render
                 system.
-            @param windowTitle
-            @param customCapabilitiesConfig see #useCustomRenderSystemCapabilities
             @return
                 A pointer to the automatically created window, if
                 requested, otherwise <b>NULL</b>.
@@ -558,8 +556,15 @@ namespace Ogre
         static DataStreamPtr openFileStream(const String& filename,
                 const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-        /// @deprecated use ColourValue::getAsBYTE()
-        OGRE_DEPRECATED void convertColourValue(const ColourValue& colour, uint32* pDest);
+        /** Generates a packed data version of the passed in ColourValue suitable for
+            use with the current RenderSystem.
+        @remarks
+            Since different render systems have different colour data formats (eg
+            RGBA for GL, ARGB for D3D) this method allows you to use 1 method for all.
+        @param colour The colour to convert
+        @param pDest Pointer to location to put the result.
+        */
+        void convertColourValue(const ColourValue& colour, uint32* pDest);
 
         /** Retrieves a pointer to the window that was created automatically
             @remarks
@@ -583,8 +588,9 @@ namespace Ogre
                                       desc.useFullScreen, &desc.miscParams);
         }
 
-        /// @deprecated call createRenderWindow multiple times
-        OGRE_DEPRECATED bool createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
+        /** @copydoc RenderSystem::_createRenderWindows
+        */
+        bool createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
             RenderWindowList& createdWindows);
     
         /** Detaches a RenderTarget from the active render system
@@ -772,7 +778,7 @@ namespace Ogre
             This is only intended for internal use; it is only valid during the
             rendering of a frame.
         */
-        SceneManager* _getCurrentSceneManager(void) const { return mSceneManagerStack.empty() ? NULL : mSceneManagerStack.back(); }
+        SceneManager* _getCurrentSceneManager(void) const;
         /** Pushes the scene manager currently being used to render.
         @remarks
             This is only intended for internal use.
@@ -912,8 +918,10 @@ namespace Ogre
         /// @deprecated use getMovableObjectFactories
         OGRE_DEPRECATED MovableObjectFactoryIterator getMovableObjectFactoryIterator(void) const;
 
-        /// @deprecated do not use
-        OGRE_DEPRECATED unsigned int getDisplayMonitorCount() const;
+        /**
+        * Gets the number of display monitors.
+        */
+        unsigned int getDisplayMonitorCount() const;
 
         /** Get the WorkQueue for processing background tasks.
             You are free to add new requests and handlers to this queue to

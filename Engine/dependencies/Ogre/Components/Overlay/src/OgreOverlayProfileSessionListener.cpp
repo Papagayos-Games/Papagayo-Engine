@@ -110,9 +110,10 @@ namespace Ogre
         OverlayContainer* container = dynamic_cast<OverlayContainer*>(mProfileGui);
         if (container)
         {
-            for (const auto& p : container->getChildren())
+            OverlayContainer::ChildIterator children = container->getChildIterator();
+            while (children.hasMoreElements())
             {
-                OverlayElement* element = p.second;
+                OverlayElement* element = children.getNext();
                 OverlayContainer* parent = element->getParent();
                 if (parent) parent->removeChild(element->getName());
                 OverlayManager::getSingleton().destroyOverlayElement(element);

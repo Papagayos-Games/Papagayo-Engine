@@ -121,7 +121,7 @@ GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, GLTexture* parent
                                  GLint level, uint32 width, uint32 height, uint32 depth)
     : GLHardwarePixelBuffer(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
       mTarget(parent->getGLTextureTarget()), mFaceTarget(0), mTextureID(parent->getGLID()),
-      mLevel(level), mHwGamma(parent->isHardwareGammaEnabled()), mSliceTRT(0),
+      mFace(face), mLevel(level), mHwGamma(parent->isHardwareGammaEnabled()), mSliceTRT(0),
       mRenderSystem(renderSystem)
 {
     // Get face identifier
@@ -131,6 +131,11 @@ GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, GLTexture* parent
     
     // Get format
     mGLInternalFormat = GLPixelUtil::getGLInternalFormat(mFormat, mHwGamma);
+    
+    // Default
+    mRowPitch = mWidth;
+    mSlicePitch = mHeight*mWidth;
+    mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
     
     // Log a message
     /*
@@ -406,9 +411,9 @@ void GLTextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Box &s
     /// Destination texture must be 1D, 2D, 3D, or Cube
     /// Source texture must be 1D, 2D or 3D
     
-    // Using this in Terrain composite map RTT interferes with Impostor RTT rendering in pagedgeometry
-    // I have no idea why! For the moment, disable when src is RTT
-    if(GLEW_EXT_framebuffer_object && (src->getUsage() & TU_RENDERTARGET) == 0 &&
+    // This does not seem to work for RTTs after the first update
+    // I have no idea why! For the moment, disable 
+    if(GLEW_EXT_framebuffer_object &&
         (srct->mTarget==GL_TEXTURE_1D||srct->mTarget==GL_TEXTURE_2D
          ||srct->mTarget==GL_TEXTURE_3D)&&mTarget!=GL_TEXTURE_2D_ARRAY_EXT)
     {
@@ -525,12 +530,12 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Box &srcBox, c
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
             GL_TEXTURE_2D, static_pointer_cast<GLTexture>(tempTex)->getGLID(), 0);
         /// Set viewport to size of destination slice
-        mRenderSystem->_getStateCacheManager()->setViewport(Rect(0, 0, dstBox.getWidth(), dstBox.getHeight()));
+        mRenderSystem->_getStateCacheManager()->setViewport(0, 0, dstBox.getWidth(), dstBox.getHeight());
     }
     else
     {
         /// We are going to bind directly, so set viewport to size and position of destination slice
-        mRenderSystem->_getStateCacheManager()->setViewport(Rect(dstBox.left, dstBox.top, dstBox.right, dstBox.bottom));
+        mRenderSystem->_getStateCacheManager()->setViewport(dstBox.left, dstBox.top, dstBox.getWidth(), dstBox.getHeight());
     }
     
     /// Process each destination slice
@@ -671,7 +676,7 @@ RenderTexture *GLTextureBuffer::getRenderTarget(size_t zoffset)
 //********* GLRenderBuffer
 //----------------------------------------------------------------------------- 
 GLRenderBuffer::GLRenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples):
-    GLHardwarePixelBuffer(width, height, 1, GLPixelUtil::getClosestOGREFormat(format),HBU_GPU_ONLY),
+    GLHardwarePixelBuffer(width, height, 1, GLPixelUtil::getClosestOGREFormat(format),HBU_WRITE_ONLY),
     mRenderbufferID(0)
 {
     mGLInternalFormat = format;

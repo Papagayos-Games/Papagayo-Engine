@@ -46,7 +46,6 @@ CompositorInstance::CompositorInstance(CompositionTechnique *technique,
         mEnabled(false),
         mAlive(false)
 {
-    OgreAssert(mChain, "Undefined compositor chain");
     mEnabled = false;
     const String& logicName = mTechnique->getCompositorLogicName();
     if (!logicName.empty())
@@ -432,7 +431,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, const Compos
                     {
                         if(x < targetpass->getNumTextureUnitStates())
                         {
-                            targetpass->getTextureUnitState((ushort)x)->setTexture(getSourceForTex(inp.name, inp.mrtIndex));
+                            targetpass->getTextureUnitState((ushort)x)->setTextureName(getSourceForTex(inp.name, inp.mrtIndex));
                         } 
                         else
                         {
@@ -596,10 +595,10 @@ CompositorChain *CompositorInstance::getChain()
 const String& CompositorInstance::getTextureInstanceName(const String& name, 
                                                          size_t mrtIndex)
 {
-    return getSourceForTex(name, mrtIndex)->getName();
+    return getSourceForTex(name, mrtIndex);
 }
 //---------------------------------------------------------------------
-const TexturePtr& CompositorInstance::getTextureInstance(const String& name, size_t mrtIndex)
+TexturePtr CompositorInstance::getTextureInstance(const String& name, size_t mrtIndex)
 {
     // try simple textures first
     LocalTextureMap::iterator i = mLocalTextures.find(name);
@@ -616,8 +615,7 @@ const TexturePtr& CompositorInstance::getTextureInstance(const String& name, siz
     }
 
     // not present
-    static TexturePtr nullPtr;
-    return nullPtr;
+    return TexturePtr();
 
 }
 //-----------------------------------------------------------------------
@@ -704,12 +702,14 @@ void CompositorInstance::createResources(bool forResizeOnly)
             
             if(width == 0)
             {
-                width = static_cast<float>(mChain->getViewport()->getActualWidth()) * def->widthFactor;
+                width = static_cast<size_t>(
+                                            static_cast<float>(mChain->getViewport()->getActualWidth()) * def->widthFactor);
                 width = width == 0 ? 1 : width;
             }
             if(height == 0)
             {
-                height = static_cast<float>(mChain->getViewport()->getActualHeight()) * def->heightFactor;
+                height = static_cast<size_t>(
+                                             static_cast<float>(mChain->getViewport()->getActualHeight()) * def->heightFactor);
                 height = height == 0 ? 1 : height;
             }
             
@@ -1032,11 +1032,14 @@ CompositorInstance::resolveTexReference(const CompositionTechnique::TextureDefin
     CompositionTechnique::TextureDefinition* refTexDef = 0;
 
     //Try chain first
-    if (CompositorInstance* refCompInst = mChain->getCompositor(texDef->refCompName))
+    if(mChain)
     {
-        refTexDef = refCompInst->getCompositor()
-                        ->getSupportedTechnique(refCompInst->getScheme())
-                        ->getTextureDefinition(texDef->refTexName);
+        CompositorInstance* refCompInst = mChain->getCompositor(texDef->refCompName);
+        if(!refCompInst)
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor");
+
+        refTexDef = refCompInst->getCompositor()->getSupportedTechnique(
+            refCompInst->getScheme())->getTextureDefinition(texDef->refTexName);
     }
 
     if(!refTexDef)
@@ -1047,10 +1050,6 @@ CompositorInstance::resolveTexReference(const CompositionTechnique::TextureDefin
         {
             refTexDef = refComp->getSupportedTechnique()->getTextureDefinition(texDef->refTexName);
         }
-
-        if (refTexDef && refTexDef->scope != CompositionTechnique::TS_GLOBAL)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Referenced texture '" + texDef->refTexName + "' must have global scope");
     }
 
     if(!refTexDef)
@@ -1090,6 +1089,7 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
             {
                 //Find the instance and check if it is before us
                 CompositorInstance* refCompInst = 0;
+                OgreAssert(mChain, "Undefined compositor chain");
                 bool beforeMe = true;
                 for (CompositorInstance* nextCompInst : mChain->getCompositorInstances())
                 {
@@ -1139,7 +1139,7 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
 
 }
 //-----------------------------------------------------------------------
-const TexturePtr &CompositorInstance::getSourceForTex(const String &name, size_t mrtIndex)
+const String &CompositorInstance::getSourceForTex(const String &name, size_t mrtIndex)
 {
     CompositionTechnique::TextureDefinition* texDef = mTechnique->getTextureDefinition(name);
     if(texDef == 0)
@@ -1159,6 +1159,7 @@ const TexturePtr &CompositorInstance::getSourceForTex(const String &name, size_t
             {
                 //Find the instance and check if it is before us
                 CompositorInstance* refCompInst = 0;
+                OgreAssert(mChain, "Undefined compositor chain");
                 bool beforeMe = true;
                 for (CompositorInstance* nextCompInst : mChain->getCompositorInstances())
                 {
@@ -1185,7 +1186,7 @@ const TexturePtr &CompositorInstance::getSourceForTex(const String &name, size_t
                     OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Referencing compositor that is later in the chain",
                         "CompositorInstance::getSourceForTex");
                 }
-                return refCompInst->getTextureInstance(texDef->refTexName, mrtIndex);
+                return refCompInst->getTextureInstanceName(texDef->refTexName, mrtIndex);
             }
             case CompositionTechnique::TS_GLOBAL:
             {
@@ -1196,7 +1197,7 @@ const TexturePtr &CompositorInstance::getSourceForTex(const String &name, size_t
                     OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor",
                         "CompositorInstance::getSourceForTex");
                 }
-                return refComp->getTextureInstance(texDef->refTexName, mrtIndex);
+                return refComp->getTextureInstanceName(texDef->refTexName, mrtIndex);
             }
             case CompositionTechnique::TS_LOCAL:
                 break; // handled by resolveTexReference
@@ -1210,7 +1211,7 @@ const TexturePtr &CompositorInstance::getSourceForTex(const String &name, size_t
         LocalTextureMap::iterator i = mLocalTextures.find(name);
         if(i != mLocalTextures.end())
         {
-            return i->second;
+            return i->second->getName();
         }
     }
     else
@@ -1219,7 +1220,7 @@ const TexturePtr &CompositorInstance::getSourceForTex(const String &name, size_t
         LocalTextureMap::iterator i = mLocalTextures.find(getMRTTexLocalName(name, mrtIndex));
         if (i != mLocalTextures.end())
         {
-            return i->second;
+            return i->second->getName();
         }
     }
     

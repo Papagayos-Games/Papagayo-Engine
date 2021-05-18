@@ -409,10 +409,5 @@ namespace Ogre
         return ConstEnabledAnimationStateIterator(
             mEnabledAnimationStates.begin(), mEnabledAnimationStates.end());
     }
-
-    ControllerValueRealPtr AnimationStateControllerValue::create(AnimationState* targetAnimationState, bool addTime)
-    {
-        return std::make_shared<AnimationStateControllerValue>(targetAnimationState, addTime);
-    }
 }
 

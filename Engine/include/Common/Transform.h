@@ -27,7 +27,7 @@ public:
 	virtual void update();
 
 	// position
-	const Vector3& getPos();
+	//const Vector3& getPos();
 	const Vector3& getPos() const;
 	void setPos(const Vector3& pos);
 	void setPosX(double x);
@@ -35,7 +35,7 @@ public:
 	void setPosZ(double z);
 
 	// rotation
-	const Vector3& getRot();
+	//const Vector3& getRot();
 	const Vector3& getRot() const;
 	void setRot(Vector3 angle);
 	void setRotX(double x);
@@ -43,7 +43,7 @@ public:
 	void setRotZ(double z);
 
 	// velocity
-	const Vector3& getVel();
+	//const Vector3& getVel();
 	const Vector3& getVel() const;
 	void setVel(const Vector3& vel);
 	void setVelX(double x);
@@ -51,7 +51,7 @@ public:
 	void setVelZ(double z);
 
 	//Dimensions
-	const Vector3& getDimensions();
+	//const Vector3& getDimensions();
 	const Vector3& getDimensions() const;
 	void setDimensions(const Vector3 dim);
 	void setDimX(double x);

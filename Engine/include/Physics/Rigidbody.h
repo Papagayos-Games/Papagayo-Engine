@@ -23,7 +23,7 @@ private:
 	//Masa del Rigidbody
 	float mass = 1.0f;
 	//Rigidbody principal
-	btRigidBody* rb = nullptr;
+	btRigidBody* rb;
 	Transform* tr_ = nullptr;
 	bool trigger = false;
 
@@ -81,7 +81,7 @@ public:
 
 #pragma region Getters
 	//metodo que devuelve la velocidad lineal del rb
-	const Vector3& getLinearVelocity();
+	//const Vector3& getLinearVelocity();
 	const Vector3& getLinearVelocity() const;
 
 	//metodo que nos dice si el rigidbody es trigger o no
@@ -93,10 +93,10 @@ public:
 	//metodo que nos dice si el rigidbody es estatico
 	bool isStatic() const;
 
-	btCollisionShape* getShape();
+	//btCollisionShape* getShape();
 	btCollisionShape* getShape() const;
 
-	btRigidBody* getBtRb();
+	//btRigidBody* getBtRb();
 	btRigidBody* getBtRb() const;
 #pragma endregion
 
@@ -104,7 +104,8 @@ public:
 	//Aplica fuerza al rigidbody de tipo Forces
 	//a una posicion relativa del objeto, es decir,
 	//la parte del cuerpo donde se aplica la fuerza
-	void addForce(const Vector3& force, Vector3& relativePos, Forces type = Forces::NORMAL);
+	void addForce(const Vector3& force, Vector3& relativePos, int type =(int)Forces::NORMAL);
+
 
 	//Aplica una fuerza de giro al objeto de tipo Forces
 	void addTorque(const Vector3& torque, Forces type = Forces::NORMAL);

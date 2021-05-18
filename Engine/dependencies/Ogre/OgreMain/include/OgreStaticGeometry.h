@@ -468,6 +468,7 @@ namespace Ogre {
                 HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
                 bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 ) override;
             EdgeData* getEdgeList(void) override;
+            bool hasEdgeList(void) override;
 
             void _releaseManualHardwareResources() override;
             void _restoreManualHardwareResources() override;

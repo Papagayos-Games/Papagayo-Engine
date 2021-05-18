@@ -95,7 +95,7 @@ namespace Ogre {
             // Texcoords
             decl->addElement(POS_TEX_BINDING, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
             // Colours - store these in a separate buffer because they change less often
-            decl->addElement(COLOUR_BINDING, 0, VET_UBYTE4_NORM, VES_DIFFUSE);
+            decl->addElement(COLOUR_BINDING, 0, VET_COLOUR, VES_DIFFUSE);
 
             mRenderOp.operationType = RenderOperation::OT_TRIANGLE_LIST;
             mRenderOp.useIndexes = false;
@@ -179,8 +179,6 @@ namespace Ogre {
             // not initialised yet, probably due to the order of creation in a template
             return;
         }
-
-        mFont->load(); // ensure glyph info is there
 
         size_t charlen = mCaption.size();
         checkMemoryAllocation( charlen );
@@ -273,9 +271,8 @@ namespace Ogre {
                 continue;
             }
 
-            const auto& glyphInfo = mFont->getGlyphInfo(character);
-            Real horiz_height = glyphInfo.aspectRatio * mViewportAspectCoef ;
-            const Font::UVRect& uvRect = glyphInfo.uvRect;
+            Real horiz_height = mFont->getGlyphAspectRatio(character) * mViewportAspectCoef ;
+            const Font::UVRect& uvRect = mFont->getGlyphTexCoords(character);
 
             // each vert is (x, y, z, u, v)
             //-------------------------------------------------------------------------------------
@@ -461,6 +458,7 @@ namespace Ogre {
             // Ugly hack, but we need to override for lazy-load
             *const_cast<MaterialPtr*>(&mMaterial) = mFont->getMaterial();
             mMaterial->setDepthCheckEnabled(false);
+            mMaterial->setLightingEnabled(false);
         }
         return mMaterial;
     }
@@ -548,8 +546,9 @@ namespace Ogre {
     void TextAreaOverlayElement::updateColours(void)
     {
         // Convert to system-specific
-        RGBA topColour = mColourTop.getAsBYTE();
-        RGBA bottomColour = mColourBottom.getAsBYTE();
+        RGBA topColour, bottomColour;
+        Root::getSingleton().convertColourValue(mColourTop, &topColour);
+        Root::getSingleton().convertColourValue(mColourBottom, &bottomColour);
 
         HardwareVertexBufferSharedPtr vbuf = 
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(COLOUR_BINDING);

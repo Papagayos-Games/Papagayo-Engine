@@ -42,6 +42,14 @@ CompositionPass::CompositionPass(CompositionTargetPass *parent):
     mAutomaticColour(false),
     mClearDepth(1.0f),
     mClearStencil(0),
+    mStencilCheck(false),
+    mStencilFunc(CMPF_ALWAYS_PASS),
+    mStencilRefValue(0),
+    mStencilMask(0xFFFFFFFF),
+    mStencilFailOp(SOP_KEEP),
+    mStencilDepthFailOp(SOP_KEEP),
+    mStencilPassOp(SOP_KEEP),
+    mStencilTwoSidedOperation(false),
     mStencilReadBackAsTexture(false),
     mQuadCornerModified(false),
     mQuad(-1, 1, 1, -1),
@@ -204,67 +212,67 @@ uint32 CompositionPass::getClearStencil() const
 
 void CompositionPass::setStencilCheck(bool value)
 {
-    mStencilState.enabled = value;
+    mStencilCheck = value;
 }
 bool CompositionPass::getStencilCheck() const
 {
-    return mStencilState.enabled;
+    return mStencilCheck;
 }
 void CompositionPass::setStencilFunc(CompareFunction value)
 {
-    mStencilState.compareOp = value;
+    mStencilFunc = value;
 }
 CompareFunction CompositionPass::getStencilFunc() const
 {
-    return mStencilState.compareOp;
+    return mStencilFunc;
 } 
 void CompositionPass::setStencilRefValue(uint32 value)
 {
-    mStencilState.referenceValue = value;
+    mStencilRefValue = value;
 }
 uint32 CompositionPass::getStencilRefValue() const
 {
-    return mStencilState.referenceValue;
+    return mStencilRefValue;
 }
 void CompositionPass::setStencilMask(uint32 value)
 {
-    mStencilState.compareMask = value;
+    mStencilMask = value;
 }
 uint32 CompositionPass::getStencilMask() const
 {
-    return mStencilState.compareMask ;
+    return mStencilMask;
 }
 void CompositionPass::setStencilFailOp(StencilOperation value)
 {
-    mStencilState.stencilFailOp = value;
+    mStencilFailOp = value;
 }
 StencilOperation CompositionPass::getStencilFailOp() const
 {
-    return mStencilState.stencilFailOp;
+    return mStencilFailOp;
 }
 void CompositionPass::setStencilDepthFailOp(StencilOperation value)
 {
-    mStencilState.depthFailOp = value;
+    mStencilDepthFailOp = value;
 }
 StencilOperation CompositionPass::getStencilDepthFailOp() const
 {
-    return mStencilState.depthFailOp;
+    return mStencilDepthFailOp;
 }
 void CompositionPass::setStencilPassOp(StencilOperation value)
 {
-    mStencilState.depthStencilPassOp = value;
+    mStencilPassOp = value;
 }
 StencilOperation CompositionPass::getStencilPassOp() const
 {
-    return mStencilState.depthStencilPassOp;
+    return mStencilPassOp;
 }
 void CompositionPass::setStencilTwoSidedOperation(bool value)
 {
-    mStencilState.twoSidedOperation = value;
+    mStencilTwoSidedOperation = value;
 }
 bool CompositionPass::getStencilTwoSidedOperation() const
 {
-    return mStencilState.twoSidedOperation;
+    return mStencilTwoSidedOperation;
 }
 void CompositionPass::setStencilReadBackAsTextureOperation(bool value)
 {

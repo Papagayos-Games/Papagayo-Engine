@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreD3D11HardwareBufferManager.h"
 #include "OgreD3D11RenderToVertexBuffer.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreD3D11HardwareBuffer.h"
+#include "OgreD3D11HardwareVertexBuffer.h"
 #include "OgreRenderable.h"
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
@@ -105,8 +105,6 @@ namespace Ogre {
         //Set pass before binding buffers to activate the GPU programs
         sceneMgr->_setPass(r2vbPass);
 
-        r2vbPass->_updateAutoParams(sceneMgr->_getAutoParamDataSource(), GPV_GLOBAL);
-
         RenderOperation renderOp;
         size_t targetBufferIndex;
         if (mResetRequested || mResetsEveryUpdate)
@@ -133,11 +131,11 @@ namespace Ogre {
         RenderSystem* targetRenderSystem = Root::getSingleton().getRenderSystem();
 
         //Draw the object
-        auto vertexBuffer = mVertexBuffers[targetBufferIndex]->_getImpl<D3D11HardwareBuffer>();
+        D3D11HardwareVertexBuffer* vertexBuffer = static_cast<D3D11HardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].get());
     
         UINT offset[1] = { 0 };
         ID3D11Buffer* iBuffer[1];
-        iBuffer[0] = vertexBuffer->getD3DBuffer();
+        iBuffer[0] = vertexBuffer->getD3DVertexBuffer();
         mDevice.GetImmediateContext()->SOSetTargets( 1, iBuffer, offset );
 
         if (r2vbPass->hasVertexProgram())

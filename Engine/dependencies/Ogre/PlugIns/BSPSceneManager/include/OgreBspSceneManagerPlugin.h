@@ -34,14 +34,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class Quake3ShaderManager;
 
     /** Plugin instance for BSPSceneManager */
     class BspSceneManagerPlugin : public Plugin
     {
     public:
         BspSceneManagerPlugin();
-        ~BspSceneManagerPlugin();
 
 
         /// @copydoc Plugin::getName
@@ -60,8 +58,9 @@ namespace Ogre
         void uninstall();
     protected:
         BspSceneManagerFactory* mBspFactory;
-        Quake3ShaderManager* mShaderMgr;
-        std::unique_ptr<Codec> mCodec;
+        BspSceneLoader* mBspSceneLoader;
+
+
     };
 }
 

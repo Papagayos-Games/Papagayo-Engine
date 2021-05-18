@@ -319,7 +319,8 @@ namespace Ogre {
                 "The maximum number of vertices a single run of this geometry program can output",
                 PT_INT),&msMaxOutputVerticesCmd);
         }
-        mPassFFPStates = Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION);
+        // Manually assign language now since we use it immediately
+        mSyntaxCode = "glsl";
     }
 
     //-----------------------------------------------------------------------

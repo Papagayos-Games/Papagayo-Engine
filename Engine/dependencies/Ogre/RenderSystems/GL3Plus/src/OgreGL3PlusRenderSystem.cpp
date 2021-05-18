@@ -35,7 +35,9 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreLight.h"
 #include "OgreCamera.h"
 #include "OgreGL3PlusTextureManager.h"
-#include "OgreGL3PlusHardwareBuffer.h"
+#include "OgreGL3PlusHardwareUniformBuffer.h"
+#include "OgreGL3PlusHardwareVertexBuffer.h"
+#include "OgreGL3PlusHardwareIndexBuffer.h"
 #include "OgreGLSLShader.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreException.h"
@@ -69,6 +71,7 @@ extern "C" void glFlushRenderAPPLE();
 #define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
 #endif
 
+#if ENABLE_GL_DEBUG_OUTPUT
 static void APIENTRY GLDebugCallback(GLenum source,
                                      GLenum type,
                                      GLuint id,
@@ -77,53 +80,46 @@ static void APIENTRY GLDebugCallback(GLenum source,
                                      const GLchar* message,
                                      const GLvoid* userParam)
 {
-    const char *debSource = "", *debType = "", *debSev = "";
-
-    auto lml = Ogre::LML_NORMAL;
+    char debSource[32] = {0}, debType[32] = {0}, debSev[32] = {0};
 
     if (source == GL_DEBUG_SOURCE_API)
-        debSource = "OpenGL";
+        strcpy(debSource, "OpenGL");
     else if (source == GL_DEBUG_SOURCE_WINDOW_SYSTEM)
-        debSource = "Windows";
+        strcpy(debSource, "Windows");
     else if (source == GL_DEBUG_SOURCE_SHADER_COMPILER)
-        debSource = "Shader Compiler";
+        strcpy(debSource, "Shader Compiler");
     else if (source == GL_DEBUG_SOURCE_THIRD_PARTY)
-        debSource = "Third Party";
+        strcpy(debSource, "Third Party");
     else if (source == GL_DEBUG_SOURCE_APPLICATION)
-        debSource = "Application";
+        strcpy(debSource, "Application");
     else if (source == GL_DEBUG_SOURCE_OTHER)
-        debSource = "Other";
+        strcpy(debSource, "Other");
 
     if (type == GL_DEBUG_TYPE_ERROR)
-        debType = "error";
+        strcpy(debType, "error");
     else if (type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR)
-        debType = "deprecated behavior";
+        strcpy(debType, "deprecated behavior");
     else if (type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)
-        debType = "undefined behavior";
+        strcpy(debType, "undefined behavior");
     else if (type == GL_DEBUG_TYPE_PORTABILITY)
-        debType = "portability";
+        strcpy(debType, "portability");
     else if (type == GL_DEBUG_TYPE_PERFORMANCE)
-        debType = "performance";
+        strcpy(debType, "performance");
     else if (type == GL_DEBUG_TYPE_OTHER)
-        debType = "message";
+        strcpy(debType, "message");
 
     if (severity == GL_DEBUG_SEVERITY_HIGH)
     {
-        debSev = "high";
-        lml = Ogre::LML_CRITICAL;
+        strcpy(debSev, "high");
     }
     else if (severity == GL_DEBUG_SEVERITY_MEDIUM)
-    {
-        debSev = "medium";
-        lml = Ogre::LML_WARNING;
-    }
+        strcpy(debSev, "medium");
     else if (severity == GL_DEBUG_SEVERITY_LOW)
-        debSev = "low";
-    else if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
-        debSev = "note";
+        strcpy(debSev, "low");
 
-    Ogre::LogManager::getSingleton().stream(lml) << debSource << ":" << debType << "(" << debSev << ") - " << message;
+    Ogre::LogManager::getSingleton().stream() << debSource << ":" << debType << "(" << debSev << ") " << id << ": " << message;
 }
+#endif
 
 namespace Ogre {
 
@@ -134,6 +130,7 @@ namespace Ogre {
 
     GL3PlusRenderSystem::GL3PlusRenderSystem()
         : mDepthWrite(true),
+          mScissorsEnabled(false),
           mStencilWriteMask(0xFFFFFFFF),
           mStateCacheManager(0),
           mShaderManager(0),
@@ -151,6 +148,8 @@ namespace Ogre {
         glsupport = mGLSupport;
 
         initConfigOptions();
+
+        mColourWrite[0] = mColourWrite[1] = mColourWrite[2] = mColourWrite[3] = true;
 
         for (i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
         {
@@ -208,13 +207,6 @@ namespace Ogre {
         opt.immutable = false;
 
         mOptions[opt.name] = opt;
-
-        opt.name = "Debug Layer";
-        opt.possibleValues = {"Off", "On"};
-        opt.currentValue = opt.possibleValues[0];
-        opt.immutable = false;
-
-        mOptions[opt.name] = opt;
     }
 
     RenderSystemCapabilities* GL3PlusRenderSystem::createRenderSystemCapabilities() const
@@ -231,7 +223,7 @@ namespace Ogre {
         }
 
         rsc->setRenderSystemName(getName());
-        rsc->setVendor(mVendor);
+        rsc->parseVendorFromString(mVendor);
 
         // Check for hardware mipmapping support.
         rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
@@ -341,14 +333,12 @@ namespace Ogre {
         // So are 1D & 3D textures
         rsc->setCapability(RSC_TEXTURE_1D);
         rsc->setCapability(RSC_TEXTURE_3D);
-        rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
 
         // UBYTE4 always supported
         rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
 
         // Infinite far plane always supported
         rsc->setCapability(RSC_INFINITE_FAR_PLANE);
-        rsc->setCapability(RSC_DEPTH_CLAMP);
 
         // Check for hardware occlusion support
         rsc->setCapability(RSC_HWOCCLUSION);
@@ -535,6 +525,12 @@ namespace Ogre {
         mRTTManager = new GL3PlusFBOManager(this);
         caps->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
 
+        Log* defaultLog = LogManager::getSingleton().getDefaultLog();
+        if (defaultLog)
+        {
+            caps->log(defaultLog);
+        }
+
         // Create the texture manager
         mTextureManager = new GL3PlusTextureManager(this);
 
@@ -588,6 +584,7 @@ namespace Ogre {
 
 
         mGLSupport->stop();
+        mStopRendering = true;
 
         // delete mTextureManager;
         // mTextureManager = 0;
@@ -597,10 +594,61 @@ namespace Ogre {
         // RenderSystem::shutdown();
     }
 
+    bool GL3PlusRenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
+                                                   RenderWindowList& createdWindows)
+    {
+        // Call base render system method.
+        if (false == RenderSystem::_createRenderWindows(renderWindowDescriptions, createdWindows))
+            return false;
+
+        // Simply call _createRenderWindow in a loop.
+        for (size_t i = 0; i < renderWindowDescriptions.size(); ++i)
+        {
+            const RenderWindowDescription& curRenderWindowDescription = renderWindowDescriptions[i];
+            RenderWindow* curWindow = NULL;
+
+            curWindow = _createRenderWindow(curRenderWindowDescription.name,
+                                            curRenderWindowDescription.width,
+                                            curRenderWindowDescription.height,
+                                            curRenderWindowDescription.useFullScreen,
+                                            &curRenderWindowDescription.miscParams);
+
+            createdWindows.push_back(curWindow);
+        }
+
+        return true;
+    }
+
     RenderWindow* GL3PlusRenderSystem::_createRenderWindow(const String &name, unsigned int width, unsigned int height,
                                                            bool fullScreen, const NameValuePairList *miscParams)
     {
-        RenderSystem::_createRenderWindow(name, width, height, fullScreen, miscParams);
+        if (mRenderTargets.find(name) != mRenderTargets.end())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Window with name '" + name + "' already exists",
+                        "GL3PlusRenderSystem::_createRenderWindow");
+        }
+
+        // Log a message
+        StringStream ss;
+        ss << "GL3PlusRenderSystem::_createRenderWindow \"" << name << "\", " <<
+            width << "x" << height << " ";
+        if (fullScreen)
+            ss << "fullscreen ";
+        else
+            ss << "windowed ";
+
+        if (miscParams)
+        {
+            ss << " miscParams: ";
+            NameValuePairList::const_iterator it;
+            for (it = miscParams->begin(); it != miscParams->end(); ++it)
+            {
+                ss << it->first << "=" << it->second << " ";
+            }
+
+            LogManager::getSingleton().logMessage(ss.str());
+        }
 
         // Create the window
         RenderWindow* win = mGLSupport->newWindow(name, width, height, fullScreen, miscParams);
@@ -831,6 +879,70 @@ namespace Ogre {
         return GL_ONE;
     }
 
+    void GL3PlusRenderSystem::_setSeparateSceneBlending(
+        SceneBlendFactor sourceFactor, SceneBlendFactor destFactor,
+        SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha,
+        SceneBlendOperation op, SceneBlendOperation alphaOp )
+    {
+        GLenum sourceBlend = getBlendMode(sourceFactor);
+        GLenum destBlend = getBlendMode(destFactor);
+        GLenum sourceBlendAlpha = getBlendMode(sourceFactorAlpha);
+        GLenum destBlendAlpha = getBlendMode(destFactorAlpha);
+
+        if (sourceFactor == SBF_ONE && destFactor == SBF_ZERO &&
+            sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
+        {
+            mStateCacheManager->setEnabled(GL_BLEND, false);
+        }
+        else
+        {
+            mStateCacheManager->setEnabled(GL_BLEND, true);
+            mStateCacheManager->setBlendFunc(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
+        }
+
+        GLint func = GL_FUNC_ADD, alphaFunc = GL_FUNC_ADD;
+
+        switch(op)
+        {
+        case SBO_ADD:
+            func = GL_FUNC_ADD;
+            break;
+        case SBO_SUBTRACT:
+            func = GL_FUNC_SUBTRACT;
+            break;
+        case SBO_REVERSE_SUBTRACT:
+            func = GL_FUNC_REVERSE_SUBTRACT;
+            break;
+        case SBO_MIN:
+            func = GL_MIN;
+            break;
+        case SBO_MAX:
+            func = GL_MAX;
+            break;
+        }
+
+        switch(alphaOp)
+        {
+        case SBO_ADD:
+            alphaFunc = GL_FUNC_ADD;
+            break;
+        case SBO_SUBTRACT:
+            alphaFunc = GL_FUNC_SUBTRACT;
+            break;
+        case SBO_REVERSE_SUBTRACT:
+            alphaFunc = GL_FUNC_REVERSE_SUBTRACT;
+            break;
+        case SBO_MIN:
+            alphaFunc = GL_MIN;
+            break;
+        case SBO_MAX:
+            alphaFunc = GL_MAX;
+            break;
+        }
+
+        mStateCacheManager->setBlendEquation(func, alphaFunc);
+    }
+
     void GL3PlusRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
         mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE, (func != CMPF_ALWAYS_PASS) && alphaToCoverage);
@@ -853,23 +965,50 @@ namespace Ogre {
             _setRenderTarget(target);
             mActiveViewport = vp;
 
+            GLsizei x, y, w, h;
+
             // Calculate the "lower-left" corner of the viewport
-            Rect vpRect = vp->getActualDimensions();
-            if (!target->requiresTextureFlipping())
+            w = vp->getActualWidth();
+            h = vp->getActualHeight();
+            x = vp->getActualLeft();
+            y = vp->getActualTop();
+
+            if (target && !target->requiresTextureFlipping())
             {
                 // Convert "upper-left" corner to "lower-left"
-                std::swap(vpRect.top, vpRect.bottom);
-                vpRect.top = target->getHeight() - vpRect.top;
-                vpRect.bottom = target->getHeight() - vpRect.bottom;
+                y = target->getHeight() - h - y;
             }
-            mStateCacheManager->setViewport(vpRect);
+
+            mStateCacheManager->setViewport(x, y, w, h);
+
+            // Configure the viewport clipping
+            glScissor(x, y, w, h);
+            mScissorBox[0] = x;
+            mScissorBox[1] = y;
+            mScissorBox[2] = w;
+            mScissorBox[3] = h;
 
             vp->_clearUpdatedFlag();
         }
     }
 
+    void GL3PlusRenderSystem::_beginFrame(void)
+    {
+        if (!mActiveViewport)
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                        "Cannot begin frame - no viewport selected.",
+                        "GL3PlusRenderSystem::_beginFrame");
+
+        mScissorsEnabled = true;
+        mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
+    }
+
     void GL3PlusRenderSystem::_endFrame(void)
     {
+        // Deactivate the viewport clipping.
+        mScissorsEnabled = false;
+        mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
+
         // unbind GPU programs at end of frame
         // this is mostly to avoid holding bound programs that might get deleted
         // outside via the resource manager
@@ -934,11 +1073,6 @@ namespace Ogre {
         mStateCacheManager->setCullFace( cullMode );
     }
 
-    void GL3PlusRenderSystem::_setDepthClamp(bool enable)
-    {
-        mStateCacheManager->setEnabled(GL_DEPTH_CLAMP, enable);
-    }
-
     void GL3PlusRenderSystem::_setDepthBufferParams(bool depthTest, bool depthWrite, CompareFunction depthFunction)
     {
         _setDepthBufferCheckEnabled(depthTest);
@@ -989,42 +1123,16 @@ namespace Ogre {
             glPolygonOffset(-slopeScaleBias, -constantBias);
         }
     }
-    static GLenum getBlendOp(SceneBlendOperation op)
+
+    void GL3PlusRenderSystem::_setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha)
     {
-        switch (op)
-        {
-        case SBO_ADD:
-            return GL_FUNC_ADD;
-        case SBO_SUBTRACT:
-            return GL_FUNC_SUBTRACT;
-        case SBO_REVERSE_SUBTRACT:
-            return GL_FUNC_REVERSE_SUBTRACT;
-        case SBO_MIN:
-            return GL_MIN;
-        case SBO_MAX:
-            return GL_MAX;
-        }
-        return GL_FUNC_ADD;
-    }
-    void GL3PlusRenderSystem::setColourBlendState(const ColourBlendState& state)
-    {
+        mStateCacheManager->setColourMask(red, green, blue, alpha);
+
         // record this
-        mCurrentBlend = state;
-
-        if (state.blendingEnabled())
-        {
-            mStateCacheManager->setEnabled(GL_BLEND, true);
-            mStateCacheManager->setBlendFunc(
-                getBlendMode(state.sourceFactor), getBlendMode(state.destFactor),
-                getBlendMode(state.sourceFactorAlpha), getBlendMode(state.destFactorAlpha));
-        }
-        else
-        {
-            mStateCacheManager->setEnabled(GL_BLEND, false);
-        }
-
-        mStateCacheManager->setBlendEquation(getBlendOp(state.operation), getBlendOp(state.alphaOperation));
-        mStateCacheManager->setColourMask(state.writeR, state.writeG, state.writeB, state.writeA);
+        mColourWrite[0] = red;
+        mColourWrite[1] = green;
+        mColourWrite[2] = blue;
+        mColourWrite[3] = alpha;
     }
 
     HardwareOcclusionQuery* GL3PlusRenderSystem::createHardwareOcclusionQuery(void)
@@ -1202,7 +1310,7 @@ namespace Ogre {
         // as one shared vertex buffer could be rendered with several index buffers, from submeshes and/or LODs
         if (op.useIndexes)
             mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                op.indexData->indexBuffer->_getImpl<GL3PlusHardwareBuffer>()->getGLBufferId());
+                static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
 
         // unconditionally modify VAO for global instance data (FIXME bad API)
         VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
@@ -1337,6 +1445,14 @@ namespace Ogre {
 
             do
             {
+                // Update derived depth bias.
+                if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
+                {
+                    _setDepthBias(mDerivedDepthBiasBase +
+                                  mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
+                                  mDerivedDepthBiasSlopeScale);
+                }
+
                 if (hasInstanceData)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawElementsInstanced(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances));
@@ -1351,6 +1467,14 @@ namespace Ogre {
         {
             do
             {
+                // Update derived depth bias.
+                if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
+                {
+                    _setDepthBias(mDerivedDepthBiasBase +
+                                  mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
+                                  mDerivedDepthBiasSlopeScale);
+                }
+
                 if (hasInstanceData)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(primType, 0, op.vertexData->vertexCount, numberOfInstances));
@@ -1383,29 +1507,68 @@ namespace Ogre {
         }
     }
 
-    void GL3PlusRenderSystem::setScissorTest(bool enabled, const Rect& rect)
+    void GL3PlusRenderSystem::setScissorTest(bool enabled, size_t left,
+                                             size_t top, size_t right,
+                                             size_t bottom)
     {
-        mStateCacheManager->setEnabled(GL_SCISSOR_TEST, enabled);
-
-        if (!enabled)
-            return;
-
+        mScissorsEnabled = enabled;
         // If request texture flipping, use "upper-left", otherwise use "lower-left"
         bool flipping = mActiveRenderTarget->requiresTextureFlipping();
-
         //  GL measures from the bottom, not the top
-        long targetHeight = mActiveRenderTarget->getHeight();
-        long top = flipping ? rect.top : targetHeight - rect.bottom;
-        // NB GL uses width / height rather than right / bottom
-        OGRE_CHECK_GL_ERROR(glScissor(rect.left, top, rect.width(), rect.height()));
+        size_t targetHeight = mActiveRenderTarget->getHeight();
+        // Calculate the "lower-left" corner of the viewport
+        int x = 0, y = 0, w = 0, h = 0;
+
+        if (enabled)
+        {
+            mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
+            // NB GL uses width / height rather than right / bottom
+            x = left;
+            if (flipping)
+                y = top;
+            else
+                y = targetHeight - bottom;
+            w = right - left;
+            h = bottom - top;
+            OGRE_CHECK_GL_ERROR(glScissor(static_cast<GLsizei>(x),
+                                          static_cast<GLsizei>(y),
+                                          static_cast<GLsizei>(w),
+                                          static_cast<GLsizei>(h)));
+
+            mScissorBox[0] = x;
+            mScissorBox[1] = y;
+            mScissorBox[2] = w;
+            mScissorBox[3] = h;
+        }
+        else
+        {
+            mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
+            // GL requires you to reset the scissor when disabling
+            w = mActiveViewport->getActualWidth();
+            h = mActiveViewport->getActualHeight();
+            x = mActiveViewport->getActualLeft();
+            if (flipping)
+                y = mActiveViewport->getActualTop();
+            else
+                y = targetHeight - mActiveViewport->getActualTop() - h;
+            OGRE_CHECK_GL_ERROR(glScissor(static_cast<GLsizei>(x),
+                                          static_cast<GLsizei>(y),
+                                          static_cast<GLsizei>(w),
+                                          static_cast<GLsizei>(h)));
+
+            mScissorBox[0] = x;
+            mScissorBox[1] = y;
+            mScissorBox[2] = w;
+            mScissorBox[3] = h;
+        }
     }
 
     void GL3PlusRenderSystem::clearFrameBuffer(unsigned int buffers,
                                                const ColourValue& colour,
                                                Real depth, unsigned short stencil)
     {
-        bool colourMask =
-            !(mCurrentBlend.writeR && mCurrentBlend.writeG && mCurrentBlend.writeB && mCurrentBlend.writeA);
+        bool colourMask = !mColourWrite[0] || !mColourWrite[1] ||
+            !mColourWrite[2] || !mColourWrite[3];
 
         GLbitfield flags = 0;
         if (buffers & FBT_COLOUR)
@@ -1442,24 +1605,37 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glClearStencil(stencil));
         }
 
-
-        Rect vpRect = mActiveViewport->getActualDimensions();
-        bool needScissorBox =
-            vpRect != Rect(0, 0, mActiveRenderTarget->getWidth(), mActiveRenderTarget->getHeight());
-        if (needScissorBox)
+        // Should be enable scissor test due the clear region is
+        // relied on scissor box bounds.
+        if (!mScissorsEnabled)
         {
-            // Should be enable scissor test due the clear region is
-            // relied on scissor box bounds.
-            setScissorTest(true, vpRect);
+            mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
+        }
+
+        // Sets the scissor box as same as viewport
+        GLint viewport[4];
+        mStateCacheManager->getViewport(viewport);
+        bool scissorBoxDifference =
+            viewport[0] != mScissorBox[0] || viewport[1] != mScissorBox[1] ||
+            viewport[2] != mScissorBox[2] || viewport[3] != mScissorBox[3];
+        if (scissorBoxDifference)
+        {
+            OGRE_CHECK_GL_ERROR(glScissor(viewport[0], viewport[1], viewport[2], viewport[3]));
         }
 
         // Clear buffers
         OGRE_CHECK_GL_ERROR(glClear(flags));
 
-        // Restore scissor test
-        if (needScissorBox)
+        // Restore scissor box
+        if (scissorBoxDifference)
         {
-           setScissorTest(false, vpRect);
+            OGRE_CHECK_GL_ERROR(glScissor(mScissorBox[0], mScissorBox[1], mScissorBox[2], mScissorBox[3]));
+        }
+
+        // Restore scissor test
+        if (!mScissorsEnabled)
+        {
+            mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
         }
 
         // Reset buffer write state
@@ -1470,8 +1646,7 @@ namespace Ogre {
 
         if (colourMask && (buffers & FBT_COLOUR))
         {
-            mStateCacheManager->setColourMask(mCurrentBlend.writeR, mCurrentBlend.writeG,
-                                              mCurrentBlend.writeB, mCurrentBlend.writeA);
+            mStateCacheManager->setColourMask(mColourWrite[0], mColourWrite[1], mColourWrite[2], mColourWrite[3]);
         }
 
         if (buffers & FBT_STENCIL)
@@ -1527,8 +1702,7 @@ namespace Ogre {
         // clearFrameBuffer would be wrong because the value we are recorded may be
         // difference with the really state stored in GL context.
         mStateCacheManager->setDepthMask(mDepthWrite);
-        mStateCacheManager->setColourMask(mCurrentBlend.writeR, mCurrentBlend.writeG,
-                                          mCurrentBlend.writeB, mCurrentBlend.writeA);
+        mStateCacheManager->setColourMask(mColourWrite[0], mColourWrite[1], mColourWrite[2], mColourWrite[3]);
         mStateCacheManager->setStencilMask(mStencilWriteMask);
     }
 
@@ -1617,19 +1791,14 @@ namespace Ogre {
         // Set provoking vertex convention
         OGRE_CHECK_GL_ERROR(glProvokingVertex(GL_FIRST_VERTEX_CONVENTION));
 
-        auto it = mOptions.find("Debug Layer");
-        bool debugEnabled = false;
-        if (it != mOptions.end())
+        if (getCapabilities()->hasCapability(RSC_DEBUG))
         {
-            debugEnabled = StringConverter::parseBool(it->second.currentValue);
-        }
-
-        if (debugEnabled && getCapabilities()->hasCapability(RSC_DEBUG))
-        {
+#if ENABLE_GL_DEBUG_OUTPUT
             OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT));
             OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS));
             OGRE_CHECK_GL_ERROR(glDebugMessageCallbackARB(&GLDebugCallback, NULL));
-            OGRE_CHECK_GL_ERROR(glDebugMessageControlARB(GL_DEBUG_SOURCE_API, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE));
+            OGRE_CHECK_GL_ERROR(glDebugMessageControlARB(GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_OTHER, GL_DONT_CARE, 0, NULL, GL_TRUE));
+#endif
         }
 
         if(getCapabilities()->hasCapability(RSC_PRIMITIVE_RESTART))
@@ -1897,6 +2066,12 @@ namespace Ogre {
         // static_cast<GL3PlusTextureManager*>(mTextureManager)->bindImages();
     }
 
+    unsigned int GL3PlusRenderSystem::getDisplayMonitorCount() const
+    {
+        return mGLSupport->getDisplayMonitorCount();
+    }
+
+
     void GL3PlusRenderSystem::beginProfileEvent( const String &eventName )
     {
         if (getCapabilities()->hasCapability(RSC_DEBUG))
@@ -1934,13 +2109,13 @@ namespace Ogre {
 
         GLuint attrib = (GLuint)GLSLProgramCommon::getFixedAttributeIndex(sem, elemIndex);
 
-        const GL3PlusHardwareBuffer* hwGlBuffer = vertexBuffer->_getImpl<GL3PlusHardwareBuffer>();
+        const GL3PlusHardwareVertexBuffer* hwGlBuffer = static_cast<const GL3PlusHardwareVertexBuffer*>(vertexBuffer.get());
         mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER, hwGlBuffer->getGLBufferId());
         void* pBufferData = GL_BUFFER_OFFSET(elem.getOffset() + vertexStart * vertexBuffer->getVertexSize());
 
-        if (vertexBuffer->isInstanceData())
+        if (hwGlBuffer->isInstanceData())
         {
-            OGRE_CHECK_GL_ERROR(glVertexAttribDivisor(attrib, vertexBuffer->getInstanceDataStepRate()));
+            OGRE_CHECK_GL_ERROR(glVertexAttribDivisor(attrib, hwGlBuffer->getInstanceDataStepRate()));
         }
 
         unsigned short typeCount = VertexElement::getTypeCount(elem.getType());
@@ -2059,7 +2234,7 @@ namespace Ogre {
         const GLubyte* pcVendor = glGetString(GL_VENDOR);
         String tmpStr = (const char*)pcVendor;
         LogManager::getSingleton().logMessage("GL_VENDOR = " + tmpStr);
-        mVendor = RenderSystemCapabilities::vendorFromString(tmpStr.substr(0, tmpStr.find(' ')));
+        mVendor = tmpStr.substr(0, tmpStr.find(' '));
 
         // Get renderer
         const GLubyte* pcRenderer = glGetString(GL_RENDERER);

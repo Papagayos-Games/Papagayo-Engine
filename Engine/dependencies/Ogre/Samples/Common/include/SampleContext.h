@@ -97,15 +97,15 @@ namespace OgreBites
                     }
                     if (!found)  // throw an exception if a plugin is not found
                     {
-                        OGRE_EXCEPT(Ogre::Exception::ERR_NOT_IMPLEMENTED, "Sample requires plugin: " + *j);
+                        Ogre::String desc = "Sample requires plugin: " + *j;
+                        Ogre::String src = "SampleContext::runSample";
+                        OGRE_EXCEPT(Ogre::Exception::ERR_NOT_IMPLEMENTED, desc, src);
                     }
                 }
 
                 // test system capabilities against sample requirements
                 s->testCapabilities(mRoot->getRenderSystem()->getCapabilities());
-#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-                s->setShaderGenerator(mShaderGenerator);
-#endif
+
                 s->_setup(mWindow, mFSLayer, mOverlaySystem);   // start new sample
             }
 
@@ -373,7 +373,7 @@ namespace OgreBites
             ApplicationContext::shutdown();
         }
         
-        Sample* mCurrentSample;         // The active sample (0 if none is active)
+        Sample* mCurrentSample;         // currently running sample
         bool mSamplePaused;             // whether current sample is paused
         bool mLastRun;                  // whether or not this is the final run
         Sample* mLastSample;            // last sample run before reconfiguration

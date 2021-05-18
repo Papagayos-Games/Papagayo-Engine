@@ -57,16 +57,23 @@ namespace Volume {
     {
     
         Timer t;
-        Image img;
-        img.load(volumeTextureName, ResourceGroupManager::getSingleton().getWorldResourceGroupName());
-
+        //we to load then read a 3d texture. we cannot load it directly as that will mean we might
+        //not be able to read it. we need to change it's usage from dynamic (default) to a readable static.
+        Ogre::ResourceManager::ResourceCreateOrRetrieveResult res =
+            TextureManager::getSingleton().createOrRetrieve(volumeTextureName,
+            Ogre::ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
+            false, 0, 0, Ogre::TEX_TYPE_3D, 0);
+        Ogre::TexturePtr tex = static_pointer_cast<Texture>(res.first);
+        tex->setUsage(TU_DYNAMIC);
+        tex->load();
+       
         LogManager::getSingleton().stream() << "Loaded texture in " << t.getMilliseconds() << "ms.";
         t.reset();
 
-        mWidth = img.getWidth();
-        mHeight= img.getHeight();
+        mWidth = tex->getSrcWidth();
+        mHeight= tex->getSrcHeight();
         mWidthTimesHeight = mWidth * mHeight;
-        mDepth = img.getDepth();
+        mDepth = tex->getSrcDepth();
 
         mPosXScale = (Real)1.0 / (Real)worldWidth * (Real)mWidth;
         mPosYScale = (Real)1.0 / (Real)worldHeight * (Real)mHeight;
@@ -74,13 +81,35 @@ namespace Volume {
 
         mVolumeSpaceToWorldSpaceFactor = (Real)worldWidth * (Real)mWidth;
 
-        auto srcBox = img.getPixelBox();
-
+        HardwarePixelBufferSharedPtr buffer = tex->getBuffer(0, 0);
+        buffer->lock(HardwareBuffer::HBL_READ_ONLY);
+        const PixelBox &pb = buffer->getCurrentLock();
+        float *pbptr = reinterpret_cast<float*>(pb.data);
         mData = OGRE_ALLOC_T(float, mWidth * mHeight * mDepth, MEMCATEGORY_GENERAL);
-        auto dstBox = srcBox;
-        dstBox.data = (uchar*)mData;
-        dstBox.format = PF_FLOAT32_R;
-        PixelUtil::bulkPixelConversion(srcBox, dstBox);
+        float * dataRunner = mData;
+        ColourValue cv;
+        size_t x, y;
+        size_t zEnd = pb.back;
+        size_t yStart = pb.top;
+        size_t yEnd = pb.bottom;
+        size_t xStart = pb.left;
+        size_t xEnd = pb.right;
+        size_t sliceSkip = pb.getSliceSkip();
+        for (size_t z = pb.front; z < zEnd; ++z)
+        {
+            for (y = yStart; y < yEnd; ++y)
+            {
+                for (x = xStart; x < xEnd; ++x)
+                {
+                    *dataRunner++ = pbptr[x];
+                }
+                pbptr += pb.rowPitch;
+            }
+            pbptr += sliceSkip;
+        }
+        buffer->unlock();
+
+        TextureManager::getSingleton().remove(tex->getHandle());
 
         LogManager::getSingleton().stream() << "Processed texture in " << t.getMilliseconds() << "ms.";
     }

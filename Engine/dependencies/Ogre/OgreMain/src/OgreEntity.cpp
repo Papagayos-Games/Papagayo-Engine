@@ -382,8 +382,10 @@ namespace Ogre {
 
             // Get the index at this biased depth
             ushort newMeshLodIndex = mMesh->getLodIndex(biasedMeshLodValue);
-            // Apply maximum detail restriction (remember lower = higher detail, higher = lower detail)
-            newMeshLodIndex = Math::Clamp(newMeshLodIndex, mMaxMeshLodIndex, mMinMeshLodIndex);
+            // Apply maximum detail restriction (remember lower = higher detail)
+            newMeshLodIndex = std::max<ushort>(mMaxMeshLodIndex, newMeshLodIndex);
+            // Apply minimum detail restriction (remember higher = lower detail)
+            newMeshLodIndex = std::min<ushort>(mMinMeshLodIndex, newMeshLodIndex);
 
             // Construct event object
             EntityMeshLodChangedEvent evt;
@@ -424,8 +426,10 @@ namespace Ogre {
 
                 // Get the index at this biased depth
                 unsigned short idx = material->getLodIndex(biasedMaterialLodValue);
-                // Apply maximum detail restriction (remember lower = higher detail, higher = lower detail)
-                idx = Math::Clamp(idx, mMaxMeshLodIndex, mMinMeshLodIndex);
+                // Apply maximum detail restriction (remember lower = higher detail)
+                idx = std::max(mMaxMaterialLodIndex, idx);
+                // Apply minimum detail restriction (remember higher = lower detail)
+                idx = std::min(mMinMaterialLodIndex, idx);
 
                 // Construct event object
                 EntityMaterialLodChangedEvent subEntEvt;
@@ -716,11 +720,25 @@ namespace Ogre {
         // HACK to display bones
         // This won't work if the entity is not centered at the origin
         // TODO work out a way to allow bones to be rendered when Entity not centered
-        if (mDisplaySkeleton && hasSkeleton() && mManager && mManager->getDebugDrawer())
+        if (mDisplaySkeleton && hasSkeleton())
         {
-            for (Bone* bone : mSkeletonInstance->getBones())
+            int numBones = mSkeletonInstance->getNumBones();
+            for (unsigned short b = 0; b < numBones; ++b)
             {
-                mManager->getDebugDrawer()->drawBone(bone);
+                Bone* bone = mSkeletonInstance->getBone(b);
+                if (mRenderQueuePrioritySet)
+                {
+                    assert(mRenderQueueIDSet == true);
+                    queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID, mRenderQueuePriority);
+                }
+                else if(mRenderQueueIDSet)
+                {
+                    queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID);
+                } 
+                else 
+                {
+                    queue->addRenderable(bone->getDebugRenderable(1));
+                }
             }
         }
     }
@@ -1720,17 +1738,27 @@ namespace Ogre {
         return mMesh->getEdgeList(mMeshLodIndex);
     }
     //-----------------------------------------------------------------------
+    bool Entity::hasEdgeList(void)
+    {
+#if OGRE_NO_MESHLOD
+        unsigned short mMeshLodIndex = 0;
+#endif
+        // check if mesh has an edge list attached
+        // give mesh a chance to built it if scheduled
+        return (mMesh->getEdgeList(mMeshLodIndex) != NULL);
+    }
+    //-----------------------------------------------------------------------
     bool Entity::isHardwareAnimationEnabled(void)
     {
         //find whether the entity has hardware animation for the current active sceme
         unsigned short schemeIndex = MaterialManager::getSingleton()._getActiveSchemeIndex();
-        for(const auto& p : mSchemeHardwareAnim)
+        SchemeHardwareAnimMap::iterator it = mSchemeHardwareAnim.find(schemeIndex);
+        if (it == mSchemeHardwareAnim.end())
         {
-            if(p.first == schemeIndex) return p.second;
+            //evaluate the animation hardware value
+            it = mSchemeHardwareAnim.emplace(schemeIndex, calcVertexProcessing()).first;
         }
-        bool ret = calcVertexProcessing();
-        mSchemeHardwareAnim.emplace_back(schemeIndex, ret);
-        return ret;
+        return it->second;
     }
 
     //-----------------------------------------------------------------------
@@ -2503,4 +2531,11 @@ namespace Ogre {
         return OGRE_NEW Entity(name, pMesh);
 
     }
+    //-----------------------------------------------------------------------
+    void EntityFactory::destroyInstance( MovableObject* obj)
+    {
+        OGRE_DELETE obj;
+    }
+
+
 }

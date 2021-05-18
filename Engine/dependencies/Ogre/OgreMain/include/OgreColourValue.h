@@ -70,56 +70,41 @@ namespace Ogre {
                     float alpha = 1.0f ) : r(red), g(green), b(blue), a(alpha)
         { }
 
-        explicit ColourValue(const uchar* byte) : r(byte[0]), g(byte[1]), b(byte[2]), a(byte[3])
-        {
-            *this /= 255;
-        }
-
-        bool operator==(const ColourValue& rhs) const
-        {
-            return (r == rhs.r && g == rhs.g && b == rhs.b && a == rhs.a);
-        }
-        bool operator!=(const ColourValue& rhs) const { return !(*this == rhs); }
+        bool operator==(const ColourValue& rhs) const;
+        bool operator!=(const ColourValue& rhs) const;
 
         float r,g,b,a;
 
-        /// @name conversions from/ to native-endian packed formats
-        /// @{
-
-        /// value packed as #PF_R8G8B8A8
+        /** Retrieves colour as RGBA.
+        */
         RGBA getAsRGBA(void) const;
 
-        /// value packed as #PF_A8R8G8B8
+        /** Retrieves colour as ARGB.
+        */
         ARGB getAsARGB(void) const;
 
-        /// value packed as #PF_B8G8R8A8
+        /** Retrieves colour as BGRA.
+        */
         BGRA getAsBGRA(void) const;
 
-        /// value packed as #PF_A8B8G8R8
+        /** Retrieves colours as ABGR */
         ABGR getAsABGR(void) const;
 
-        /// value packed as #PF_BYTE_RGBA
-        RGBA getAsBYTE() const
-        {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-            return getAsRGBA();
-#else
-            return getAsABGR();
-#endif
-        }
-
-        /// Set value from #PF_R8G8B8A8
+        /** Sets colour as RGBA.
+        */
         void setAsRGBA(RGBA val);
 
-        /// Set value from #PF_A8R8G8B8
+        /** Sets colour as ARGB.
+        */
         void setAsARGB(ARGB val);
 
-        /// Set value from #PF_B8G8R8A8
+        /** Sets colour as BGRA.
+        */
         void setAsBGRA(BGRA val);
 
-        /// Set value from #PF_A8B8G8R8
+        /** Sets colour as ABGR.
+        */
         void setAsABGR(ABGR val);
-        /// @}
 
         /** Clamps colour value to the range [0, 1].
         */

@@ -65,6 +65,9 @@ namespace Ogre {
                                             PT_BOOL),&msCmdOptimisation);
 #endif
         }
+        // Manually assign language now since we use it immediately
+        mSyntaxCode = "glsles";
+
         // There is nothing to load
         mLoadFromFile = false;
     }
@@ -168,10 +171,12 @@ namespace Ogre {
         if (!mSource.empty())
         {
             size_t versionPos = mSource.find("#version");
+            int shaderVersion = 100;
             size_t belowVersionPos = 0;
 
             if(versionPos != String::npos)
             {
+                shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
                 belowVersionPos = mSource.find('\n', versionPos) + 1;
             }
 
@@ -182,7 +187,7 @@ namespace Ogre {
             // Fix up the source in case someone forgot to redeclare gl_Position
             if (caps->hasCapability(RSC_GLSL_SSO_REDECLARE) && mType == GPT_VERTEX_PROGRAM)
             {
-                if(mShaderVersion >= 300) {
+                if(shaderVersion >= 300) {
                     // Check that it's missing and that this shader has a main function, ie. not a child shader.
                     if(mSource.find("out highp vec4 gl_Position") == String::npos)
                     {

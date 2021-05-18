@@ -326,7 +326,7 @@ namespace Ogre
         return ret;
     }
     //-----------------------------------------------------------------------------
-    const GpuProgramParametersPtr& GpuProgram::getDefaultParameters(void)
+    GpuProgramParametersSharedPtr GpuProgram::getDefaultParameters(void)
     {
         if (!mDefaultParams)
         {
@@ -410,7 +410,30 @@ namespace Ogre
     String GpuProgram::CmdType::doGet(const void* target) const
     {
         const GpuProgram* t = static_cast<const GpuProgram*>(target);
-        return GpuProgram::getProgramTypeName(t->getType()) + "_program";
+        if (t->getType() == GPT_VERTEX_PROGRAM)
+        {
+            return "vertex_program";
+        }
+        else if (t->getType() == GPT_GEOMETRY_PROGRAM)
+        {
+            return "geometry_program";
+        }
+        else if (t->getType() == GPT_DOMAIN_PROGRAM)
+        {
+            return "domain_program";
+        }
+        else if (t->getType() == GPT_HULL_PROGRAM)
+        {
+            return "hull_program";
+        }
+        else if (t->getType() == GPT_COMPUTE_PROGRAM)
+        {
+            return "compute_program";
+        }
+        else
+        {
+            return "fragment_program";
+        }
     }
     void GpuProgram::CmdType::doSet(void* target, const String& val)
     {
@@ -520,7 +543,6 @@ namespace Ogre
         t->mNeedsAdjacencyInfo = StringConverter::parseBool(val);
     }
     //-----------------------------------------------------------------------
-    OGRE_IGNORE_DEPRECATED_BEGIN
     String GpuProgram::CmdComputeGroupDims::doGet(const void* target) const
     {
         const GpuProgram* t = static_cast<const GpuProgram*>(target);
@@ -531,6 +553,5 @@ namespace Ogre
         GpuProgram* t = static_cast<GpuProgram*>(target);
         t->setComputeGroupDimensions(StringConverter::parseVector3(val));
     }
-    OGRE_IGNORE_DEPRECATED_END
 }
 

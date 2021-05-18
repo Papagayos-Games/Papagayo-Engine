@@ -40,7 +40,14 @@ namespace Ogre {
     /** \addtogroup ParticleFX
     *  @{
     */
-    /** This emitter emits particles in a random direction from within a cylinder area, where the cylinder is oriented along the Z-axis.
+    /** Particle emitter which emits particles randomly from points inside a cylinder.
+    @remarks
+        This basic particle emitter emits particles from a cylinder area. The
+        initial direction of these particles can either be a single direction
+        (i.e. a line), a random scattering inside a cone, or a random
+        scattering in all directions, depending the 'angle' parameter, which
+        is the angle across which to scatter the particles either side of the
+        base direction of the emitter. 
     */
     class _OgreParticleFXExport CylinderEmitter : public AreaEmitter
     {

@@ -71,10 +71,10 @@ namespace Ogre {
         virtual void _notifyCurrentCamera(Camera* cam) = 0;
         /** Delegated to by ParticleSystem::_notifyAttached */
         virtual void _notifyAttached(Node* parent, bool isTagPoint = false) = 0;
-        /// @deprecated do not use
-        OGRE_DEPRECATED virtual void _notifyParticleRotated(void) {}
-        /// @deprecated do not use
-        OGRE_DEPRECATED virtual void _notifyParticleResized(void) {}
+        /** Optional callback notified when particles are rotated */
+        virtual void _notifyParticleRotated(void) {}
+        /** Optional callback notified when particles are resized individually */
+        virtual void _notifyParticleResized(void) {}
         /** Tells the renderer that the particle quota has changed */
         virtual void _notifyParticleQuota(size_t quota) = 0;
         /** Tells the renderer that the particle default size has changed */
@@ -127,13 +127,14 @@ namespace Ogre {
         virtual void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false) = 0;
 
-        /// Tells the Renderer about the ParticleSystem bounds
-        virtual void _notifyBoundingBox(const AxisAlignedBox& aabb) {}
-
-        /// Tells the Renderer whether to cast shadows
-        virtual void _notifyCastShadows(bool enabled) {}
     };
 
+    /** Abstract class definition of a factory object for ParticleSystemRenderer. */
+    class _OgreExport ParticleSystemRendererFactory : public FactoryObj<ParticleSystemRenderer>, public FXAlloc
+    {
+    public:
+        // No methods, must just override all methods inherited from FactoryObj
+    };
     /** @} */
     /** @} */
 

@@ -47,18 +47,18 @@ namespace Ogre {
      */
     enum TextureUsage
     {
-        /// same as #HBU_GPU_TO_CPU
-        TU_STATIC = HBU_GPU_TO_CPU,
-        /// same as #HBU_CPU_ONLY
-        TU_DYNAMIC = HBU_CPU_ONLY,
-        /// same as #HBU_DETAIL_WRITE_ONLY
-        TU_WRITE_ONLY = HBU_DETAIL_WRITE_ONLY,
-        /// same as #HBU_GPU_ONLY
-        TU_STATIC_WRITE_ONLY = HBU_GPU_ONLY,
-        /// same as #HBU_CPU_TO_GPU
-        TU_DYNAMIC_WRITE_ONLY = HBU_CPU_TO_GPU,
-        /// @deprecated do not use
-        TU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HBU_CPU_TO_GPU,
+        /// same as HardwareBuffer::HBU_STATIC
+        TU_STATIC = HardwareBuffer::HBU_STATIC,
+        /// same as HardwareBuffer::HBU_DYNAMIC
+        TU_DYNAMIC = HardwareBuffer::HBU_DYNAMIC,
+        /// same as HardwareBuffer::HBU_WRITE_ONLY
+        TU_WRITE_ONLY = HardwareBuffer::HBU_WRITE_ONLY,
+        /// same as HardwareBuffer::HBU_STATIC_WRITE_ONLY
+        TU_STATIC_WRITE_ONLY = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+        /// same as HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY
+        TU_DYNAMIC_WRITE_ONLY = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
+        /// same as HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE
+        TU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
         /// Mipmaps will be automatically generated for this texture
         TU_AUTOMIPMAP = 0x10,
         /** This texture will be a render target, i.e. used as a target for render to texture
@@ -73,7 +73,7 @@ namespace Ogre {
         /// Texture can be used as an UAV, but not as a regular texture.
         TU_UAV_NOT_SRV = TU_UAV | TU_NOT_SRV,
         /// Default to automatic mipmap generation static textures
-        TU_DEFAULT = TU_AUTOMIPMAP | HBU_GPU_ONLY,
+        TU_DEFAULT = TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY,
 
         // deprecated
         TU_NOTSHADERRESOURCE = TU_NOT_SRV
@@ -376,11 +376,16 @@ namespace Ogre {
         */
         void setDesiredBitDepths(ushort integerBits, ushort floatBits);
 
-        /// @deprecated use setFormat(PF_A8)
-        OGRE_DEPRECATED void setTreatLuminanceAsAlpha(bool asAlpha);
+        /** specify that a single channel (luminance) texture should be loaded as alpha
 
-        /// @deprecated do not use
-        OGRE_DEPRECATED bool getTreatLuminanceAsAlpha(void) const;
+          rather than the default which is to load it into the red channel. This can be helpful if
+          you want to use alpha-only textures in the fixed function pipeline.
+         */
+        void setTreatLuminanceAsAlpha(bool asAlpha);
+
+        /** Gets whether luminace pixel format will treated as alpha format when load this texture.
+        */
+        bool getTreatLuminanceAsAlpha(void) const;
 
         /** Return the number of faces this texture has. This will be 6 for a cubemap
             texture and 1 for a 1D, 2D or 3D one.

@@ -55,11 +55,11 @@ void Transform::init() {
 void Transform::update() {
 
 }
-
-const Vector3& Transform::getPos() 
-{
-	return _position;
-}
+//
+//const Vector3& Transform::getPos() 
+//{
+//	return _position;
+//}
 
 const Vector3& Transform::getPos() const
 {
@@ -86,10 +86,10 @@ void Transform::setPosZ(double z)
 	_position.setZ(z);
 }
 
-const Vector3& Transform::getRot()
-{
-	return _rotation;
-}
+//const Vector3& Transform::getRot()
+//{
+//	return _rotation;
+//}
 
 const Vector3& Transform::getRot() const
 {
@@ -116,10 +116,10 @@ void Transform::setRotZ(double z)
 	_rotation.setZ(z);
 }
 
-const Vector3& Transform::getVel()
-{
-	return _velocity;
-}
+//const Vector3& Transform::getVel()
+//{
+//	return _velocity;
+//}
 
 const Vector3& Transform::getVel() const
 {
@@ -146,10 +146,10 @@ void Transform::setVelZ(double z)
 	_velocity.setZ(z);
 }
 
-const Vector3& Transform::getDimensions()
-{
-	return _dimensions;
-}
+//const Vector3& Transform::getDimensions()
+//{
+//	return _dimensions;
+//}
 
 const Vector3& Transform::getDimensions() const
 {

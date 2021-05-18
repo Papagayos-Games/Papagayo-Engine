@@ -44,8 +44,6 @@ THE SOFTWARE.
 #include "OgrePass.h"
 #include "OgreMaterialManager.h"
 #include "OgreSceneLoaderManager.h"
-#include "OgreCodec.h"
-#include "OgreRoot.h"
 
 #include <fstream>
 
@@ -84,15 +82,17 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BspSceneManager::setWorldGeometry(const String& filename)
     {
-        auto stream = Root::openFileStream(
-            filename, ResourceGroupManager::getSingleton().getWorldResourceGroupName());
-        setWorldGeometry(stream);
+        SceneLoaderManager::getSingleton().load(
+            filename, ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
+            getRootSceneNode());
     }
     //-----------------------------------------------------------------------
     void BspSceneManager::setWorldGeometry(DataStreamPtr& stream, 
         const String& typeName)
     {
-        Codec::getCodec("bsp")->decode(stream, getRootSceneNode());
+        SceneLoaderManager::getSingleton().load(
+            stream, ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
+            getRootSceneNode());
     }
 
     void BspSceneManager::setLevel(const BspLevelPtr& level)

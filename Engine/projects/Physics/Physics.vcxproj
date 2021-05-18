@@ -20,11 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Physics\DebugDrawer.cpp" />
+    <ClCompile Include="..\..\src\Physics\MeshStrider.cpp" />
     <ClCompile Include="..\..\src\Physics\PhysicsManager.cpp" />
     <ClCompile Include="..\..\src\Physics\Rigidbody.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Physics\DebugDrawer.h" />
+    <ClInclude Include="..\..\include\Physics\MeshStrider.h" />
     <ClInclude Include="..\..\include\Physics\PhysicsManager.h" />
     <ClInclude Include="..\..\include\Physics\Rigidbody.h" />
   </ItemGroup>
@@ -121,7 +123,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\Physics;$(SolutionDir)include\Common;$(SolutionDir)include\Graphics;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\json</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Physics;$(SolutionDir)include\Common;$(SolutionDir)include;$(SolutionDir)include\Graphics;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\json</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -157,7 +159,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\Physics;$(SolutionDir)include\Common;$(SolutionDir)include\Graphics;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\json</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Physics;$(SolutionDir)include\Common;$(SolutionDir)include;$(SolutionDir)include\Graphics;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Ogre\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\json</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

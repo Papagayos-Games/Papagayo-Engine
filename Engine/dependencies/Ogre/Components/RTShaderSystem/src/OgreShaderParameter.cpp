@@ -54,8 +54,10 @@ namespace RTShader {
         */
         virtual String toString () const
         {
+            const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
             StringStream str;
-            str << "vec2(" << std::showpoint << mValue.x << "," << mValue.y << ")";
+            str << (!lang.empty() && lang[0] == 'g' ? "vec2(" : "float2(");
+            str << std::showpoint << mValue.x << "," << mValue.y << ")";
             return str.str();
         }
     };
@@ -79,8 +81,10 @@ namespace RTShader {
         */
         virtual String toString () const
         {
+            const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
             StringStream str;
-            str << "vec3(" << std::showpoint << mValue.x << "," << mValue.y << "," << mValue.z << ")";
+            str << (!lang.empty() && lang[0] == 'g' ? "vec3(" : "float3(");
+            str << std::showpoint << mValue.x << "," << mValue.y << "," << mValue.z << ")";
             return str.str();
         }
     };
@@ -104,8 +108,10 @@ namespace RTShader {
         */
         virtual String toString () const
         {
+            const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
             StringStream str;
-            str << "vec4(" << std::showpoint << mValue.x << "," << mValue.y << "," << mValue.z << "," << mValue.w << ")";
+            str << (!lang.empty() && lang[0] == 'g' ? "vec4(" : "float4(");
+            str << std::showpoint << mValue.x << "," << mValue.y << "," << mValue.z << "," << mValue.w << ")";
             return str.str();
         }
     };
@@ -168,6 +174,8 @@ Parameter::Parameter(GpuConstantType type, const String& name,
             const Content& content, size_t size) :
     mName(name), mType(type), mSemantic(semantic), mIndex(index), mContent(content), mSize(size), mUsed(false)
 {
+    if (ShaderGenerator::getSingleton().getTargetLanguage()[0] == 'h' && mSemantic == SPS_BLEND_INDICES)
+        mType = GCT_UINT4;
 }
 
 //-----------------------------------------------------------------------
@@ -411,7 +419,7 @@ ParameterPtr ParameterFactory::createInWeights(int index)
 ParameterPtr ParameterFactory::createInIndices(int index)
 {
 	return ParameterPtr(OGRE_NEW Parameter(
-		GCT_UINT4
+		GCT_FLOAT4
 	, "iBlendIndices_" + StringConverter::toString(index), 
         Parameter::SPS_BLEND_INDICES, index, 
         Parameter::SPC_BLEND_INDICES));

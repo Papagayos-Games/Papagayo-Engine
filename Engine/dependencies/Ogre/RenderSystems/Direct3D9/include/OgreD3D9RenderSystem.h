@@ -69,6 +69,12 @@ namespace Ogre
     private:
         /// Direct3D
         IDirect3D9*  mD3D;
+        // TODO: remove following fields, use values directly from mOptions map as other render systems does
+        size_t mFSAASamples;
+        String mFSAAHint;
+        bool mVSync; 
+        unsigned int mVSyncInterval;
+        unsigned int mBackBufferCount; // -1 means 2 for vsync and 1 for no vsync
 
         /// instance
         HINSTANCE mhInstance;
@@ -155,7 +161,7 @@ namespace Ogre
         virtual void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
 
 
-        void convertVertexShaderCaps(RenderSystemCapabilities* rsc);
+        void convertVertexShaderCaps(RenderSystemCapabilities* rsc) const;
         void convertPixelShaderCaps(RenderSystemCapabilities* rsc) const;
         bool checkVertexTextureFormats(D3D9RenderWindow* renderWindow) const;
         void detachRenderTargetImpl(const String& name);
@@ -204,6 +210,10 @@ namespace Ogre
         RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
             bool fullScreen, const NameValuePairList *miscParams = 0);
         
+        /// @copydoc RenderSystem::_createRenderWindows
+        bool _createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
+            RenderWindowList& createdWindows);
+
         /// @copydoc RenderSystem::_createDepthBufferFor
         DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
 
@@ -250,18 +260,8 @@ namespace Ogre
         const String& getName() const;
 
         // Low-level overridden members
-        /**
-         Specific options:
-
-        | Key |  Default | Description |
-        |-----|---------------|---------|
-        | Allow DirectX9Ex | No | Use Direct3D 9Ex if possible |
-        | Multi device memory hint | Auto hardware buffers management | Automatically restore hardware buffers on device lost |
-        | Resource Creation Policy | - | See @ref D3D9ResourceCreationPolicy |
-        | Fixed Pipeline Enabled | true | Use fixed function units where possible. Disable to test migration to shader-only pipeline |
-        | Rendering Device | (default) |  |
-        */
         void setConfigOption( const String &name, const String &value );
+        void reinitialise();
         void shutdown();
         void setAmbientLight( float r, float g, float b );
         void setShadingType( ShadeOptions so );
@@ -293,6 +293,7 @@ namespace Ogre
         void _setTextureBlendMode( size_t unit, const LayerBlendModeEx& bm );
         void _setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw);
         void _setTextureMatrix( size_t unit, const Matrix4 &xform );
+        void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
         void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
         void _setViewport( Viewport *vp );      
         void _beginFrame();
@@ -302,7 +303,7 @@ namespace Ogre
         void _setCullingMode( CullingMode mode );
         void _setDepthBufferParams( bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL );
         void _setDepthBufferCheckEnabled( bool enabled = true );
-        void setColourBlendState(const ColourBlendState& state);
+        void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha);
         void _setDepthBufferWriteEnabled(bool enabled = true);
         void _setDepthBufferFunction( CompareFunction func = CMPF_LESS_EQUAL );
         void _setDepthBias(float constantBias, float slopeScaleBias);
@@ -324,7 +325,7 @@ namespace Ogre
         void bindGpuProgramParameters(GpuProgramType gptype, 
             const GpuProgramParametersPtr& params, uint16 variabilityMask);
 
-        void setScissorTest(bool enabled, const Rect& rect = Rect());
+        void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);
         void clearFrameBuffer(unsigned int buffers, 
             const ColourValue& colour = ColourValue::Black, 
             Real depth = 1.0f, unsigned short stencil = 0);
@@ -335,6 +336,15 @@ namespace Ogre
         Real getVerticalTexelOffset();
         Real getMinimumDepthInputValue();
         Real getMaximumDepthInputValue();
+        void registerThread();
+        void unregisterThread();
+        void preExtraThreadsStarted();
+        void postExtraThreadsStarted();     
+                
+        /*
+        Returns whether under the current render system buffers marked as TU_STATIC can be locked for update
+        */
+        virtual bool isStaticBufferLockable() const { return !mIsDirectX9Ex; }
 
 		bool IsActiveDeviceLost();
 

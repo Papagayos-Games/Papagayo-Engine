@@ -52,18 +52,36 @@ namespace Ogre {
           mCSAA(0)
     {
         // already handled by resize
-        emscripten_set_fullscreenchange_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, (void*)this, 1, &EmscriptenEGLWindow::fullscreenCallback);
-        emscripten_set_webglcontextlost_callback("#canvas", (void*)this, 1, &EmscriptenEGLWindow::contextLostCallback);
-        emscripten_set_webglcontextrestored_callback("#canvas", (void*)this, 1, &EmscriptenEGLWindow::contextRestoredCallback);
-        emscripten_set_resize_callback("#canvas", (void*)this, 1, &EmscriptenEGLWindow::canvasWindowResized);
+        //emscripten_set_fullscreenchange_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::fullscreenCallback);
+        emscripten_set_webglcontextlost_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::contextLostCallback);
+        emscripten_set_webglcontextrestored_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::contextRestoredCallback);
+        emscripten_set_resize_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::canvasWindowResized);
     }
 
     EmscriptenEGLWindow::~EmscriptenEGLWindow()
     {
-        emscripten_set_fullscreenchange_callback("#canvas", NULL, 0, NULL);
-        emscripten_set_resize_callback("#canvas", NULL, 0, NULL);
-        emscripten_set_webglcontextlost_callback("#canvas", NULL, 0, NULL);
-        emscripten_set_webglcontextrestored_callback("#canvas", NULL, 0, NULL);
+        emscripten_set_fullscreenchange_callback(NULL, NULL, 0, NULL);
+        emscripten_set_resize_callback(NULL, NULL, 0, NULL);
+        emscripten_set_webglcontextlost_callback(NULL, NULL, 0, NULL);
+        emscripten_set_webglcontextrestored_callback(NULL, NULL, 0, NULL);
+    }
+
+    void EmscriptenEGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
+    {
+        // We don't have a native window, so return 0.
+        left = top = 0;
+    }
+
+    void EmscriptenEGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
+    {
+    }
+
+    void EmscriptenEGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
+    {
+    }
+
+    void EmscriptenEGLWindow::reposition( int left, int top )
+    {
     }
 
     void EmscriptenEGLWindow::resize(uint width, uint height)
@@ -73,9 +91,6 @@ namespace Ogre {
         
 
         EMSCRIPTEN_RESULT result = emscripten_set_canvas_element_size(mCanvasSelector.c_str(), width, height);
-        // This is a workaroud for issue: https://github.com/emscripten-core/emscripten/issues/3283.
-        // The setTimeout of 0 will ensure that this code is runs on the next JSEventLoop.
-        EM_ASM(setTimeout(function(){var canvas = document.getElementById('canvas'); canvas.width = $0; canvas.height = $1;}, 0), width, height);
         
         if(result < 0)
         {
@@ -184,6 +199,8 @@ namespace Ogre {
             }
         }
         
+        initNativeCreatedWindow(miscParams);
+        
         if (mEglSurface)
         {
             mEglConfig = mGLSupport->getGLConfigFromDrawable (mEglSurface, &width, &height);
@@ -210,7 +227,7 @@ namespace Ogre {
             mHwGamma = false;
         }
         
-        mContext = createEGLContext(eglContext);
+        mContext = createEGLContext();
         mContext->setCurrent();
         EMSCRIPTEN_RESULT result = emscripten_set_canvas_element_size(mCanvasSelector.c_str(), width, height);
         
@@ -223,8 +240,7 @@ namespace Ogre {
         
         mOldWidth = width;
         mOldHeight = height;
-        if(fullScreen)
-            switchFullScreen(true);
+        switchFullScreen(fullScreen);
         
         EGL_CHECK_ERROR
 

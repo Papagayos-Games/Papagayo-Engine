@@ -47,10 +47,15 @@ namespace Ogre {
         if (checkMovables)
         {
             // Check membership of attached objects
-            for (auto mov : getAttachedObjects())
+            ObjectMap::const_iterator it, itend;
+            itend = mObjectsByName.end();
+            for (it = mObjectsByName.begin(); it != itend; ++it)
             {
-                static_cast<BspSceneManager*>(getCreator())->_notifyObjectMoved(
+                MovableObject* mov = *it;
+
+                static_cast<BspSceneManager*>(mCreator)->_notifyObjectMoved(
                     mov, this->_getDerivedPosition());
+
             }
         }
 
@@ -59,7 +64,7 @@ namespace Ogre {
     MovableObject* BspSceneNode::detachObject(unsigned short index)
     {
         MovableObject* ret = SceneNode::detachObject(index);
-        static_cast<BspSceneManager*>(getCreator())->_notifyObjectDetached(ret);
+        static_cast<BspSceneManager*>(mCreator)->_notifyObjectDetached(ret);
         return ret;
         
     }
@@ -67,36 +72,41 @@ namespace Ogre {
     MovableObject* BspSceneNode::detachObject(const String& name)
     {
         MovableObject* ret = SceneNode::detachObject(name);
-        static_cast<BspSceneManager*>(getCreator())->_notifyObjectDetached(ret);
+        static_cast<BspSceneManager*>(mCreator)->_notifyObjectDetached(ret);
         return ret;
     }
     //-------------------------------------------------------------------------
     void BspSceneNode::detachAllObjects(void)
     {
-        for (auto o : getAttachedObjects())
+        ObjectMap::const_iterator i, iend;
+        iend = mObjectsByName.end();
+        for (i = mObjectsByName.begin(); i != iend; ++i)
         {
-            static_cast<BspSceneManager*>(getCreator())
-                ->_notifyObjectDetached(o);
+            static_cast<BspSceneManager*>(mCreator)
+                ->_notifyObjectDetached(*i);
         }
         SceneNode::detachAllObjects();
     }
     //-------------------------------------------------------------------------
     void BspSceneNode::setInSceneGraph(bool inGraph)
     {
-        if (isInSceneGraph() != inGraph)
+        if (mIsInSceneGraph != inGraph)
         {
-            for (auto o : getAttachedObjects())
+            ObjectMap::const_iterator i, iend;
+            iend = mObjectsByName.end();
+            for (i = mObjectsByName.begin(); i != iend; ++i)
             {
                 if (!inGraph)
                 {
                     // Equivalent to detaching
-                    static_cast<BspSceneManager*>(getCreator())->_notifyObjectDetached(o);
+                    static_cast<BspSceneManager*>(mCreator)
+                        ->_notifyObjectDetached(*i);
                 }
                 else
                 {
                     // move deals with re-adding
-                    static_cast<BspSceneManager*>(getCreator())
-                        ->_notifyObjectMoved(o, this->_getDerivedPosition());
+                    static_cast<BspSceneManager*>(mCreator)->_notifyObjectMoved(
+                        *i, this->_getDerivedPosition());
                 }
             }
         }

@@ -38,12 +38,12 @@ namespace Ogre
             HardwareBuffer::Usage usage, bool useSystemMemory, bool useShadowBuffer):
         HardwareBuffer(usage, useSystemMemory, useShadowBuffer),
         mWidth(width), mHeight(height), mDepth(depth),
-        mFormat(format), mCurrentLockOptions()
+        mFormat(format)
     {
         // Default
         mRowPitch = mWidth;
         mSlicePitch = mHeight*mWidth;
-        mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
+        mSizeInBytes = mHeight*mWidth*PixelUtil::getNumElemBytes(mFormat);
     }
     
     //-----------------------------------------------------------------------------    
@@ -54,8 +54,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------    
     void* HardwarePixelBuffer::lock(size_t offset, size_t length, LockOptions options)
     {
-        OgreAssert(!isLocked(), "Cannot lock this buffer: it is already locked");
-        OgreAssert(offset == 0 && length == mSizeInBytes, "Cannot lock memory region: must lock box or entire buffer");
+        assert(!isLocked() && "Cannot lock this buffer, it is already locked!");
+        assert(offset == 0 && length == mSizeInBytes && "Cannot lock memory region, most lock box or entire buffer");
         
         Box myBox(0, 0, 0, mWidth, mHeight, mDepth);
         const PixelBox &rv = lock(myBox, options);
@@ -65,7 +65,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------    
     const PixelBox& HardwarePixelBuffer::lock(const Box& lockBox, LockOptions options)
     {
-        if (mShadowBuffer)
+        if (mUseShadowBuffer)
         {
             if (options != HBL_READ_ONLY)
             {
@@ -78,8 +78,6 @@ namespace Ogre
         }
         else
         {
-            mCurrentLockOptions = options;
-            mLockedBox = lockBox;
             // Lock the real buffer if there is no shadow buffer 
             mCurrentLock = lockImpl(lockBox, options);
             mIsLocked = true;
@@ -91,7 +89,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------    
     const PixelBox& HardwarePixelBuffer::getCurrentLock() 
     { 
-        OgreAssert(isLocked(), "Cannot get current lock: buffer not locked");
+        assert(isLocked() && "Cannot get current lock: buffer not locked");
+        
         return mCurrentLock; 
     }
     

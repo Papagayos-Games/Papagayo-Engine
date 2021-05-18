@@ -18,19 +18,21 @@ enum class ManID
 	Physics,
 	Render,
 	LUA,
+	UI,
 
 	LastManId
 };
 
 class Manager {
 protected:
-	std::map <std::string, std::function<Component* ()>> compsRegistry_;
+	std::map <std::string, int> enum_map_;
+	std::map <int, std::function<Component* ()>> compsRegistry_;
 	std::list<Component*> _compsList;
 	ManID _manId;
 public:
 	Manager(ManID id);
 	virtual ~Manager();
-
+	int getCompID(const std::string& s);
 	/// <summary>
 	/// Anyade un componente a la entidad
 	/// </summary>
@@ -50,7 +52,7 @@ public:
 	virtual bool destroyComponent(Entity* ent, int compId);
 
 	//-- Factory --//
-	void registerComponent(const std::string& name, std::function<Component * ()>compConst);
+	void registerComponent(const std::string& name, int id, std::function<Component * ()>compConst);
 	Component* create(const std::string& name, Entity* ent);	//esto puede ser un puntero inteligente
 	//-------------//
 

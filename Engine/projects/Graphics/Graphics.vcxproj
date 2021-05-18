@@ -26,7 +26,6 @@
     <ClInclude Include="..\..\include\Graphics\PlaneComponent.h" />
     <ClInclude Include="..\..\include\Graphics\RenderManager.h" />
     <ClInclude Include="..\..\include\Graphics\RTShaderTecnhiqueResolveListener.h" />
-    <ClInclude Include="..\..\include\Graphics\WindowGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Graphics\Camera.cpp" />
@@ -37,7 +36,6 @@
     <ClCompile Include="..\..\src\Graphics\RenderManager.cpp" />
     <ClCompile Include="..\..\src\Graphics\RTShaderTecnhiqueResolveListener.cpp" />
     <ClCompile Include="..\..\src\Graphics\SkyPlaneComponent.cpp" />
-    <ClCompile Include="..\..\src\Graphics\WindowGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">
@@ -164,7 +162,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\json;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\json;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\PlugIns\STBICodec\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -175,7 +173,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OgreMain_d.lib;OgreRTShaderSystem_d.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OgreMain_d.lib;OgreRTShaderSystem_d.lib;Codec_STBI_d.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -186,7 +184,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\json;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\json;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\Components\RTShaderSystem\include;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\PlugIns\STBICodec\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>

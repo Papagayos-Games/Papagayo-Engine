@@ -3,7 +3,6 @@
 #include "RenderManager.h"
 #include "OgreContext.h"
 #include <checkML.h>
-#include "WindowGenerator.h"
 #include "Ogre.h"
 #include "OgreSceneNode.h"
 #include "Vector3.h"
@@ -22,29 +21,12 @@ Camera::Camera() : Component(RenderManager::getInstance(), (int)RenderManager::R
 	init();
 }
 
-
-//Camera::Camera(Ogre::SceneNode* parentNode,std::string cameraName) : Component(RenderManager::getInstance(), (int)RenderManager::RenderCmpId::Camera), name_(cameraName)
-//{
-//	mCamera_ = OgreContext::getInstance()->getSceneManager()->createCamera(name_);
-//	mCamera_->setNearClipDistance(1);
-//	mCamera_->setFarClipDistance(10000);
-//	//mCamera_->lookAt(0, 0, -1);
-//	mCamera_->setAutoAspectRatio(true);
-//	//cam->setPolygonMode(Ogre::PM_WIREFRAME); 
-//
-//	camNode_ = parentNode->createChildSceneNode(name_ + "Node");
-//	camNode_->attachObject(mCamera_);
-//
-//	camNode_->setPosition(0, 0, 1000);
-//	camNode_->lookAt(Ogre::Vector3(0, 0, 0), Ogre::Node::TS_WORLD);
-//	vp_ = WindowGenerator::getInstance()->getRenderWindow()->addViewport(mCamera_);
-//	vp_->setBackgroundColour(Ogre::ColourValue(0.0, 1.0, 0.0, 1.0));//cambia el color del fondo
-//}
-
 Camera::~Camera()
 {
-	if (mCamera_ != nullptr) OgreContext::getInstance()->getSceneManager()->destroyCamera(mCamera_);
-	if (camNode_ != nullptr) OgreContext::getInstance()->getSceneManager()->destroySceneNode(camNode_);
+	if (mCamera_ != nullptr) 
+		OgreContext::getInstance()->getSceneManager()->destroyCamera(mCamera_);
+	if (camNode_ != nullptr) 
+		OgreContext::getInstance()->getSceneManager()->destroySceneNode(camNode_);
 }
 
 void Camera::update()
@@ -53,7 +35,7 @@ void Camera::update()
 	Vector3 pos = tr_->getPos();
 	camNode_->setPosition(Ogre::Vector3(pos.x, pos.y, pos.z));
 	Vector3 rot = tr_->getRot();
-	//rotaciones //TO DO: revisar
+	//rotaciones
 	camNode_->resetOrientation();
 	camNode_->yaw(Ogre::Degree(rot.y), Ogre::Node::TS_WORLD);//ejeY
 	camNode_->pitch(Ogre::Degree(rot.x), Ogre::Node::TS_WORLD);//ejex
@@ -82,7 +64,6 @@ void Camera::load(const nlohmann::json& params)
 	}
 
 	//Posición de la cámara
-	//TO DO: Probably lo lleve el transform
 	it = params.find("camPosition");
 	if (it != params.end()) {
 		std::vector<float> pos = it->get<std::vector<float>>();
@@ -145,10 +126,10 @@ void Camera::load(const nlohmann::json& params)
 				height = value;
 		}
 
-		vp_ = WindowGenerator::getInstance()->getRenderWindow()->addViewport(mCamera_, zOrder, left, top, width, height);
+		vp_ = OgreContext::getInstance()->getRenderWindow()->addViewport(mCamera_, zOrder, left, top, width, height);
 	}
 	//Viewport por defecto
-	else vp_ = WindowGenerator::getInstance()->getRenderWindow()->addViewport(mCamera_);
+	else vp_ = OgreContext::getInstance()->getRenderWindow()->addViewport(mCamera_);
 
 	//Color del viewPort
 	it = params.find("viewportColor");
@@ -210,11 +191,11 @@ void Camera::setFarClipDistance(int distance)
 	mCamera_->setFarClipDistance(distance);
 }
 
-const Vector3& Camera::getCameraPosition()
-{
-	Ogre::Vector3 aux = camNode_->getPosition();
-	return Vector3(aux.x, aux.y, aux.z);
-}
+//const Vector3& Camera::getCameraPosition()
+//{
+//	Ogre::Vector3 aux = camNode_->getPosition();
+//	return Vector3(aux.x, aux.y, aux.z);
+//}
 
 const Vector3& Camera::getCameraPosition() const
 {
@@ -222,9 +203,9 @@ const Vector3& Camera::getCameraPosition() const
 	return Vector3(aux.x, aux.y, aux.z);
 }
 
-Ogre::Camera* Camera::getCamera() {
-	return mCamera_;
-}
+//Ogre::Camera* Camera::getCamera() {
+//	return mCamera_;
+//}
 
 Ogre::Camera* Camera::getCamera() const {
 	return mCamera_;

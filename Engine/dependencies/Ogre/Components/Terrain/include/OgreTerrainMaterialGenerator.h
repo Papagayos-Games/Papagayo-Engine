@@ -35,7 +35,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class Rectangle2D;
     class Terrain;
 
     /** \addtogroup Optional
@@ -180,8 +179,8 @@ namespace Ogre
             TerrainMaterialGenerator* getParent() const { return mParent; }
             /// Get the name of this profile
             const String& getName() const { return mName; }
-            /// @deprecated do not use
-            OGRE_DEPRECATED const String& getDescription() const { return mDesc; }
+            /// Get the description of this profile
+            const String& getDescription() const { return mDesc; }
             /// Compressed vertex format supported?
             virtual bool isVertexCompressionSupported() const = 0;      
             /// Generate / reuse a material for the terrain
@@ -402,8 +401,9 @@ namespace Ogre
         unsigned int mDebugLevel;
         SceneManager* mCompositeMapSM;
         Camera* mCompositeMapCam;
+        SceneNode* mCamNode;
         Texture* mCompositeMapRTT; // deliberately holding this by raw pointer to avoid shutdown issues
-        Rectangle2D* mCompositeMapPlane;
+        ManualObject* mCompositeMapPlane;
         Light* mCompositeMapLight;
         SceneNode* mLightNode;
 

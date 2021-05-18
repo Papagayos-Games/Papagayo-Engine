@@ -333,7 +333,7 @@ namespace Ogre {
             {
                 std::stable_sort(
                     mSortedDescending.begin(), mSortedDescending.end(), 
-                    DistanceSortDescendingLess(cam));
+                    DepthSortDescendingLess(cam));
             }
         }
 

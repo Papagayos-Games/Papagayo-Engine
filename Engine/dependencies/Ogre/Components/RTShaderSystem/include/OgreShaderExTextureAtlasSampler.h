@@ -273,7 +273,11 @@ public:
             information in any case.
     */
     bool addTexutreAtlasDefinition( const Ogre::String& filename, TextureAtlasTablePtr textureAtlasTable = TextureAtlasTablePtr());
-    /// @overload
+    /**
+        @overload addTexutreAtlasDefinition(const Ogre::String& filename, TextureAtlasTablePtr textureAtlasTable)
+
+        @param stream A stream to a file containing ".tai" format data
+    */
     bool addTexutreAtlasDefinition( DataStreamPtr stream, TextureAtlasTablePtr textureAtlasTable = TextureAtlasTablePtr());
 
     /**
@@ -360,7 +364,7 @@ private:
     TextureAtlasAttib mDefaultAtlasAttrib;
 };
 
-OGRE_DEPRECATED _OgreRTSSExport void operator<<(std::ostream& o, const TextureAtlasSamplerFactory::TextureAtlasAttib& tai);
+_OgreRTSSExport void operator<<(std::ostream& o, const TextureAtlasSamplerFactory::TextureAtlasAttib& tai);
 
 /** @} */
 /** @} */

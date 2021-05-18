@@ -40,6 +40,7 @@ namespace Ogre {
         mAutoAspectRatio(false),
         mUseRenderingDistance(true),
         mUseMinPixelSize(false),
+        mSceneMgr(sm),
         mSceneDetail(PM_SOLID),
 #ifdef OGRE_NODELESS_POSITIONING
         mOrientation(Quaternion::IDENTITY),
@@ -52,8 +53,7 @@ namespace Ogre {
         mLastViewport(0),
         mCullFrustum(0),
         mLodCamera(0),
-        mPixelDisplayRatio(0),
-        mSortMode(SM_DISTANCE)
+        mPixelDisplayRatio(0)
     {
 
         // Reasonable defaults to camera params
@@ -81,7 +81,7 @@ namespace Ogre {
         mReflect = false;
 
         mVisible = false;
-        mManager = sm;
+
     }
 
     //-----------------------------------------------------------------------
@@ -96,7 +96,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SceneManager* Camera::getSceneManager(void) const
     {
-        return mManager;
+        return mSceneMgr;
     }
 
 
@@ -154,9 +154,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Camera::setDirection(Real x, Real y, Real z)
     {
-        OGRE_IGNORE_DEPRECATED_BEGIN
         setDirection(Vector3(x,y,z));
-        OGRE_IGNORE_DEPRECATED_END
     }
 
     //-----------------------------------------------------------------------
@@ -174,9 +172,16 @@ namespace Ogre {
 
         Quaternion targetWorldOrientation;
 
+
         if( mYawFixed )
         {
-            targetWorldOrientation = Math::lookRotation(zAdjustVec, mYawFixedAxis);
+            Vector3 xVec = mYawFixedAxis.crossProduct( zAdjustVec );
+            xVec.normalise();
+
+            Vector3 yVec = zAdjustVec.crossProduct( xVec );
+            yVec.normalise();
+
+            targetWorldOrientation.FromAxes( xVec, yVec, zAdjustVec );
         }
         else
         {
@@ -242,18 +247,14 @@ namespace Ogre {
     void Camera::lookAt(const Vector3& targetPoint)
     {
         updateView();
-        OGRE_IGNORE_DEPRECATED_BEGIN
         this->setDirection(targetPoint - mRealPosition);
-        OGRE_IGNORE_DEPRECATED_END
     }
 
     //-----------------------------------------------------------------------
     void Camera::lookAt( Real x, Real y, Real z )
     {
         Vector3 vTemp( x, y, z );
-        OGRE_IGNORE_DEPRECATED_BEGIN
         this->lookAt(vTemp);
-        OGRE_IGNORE_DEPRECATED_END
     }
 
     //-----------------------------------------------------------------------
@@ -261,9 +262,7 @@ namespace Ogre {
     {
         // Rotate around local Z axis
         Vector3 zAxis = mOrientation * Vector3::UNIT_Z;
-        OGRE_IGNORE_DEPRECATED_BEGIN
         rotate(zAxis, angle);
-        OGRE_IGNORE_DEPRECATED_END
 
         invalidateView();
     }
@@ -284,9 +283,7 @@ namespace Ogre {
             yAxis = mOrientation * Vector3::UNIT_Y;
         }
 
-        OGRE_IGNORE_DEPRECATED_BEGIN
         rotate(yAxis, angle);
-        OGRE_IGNORE_DEPRECATED_END
 
         invalidateView();
     }
@@ -296,9 +293,7 @@ namespace Ogre {
     {
         // Rotate around local X axis
         Vector3 xAxis = mOrientation * Vector3::UNIT_X;
-        OGRE_IGNORE_DEPRECATED_BEGIN
         rotate(xAxis, angle);
-        OGRE_IGNORE_DEPRECATED_END
 
         invalidateView();
 
@@ -309,9 +304,7 @@ namespace Ogre {
     {
         Quaternion q;
         q.FromAngleAxis(angle,axis);
-        OGRE_IGNORE_DEPRECATED_BEGIN
         rotate(q);
-        OGRE_IGNORE_DEPRECATED_END
     }
 
     //-----------------------------------------------------------------------
@@ -345,9 +338,7 @@ namespace Ogre {
         // NB assumes that all scene nodes have been updated
         if (mAutoTrackTarget)
         {
-            OGRE_IGNORE_DEPRECATED_BEGIN
             lookAt(mAutoTrackTarget->_getFullTransform() * mAutoTrackOffset);
-            OGRE_IGNORE_DEPRECATED_END
         }
     }
 
@@ -493,7 +484,7 @@ namespace Ogre {
         }
 
         //render scene
-        mManager->_renderScene(this, vp, includeOverlays);
+        mSceneMgr->_renderScene(this, vp, includeOverlays);
 
         // Listener list may have change
         listenersCopy = mListeners;

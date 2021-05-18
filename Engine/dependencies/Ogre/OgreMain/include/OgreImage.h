@@ -59,28 +59,13 @@ namespace Ogre {
     */
     class _OgreExport Image : public ImageAlloc
     {
-    friend class ImageCodec;
     public:
         /** Standard constructor.
-         *
-         * allocates a buffer of given size if buffer pointer is NULL.
-         */
-        Image(PixelFormat format = PF_UNKNOWN, uint32 width = 0, uint32 height = 0, uint32 depth = 1,
-              uchar* buffer = NULL, bool autoDelete = true);
+        */
+        Image();
         /** Copy-constructor - copies all the data from the target image.
-         */
+        */
         Image( const Image &img );
-
-        /**
-         * allocates a buffer of given size if needed
-         *
-         * - If the current allocation is equal to the requested size, this does nothing
-         * - Otherwise any current allocation is freed, and memory of specified size is allocated
-         *
-         * @see loadDynamicImage
-         */
-        void create(PixelFormat format, uint32 width, uint32 height, uint32 depth = 1, uint32 numFaces = 1,
-                    uint32 numMipMaps = 0);
 
         /** Standard destructor.
         */
@@ -89,13 +74,6 @@ namespace Ogre {
         /** Assignment operator - copies all the data from the target image.
         */
         Image & operator = ( const Image & img );
-
-        /**
-         * sets all pixels to the specified colour
-         *
-         * format conversion is performed as needed
-         */
-        void setTo(const ColourValue& col);
 
         /** Flips (mirrors) the image around the Y-axis. 
             @remarks
@@ -322,39 +300,23 @@ namespace Ogre {
         */
         DataStreamPtr encode(const String& formatextension);
 
-        /** Returns a pointer to the internal image buffer at the specified pixel location.
-
+        /** Returns a pointer to the internal image buffer.
+        @remarks
             Be careful with this method. You will almost certainly
             prefer to use getPixelBox, especially with complex images
             which include many faces or custom mipmaps.
         */
-        uchar* getData(uint32 x = 0, uint32 y = 0, uint32 z = 0)
-        {
-            assert((!mBuffer && (x + y + z) == 0) || (x < mWidth && y < mHeight && z < mDepth));
-            return mBuffer + mPixelSize * (z * mWidth * mHeight + mWidth * y + x);
-        }
+        uchar* getData(void);
 
-        /// @overload
-        const uchar* getData(uint32 x = 0, uint32 y = 0, uint32 z = 0) const
-        {
-            assert(mBuffer);
-            assert(x < mWidth && y < mHeight && z < mDepth);
-            return mBuffer + mPixelSize * (z * mWidth * mHeight + mWidth * y + x);
-        }
+        /** Returns a const pointer to the internal image buffer.
+        @remarks
+            Be careful with this method. You will almost certainly
+            prefer to use getPixelBox, especially with complex images
+            which include many faces or custom mipmaps.
+        */
+        const uchar * getData() const;       
 
-        /// @overload
-        template <typename T> T* getData(uint32 x = 0, uint32 y = 0, uint32 z = 0)
-        {
-            return reinterpret_cast<T*>(getData(x, y, z));
-        }
-
-        /// @overload
-        template <typename T> const T* getData(uint32 x = 0, uint32 y = 0, uint32 z = 0) const
-        {
-            return reinterpret_cast<const T*>(getData(x, y, z));
-        }
-
-        /** Returns the size of the data buffer in bytes
+        /** Returns the size of the data buffer.
         */
         size_t getSize() const;
 
@@ -432,7 +394,7 @@ namespace Ogre {
         {
             FILTER_NEAREST,
             FILTER_LINEAR,
-            FILTER_BILINEAR = FILTER_LINEAR,
+            FILTER_BILINEAR,
             FILTER_BOX,
             FILTER_TRIANGLE,
             FILTER_BICUBIC

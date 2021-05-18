@@ -3,7 +3,6 @@
 OGRE drives many of its features through scripts in order to make it easier to set up. The scripts are simply plain text files which can be edited in any standard text editor, and modifying them immediately takes effect on your OGRE-based applications, without any need to recompile. This makes prototyping a lot faster. Here are the items that OGRE lets you script:
 
 - @subpage Material-Scripts
-- @subpage High-level-Programs
 - @subpage Compositor-Scripts
 - @subpage Particle-Scripts
 - @subpage Overlay-Scripts
@@ -13,16 +12,7 @@ OGRE drives many of its features through scripts in order to make it easier to s
 
 # Loading scripts
 
-Scripts are loaded when resource groups are initialised: OGRE looks in all resource locations associated with the group (see Ogre::ResourceGroupManager::addResourceLocation) for files with the respective extension (e.g. ’.material’, ’.compositor’, ..) and parses them. If you want to parse files manually, use Ogre::ScriptCompilerManager::parseScript.
-
-The file extension does not actually restrict the items that can be specified inside the file; e.g. %Ogre is perfectly fine with loading a particle-system from a ’.compositor’ file - but it will lead you straight to maintenance-hell if you do that.
-The extensions, however, do specify the order in which the scripts are parsed, which is as follows:
-
-1. "*.program"
-2. "*.material"
-3. "*.particle"
-4. "*.compositor"
-5. "*.os"
+Scripts are loaded when resource groups are initialised: OGRE looks in all resource locations associated with the group (see Ogre::ResourceGroupManager::addResourceLocation) for files with the respective extension (e.g. ’.material’, ’.compositor’, ..) and parses them. If you want to parse files manually, use the `parseScript` method of the according manager.
 
 # Format {#Format}
 
@@ -50,7 +40,7 @@ An script object can inherit from a previously defined object by using a *colon*
 
 ## Script Inheritance {#Script-Inheritance}
 
-When creating new script objects that are only slight variations of another object, it’s good to avoid copying and pasting between scripts. Script inheritance lets you do this; in this section we’ll use material scripts as an example, but this applies to all scripts parsed with the script compilers in %Ogre 1.6 onwards.
+When creating new script objects that are only slight variations of another object, it’s good to avoid copying and pasting between scripts. Script inheritance lets you do this; in this section we’ll use material scripts as an example, but this applies to all scripts parsed with the script compilers in Ogre 1.6 onwards.
 
 For example, to make a new material that is based on one previously defined, add a *colon* ’:’ after the new material name followed by the name of the material that is to be copied.
 
@@ -59,7 +49,7 @@ Example
 material <NewUniqueChildName> : <ReferenceParentMaterial>
 ```
 
-The only caveat is that a parent material must have been defined/parsed prior to the child material script being parsed. The easiest way to achieve this is to either place parents at the beginning of the material script file, or to use the @ref Script-Import-Directive. Note that inheritance is actually a copy - after scripts are loaded into Ogre, objects no longer maintain their copy inheritance structure. If a parent material is modified through code at runtime, the changes have no effect on child materials that were copied from it in the script.
+The only caveat is that a parent material must have been defined/parsed prior to the child material script being parsed. The easiest way to achieve this is to either place parents at the beginning of the material script file, or to use the ’import’ directive (See @ref Script-Import-Directive). Note that inheritance is actually a copy - after scripts are loaded into Ogre, objects no longer maintain their copy inheritance structure. If a parent material is modified through code at runtime, the changes have no effect on child materials that were copied from it in the script.
 
 Material copying within the script alleviates some drudgery from copy/paste but having the ability to identify specific techniques, passes, and texture units to modify makes material copying easier. Techniques, passes, texture units can be identified directly in the child material without having to layout previous techniques, passes, texture units by associating a name with them, Techniques and passes can take a name and texture units can be numbered within the material script. You can also use variables, See @ref Script-Variables.
 
@@ -214,7 +204,7 @@ import Parent from "parent.material"
 
 If there were other definitions in the parent.material file, they would not be imported.
 
-@note Importing does not actually cause objects in the imported script to be fully parsed & created, it just makes the definitions available for inheritance. This has a specific ramification for vertex / fragment program definitions, which must be loaded before any parameters can be specified. You should continue to put common program definitions in .program files to ensure they are fully parsed before being referenced in multiple .material files. The ’import’ command just makes sure you can resolve dependencies between equivalent script definitions (e.g. material to material).
+Note, however that importing does not actually cause objects in the imported script to be fully parsed & created, it just makes the definitions available for inheritance. This has a specific ramification for vertex / fragment program definitions, which must be loaded before any parameters can be specified. You should continue to put common program definitions in .program files to ensure they are fully parsed before being referenced in multiple .material files. The ’import’ command just makes sure you can resolve dependencies between equivalent script definitions (e.g. material to material).
 
 # Custom Translators {#custom-translators}
 Writing a custom translators allows you to extend Ogre's standard compilers with completely new functionality. The same scripting interfaces can be used to define application-specific functionality. Here's how you do it.
@@ -723,8 +713,6 @@ For passes of type ’stencil’, this section defines the stencil operation par
 @par
 Format: pass stencil { }
 
-@copydetails Ogre::StencilState
-
 Here are the attributes you can use in a ’stencil’ section of a .compositor script:
 
 -   [check](#compositor_005fstencil_005fcheck)
@@ -746,8 +734,9 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     ## comp\_func
 
-    Sets the function used to perform the stencil comparison.
+    Sets the function used to perform the following comparison: (ref\_value & mask) comp\_func (Stencil Buffer Value & mask)
 
+    What happens as a result of this comparison will be one of 3 actions on the stencil buffer, depending on whether the test fails, succeeds but with the depth buffer check still failing, or succeeds with the depth buffer check passing too. You set the actions in the [fail\_op](#compositor_005fstencil_005ffail_005fop), [depth\_fail\_op](#compositor_005fstencil_005fdepth_005ffail_005fop) and [pass\_op](#compositor_005fstencil_005fpass_005fop) respectively. If the stencil check fails, no colour or depth are written to the frame buffer. 
     @par
     Format: comp\_func (always\_fail | always\_pass | less | less\_equal | not\_equal | greater\_equal | greater)
     @par
@@ -1261,5 +1250,7 @@ Here are the attributes you need to supply:
 @param antialias\_colour <b>&lt;true|false&gt;</b> This is an optional flag, which defaults to `false`. The generator will antialias the font by default using the alpha component of the texture, which will look fine if you use alpha blending to render your text (this is the default assumed by TextAreaOverlayElement for example). If, however you wish to use a colour based blend like add or modulate in your own code, you should set this to `true` so the colour values are anti-aliased too. If you set this to true and use alpha blending, you’ll find the edges of your font are antialiased too quickly resulting in a *thin* look to your fonts, because not only is the alpha blending the edges, the colour is fading too. Leave this option at the default if in doubt.
 
 @param code\_points <b>nn-nn \[nn-nn\] ..</b> This directive allows you to specify which unicode code points should be generated as glyphs into the font texture. If you don’t specify this, code points 33-126 will be generated by default which covers the ASCII glyphs. If you use this flag, you should specify a space-separated list of inclusive code point ranges of the form ’start-end’. Numbers must be decimal.
+
+@param character\_spacer <b>&lt;spacing\_in\_points&gt;</b> This option can be useful for fonts that are atypically wide, e.g. calligraphy fonts, where you may see artifacts from characters overlapping. The default value is 5.
 
 You can also create new fonts at runtime by using the FontManager if you wish.

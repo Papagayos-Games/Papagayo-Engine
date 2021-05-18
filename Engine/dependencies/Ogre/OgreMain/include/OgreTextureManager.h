@@ -65,10 +65,27 @@ namespace Ogre {
         virtual ~TextureManager();
 
         /// create a new sampler
-        SamplerPtr createSampler(const String& name = BLANKSTRING);
+        SamplerPtr createSampler(const String& name = BLANKSTRING)
+        {
+            SamplerPtr ret = _createSamplerImpl();
+            if(!name.empty())
+            {
+                OgreAssert(mNamedSamplers.find(name) == mNamedSamplers.end(),
+                           ("Sampler '" + name + "' already exists").c_str());
+                mNamedSamplers[name] = ret;
+            }
+            return ret;
+        }
 
         /// retrieve an named sampler
-        const SamplerPtr& getSampler(const String& name) const;
+        const SamplerPtr& getSampler(const String& name) const
+        {
+            static SamplerPtr nullPtr;
+            auto it = mNamedSamplers.find(name);
+            if(it == mNamedSamplers.end())
+                return nullPtr;
+            return it->second;
+        }
 
         /// Create a new texture
         /// @copydetails ResourceManager::createResource
@@ -94,7 +111,9 @@ namespace Ogre {
             @param
                 gamma The gamma adjustment factor to apply to this texture (brightening/darkening)
             @param 
-                isAlpha deprecated: same as specifying #PF_A8 for @c desiredFormat
+                isAlpha Only applicable to greyscale images. If true, specifies that
+                the image should be loaded into an alpha texture rather than a
+                single channel colour texture - useful for fixed-function systems.
             @param 
                 desiredFormat The format you would like to have used instead of
                 the format being based on the contents of the texture
@@ -112,16 +131,6 @@ namespace Ogre {
             PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
 
         /** Prepares to loads a texture from a file.
-            @copydetails TextureManager::load
-            @param isAlpha deprecated: same as specifying #PF_A8 for @c desiredFormat
-        */
-        TexturePtr prepare(
-            const String& name, const String& group,
-            TextureType texType = TEX_TYPE_2D, int numMipmaps = MIP_DEFAULT,
-            Real gamma = 1.0f, bool isAlpha = false,
-            PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
-
-        /** Loads a texture from a file.
             @param
                 name The file to load, or a String identifier in some cases
             @param
@@ -135,7 +144,10 @@ namespace Ogre {
                 level, 1x1x1.
             @param
                 gamma The gamma adjustment factor to apply to this texture (brightening/darkening)
-
+            @param 
+                isAlpha Only applicable to greyscale images. If true, specifies that
+                the image should be loaded into an alpha texture rather than a
+                single channel colour texture - useful for fixed-function systems.
             @param 
                 desiredFormat The format you would like to have used instead of
                 the format being based on the contents of the texture; the manager reserves
@@ -147,14 +159,21 @@ namespace Ogre {
                 8-bits per channel textures, will be ignored for other types. Has the advantage
                 over pre-applied gamma that the texture precision is maintained.
         */
-        TexturePtr load(const String& name, const String& group, TextureType texType = TEX_TYPE_2D,
-                        int numMipmaps = MIP_DEFAULT, Real gamma = 1.0f,
-                        PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
-        /// @deprecated
-        OGRE_DEPRECATED TexturePtr load(const String& name, const String& group, TextureType texType,
-                                        int numMipmaps, Real gamma, bool isAlpha,
-                                        PixelFormat desiredFormat = PF_UNKNOWN,
-                                        bool hwGammaCorrection = false);
+        TexturePtr prepare(
+            const String& name, const String& group, 
+            TextureType texType = TEX_TYPE_2D, int numMipmaps = MIP_DEFAULT, 
+            Real gamma = 1.0f, bool isAlpha = false,
+            PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
+
+        /** Loads a texture from a file.
+            @copydetails TextureManager::prepare
+        */
+        TexturePtr load(
+            const String& name, const String& group, 
+            TextureType texType = TEX_TYPE_2D, int numMipmaps = MIP_DEFAULT, 
+            Real gamma = 1.0f, bool isAlpha = false,
+            PixelFormat desiredFormat = PF_UNKNOWN, 
+            bool hwGammaCorrection = false);
 
         /** Loads a texture from an Image object.
             @note
@@ -233,8 +252,8 @@ namespace Ogre {
                 usage The kind of usage this texture is intended for. It 
                 is a combination of TU_STATIC, TU_DYNAMIC, TU_WRITE_ONLY, 
                 TU_AUTOMIPMAP and TU_RENDERTARGET (see TextureUsage enum). You are
-                strongly advised to use HBU_GPU_ONLY wherever possible, if you need to
-                update regularly, consider HBU_CPU_TO_GPU.
+                strongly advised to use HBU_STATIC_WRITE_ONLY wherever possible, if you need to 
+                update regularly, consider HBU_DYNAMIC_WRITE_ONLY.
             @param
                 loader If you intend the contents of the manual texture to be 
                 regularly updated, to the extent that you don't need to recover 
@@ -252,7 +271,7 @@ namespace Ogre {
             @param fsaa The level of multisampling to use if this is a render target. Ignored
                 if usage does not include TU_RENDERTARGET or if the device does
                 not support it.
-            @param fsaaHint @copybrief RenderTarget::getFSAAHint
+            @param fsaaHint specify "Quality" to enable CSAA on D3D
         */
         virtual TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, uint depth, 

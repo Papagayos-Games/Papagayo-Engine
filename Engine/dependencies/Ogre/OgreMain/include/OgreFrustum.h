@@ -40,7 +40,7 @@ namespace Ogre
     /** \addtogroup Core
     *  @{
     */
-    /** \addtogroup Scene
+    /** \addtogroup Math
     *  @{
     */
     /** Specifies orientation mode.
@@ -83,7 +83,6 @@ namespace Ogre
     */
     class _OgreExport Frustum : public MovableObject, public Renderable
     {
-        bool getCastsShadows(void) const override { return getCastShadows(); }
     protected:
         /// Orthographic or perspective?
         ProjectionType mProjType;
@@ -169,7 +168,6 @@ namespace Ogre
         mutable AxisAlignedBox mBoundingBox;
         mutable VertexData mVertexData;
 
-        ColourValue mDebugColour;
         MaterialPtr mMaterial;
         mutable Vector3 mWorldSpaceCorners[8];
 
@@ -209,6 +207,8 @@ namespace Ogre
         @par
             This value represents the VERTICAL field-of-view. The horizontal field of view is calculated from
             this depending on the dimensions of the viewport (they will only be the same if the viewport is square).
+        @note
+            Setting the FOV overrides the value supplied for frustum::setNearClipPlane.
          */
         void setFOVy(const Radian& fovy);
 
@@ -480,11 +480,8 @@ namespace Ogre
         const String& getMovableType(void) const override;
         void _notifyCurrentCamera(Camera* cam) override;
 
-        /// @deprecated use setDebugColour
-        OGRE_DEPRECATED void setMaterial(const MaterialPtr& mat);
-
-        void setDebugColour(const ColourValue& col) { mDebugColour = col; }
-        const ColourValue& getDebugColour() const { return mDebugColour; }
+        /// material to use for debug display
+        void setMaterial(const MaterialPtr& mat);
 
         const MaterialPtr& getMaterial(void) const override;
         void getRenderOperation(RenderOperation& op) override;

@@ -34,103 +34,18 @@ namespace Ogre {
     ImageCodec::~ImageCodec() {
     }
 
-    void ImageCodec::decode(const DataStreamPtr& input, const Any& output) const
-    {
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        Codec::DecodeResult res = decode(input);
-        OGRE_IGNORE_DEPRECATED_END
-
-        auto pData = static_cast<ImageCodec::ImageData*>(res.second.get());
-
-        Image* dest = any_cast<Image*>(output);
-        dest->mWidth = pData->width;
-        dest->mHeight = pData->height;
-        dest->mDepth = pData->depth;
-        dest->mBufSize = pData->size;
-        dest->mNumMipmaps = pData->num_mipmaps;
-        dest->mFlags = pData->flags;
-        dest->mFormat = pData->format;
-        // Just use internal buffer of returned memory stream
-        dest->mBuffer = res.first->getPtr();
-        // Make sure stream does not delete
-        res.first->setFreeOnClose(false);
-    }
-
-    DataStreamPtr ImageCodec::encode(const Any& input) const
-    {
-        Image* src = any_cast<Image*>(input);
-
-        auto imgData = std::make_shared<ImageCodec::ImageData>();
-        imgData->format = src->getFormat();
-        imgData->height = src->getHeight();
-        imgData->width = src->getWidth();
-        imgData->depth = src->getDepth();
-        imgData->size = src->getSize();
-        imgData->num_mipmaps = src->getNumMipmaps();
-
-        // Wrap memory, be sure not to delete when stream destroyed
-        auto wrapper = std::make_shared<MemoryDataStream>(src->getData(), src->getSize(), false);
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        return encode(wrapper, imgData);
-        OGRE_IGNORE_DEPRECATED_END
-    }
-    void ImageCodec::encodeToFile(const Any& input, const String& outFileName) const
-    {
-        Image* src = any_cast<Image*>(input);
-
-        auto imgData = std::make_shared<ImageCodec::ImageData>();
-        imgData->format = src->getFormat();
-        imgData->height = src->getHeight();
-        imgData->width = src->getWidth();
-        imgData->depth = src->getDepth();
-        imgData->size = src->getSize();
-		imgData->num_mipmaps = src->getNumMipmaps();
-
-        // Wrap memory, be sure not to delete when stream destroyed
-        auto wrapper = std::make_shared<MemoryDataStream>(src->getData(), src->getSize(), false);
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        encodeToFile(wrapper, outFileName, imgData);
-        OGRE_IGNORE_DEPRECATED_END
-    }
-
     //-----------------------------------------------------------------------------
-    Image::Image(PixelFormat format, uint32 width, uint32 height, uint32 depth, uchar* buffer, bool autoDelete)
+    Image::Image()
         : mWidth(0),
         mHeight(0),
         mDepth(0),
         mBufSize(0),
         mNumMipmaps(0),
         mFlags(0),
-        mFormat(format),
+        mFormat(PF_UNKNOWN),
         mBuffer( NULL ),
         mAutoDelete( true )
     {
-        if (format == PF_UNKNOWN)
-            return;
-
-        size_t size = calculateSize(0, 1,  width, height, depth, mFormat);
-
-        if (size == 0)
-            return;
-
-        if (!buffer)
-            buffer = OGRE_ALLOC_T(uchar, size, MEMCATEGORY_GENERAL);
-        loadDynamicImage(buffer, width, height, depth, format, autoDelete);
-    }
-
-    void Image::create(PixelFormat format, uint32 width, uint32 height, uint32 depth, uint32 numFaces,
-                       uint32 numMipMaps)
-    {
-        size_t size = calculateSize(numMipMaps, numFaces, width, height, depth, format);
-        if (!mAutoDelete || !mBuffer || mBufSize != size)
-        {
-            freeMemory();
-            mBuffer = new uchar[size]; // allocate
-        }
-
-        // make sure freeMemory() does nothing, we set this true immediately after
-        mAutoDelete = false;
-        loadDynamicImage(mBuffer, width, height, depth, format, true, numFaces, numMipMaps);
     }
 
     //-----------------------------------------------------------------------------
@@ -160,38 +75,30 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------------
-    Image& Image::operator=(const Image& img)
+    Image & Image::operator = ( const Image &img )
     {
-        // Only create & copy when other data was owning
-        if (img.mBuffer && img.mAutoDelete)
+        freeMemory();
+        mWidth = img.mWidth;
+        mHeight = img.mHeight;
+        mDepth = img.mDepth;
+        mFormat = img.mFormat;
+        mBufSize = img.mBufSize;
+        mFlags = img.mFlags;
+        mPixelSize = img.mPixelSize;
+        mNumMipmaps = img.mNumMipmaps;
+        mAutoDelete = img.mAutoDelete;
+        //Only create/copy when previous data was not dynamic data
+        if( img.mBuffer && mAutoDelete )
         {
-            create(img.mFormat, img.mWidth, img.mHeight, img.mDepth, img.getNumFaces(), img.mNumMipmaps);
-            memcpy(mBuffer, img.mBuffer, mBufSize);
+            mBuffer = OGRE_ALLOC_T(uchar, mBufSize, MEMCATEGORY_GENERAL);
+            memcpy( mBuffer, img.mBuffer, mBufSize );
         }
         else
         {
-            loadDynamicImage(img.mBuffer, img.mWidth, img.mHeight, img.mDepth, img.mFormat, false,
-                             img.getNumFaces(), img.mNumMipmaps);
+            mBuffer = img.mBuffer;
         }
 
         return *this;
-    }
-
-    void Image::setTo(const ColourValue& col)
-    {
-        OgreAssert(mBuffer, "image is empty");
-        if(col == ColourValue::ZERO)
-        {
-            memset(mBuffer, 0, getSize());
-            return;
-        }
-
-        uchar rawCol[4 * sizeof(float)]; // max packed size currently is 4*float
-        PixelUtil::packColour(col, mFormat, rawCol);
-        for(size_t p = 0; p < mBufSize; p += mPixelSize)
-        {
-            memcpy(mBuffer + p, rawCol, mPixelSize);
-        }
     }
 
     //-----------------------------------------------------------------------------
@@ -347,20 +254,71 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void Image::save(const String& filename)
     {
-        OgreAssert(mBuffer, "No image data loaded");
+        if( !mBuffer )
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "No image data loaded", 
+                "Image::save");
+        }
 
-        String base, ext;
-        StringUtil::splitBaseFilename(filename, base, ext);
+        String strExt;
+        size_t pos = filename.find_last_of('.');
+        if( pos == String::npos )
+            OGRE_EXCEPT(
+            Exception::ERR_INVALIDPARAMS, 
+            "Unable to save image file '" + filename + "' - invalid extension.",
+            "Image::save" );
 
-        // getCodec throws when no codec is found
-        Codec::getCodec(ext)->encodeToFile(this, filename);
+        while( pos != filename.length() - 1 )
+            strExt += filename[++pos];
+
+        Codec * pCodec = Codec::getCodec(strExt);
+        if( !pCodec )
+            OGRE_EXCEPT(
+            Exception::ERR_INVALIDPARAMS, 
+            "Unable to save image file '" + filename + "' - invalid extension.",
+            "Image::save" );
+
+        ImageCodec::ImageData* imgData = OGRE_NEW ImageCodec::ImageData();
+        imgData->format = mFormat;
+        imgData->height = mHeight;
+        imgData->width = mWidth;
+        imgData->depth = mDepth;
+        imgData->size = mBufSize;
+		imgData->num_mipmaps = mNumMipmaps;
+        // Wrap in CodecDataPtr, this will delete
+        Codec::CodecDataPtr codeDataPtr(imgData);
+        // Wrap memory, be sure not to delete when stream destroyed
+        MemoryDataStreamPtr wrapper(OGRE_NEW MemoryDataStream(mBuffer, mBufSize, false));
+
+        pCodec->encodeToFile(wrapper, filename, codeDataPtr);
     }
     //---------------------------------------------------------------------
     DataStreamPtr Image::encode(const String& formatextension)
     {
-        OgreAssert(mBuffer, "No image data loaded");
-        // getCodec throws when no codec is found
-        return Codec::getCodec(formatextension)->encode(this);
+        if( !mBuffer )
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "No image data loaded", 
+                "Image::encode");
+        }
+
+        Codec * pCodec = Codec::getCodec(formatextension);
+        if( !pCodec )
+            OGRE_EXCEPT(
+            Exception::ERR_INVALIDPARAMS, 
+            "Unable to encode image data as '" + formatextension + "' - invalid extension.",
+            "Image::encode" );
+
+        ImageCodec::ImageData* imgData = OGRE_NEW ImageCodec::ImageData();
+        imgData->format = mFormat;
+        imgData->height = mHeight;
+        imgData->width = mWidth;
+        imgData->depth = mDepth;
+        // Wrap in CodecDataPtr, this will delete
+        Codec::CodecDataPtr codeDataPtr(imgData);
+        // Wrap memory, be sure not to delete when stream destroyed
+        MemoryDataStreamPtr wrapper(OGRE_NEW MemoryDataStream(mBuffer, mBufSize, false));
+
+        return pCodec->encode(wrapper, codeDataPtr);
     }
     //-----------------------------------------------------------------------------
     Image & Image::load(const DataStreamPtr& stream, const String& type )
@@ -384,16 +342,33 @@ namespace Ogre {
             stream->seek(0);
             pCodec = Codec::getCodec(magicBuf, magicLen);
 
-            if (!pCodec)
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "Unable to load image: Image format is unknown. Unable to identify codec. "
-                            "Check it or specify format explicitly.");
+      if( !pCodec )
+        OGRE_EXCEPT(
+        Exception::ERR_INVALIDPARAMS, 
+        "Unable to load image: Image format is unknown. Unable to identify codec. "
+        "Check it or specify format explicitly.",
+        "Image::load" );
         }
 
-        pCodec->decode(stream, this);
+        Codec::DecodeResult res = pCodec->decode(stream);
 
-        // compute the pixel size
+        ImageCodec::ImageData* pData = 
+            static_cast<ImageCodec::ImageData*>(res.second.get());
+
+        mWidth = pData->width;
+        mHeight = pData->height;
+        mDepth = pData->depth;
+        mBufSize = pData->size;
+        mNumMipmaps = pData->num_mipmaps;
+        mFlags = pData->flags;
+
+        // Get the format and compute the pixel size
+        mFormat = pData->format;
         mPixelSize = static_cast<uchar>(PixelUtil::getNumElemBytes( mFormat ));
+        // Just use internal buffer of returned memory stream
+        mBuffer = res.first->getPtr();
+        // Make sure stream does not delete
+        res.first->setFreeOnClose(false);
         // make sure we delete
         mAutoDelete = true;
 
@@ -416,6 +391,19 @@ namespace Ogre {
             return BLANKSTRING;
 
     }
+    //-----------------------------------------------------------------------------
+    uchar* Image::getData()
+    {
+        return mBuffer;
+    }
+
+    //-----------------------------------------------------------------------------
+    const uchar* Image::getData() const
+    {
+        assert( mBuffer );
+        return mBuffer;
+    }
+
     //-----------------------------------------------------------------------------
     size_t Image::getSize() const
     {
@@ -507,16 +495,19 @@ namespace Ogre {
     void Image::resize(ushort width, ushort height, Filter filter)
     {
         OgreAssert(mAutoDelete, "resizing dynamic images is not supported");
-        OgreAssert(mDepth == 1, "only 2D formats supported");
+        assert(mDepth == 1);
 
         // reassign buffer to temp image, make sure auto-delete is true
-        Image temp(mFormat, mWidth, mHeight, 1, mBuffer, true);
-
+        Image temp;
+        temp.loadDynamicImage(mBuffer, mWidth, mHeight, 1, mFormat, true);
         // do not delete[] mBuffer!  temp will destroy it
-        mBuffer = 0;
 
         // set new dimensions, allocate new buffer
-        create(mFormat, width, height); // Loses precomputed mipmaps
+        mWidth = width;
+        mHeight = height;
+        mBufSize = PixelUtil::getMemorySize(mWidth, mHeight, 1, mFormat);
+        mBuffer = OGRE_ALLOC_T(uchar, mBufSize, MEMCATEGORY_GENERAL);
+        mNumMipmaps = 0; // Loses precomputed mipmaps
 
         // scale the image from temp into our resized buffer
         Image::scale(temp.getPixelBox(), getPixelBox(), filter);
@@ -526,18 +517,23 @@ namespace Ogre {
     {
         assert(PixelUtil::isAccessible(src.format));
         assert(PixelUtil::isAccessible(scaled.format));
-        Image buf; // For auto-delete
-        // Assume no intermediate buffer needed
-        PixelBox temp = scaled;
+        MemoryDataStreamPtr buf; // For auto-delete
+        PixelBox temp;
         switch (filter) 
         {
         default:
         case FILTER_NEAREST:
-            if(src.format != scaled.format)
+            if(src.format == scaled.format) 
+            {
+                // No intermediate buffer needed
+                temp = scaled;
+            }
+            else
             {
                 // Allocate temporary buffer of destination size in source format 
-                buf.create(src.format, scaled.getWidth(), scaled.getHeight(), scaled.getDepth());
-                temp = buf.getPixelBox();
+                temp = PixelBox(scaled.getWidth(), scaled.getHeight(), scaled.getDepth(), src.format);
+                buf.reset(OGRE_NEW MemoryDataStream(temp.getConsecutiveSize()));
+                temp.data = buf->getPtr();
             }
             // super-optimized: no conversion
             switch (PixelUtil::getNumElemBytes(src.format)) 
@@ -561,6 +557,7 @@ namespace Ogre {
             }
             break;
 
+        case FILTER_LINEAR:
         case FILTER_BILINEAR:
             switch (src.format) 
             {
@@ -569,11 +566,17 @@ namespace Ogre {
             case PF_R8G8B8A8: case PF_B8G8R8A8:
             case PF_A8B8G8R8: case PF_A8R8G8B8:
             case PF_X8B8G8R8: case PF_X8R8G8B8:
-                if(src.format != scaled.format)
+                if(src.format == scaled.format) 
+                {
+                    // No intermediate buffer needed
+                    temp = scaled;
+                }
+                else
                 {
                     // Allocate temp buffer of destination size in source format 
-                    buf.create(src.format, scaled.getWidth(), scaled.getHeight(), scaled.getDepth());
-                    temp = buf.getPixelBox();
+                    temp = PixelBox(scaled.getWidth(), scaled.getHeight(), scaled.getDepth(), src.format);
+                    buf.reset(OGRE_NEW MemoryDataStream(temp.getConsecutiveSize()));
+                    temp.data = buf->getPtr();
                 }
                 // super-optimized: byte-oriented math, no conversion
                 switch (PixelUtil::getNumElemBytes(src.format)) 
@@ -614,7 +617,7 @@ namespace Ogre {
     ColourValue Image::getColourAt(size_t x, size_t y, size_t z) const
     {
         ColourValue rval;
-        PixelUtil::unpackColour(&rval, mFormat, getData(x, y, z));
+        PixelUtil::unpackColour(&rval, mFormat, &mBuffer[mPixelSize * (z * mWidth * mHeight + mWidth * y + x)]);
         return rval;
     }
 
@@ -622,7 +625,8 @@ namespace Ogre {
     
     void Image::setColourAt(ColourValue const &cv, size_t x, size_t y, size_t z)
     {
-        PixelUtil::packColour(cv, mFormat, getData(x, y, z));
+        size_t pixelSize = PixelUtil::getNumElemBytes(getFormat());
+        PixelUtil::packColour(cv, getFormat(), &(getData())[pixelSize * (z * getWidth() * getHeight() + y * getWidth() + x)]);
     }
 
     //-----------------------------------------------------------------------------    
@@ -720,21 +724,60 @@ namespace Ogre {
     Image & Image::combineTwoImagesAsRGBA(const Image& rgb, const Image& alpha, PixelFormat fmt)
     {
         // the images should be the same size, have the same number of mipmaps
-        OgreAssert(rgb.getWidth() == alpha.getWidth() && rgb.getHeight() == alpha.getHeight() &&
-                       rgb.getDepth() == alpha.getDepth(),
-                   "Images must be the same dimensions");
-        OgreAssert(rgb.getNumMipmaps() == alpha.getNumMipmaps() && rgb.getNumFaces() == alpha.getNumFaces(),
-                   "Images must have the same number of surfaces (faces & mipmaps)");
-
+        if (rgb.getWidth() != alpha.getWidth() ||
+            rgb.getHeight() != alpha.getHeight() ||
+            rgb.getDepth() != alpha.getDepth())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+                "Images must be the same dimensions", "Image::combineTwoImagesAsRGBA");
+        }
+        if (rgb.getNumMipmaps() != alpha.getNumMipmaps() ||
+            rgb.getNumFaces() != alpha.getNumFaces())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+                "Images must have the same number of surfaces (faces & mipmaps)", 
+                "Image::combineTwoImagesAsRGBA");
+        }
         // Format check
-        OgreAssert(PixelUtil::getComponentCount(fmt) == 4, "Target format must have 4 components");
+        if (PixelUtil::getComponentCount(fmt) != 4)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+                "Target format must have 4 components", 
+                "Image::combineTwoImagesAsRGBA");
+        }
+        if (PixelUtil::isCompressed(fmt) || PixelUtil::isCompressed(rgb.getFormat()) 
+            || PixelUtil::isCompressed(alpha.getFormat()))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+                "Compressed formats are not supported in this method", 
+                "Image::combineTwoImagesAsRGBA");
+        }
 
-        OgreAssert(!(PixelUtil::isCompressed(fmt) || PixelUtil::isCompressed(rgb.getFormat()) ||
-                     PixelUtil::isCompressed(alpha.getFormat())),
-                   "Compressed formats are not supported in this method");
+        freeMemory();
 
+        mWidth = rgb.getWidth();
+        mHeight = rgb.getHeight();
+        mDepth = rgb.getDepth();
+        mFormat = fmt;
+        mNumMipmaps = rgb.getNumMipmaps();
         size_t numFaces = rgb.getNumFaces();
-        create(fmt, rgb.getWidth(), rgb.getHeight(), rgb.getDepth(), numFaces, rgb.getNumMipmaps());
+
+        // Set flags
+        mFlags = 0;
+        if (mDepth != 1)
+            mFlags |= IF_3D_TEXTURE;
+        if(numFaces == 6)
+            mFlags |= IF_CUBEMAP;
+
+        mBufSize = calculateSize(mNumMipmaps, numFaces, mWidth, mHeight, mDepth, mFormat);
+
+        mPixelSize = static_cast<uchar>(PixelUtil::getNumElemBytes( mFormat ));
+
+        mBuffer = static_cast<uchar*>(OGRE_MALLOC(mBufSize, MEMCATEGORY_GENERAL));
+
+        // make sure we delete
+        mAutoDelete = true;
+
 
         for (size_t face = 0; face < numFaces; ++face)
         {
@@ -767,13 +810,17 @@ namespace Ogre {
                             
                             psrcAlpha += PixelUtil::getNumElemBytes(alpha.getFormat());
                             pdst += PixelUtil::getNumElemBytes(mFormat);
+
                         }
                     }
                 }
+                
+
             }
         }
 
         return *this;
+
     }
     //---------------------------------------------------------------------
 

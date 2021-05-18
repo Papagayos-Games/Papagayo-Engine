@@ -1,0 +1,15 @@
+Documentation
+*.swp
+Makefile
+CMakeCache.txt
+CMakeFiles/
+build/
+*.dir/
+*.cmake
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+.vs/
+.vscode
+.DS_store

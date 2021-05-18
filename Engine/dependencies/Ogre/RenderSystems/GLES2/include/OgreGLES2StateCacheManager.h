@@ -171,7 +171,7 @@ namespace Ogre
          */
         void setCullFace(GLenum face);
 
-        void setViewport(const Rect& r);
+        void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
     };
 }
 

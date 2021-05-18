@@ -1,5 +1,6 @@
 #include "Scene/Scene.h"
 #include "Common/Entity.h"
+#include <algorithm>
 
 Scene::Scene()
 {
@@ -11,33 +12,65 @@ Scene::~Scene()
 
 void Scene::clean()
 {
-	for (auto it = entities_.begin(); it != entities_.end(); it = entities_.begin()) {
-		delete (*it);
-		entities_.pop_front();
-	}
+    for (auto it = entities.begin(); it != entities.end(); it++) {
+        delete it->second;
+    }
+    entities.clear();
+    usedNames.clear();
+}
+
+void Scene::eraseEntities()
+{
+    for (auto it = entities_to_erase.begin(); it != entities_to_erase.end(); ++it) {
+        (*it)->second->destroy();
+        entities.erase(*it);
+    }
+    entities_to_erase.clear();
+}
+
+void Scene::killEntityByName(const std::string& s)
+{
+    auto it = entities.find(s);
+    if (it != entities.end()) {
+        entities_to_erase.push_back(it);
+    }
+}
+
+void Scene::killEntity(Entity* e)
+{
+    auto it = std::find_if(entities.begin(), entities.end(), [e](const auto& mo) {return mo.second == e; });
+    if (it != entities.end()) {
+        entities_to_erase.push_back(it);
+    }
+
 }
 
 
-void Scene::addEntity(Entity* ent)
+void Scene::addEntity(const std::string& name, Entity* ent)
 {
-	entities_.push_back(ent);
+    //entities.pushback(name, ent);
+    std::string n = name;
+    if (entities.find(name) != entities.end())
+        n += std::to_string(++usedNames[name]);
+    else usedNames.insert(std::pair<std::string, int>(name, 0));
+    entities.insert(std::pair<std::string, Entity*>(n, ent));
+    ent->setName(n);
 }
 
 void Scene::setName(const std::string& s)
 {
-	name = s;
+    name = s;
 }
 
 const std::string& Scene::getName() const
 {
-	return name;
+    return name;
 }
 
 Entity* Scene::getEntity(const std::string& name) {
-	/*map<string, Entity*>::iterator entity = entities_.find(name);
-	if (entity == entities_.end())
-		return nullptr;
-	else
-		return entity->second;*/
-	return nullptr;
+    std::map<std::string, Entity*>::iterator entity = entities.find(name);
+    if (entity == entities.end())
+        return nullptr;
+    else
+        return entity->second;
 }

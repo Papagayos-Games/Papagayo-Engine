@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define __Overlay_H__
 
 #include "OgreOverlayPrerequisites.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreMatrix4.h"
 #include "OgreViewport.h"
 

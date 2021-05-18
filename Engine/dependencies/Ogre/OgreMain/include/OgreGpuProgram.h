@@ -330,14 +330,18 @@ namespace Ogre {
     */
     virtual bool isVertexTextureFetchRequired(void) const { return mVertexTextureFetch; }
 
-    /// @deprecated use OT_DETAIL_ADJACENCY_BIT
-    OGRE_DEPRECATED virtual void setAdjacencyInfoRequired(bool r) { mNeedsAdjacencyInfo = r; }
-    /// @deprecated use OT_DETAIL_ADJACENCY_BIT
+    /// @deprecated
+    virtual void setAdjacencyInfoRequired(bool r) { mNeedsAdjacencyInfo = r; }
+    /// @deprecated
     virtual bool isAdjacencyInfoRequired(void) const { return mNeedsAdjacencyInfo; }
-    /// @deprecated obsolete
-    OGRE_DEPRECATED void setComputeGroupDimensions(Vector3 dimensions) { mComputeGroupDimensions = dimensions; }
-    /// @deprecated obsolete
-    OGRE_DEPRECATED Vector3 getComputeGroupDimensions(void) const { return mComputeGroupDimensions; }
+    /** Sets the number of process groups dispatched by this compute
+        program.
+     */
+    virtual void setComputeGroupDimensions(Vector3 dimensions) { mComputeGroupDimensions = dimensions; }
+    /** Returns the number of process groups dispatched by this compute 
+        program.
+     */
+    virtual Vector3 getComputeGroupDimensions(void) const { return mComputeGroupDimensions; }
 
     /** Get a reference to the default parameters which are to be used for all
         uses of this program.
@@ -349,7 +353,7 @@ namespace Ogre {
         the default parameters; thus users of the program need only change the parameters
         which are unique to their own usage of the program.
     */
-    virtual const GpuProgramParametersPtr& getDefaultParameters(void);
+    virtual GpuProgramParametersSharedPtr getDefaultParameters(void);
 
     /** Returns true if default parameters have been set up.
      */
@@ -439,8 +443,6 @@ namespace Ogre {
     virtual void loadFromSource(void) = 0;
 
     };
-
-    inline String to_string(const GpuProgramType& v) { return GpuProgram::getProgramTypeName(v); }
     /** @} */
     /** @} */
 }

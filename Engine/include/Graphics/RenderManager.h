@@ -17,7 +17,7 @@ private:
 
 	Ogre::Root* ogreRoot_;
 	RenderManager();
-	~RenderManager();
+	virtual ~RenderManager();
 public:
 	enum class RenderCmpId : int {
 		Mesh = 0,
@@ -29,8 +29,9 @@ public:
 	};
 
 	static RenderManager* getInstance();
-
-	virtual void addComponent(Entity* ent, int compId);
+	static bool setUpInstance();
+	static void clean();
+	static void destroy();
 	virtual void start();
 	virtual void update();
 };

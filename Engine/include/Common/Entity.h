@@ -4,6 +4,7 @@
 #define _COMMON_ENTITY_H
 
 #include <map>
+#include <string>
 
 class Component;
 
@@ -12,14 +13,26 @@ class Entity
 private:
 	std::map<int, std::map<int, Component*>> _componentMap;
 
+	std::string name_;
+
 public:
 	//constructor
 	Entity();
 	//destructor
 	~Entity();
 
+	// inicializa las componentes
+	void start();
+
+	// destruye una entidad y sus componentes
+	void destroy();
+
 	// añade un componente
 	void addComponent(Component* comp);
+
+	const std::string& getName() const;
+
+	void setName(const std::string& name);
 
 	// devuelve el compenente asociado a esa id
 	Component* getComponent(int managerId, int compI);

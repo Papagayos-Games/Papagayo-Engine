@@ -1,0 +1,23 @@
+{
+    "Entities": [
+        {
+        "Prefab" : "DefaultCamera",
+        "Components" : [
+                {
+                "Component": "Transform",
+                "Type": "Common",
+                "Parameters" : {
+                    "position" : [0,100,500]
+                }
+                }
+            ]
+        },
+        {
+            "Prefab": "DefaultLight"
+        },
+        {
+          "Name" : "pepito",
+          "Prefab": "penguinTest"
+        }
+    ]
+}

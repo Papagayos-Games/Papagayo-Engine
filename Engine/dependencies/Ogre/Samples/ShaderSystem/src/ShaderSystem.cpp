@@ -171,7 +171,7 @@ void Sample_ShaderSystem::buttonHit( OgreBites::Button* b )
     }
 
     // Case the blend layer type modified.
-    else if (b->getName() == LAYERBLEND_BUTTON_NAME && mLayerBlendSubRS)
+    else if (b->getName() == LAYERBLEND_BUTTON_NAME && mLayerBlendSubRS != NULL)
     {   
         changeTextureLayerBlendMode();
         
@@ -237,6 +237,19 @@ bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
     return SdkSample::frameRenderingQueued(evt);
 }
 
+
+//-----------------------------------------------------------------------
+//void Sample_ShaderSystem::setupView()
+//{ 
+//  // setup default viewport layout and camera
+//  mCamera = mSceneMgr->createCamera("MainCamera");
+//  mViewport = mWindow->addViewport(mCamera);
+//  mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
+//  mCamera->setNearClipDistance(5);
+//
+//  mCameraMan = new SdkCameraMan(mCamera);   // create a default camera controller
+//}
+
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::setupContent()
 {
@@ -268,7 +281,6 @@ void Sample_ShaderSystem::setupContent()
     pPlaneEnt->setCastShadows(false);
     mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,0,0))->attachObject(pPlaneEnt);
 
-    mCamera->setNearClipDistance(30);
 
     // Load sample meshes and generate tangent vectors.
     for (int i=0; i < MESH_ARRAY_SIZE; ++i)
@@ -322,14 +334,21 @@ void Sample_ShaderSystem::setupContent()
     childNode->attachObject(mLayeredBlendingEntity);
 
     // Grab the render state of the material.
-    auto renderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-                                                        "RTSS/LayeredBlending", RGN_INTERNAL, 0);
+    RTShader::RenderState* renderState = mShaderGenerator->getRenderState(
+        RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, "RTSS/LayeredBlending",
+        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 0);
 
-    if (renderState)
+    if (renderState != NULL)
     {           
+        const SubRenderStateList& subRenderStateList = renderState->getTemplateSubRenderStateList();
+        SubRenderStateListConstIterator it = subRenderStateList.begin();
+        SubRenderStateListConstIterator itEnd = subRenderStateList.end();
+
         // Search for the texture layer blend sub state.
-        for (auto curSubRenderState : renderState->getSubRenderStates())
+        for (; it != itEnd; ++it)
         {
+            SubRenderState* curSubRenderState = *it;
+
             if (curSubRenderState->getType() == LayeredBlending::Type)
             {
                 mLayerBlendSubRS = static_cast<LayeredBlending*>(curSubRenderState);
@@ -460,7 +479,6 @@ void Sample_ShaderSystem::setupUI()
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
     mShadowMenu->addItem("PSSM 3");
-    mShadowMenu->addItem("PSSM debug");
 #endif
 
 
@@ -577,7 +595,7 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
 
         // Grab the scheme render state.
         RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-        const SubRenderStateList& subRenderStateList = schemRenderState->getSubRenderStates();
+        const SubRenderStateList& subRenderStateList = schemRenderState->getTemplateSubRenderStateList();
         SubRenderStateListConstIterator it = subRenderStateList.begin();
         SubRenderStateListConstIterator itEnd = subRenderStateList.end();
         FFPFog* fogSubRenderState = NULL;
@@ -675,8 +693,10 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 
             // Grab the first pass render state. 
             // NOTE: For more complicated samples iterate over the passes and build each one of them as desired.
-            RTShader::RenderState* renderState = mShaderGenerator->getRenderState(
-                RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, *curMaterial);
+            RTShader::RenderState* renderState =
+                mShaderGenerator->getRenderState(
+                    RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+                    curMaterial->getName(), curMaterial->getGroup(), 0);
 
             // Remove all sub render states.
             renderState->reset();
@@ -761,8 +781,9 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
             }
                                 
             // Invalidate this material in order to re-generate its shaders.
-            mShaderGenerator->invalidateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-                                                 *curMaterial);
+            mShaderGenerator->invalidateMaterial(
+                RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+                curMaterial->getName(), curMaterial->getGroup());
         }
     }
 }
@@ -1006,12 +1027,12 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
         mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-        for (auto srs : schemRenderState->getSubRenderStates())
+        for (auto srs : schemRenderState->getTemplateSubRenderStateList())
         {
             // This is the pssm3 sub render state -> remove it.
             if (dynamic_cast<RTShader::IntegratedPSSM3*>(srs))
             {
-                schemRenderState->removeSubRenderState(srs);
+                schemRenderState->removeTemplateSubRenderState(srs);
                 break;
             }
         }
@@ -1029,14 +1050,13 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
     // Integrated shadow PSSM with 3 splits.
-    else if (menuIndex >= 1)
+    else if (menuIndex == 1)
     {
         mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
-        mSceneMgr->setShadowFarDistance(3000);
 
         // 3 textures per directional light
         mSceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
-        mSceneMgr->setShadowTextureSettings(512, 3, PF_DEPTH16);
+        mSceneMgr->setShadowTextureSettings(512, 3, PF_FLOAT32_R);
         mSceneMgr->setShadowTextureSelfShadow(true);
 
         // Leave only directional light.
@@ -1061,8 +1081,8 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 
         // shadow camera setup
         PSSMShadowCameraSetup* pssmSetup = new PSSMShadowCameraSetup();
-        pssmSetup->calculateSplitPoints(3, mCamera->getNearClipDistance(), mSceneMgr->getShadowFarDistance());
-        pssmSetup->setSplitPadding(mCamera->getNearClipDistance()*2);
+        pssmSetup->calculateSplitPoints(3, 5, 3000);
+        pssmSetup->setSplitPadding(10);
         pssmSetup->setOptimalAdjustFactor(0, 2);
         pssmSetup->setOptimalAdjustFactor(1, 1);
         pssmSetup->setOptimalAdjustFactor(2, 0.5);
@@ -1072,7 +1092,6 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
     
         auto subRenderState = mShaderGenerator->createSubRenderState<RTShader::IntegratedPSSM3>();
         subRenderState->setSplitPoints(pssmSetup->getSplitPoints());
-        subRenderState->setDebug(menuIndex > 1);
         schemRenderState->addTemplateSubRenderState(subRenderState);        
     }
 #endif
@@ -1096,7 +1115,7 @@ void Sample_ShaderSystem::exportRTShaderSystemMaterial(const String& fileName, c
     if (success)
     {
         // Force shader generation of the given material.
-        RTShader::ShaderGenerator::getSingleton().validateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, *materialPtr);
+        RTShader::ShaderGenerator::getSingleton().validateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, materialName, materialPtr->getGroup());
 
         // Grab the RTSS material serializer listener.
         MaterialSerializer::Listener* matRTSSListener = RTShader::ShaderGenerator::getSingleton().getMaterialSerializerListener();
@@ -1287,7 +1306,8 @@ void Sample_ShaderSystem::changeTextureLayerBlendMode()
     
     mLayerBlendSubRS->setBlendMode(1, nextBlendMode);
     mShaderGenerator->invalidateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-                                         "RTSS/LayeredBlending", RGN_INTERNAL);
+                                         "RTSS/LayeredBlending",
+                                         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     // Update the caption.
     updateLayerBlendingCaption(nextBlendMode);
@@ -1462,7 +1482,7 @@ void Sample_ShaderSystem::destroyInstancedViewports()
     if (mInstancedViewportsSubRenderState)
     {
         Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-        renderState->removeSubRenderState(mInstancedViewportsSubRenderState);
+        renderState->removeTemplateSubRenderState(mInstancedViewportsSubRenderState);
         mInstancedViewportsSubRenderState = NULL;
     }
 

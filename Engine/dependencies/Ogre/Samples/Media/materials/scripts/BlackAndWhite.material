@@ -1,10 +1,16 @@
-fragment_program Ogre/Compositor/B&W_Cg_FP hlsl
+fragment_program Ogre/Compositor/B&W_Cg_FP cg
 {
 	source GrayScale.cg
 	entry_point GrayScale_ps
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 }
 
-fragment_program Ogre/Compositor/B&W_GLSL_FP glsl glsles
+fragment_program Ogre/Compositor/B&W_GLSLES_FP glsles
+{
+	source GrayScale.glsl
+}
+
+fragment_program Ogre/Compositor/B&W_GLSL_FP glsl
 {
 	source GrayScale.glsl
 }
@@ -12,6 +18,7 @@ fragment_program Ogre/Compositor/B&W_GLSL_FP glsl glsles
 fragment_program Ogre/Compositor/B&W_FP unified
 {
 	delegate Ogre/Compositor/B&W_GLSL_FP
+	delegate Ogre/Compositor/B&W_GLSLES_FP
 	delegate Ogre/Compositor/B&W_Cg_FP
 }
 

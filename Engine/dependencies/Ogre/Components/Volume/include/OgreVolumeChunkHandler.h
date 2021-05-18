@@ -78,8 +78,14 @@ namespace Volume {
 
         /// Whether this is an update of an existing tree
         bool isUpdate;
-
-        OGRE_DEPRECATED _OgreVolumeExport friend std::ostream& operator<<(std::ostream& o, const ChunkRequest& r)
+        
+        /** Stream operator <<.
+        @param o
+            The used stream.
+        @param r
+            The streamed ChunkRequest.
+        */
+        _OgreVolumeExport friend std::ostream& operator<<(std::ostream& o, const ChunkRequest& r)
         { return o; }
     } ChunkRequest;
     

@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreGLSupportPrerequisites.h"
-#include "OgreCommon.h"
 
 namespace Ogre
 {
@@ -78,7 +77,7 @@ namespace Ogre
         /// Stores the current stencil mask
         uint32 mStencilMask;
         /// Viewport origin and size
-        Rect mViewport;
+        int mViewport[4];
         /// A map of different buffer types and the currently bound buffer for each type
         BindBufferMap mActiveBufferMap;
         /// Stores the current face culling setting
@@ -96,6 +95,11 @@ namespace Ogre
         size_t mActiveTextureUnit;
     public:
         virtual ~GLStateCacheManagerCommon() {}
+
+        void getViewport(int* array) {
+            for (int i = 0; i < 4; ++i)
+                array[i] = mViewport[i];
+        }
 
         /** Gets the current colour mask setting.
          @return An array containing the mask in RGBA order.

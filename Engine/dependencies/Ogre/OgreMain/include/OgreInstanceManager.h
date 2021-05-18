@@ -279,7 +279,8 @@ namespace Ogre
         /** Returns true if settings were already created for the given material name.
             If false is returned, it means getSetting will return default settings.
         */
-        bool hasSettings( const String &materialName ) const;
+        bool hasSettings( const String &materialName ) const
+        { return mBatchSettings.find( materialName ) != mBatchSettings.end(); }
 
         /** @copydoc InstanceBatch::setStaticAndUpdate */
         void setBatchesAsStaticAndUpdate( bool bStatic );
@@ -305,7 +306,15 @@ namespace Ogre
             setCustomParameter), but there's no synchronization mechanism when
             multithreading or creating more instances, that's up to the user.
         */
-        InstanceBatchIterator getInstanceBatchIterator( const String &materialName ) const;
+        InstanceBatchIterator getInstanceBatchIterator( const String &materialName ) const
+        {
+            InstanceBatchMap::const_iterator it = mInstanceBatches.find( materialName );
+            if(it != mInstanceBatches.end())
+                return InstanceBatchIterator( it->second.begin(), it->second.end() );
+            else
+                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Cannot create instance batch iterator. "
+                            "Material " + materialName + " cannot be found.", "InstanceManager::getInstanceBatchIterator");
+        }
     };
 } // namespace Ogre
 

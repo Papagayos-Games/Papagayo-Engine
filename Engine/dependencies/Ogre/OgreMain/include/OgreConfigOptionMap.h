@@ -38,7 +38,7 @@ namespace Ogre {
     /** \addtogroup Core
     *  @{
     */
-    /** \addtogroup RenderSystem
+    /** \addtogroup General
     *  @{
     */
     /** Packages the details of a configuration option.

@@ -1,7 +1,9 @@
-// This file is part of the OGRE project.
-// It is subject to the license terms in the LICENSE file found in the top-level directory
-// of this distribution and at https://www.ogre3d.org/licensing.
-// SPDX-License-Identifier: MIT
+/*
+ * AdvancedRenderControls.cpp
+ *
+ *  Created on: 24.12.2016
+ *      Author: pavel
+ */
 
 #include "OgreAdvancedRenderControls.h"
 #include "OgreTextureManager.h"
@@ -186,10 +188,10 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
 
         // Search the per pixel sub render state and remove it.
         else {
-            for (auto srs : schemRenderState->getSubRenderStates()) {
+            for (auto srs : schemRenderState->getTemplateSubRenderStateList()) {
                 // This is the per pixel sub render state -> remove it.
                 if (dynamic_cast<Ogre::RTShader::FFPLighting*>(srs)) {
-                    schemRenderState->removeSubRenderState(srs);
+                    schemRenderState->removeTemplateSubRenderState(srs);
                     break;
                 }
             }

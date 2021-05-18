@@ -11,7 +11,7 @@ material Examples/Smoke
 
 			texture_unit
 			{
-				texture Smoke15Frames.png
+				texture smoke.png
 				tex_address_mode clamp
 			}
 		}

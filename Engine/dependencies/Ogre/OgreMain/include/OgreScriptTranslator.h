@@ -38,7 +38,7 @@ namespace Ogre{
     /** \addtogroup Core
     *  @{
     */
-    /** \addtogroup Script
+    /** \addtogroup General
     *  @{
     */
     /** This class translates script AST (abstract syntax tree) into

@@ -768,7 +768,7 @@ namespace Ogre {
             return maincam->getNearClipDistance();
     }
     //---------------------------------------------------------------------
-    Real Light::_deriveShadowFarClipDistance() const
+    Real Light::_deriveShadowFarClipDistance(const Camera* maincam) const
     {
         if (mShadowFarClipDist >= 0)
             return mShadowFarClipDist;
@@ -968,4 +968,13 @@ namespace Ogre {
 
         return light;
     }
+    //-----------------------------------------------------------------------
+    void LightFactory::destroyInstance( MovableObject* obj)
+    {
+        OGRE_DELETE obj;
+    }
+
+
+
+
 } // Namespace

@@ -459,13 +459,15 @@ namespace Ogre {
                      const char *iMacroValue, size_t iMacroValueLen);
 
         /**
-         * Define a symbolical macro.
+         * Define a numerical macro.
          * @param iMacroName
          *     The name of the defined macro
          * @param iMacroNameLen
          *     The length of the name of the defined macro
+         * @param iMacroValue
+         *     The value of the defined macro
          */
-        void Define (const char *iMacroName, size_t iMacroNameLen);
+        void Define (const char *iMacroName, size_t iMacroNameLen, long iMacroValue);
 
         /**
          * Undefine a macro.

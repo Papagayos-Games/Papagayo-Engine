@@ -123,6 +123,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Graphics;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src\$(Configuration);$(SolutionDir)dependencies\json;$(SolutionDir)dependencies\Ogre\RTShaderSystem\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\lua\include;$(SolutionDir)dependencies\fmod\include;$(SolutionDir)dependencies\LuaBridge3-master\Source\LuaBridge;$(SolutionDir)dependencies\LuaBridge3-master\Source\LuaBridge\detail;$(SolutionDir)include\Audio</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,6 +144,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\Graphics;$(SolutionDir)include\Physics;$(SolutionDir)dependencies\Bullet\src\$(Configuration);$(SolutionDir)dependencies\json;$(SolutionDir)dependencies\Ogre\RTShaderSystem\include;$(SolutionDir)include\Common;$(SolutionDir)dependencies\Ogre\build\SDL2-2.0.10\include;$(SolutionDir)dependencies\Ogre\OgreMain\include;$(SolutionDir)dependencies\Ogre\build\include;$(SolutionDir)dependencies\Bullet\src;$(SolutionDir)dependencies\lua\include;$(SolutionDir)dependencies\fmod\include;$(SolutionDir)dependencies\LuaBridge3-master\Source\LuaBridge;$(SolutionDir)dependencies\LuaBridge3-master\Source\LuaBridge\detail;$(SolutionDir)include\Audio</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -156,14 +160,28 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\LUA\LuaComponent.cpp" />
     <ClCompile Include="..\..\src\LUA\LUAManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\LUA\LuaComponent.h" />
     <ClInclude Include="..\..\include\LUA\LUAManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Audio\Audio.vcxproj">
+      <Project>{561c0c24-e2a5-473b-beb8-d1d72fccd0a2}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Common\Common.vcxproj">
       <Project>{a01f7af5-4e1e-4311-878a-c76475434688}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Graphics\Graphics.vcxproj">
+      <Project>{01362587-2c6a-4830-bd0b-49415725530b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Input\Input.vcxproj">
+      <Project>{749d77f5-ef31-4a74-abce-09db88ef4c00}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Physics\Physics.vcxproj">
+      <Project>{9d96a3f7-e843-4086-9be5-e4e25ca690d3}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

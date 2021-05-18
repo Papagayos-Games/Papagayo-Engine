@@ -24,13 +24,6 @@ void MeshComponent::setActive(bool act)
 	mNode_->setVisible(_active);
 }
 
-//MeshComponent::MeshComponent(Ogre::SceneNode* parentNode, std::string meshName): Component(nullptr, (int)RenderManager::RenderCmpId::Mesh)
-//{
-//	mNode_ = parentNode->createChildSceneNode(); //TO DO: NOMBRES A LOS NODOS
-//	ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity(meshName + ".mesh");
-//	mNode_->attachObject(ogreEnt_);
-//}
-
 MeshComponent::~MeshComponent()
 {
 	if (ogreEnt_ != nullptr) OgreContext::getInstance()->getSceneManager()->destroyEntity(ogreEnt_);
@@ -43,7 +36,7 @@ void MeshComponent::update()
 	Vector3 pos = tr_->getPos();
 	mNode_->setPosition(Ogre::Vector3(pos.x, pos.y, pos.z));
 	Vector3 rot = tr_->getRot();
-	//rotaciones //TO DO: revisar
+	//rotaciones 
 	mNode_->resetOrientation();
 	mNode_->yaw(Ogre::Radian(rot.z), Ogre::Node::TS_WORLD);//ejeY
 	mNode_->pitch(Ogre::Radian(rot.y), Ogre::Node::TS_WORLD);//ejex
@@ -67,16 +60,18 @@ void MeshComponent::load(const nlohmann::json& params)
 	std::string meshName;
 
 	//Cogemos el nombre de la malla
-	if (it != params.end()) meshName = it->get<std::string>();
+	if (it != params.end()) {
+		meshName = it->get<std::string>();
+	} 
 	//Si no se ha especificado ningún nombre creamos por defecto un pinguino
 	else meshName = "penguin";
-	
+
 	//Tratamos de crear la malla
 	try {
 		ogreEnt_ = OgreContext::getInstance()->getSceneManager()->createEntity(meshName + ".mesh");
 	}
 	catch (const std::exception& e) {
-		throw std::runtime_error("Error creating MeshComponent. Can't find mesh with mesh name: " + meshName + " "+ e.what());
+		throw std::runtime_error("Error creating MeshComponent. Can't find mesh with mesh name: " + meshName + " " + e.what());
 	}
 	mNode_->attachObject(ogreEnt_);
 
@@ -90,6 +85,11 @@ void MeshComponent::load(const nlohmann::json& params)
 
 void MeshComponent::init()
 {
+}
+
+Ogre::Entity* MeshComponent::getOgreEntity()
+{
+	return ogreEnt_;
 }
 
 void MeshComponent::setMaterial(const std::string& matName)

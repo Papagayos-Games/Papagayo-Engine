@@ -112,9 +112,9 @@ namespace Ogre
         RSC_HWOCCLUSION             = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 14),
         /// Supports user clipping planes
         RSC_USER_CLIP_PLANES        = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 15),
-        /// @deprecated All targetted APIs by Ogre support this feature
+        /// Supports the VET_UBYTE4 vertex element type
         RSC_VERTEX_FORMAT_UBYTE4    = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 16),
-        /// @deprecated All targetted APIs by Ogre support this feature
+        /// Supports infinite far plane projection
         RSC_INFINITE_FAR_PLANE      = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 17),
         /// Supports hardware render-to-texture (bigger than framebuffer)
         RSC_HWRENDER_TO_TEXTURE     = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 18),
@@ -190,10 +190,6 @@ namespace Ogre
         RSC_COMPUTE_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 23),
         /// Supports asynchronous hardware occlusion queries
         RSC_HWOCCLUSION_ASYNCHRONOUS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 24),
-        /// Supports 2D Texture Arrays
-        RSC_TEXTURE_2D_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 25),
-        /// Supports depth clamping
-        RSC_DEPTH_CLAMP = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 26),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported
@@ -235,8 +231,28 @@ namespace Ogre
             major = minor = release = build = 0;
         }
 
-        String toString() const;
-        void fromString(const String& versionString);
+        String toString() const 
+        {
+            StringStream str;
+            str << major << "." << minor << "." << release << "." << build;
+            return str.str();
+        }
+
+        void fromString(const String& versionString)
+        {
+            StringVector tokens = StringUtil::split(versionString, ".");
+            if(!tokens.empty())
+            {
+                major = StringConverter::parseInt(tokens[0]);
+                if (tokens.size() > 1)
+                    minor = StringConverter::parseInt(tokens[1]);
+                if (tokens.size() > 2)
+                    release = StringConverter::parseInt(tokens[2]);
+                if (tokens.size() > 3)
+                    build = StringConverter::parseInt(tokens[3]);
+            }
+
+        }
     };
 
     /** Enumeration of GPU vendors. */
@@ -534,15 +550,26 @@ namespace Ogre
 
         /** Adds the profile to the list of supported profiles
         */
-        void addShaderProfile(const String& profile);
+        void addShaderProfile(const String& profile)
+        {
+            mSupportedShaderProfiles.insert(profile);
+
+        }
 
         /** Remove a given shader profile, if present.
         */
-        void removeShaderProfile(const String& profile);
+        void removeShaderProfile(const String& profile)
+        {
+            mSupportedShaderProfiles.erase(profile);
+        }
 
         /** Returns true if profile is in the list of supported profiles
         */
-        bool isShaderProfileSupported(const String& profile) const;
+        bool isShaderProfileSupported(const String& profile) const
+        {
+            return (mSupportedShaderProfiles.end() != mSupportedShaderProfiles.find(profile));
+        }
+
 
         /** Returns a set of all supported shader profiles
         * */
@@ -849,9 +876,6 @@ namespace Ogre
         }
 
     };
-
-    inline String to_string(GPUVendor v) { return RenderSystemCapabilities::vendorToString(v); }
-    inline String to_string(const DriverVersion& v) { return v.toString(); }
 
     /** @} */
     /** @} */

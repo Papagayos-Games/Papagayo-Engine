@@ -136,7 +136,6 @@ namespace Ogre {
 				args.push_back("dcls");
 			}
 		}
-		args.push_back("-DOGRE_CG");
 		// Now split args into that god-awful char** that Cg insists on
 		freeCgArgs();
 		mCgArguments = OGRE_ALLOC_T(char*, args.size() + 1, MEMCATEGORY_RESOURCE);
@@ -193,7 +192,7 @@ namespace Ogre {
 		if (mDelegate)
 		{
 			mDelegate->setSource(mProgramString);
-
+			mDelegate->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
 			if (mSelectedCgProfile == CG_PROFILE_GLSLG)
 			{
 				// need to set input and output operations
@@ -317,7 +316,7 @@ namespace Ogre {
 		}
 		buildArgs();
 		// deal with includes
-		String sourceToUse = _resolveIncludes(mSource, this, mFilename, true);
+		String sourceToUse = _resolveIncludes(mSource, this, mFilename);
 
 		cgProgram = cgCreateProgram(mCgContext, CG_SOURCE, sourceToUse.c_str(),
 			mSelectedCgProfile, mEntryPoint.c_str(), const_cast<const char**>(mCgArguments));
@@ -487,6 +486,8 @@ namespace Ogre {
 					mType,
 					mSelectedProfile);
 			}
+			// Shader params need to be forwarded to low level implementation
+			mAssemblerProgram->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -800,7 +801,7 @@ namespace Ogre {
 			return HighLevelGpuProgram::isVertexTextureFetchRequired();
 	}
 	//-----------------------------------------------------------------------
-	const GpuProgramParametersPtr& CgProgram::getDefaultParameters(void)
+	GpuProgramParametersSharedPtr CgProgram::getDefaultParameters(void)
 	{
 		loadHighLevelSafe();
 		if (mDelegate)

@@ -94,6 +94,11 @@ endfunction(ogre_create_vcproj_userfile)
 
 # install targets according to current build type
 function(ogre_install_target TARGETNAME SUFFIX EXPORT)
+	# Skip all install targets in SDK
+	if (OGRE_SDK_BUILD)
+		return()
+	endif()
+
 	if(EXPORT)
 	  install(TARGETS ${TARGETNAME} EXPORT OgreTargetsRelease
 		CONFIGURATIONS Release None ""
@@ -243,7 +248,7 @@ function(ogre_config_framework LIBNAME)
       # Set the INSTALL_PATH so that frameworks can be installed in the application package
       set_target_properties(${LIBNAME}
          PROPERTIES BUILD_WITH_INSTALL_RPATH 1
-         INSTALL_NAME_DIR "@rpath"
+         INSTALL_NAME_DIR "@executable_path/../Frameworks"
       )
       set_target_properties(${LIBNAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES};${PLATFORM_HEADERS};" )
       set_target_properties(${LIBNAME} PROPERTIES RESOURCE "${RESOURCE_FILES}")
@@ -358,6 +363,16 @@ function(ogre_config_sample_exe SAMPLENAME)
 		  CONFIGURATIONS RelWithDebInfo
 		  )
   endif ()
+
+  if (APPLE AND NOT APPLE_IOS AND OGRE_SDK_BUILD)
+    # Add the path where the Ogre framework was found
+    if(NOT ${OGRE_FRAMEWORK_PATH} STREQUAL "")
+      set_target_properties(${SAMPLENAME} PROPERTIES
+        COMPILE_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
+        LINK_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
+      )
+    endif()
+  endif(APPLE AND NOT APPLE_IOS AND OGRE_SDK_BUILD)
 endfunction(ogre_config_sample_exe)
 
 function(ogre_config_sample_lib SAMPLENAME)
@@ -376,6 +391,16 @@ function(ogre_config_sample_lib SAMPLENAME)
 		  )
     endif ()
   endif ()
+
+  if (APPLE AND NOT APPLE_IOS AND OGRE_SDK_BUILD)
+    # Add the path where the Ogre framework was found
+    if(NOT ${OGRE_FRAMEWORK_PATH} STREQUAL "")
+      set_target_properties(${SAMPLENAME} PROPERTIES
+        COMPILE_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
+        LINK_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
+      )
+    endif()
+  endif(APPLE AND NOT APPLE_IOS AND OGRE_SDK_BUILD)
 
   if(NOT OGRE_STATIC AND (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
     # add GCC visibility flags to shared library build

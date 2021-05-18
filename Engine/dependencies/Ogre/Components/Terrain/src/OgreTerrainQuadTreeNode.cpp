@@ -66,7 +66,9 @@ namespace Ogre
         , mSelfOrChildRendered(false)
         , mNodeWithVertexData(0)
         , mVertexDataRecord(0)
+        , mMovable(0)
         , mLocalNode(0)
+        , mRend(0)
     {
         if (terrain->getMaxBatchSize() < size)
         {
@@ -127,10 +129,22 @@ namespace Ogre
         // TODO - what if we actually centred this at the terrain height at this point?
         // would this be better?
         mTerrain->getPoint(midpointx, midpointy, 0, &mLocalCentre);
+
+        mMovable = OGRE_NEW Movable(this);
+        mRend = OGRE_NEW Rend(this);
+
+    
     }
     //---------------------------------------------------------------------
     TerrainQuadTreeNode::~TerrainQuadTreeNode()
     {
+        if (mMovable->isAttached())
+            mLocalNode->detachObject(mMovable);
+        OGRE_DELETE mMovable;
+        mMovable = 0;
+        OGRE_DELETE mRend;
+        mRend = 0;
+
         if (mLocalNode)
         {
             mTerrain->_getRootSceneNode()->removeAndDestroyChild(mLocalNode);
@@ -257,8 +271,8 @@ namespace Ogre
         if (!mLocalNode)
             mLocalNode = mTerrain->_getRootSceneNode()->createChildSceneNode(mLocalCentre);
 
-        if (!isAttached())
-            mLocalNode->attachObject(this);
+        if (!mMovable->isAttached())
+            mLocalNode->attachObject(mMovable);
     }
     //---------------------------------------------------------------------
     void TerrainQuadTreeNode::unload()
@@ -268,7 +282,9 @@ namespace Ogre
                 mChildren[i]->unload();
 
         destroyGpuVertexData();
-        detachFromParent();
+
+        if (mMovable->isAttached())
+            mLocalNode->detachObject(mMovable);
     }
 
     void TerrainQuadTreeNode::unload(uint16 treeDepthStart, uint16 treeDepthEnd)
@@ -283,7 +299,9 @@ namespace Ogre
         if (mDepth >= treeDepthStart && mDepth < treeDepthEnd)
         {
             destroyGpuVertexData();
-            detachFromParent();
+            if (mMovable->isAttached())
+                mLocalNode->detachObject(mMovable);
+
         }
     }
     //---------------------------------------------------------------------
@@ -507,7 +525,11 @@ namespace Ogre
             if (mVertexDataRecord)
             {
                 // Trim to our bounds
-                Rect updateRect = rect.intersect(Rect(mOffsetX, mOffsetY, mBoundaryX, mBoundaryY));
+                Rect updateRect(mOffsetX, mOffsetY, mBoundaryX, mBoundaryY);
+                updateRect.left = std::max(updateRect.left, rect.left);
+                updateRect.right = std::min(updateRect.right, rect.right);
+                updateRect.top = std::max(updateRect.top, rect.top);
+                updateRect.bottom = std::min(updateRect.bottom, rect.bottom);
 
                 // update the GPU buffer directly
                 // TODO: do we have no use for CPU vertex data after initial load?
@@ -538,7 +560,7 @@ namespace Ogre
                     mChildren[i]->updateVertexData(positions, deltas, rect, cpuData);
 
                     // merge bounds from children
-                    AxisAlignedBox childBox = mChildren[i]->getBoundingBox();
+                    AxisAlignedBox childBox = mChildren[i]->getAABB();
                     // this box is relative to child centre
                     Vector3 boxoffset = mChildren[i]->getLocalCentre() - getLocalCentre();
                     childBox.setMinimum(childBox.getMinimum() + boxoffset);
@@ -548,8 +570,8 @@ namespace Ogre
 
             }
             // Make sure node knows to update
-            if (isAttached())
-                mLocalNode->needUpdate();
+            if (mMovable && mMovable->isAttached())
+                mMovable->getParentSceneNode()->needUpdate();
 
 
 
@@ -1189,7 +1211,7 @@ namespace Ogre
         mSelfOrChildRendered = false;
 
         // early-out
-        if (!cam->isVisible(getWorldBoundingBox(true)))
+        if (!cam->isVisible(mMovable->getWorldBoundingBox(true)))
         {
             mCurrentLod = -1;
             return mSelfOrChildRendered;
@@ -1208,7 +1230,7 @@ namespace Ogre
         }
 
         // this node not loaded yet so skip
-        if (!isAttached())
+        if (!mMovable->isAttached())
         {
             mCurrentLod = -1;
             return mSelfOrChildRendered;
@@ -1244,7 +1266,7 @@ namespace Ogre
             // Do material LOD
             MaterialPtr material = getMaterial();
             const LodStrategy *materialStrategy = material->getLodStrategy();
-            Real lodValue = materialStrategy->getValue(this, cam);
+            Real lodValue = materialStrategy->getValue(mMovable, cam);
             // Get the index at this biased depth
             mMaterialLodIndex = material->getLodIndex(lodValue);
 
@@ -1326,7 +1348,7 @@ namespace Ogre
                             // this selectively applies the morph just to the
                             // vertices which would drop out at this LOD, even 
                             // while using the single shared vertex data
-                            setCustomParameter(Terrain::LOD_MORPH_CUSTOM_PARAM,
+                            mRend->setCustomParameter(Terrain::LOD_MORPH_CUSTOM_PARAM, 
                                 Vector4(mLodTransition, mCurrentLod + mBaseLod + 1, 0, 0));
 
                         }
@@ -1369,15 +1391,20 @@ namespace Ogre
     void TerrainQuadTreeNode::setCurrentLod(int lod)
     {
          mCurrentLod = lod;
-         setCustomParameter(Terrain::LOD_MORPH_CUSTOM_PARAM,
+         mRend->setCustomParameter(Terrain::LOD_MORPH_CUSTOM_PARAM, 
              Vector4(mLodTransition, mCurrentLod + mBaseLod + 1, 0, 0));
     }
     //---------------------------------------------------------------------
     void TerrainQuadTreeNode::setLodTransition(float t)
     {
         mLodTransition = t;                         
-        setCustomParameter(Terrain::LOD_MORPH_CUSTOM_PARAM,
+        mRend->setCustomParameter(Terrain::LOD_MORPH_CUSTOM_PARAM, 
             Vector4(mLodTransition, mCurrentLod + mBaseLod + 1, 0, 0));
+    }
+    //---------------------------------------------------------------------
+    Renderable *TerrainQuadTreeNode::_getRenderable()
+    {
+        return mRend;
     }
     //---------------------------------------------------------------------
     bool TerrainQuadTreeNode::isRenderedAtCurrentLod() const
@@ -1390,17 +1417,17 @@ namespace Ogre
         return mSelfOrChildRendered;
     }
     //---------------------------------------------------------------------
-    void TerrainQuadTreeNode::_updateRenderQueue(RenderQueue* queue)
+    void TerrainQuadTreeNode::updateRenderQueue(RenderQueue* queue)
     {
         if (isRenderedAtCurrentLod())
         {
-            queue->addRenderable(this, mTerrain->getRenderQueueGroup());
+            queue->addRenderable(mRend, mTerrain->getRenderQueueGroup());           
         }
     }
     //---------------------------------------------------------------------
     void TerrainQuadTreeNode::visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables)
     {
-        visitor->visit(this, 0, false);
+        visitor->visit(mRend, 0, false);
     }
     //---------------------------------------------------------------------
     const MaterialPtr& TerrainQuadTreeNode::getMaterial(void) const
@@ -1410,7 +1437,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     Technique* TerrainQuadTreeNode::getTechnique(void) const
     { 
-        return getMaterial()->getBestTechnique(mMaterialLodIndex, this);
+        return getMaterial()->getBestTechnique(mMaterialLodIndex, mRend); 
     }
     //---------------------------------------------------------------------
     void TerrainQuadTreeNode::getRenderOperation(RenderOperation& op)
@@ -1435,19 +1462,19 @@ namespace Ogre
         else 
         {
             // the vertex data is relative to the node that owns the vertex data
-            *xform = mNodeWithVertexData->_getParentNodeFullTransform();
+            *xform = mNodeWithVertexData->mMovable->_getParentNodeFullTransform();          
         }
 
     }
     //---------------------------------------------------------------------
     Real TerrainQuadTreeNode::getSquaredViewDepth(const Camera* cam) const
     {
-        return mLocalNode->getSquaredViewDepth(cam);
+        return mMovable->getParentSceneNode()->getSquaredViewDepth(cam);
     }
     //---------------------------------------------------------------------
     const LightList& TerrainQuadTreeNode::getLights(void) const
     {
-        return queryLights();
+        return mMovable->queryLights();
     }
     //---------------------------------------------------------------------
     bool TerrainQuadTreeNode::getCastsShadows(void) const
@@ -1455,7 +1482,18 @@ namespace Ogre
         return TerrainGlobalOptions::getSingleton().getCastsDynamicShadows();
     }
     //---------------------------------------------------------------------
-    const String& TerrainQuadTreeNode::getMovableType(void) const
+    //---------------------------------------------------------------------
+    TerrainQuadTreeNode::Movable::Movable(TerrainQuadTreeNode* parent)
+        : mParent(parent)
+    {
+    }
+    //---------------------------------------------------------------------
+    TerrainQuadTreeNode::Movable::~Movable()
+    {
+
+    }
+    //---------------------------------------------------------------------
+    const String& TerrainQuadTreeNode::Movable::getMovableType(void) const
     {
         static String stype("OgreTerrainNodeMovable");
 
@@ -1463,12 +1501,101 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    bool TerrainQuadTreeNode::isVisible(void) const
+    const AxisAlignedBox& TerrainQuadTreeNode::Movable::getBoundingBox(void) const
     {
-        if (getCurrentLod() == -1)
+        return mParent->getAABB();
+    }
+    //---------------------------------------------------------------------
+    Real TerrainQuadTreeNode::Movable::getBoundingRadius(void) const
+    {
+        return mParent->getBoundingRadius();
+    }
+    //---------------------------------------------------------------------
+    bool TerrainQuadTreeNode::Movable::isVisible(void) const
+    {
+        if (mParent->getCurrentLod() == -1)
             return false;
         else
             return MovableObject::isVisible();
     }
+    //---------------------------------------------------------------------
+    uint32 TerrainQuadTreeNode::Movable::getVisibilityFlags(void) const
+    {
+        // Combine own vis (in case anyone sets this) and terrain overall
+        return mVisibilityFlags & mParent->getTerrain()->getVisibilityFlags();
+    }
+    //---------------------------------------------------------------------
+    uint32 TerrainQuadTreeNode::Movable::getQueryFlags(void) const
+    {
+        // Combine own vis (in case anyone sets this) and terrain overall
+        return mQueryFlags & mParent->getTerrain()->getQueryFlags();
+    }
+    //------------------------------------------------------------------------
+    void TerrainQuadTreeNode::Movable::_updateRenderQueue(RenderQueue* queue)
+    {
+        mParent->updateRenderQueue(queue);      
+    }
+    //------------------------------------------------------------------------
+    void TerrainQuadTreeNode::Movable::visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables)
+    {
+        mParent->visitRenderables(visitor, debugRenderables);   
+    }
+    //---------------------------------------------------------------------
+    bool TerrainQuadTreeNode::Movable::getCastShadows(void) const
+    {
+        return mParent->getCastsShadows();
+    }
+    //------------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    TerrainQuadTreeNode::Rend::Rend(TerrainQuadTreeNode* parent)
+        :mParent(parent)
+    {
+    }
+    //---------------------------------------------------------------------
+    TerrainQuadTreeNode::Rend::~Rend()
+    {
+    }
+    //---------------------------------------------------------------------
+    const MaterialPtr& TerrainQuadTreeNode::Rend::getMaterial(void) const
+    {
+        return mParent->getMaterial();
+    }
+    //---------------------------------------------------------------------
+    Technique* TerrainQuadTreeNode::Rend::getTechnique() const
+    {
+        return mParent->getTechnique();
+    }
+    //---------------------------------------------------------------------
+    void TerrainQuadTreeNode::Rend::getRenderOperation(RenderOperation& op)
+    {
+        mParent->getRenderOperation(op);
+    }
+    //---------------------------------------------------------------------
+    void TerrainQuadTreeNode::Rend::getWorldTransforms(Matrix4* xform) const
+    {
+        mParent->getWorldTransforms(xform);
+    }
+    //---------------------------------------------------------------------
+    Real TerrainQuadTreeNode::Rend::getSquaredViewDepth(const Camera* cam) const
+    {
+        return mParent->getSquaredViewDepth(cam);
+    }
+    //---------------------------------------------------------------------
+    const LightList& TerrainQuadTreeNode::Rend::getLights(void) const
+    {
+        return mParent->getLights();
+    }
+    //---------------------------------------------------------------------
+    bool TerrainQuadTreeNode::Rend::getCastsShadows(void) const
+    {
+        return mParent->getCastsShadows();
+    }
+    //---------------------------------------------------------------------
+
+
+    
+
+
+
 }
 

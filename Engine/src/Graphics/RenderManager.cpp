@@ -1,3 +1,5 @@
+#include "..\..\include\Graphics\RenderManager.h"
+#include "..\..\include\Graphics\RenderManager.h"
 #include "RenderManager.h"
 #include "OgreContext.h"
 #include <checkML.h>
@@ -15,10 +17,10 @@ RenderManager::RenderManager() : Manager(ManID::Render)
 {
 	ogreRoot_ = OgreContext::getInstance()->getOgreRoot();
 
-	registerComponent("MeshComponent", []() -> MeshComponent* { return new  MeshComponent(); });
-	registerComponent("Camera", []() -> Camera* { return new Camera(); });
-	registerComponent("LightComponent", []() -> LightComponent* { return new LightComponent(); });
-	registerComponent("PlaneComponent", []() -> PlaneComponent* { return new PlaneComponent(); });
+	registerComponent("MeshComponent", (int)RenderCmpId::Mesh,[]() -> MeshComponent* { return new  MeshComponent(); });
+	registerComponent("Camera", (int)RenderCmpId::Camera, []() -> Camera* { return new Camera(); });
+	registerComponent("LightComponent", (int)RenderCmpId::Light, []() -> LightComponent* { return new LightComponent(); });
+	registerComponent("PlaneComponent", (int)RenderCmpId::Plane, []() -> PlaneComponent* { return new PlaneComponent(); });
 }
 
 RenderManager::~RenderManager()
@@ -27,34 +29,30 @@ RenderManager::~RenderManager()
 
 RenderManager* RenderManager::getInstance()
 {
-	if (!instance_)
-		instance_ = new RenderManager();
 	return instance_;
 }
 
-void RenderManager::addComponent(Entity* ent, int compId)
-{
-	
-	RenderCmpId id = (RenderCmpId)compId;
-	Component* cmp = nullptr;
-	switch (id)
-	{
-	case RenderCmpId::Mesh:
-		cmp = new MeshComponent();
-		break;
-	case RenderCmpId::Camera:
-		cmp = new Camera();
-		break;
-	case RenderCmpId::LastRenderCmpId:
-		break;
-	default:
-		throw "ERROR: Tried to add a non existant Common Component\n";
+bool RenderManager::setUpInstance() {
+	if (!instance_) {
+		try {
+			instance_ = new RenderManager();
+		}
+		catch (...) {
+			return false;
+		}
 	}
-	if (!cmp)
-		throw ("ERROR: Common Manager couldn't create a component with an Id: ", compId, "\n");
-	_compsList.push_back(cmp);
-	cmp->setEntity(ent);
-	ent->addComponent(cmp);
+	return true;
+}
+
+void RenderManager::clean()
+{
+	instance_->destroyAllComponents();
+}
+
+void RenderManager::destroy()
+{
+	instance_->clean();
+	delete instance_;
 }
 
 void RenderManager::start()

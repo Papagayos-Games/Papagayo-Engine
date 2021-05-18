@@ -42,18 +42,12 @@ namespace Ogre {
         mSizeInBytes = sizeBytes;
 
         // Create a shadow buffer if required
-        if (useShadowBuffer)
+        if (mUseShadowBuffer)
         {
-            mShadowBuffer.reset(new DefaultHardwareBuffer(mSizeInBytes));
+            mShadowBuffer.reset(new DefaultHardwareUniformBuffer(mMgr, sizeBytes, HardwareBuffer::HBU_DYNAMIC, false));
         }
     }
-
-    HardwareUniformBuffer::HardwareUniformBuffer(HardwareBufferManagerBase* mgr, HardwareBuffer* delegate)
-        : HardwareUniformBuffer(mgr, delegate->getSizeInBytes(), delegate->getUsage(), false)
-    {
-        mDelegate.reset(delegate);
-    }
-
+    
     HardwareUniformBuffer::~HardwareUniformBuffer()
     {
         if (mMgr)

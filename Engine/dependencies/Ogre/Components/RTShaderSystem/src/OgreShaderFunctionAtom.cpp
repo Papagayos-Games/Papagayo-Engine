@@ -445,7 +445,9 @@ void SampleTextureAtom::writeSourceCode(std::ostream& os, const String& targetLa
     writeOperands(os, outOp, mOperands.end());
     os << "\t=\t";
 
-    os << "texture";
+    bool is_glsl = targetLanguage[0] == 'g';
+
+    os << (is_glsl ? "texture" : "tex");
     const auto& sampler = mOperands.front().getParameter();
     switch(sampler->getType())
     {
@@ -460,7 +462,7 @@ void SampleTextureAtom::writeSourceCode(std::ostream& os, const String& targetLa
         os << "3D";
         break;
     case GCT_SAMPLERCUBE:
-        os << "Cube";
+        os << (is_glsl ? "Cube" : "CUBE");
         break;
     default:
         OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "unknown sampler");

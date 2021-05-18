@@ -97,9 +97,9 @@ namespace Ogre
 
          | Platform         | Location |
          |------------------|----------|
-         | Windows          | Documents/$subdir/ |
+         | Windows          | Documents/Ogre/$subdir/ |
          | Linux            | ~/.cache/$subdir/ |
-         | OSX              | ~/Library/Application Support/$subdir/ |
+         | OSX              | ~/Library/Application Support/Ogre/$subdir/ |
          | iOS              | NSDocumentDirectory |
          | Android / Emscripten | n/a |
 

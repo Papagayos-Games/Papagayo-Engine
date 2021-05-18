@@ -231,13 +231,12 @@ namespace Ogre
             return false;
     }
     //-----------------------------------------------------------------------
-    const GpuProgramParametersPtr& UnifiedHighLevelGpuProgram::getDefaultParameters(void)
+    GpuProgramParametersSharedPtr UnifiedHighLevelGpuProgram::getDefaultParameters(void)
     {
         if (_getDelegate())
             return _getDelegate()->getDefaultParameters();
-
-        static GpuProgramParametersSharedPtr nullPtr;
-        return nullPtr;
+        else
+            return GpuProgramParametersSharedPtr();
     }
     //-----------------------------------------------------------------------
     bool UnifiedHighLevelGpuProgram::hasDefaultParameters(void) const

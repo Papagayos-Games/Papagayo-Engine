@@ -12,18 +12,19 @@ class Scene;
 
 class SceneManager {
 public:
-	~SceneManager();
-
 	static SceneManager* getInstance();
+	static Scene* getCurrentScene();
 	static bool setupInstance();
 	static void clean();
+	static void destroy();
 	
 	void update();
 	void changeScene(const std::string& sceneName);
 	void createStartScene();
 private:
 	SceneManager();	
-	
+	~SceneManager();
+
 	void loadScene(const std::string& sceneName);
 	void cleanupScene();
 

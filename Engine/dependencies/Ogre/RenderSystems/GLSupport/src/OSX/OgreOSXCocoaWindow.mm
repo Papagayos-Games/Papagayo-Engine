@@ -322,7 +322,6 @@ namespace Ogre {
         // Make active
         setHidden(hidden);
 		mActive = true;
-        mVisible = true;
         mClosed = false;
         mName = [windowTitle cStringUsingEncoding:NSUTF8StringEncoding];
         mWidth = _getPixelFromPoint(widthPt);
@@ -560,10 +559,7 @@ namespace Ogre {
         }
         //make sure the context is current
         NSOpenGLContextGuard ctx_guard(mGLContext);
-        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
-        {
-            (*it).second->_updateDimensions();
-        }
+
 		[mGLContext update];
     }
 

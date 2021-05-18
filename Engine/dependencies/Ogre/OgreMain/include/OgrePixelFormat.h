@@ -41,14 +41,10 @@ namespace Ogre {
     */
     /** The pixel format used for images, textures, and render surfaces
      *
-     * A pixel format described the storage format of pixel data. It defines the way pixels are encoded in memory.
-     * The components are specified in "packed" native byte order for native endian (16, 24 and 32 bit) integers.
-     * This means that a pixel with format Ogre::PF_A8R8G8B8 can be seen as a 32 bit integer, written as @c 0xAARRGGBB in hexadecimal
-     * on a little-endian (x86) machine or as @c 0xBBGGRRAA on a big-endian machine.
-     * The example above would be expressed with an array of bytes as `{0xBB, 0xGG, 0xRR, 0xAA}` on both machines.
-     * Therefore, one would use the Ogre::PF_BYTE_BGRA format when reading pixel data expressed in bytes.
-     * This format aliases to either Ogre::PF_A8B8G8R8 or Ogre::PF_R8G8B8A8
-     * depending on the machine endianess.
+     * @note the components are specified in "packed" native byte order.
+     * For PF_BYTE_* formats this means that platform endianess changes the order:
+     * e.g. Ogre::PF_BYTE_RGBA on little endian (x86) forms an integer as Ogre::PF_A8B8G8R8,
+     * while on big endian it "packs" as Ogre::PF_R8G8B8A8
      */
     enum PixelFormat
     {
@@ -213,8 +209,7 @@ namespace Ogre {
         /// 8-bit pixel format, all bits red.
         PF_R8,
         /// 16-bit pixel format, 8 bits red, 8 bits green.
-        PF_R8G8,
-        PF_RG8 = PF_R8G8,
+        PF_RG8,
         /// 8-bit pixel format, 8 bits red (signed normalised int).
         PF_R8_SNORM,
         /// 16-bit pixel format, 8 bits red (signed normalised int), 8 bits blue (signed normalised int).
@@ -654,8 +649,6 @@ namespace Ogre {
          */
         static void bulkPixelVerticalFlip(const PixelBox &box);
     };
-
-    inline const String& to_string(PixelFormat v) { return PixelUtil::getFormatName(v); }
     /** @} */
     /** @} */
 

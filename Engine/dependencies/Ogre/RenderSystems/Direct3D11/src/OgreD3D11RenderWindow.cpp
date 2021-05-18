@@ -138,6 +138,8 @@ namespace Ogre
     {
         assert(mpBackBuffer && !mRenderTargetView && !mDepthStencilView);
 
+        HRESULT hr;
+
         // get the backbuffer desc
         D3D11_TEXTURE2D_DESC BBDesc;
         mpBackBuffer->GetDesc( &BBDesc );
@@ -151,8 +153,16 @@ namespace Ogre
 
         RTVDesc.Format = _getRenderFormat(); // if BB is from swapchain than RTV format can have extra _SRGB suffix not present in BB format
         RTVDesc.ViewDimension = mFSAAType.Count > 1 ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
-        OGRE_CHECK_DX_ERROR(mDevice->CreateRenderTargetView(mpBackBuffer.Get(), &RTVDesc,
-                                                            mRenderTargetView.ReleaseAndGetAddressOf()));
+        hr = mDevice->CreateRenderTargetView( mpBackBuffer.Get(), &RTVDesc, mRenderTargetView.ReleaseAndGetAddressOf() );
+
+        if( FAILED(hr) )
+        {
+			String errorDescription = mDevice.getErrorDescription(hr);
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Unable to create rendertagert view\nError Description:" + errorDescription,
+                "D3D11RenderWindow::_createSizeDependedD3DResources");
+        }
+
 
         if( mDepthBufferPoolId != DepthBuffer::POOL_NO_DEPTH )
         {
@@ -172,8 +182,14 @@ namespace Ogre
             descDepth.CPUAccessFlags = 0;
             descDepth.MiscFlags = 0;
 
-            OGRE_CHECK_DX_ERROR(
-                mDevice->CreateTexture2D(&descDepth, NULL, pDepthStencil.ReleaseAndGetAddressOf()));
+            hr = mDevice->CreateTexture2D( &descDepth, NULL, pDepthStencil.ReleaseAndGetAddressOf() );
+            if( FAILED(hr) || mDevice.isError())
+            {
+                String errorDescription = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                    "Unable to create depth texture\nError Description:" + errorDescription,
+                    "D3D11RenderWindow::_createSizeDependedD3DResources");
+            }
 
             // Create the depth stencil view
             D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
@@ -181,8 +197,15 @@ namespace Ogre
 
             descDSV.Format =  descDepth.Format;
             descDSV.ViewDimension = mFSAAType.Count > 1 ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
-            OGRE_CHECK_DX_ERROR(mDevice->CreateDepthStencilView(
-                pDepthStencil.Get(), &descDSV, mDepthStencilView.ReleaseAndGetAddressOf()));
+            hr = mDevice->CreateDepthStencilView( pDepthStencil.Get(), &descDSV, mDepthStencilView.ReleaseAndGetAddressOf() );
+
+            if( FAILED(hr) )
+            {
+				String errorDescription = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                    "Unable to create depth stencil view\nError Description:" + errorDescription,
+                    "D3D11RenderWindow::_createSizeDependedD3DResources");
+            }
 
             D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
             DepthBuffer *depthBuf = rsys->_addManualDepthBuffer( mDepthStencilView.Get(), mWidth, mHeight,
@@ -242,7 +265,13 @@ namespace Ogre
                 "D3D11RenderWindowBase::_queryDxgiDevice");
         }
 
-        OGRE_CHECK_DX_ERROR(mDevice->QueryInterface( __uuidof(IDXGIDeviceN), (void**)dxgiDevice ));
+        HRESULT hr = mDevice->QueryInterface( __uuidof(IDXGIDeviceN), (void**)dxgiDevice );
+        if( FAILED(hr) )
+        {
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Unable to query a DXGIDevice",
+                "D3D11RenderWindowBase::_queryDxgiDevice");
+        }
     }
 
     uint D3D11RenderWindowBase::getNumberOfViews() const { return 1; }
@@ -406,7 +435,13 @@ namespace Ogre
         ZeroMemory( &mSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC_N) );
 
         // here the mSwapChainDesc and mpSwapChain are initialized
-        OGRE_CHECK_DX_ERROR(_createSwapChainImpl(_queryDxgiDevice().Get()));
+        HRESULT hr = _createSwapChainImpl(_queryDxgiDevice().Get());
+        if (FAILED(hr))
+        {
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Unable to create swap chain",
+                "D3D11RenderWindowSwapChainBased::_createSwapChain");
+        }
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::_createSizeDependedD3DResources()

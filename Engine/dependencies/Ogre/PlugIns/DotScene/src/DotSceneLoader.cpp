@@ -1,22 +1,13 @@
 #include <Ogre.h>
+#include <OgreTerrain.h>
+#include <OgreTerrainGroup.h>
 #include <OgreDotSceneLoader.h>
 #include <OgreSceneLoaderManager.h>
 #include <OgreComponents.h>
 
-#ifdef OGRE_BUILD_COMPONENT_TERRAIN
-#include <OgreTerrain.h>
-#include <OgreTerrainGroup.h>
-#endif
-
 #include <pugixml.hpp>
 
 using namespace Ogre;
-
-#ifndef OGRE_BUILD_COMPONENT_TERRAIN
-namespace Ogre {
-    class TerrainGroup {}; // appease unique_ptr destructor
-}
-#endif
 
 namespace
 {
@@ -109,25 +100,17 @@ ColourValue parseColour(pugi::xml_node& XMLNode)
                        StringConverter::parseReal(XMLNode.attribute("b").value()),
                        XMLNode.attribute("a") != NULL ? StringConverter::parseReal(XMLNode.attribute("a").value()) : 1);
 }
-
-struct DotSceneCodec : public Codec
-{
-    String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const { return ""; }
-    String getType() const override { return "scene"; }
-    void decode(const DataStreamPtr& stream, const Any& output) const override
-    {
-        DataStreamPtr _stream(stream);
-        DotSceneLoader loader;
-        loader.load(_stream, ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
-                    any_cast<SceneNode*>(output));
-    }
-};
-
 } // namespace
 
-DotSceneLoader::DotSceneLoader() : mSceneMgr(0), mBackgroundColour(ColourValue::Black) {}
+DotSceneLoader::DotSceneLoader() : mSceneMgr(0), mBackgroundColour(ColourValue::Black)
+{
+    SceneLoaderManager::getSingleton().registerSceneLoader("DotScene", {".scene"}, this);
+}
 
-DotSceneLoader::~DotSceneLoader() {}
+DotSceneLoader::~DotSceneLoader()
+{
+    SceneLoaderManager::getSingleton().unregisterSceneLoader("DotScene");
+}
 
 void DotSceneLoader::load(DataStreamPtr& stream, const String& groupName, SceneNode* rootNode)
 {
@@ -139,7 +122,7 @@ void DotSceneLoader::load(DataStreamPtr& stream, const String& groupName, SceneN
     auto result = XMLDoc.load_buffer(stream->getAsString().c_str(), stream->size());
     if (!result)
     {
-        LogManager::getSingleton().logError("DotSceneLoader - " + String(result.description()));
+        LogManager::getSingleton().stream(LML_CRITICAL) << "[DotSceneLoader] " << result.description();
         return;
     }
 
@@ -149,7 +132,7 @@ void DotSceneLoader::load(DataStreamPtr& stream, const String& groupName, SceneN
     // Validate the File
     if (!XMLRoot.attribute("formatVersion"))
     {
-        LogManager::getSingleton().logError("DotSceneLoader - Invalid .scene File. Missing <scene formatVersion='x.y' >");
+        LogManager::getSingleton().logError("[DotSceneLoader] Invalid .scene File. Missing <scene formatVersion='x.y' >");
         return;
     }
 
@@ -284,9 +267,9 @@ void DotSceneLoader::processTerrainGroup(pugi::xml_node& XMLNode)
     terrainGlobalOptions->setMaxPixelError((Real)maxPixelError);
     terrainGlobalOptions->setCompositeMapDistance((Real)compositeMapDistance);
 
-    auto terrainGroup = std::make_shared<TerrainGroup>(mSceneMgr, Terrain::ALIGN_X_Z, mapSize, worldSize);
-    terrainGroup->setOrigin(Vector3::ZERO);
-    terrainGroup->setResourceGroup(m_sGroupName);
+    mTerrainGroup.reset(new TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, mapSize, worldSize));
+    mTerrainGroup->setOrigin(Vector3::ZERO);
+    mTerrainGroup->setResourceGroup(m_sGroupName);
 
     // Process terrain pages (*)
     for (auto pPageElement : XMLNode.children("terrain"))
@@ -294,13 +277,11 @@ void DotSceneLoader::processTerrainGroup(pugi::xml_node& XMLNode)
         int pageX = StringConverter::parseInt(pPageElement.attribute("x").value());
         int pageY = StringConverter::parseInt(pPageElement.attribute("y").value());
 
-        terrainGroup->defineTerrain(pageX, pageY, pPageElement.attribute("dataFile").value());
+        mTerrainGroup->defineTerrain(pageX, pageY, pPageElement.attribute("dataFile").value());
     }
-    terrainGroup->loadAllTerrains(true);
+    mTerrainGroup->loadAllTerrains(true);
 
-    terrainGroup->freeTemporaryResources();
-
-    mAttachNode->getUserObjectBindings().setUserAny("TerrainGroup", terrainGroup);
+    mTerrainGroup->freeTemporaryResources();
 #else
     OGRE_EXCEPT(Exception::ERR_INVALID_CALL, "recompile with Terrain component");
 #endif
@@ -537,9 +518,9 @@ void DotSceneLoader::processLookTarget(pugi::xml_node& XMLNode, SceneNode* pPare
 
         pParent->lookAt(position, relativeTo, localDirection);
     }
-    catch (const Exception& e)
+    catch (Exception& /*e*/)
     {
-        LogManager::getSingleton().logError("DotSceneLoader - " + e.getDescription());
+        LogManager::getSingleton().logMessage("[DotSceneLoader] Error processing a look target!");
     }
 }
 
@@ -564,9 +545,9 @@ void DotSceneLoader::processTrackTarget(pugi::xml_node& XMLNode, SceneNode* pPar
         SceneNode* pTrackNode = mSceneMgr->getSceneNode(nodeName);
         pParent->setAutoTracking(true, pTrackNode, localDirection, offset);
     }
-    catch (const Exception& e)
+    catch (Exception& /*e*/)
     {
-        LogManager::getSingleton().logError("DotSceneLoader - " + e.getDescription());
+        LogManager::getSingleton().logMessage("[DotSceneLoader] Error processing a track target!");
     }
 }
 
@@ -588,10 +569,9 @@ void DotSceneLoader::processEntity(pugi::xml_node& XMLNode, SceneNode* pParent)
         if (auto material = XMLNode.attribute("material"))
             pEntity->setMaterialName(material.value());
     }
-    catch (const Exception& e)
+    catch (Exception& /*e*/)
     {
-        LogManager::getSingleton().logError("DotSceneLoader - " + e.getDescription());
-        return;
+        LogManager::getSingleton().logMessage("[DotSceneLoader] Error loading an entity!", LML_CRITICAL);
     }
 
     // Process userDataReference (?)
@@ -614,9 +594,9 @@ void DotSceneLoader::processParticleSystem(pugi::xml_node& XMLNode, SceneNode* p
         ParticleSystem* pParticles = mSceneMgr->createParticleSystem(name, templateName);
         pParent->attachObject(pParticles);
     }
-    catch (const Exception& e)
+    catch (Exception& /*e*/)
     {
-        LogManager::getSingleton().logError("DotSceneLoader - " + e.getDescription());
+        LogManager::getSingleton().logMessage("[DotSceneLoader] Error creating a particle system!");
     }
 }
 
@@ -795,13 +775,11 @@ const Ogre::String& DotScenePlugin::getName() const {
 }
 
 void DotScenePlugin::initialise() {
-    mCodec = new DotSceneCodec();
-    Codec::registerCodec(mCodec);
+    mDotSceneLoader = new Ogre::DotSceneLoader();
 }
 
 void DotScenePlugin::shutdown() {
-    Codec::unregisterCodec(mCodec);
-    delete mCodec;
+    delete mDotSceneLoader;
 }
 
 #ifndef OGRE_STATIC_LIB

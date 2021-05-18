@@ -234,58 +234,51 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    template <typename T> static bool assignValid(bool valid, const T& val, T& ret)
-    {
-        if (valid)
-            ret = val;
-        return valid;
-    }
-
     bool StringConverter::parse(const String& val, float& ret)
     {
         char* end;
-        auto tmp = (float)strtod_l(val.c_str(), &end, _numLocale);
-        return assignValid(val.c_str() != end, tmp, ret);
+        ret = (float)strtod_l(val.c_str(), &end, _numLocale);
+        return val.c_str() != end;
     }
     bool StringConverter::parse(const String& val, double& ret)
     {
         char* end;
-        auto tmp = strtod_l(val.c_str(), &end, _numLocale);
-        return assignValid(val.c_str() != end, tmp, ret);
+        ret = strtod_l(val.c_str(), &end, _numLocale);
+        return val.c_str() != end;
     }
     //-----------------------------------------------------------------------
     bool StringConverter::parse(const String& val, int32& ret)
     {
         char* end;
-        auto tmp = (int32)strtol_l(val.c_str(), &end, 0, _numLocale);
-        return assignValid(val.c_str() != end, tmp, ret);
+        ret = (int32)strtol_l(val.c_str(), &end, 0, _numLocale);
+        return val.c_str() != end;
     }
     //-----------------------------------------------------------------------
     bool StringConverter::parse(const String& val, int64& ret)
     {
         char* end;
-        int64 tmp = strtoll_l(val.c_str(), &end, 0, _numLocale);
-        return assignValid(val.c_str() != end, tmp, ret);
+        ret = strtoll_l(val.c_str(), &end, 0, _numLocale);
+        return val.c_str() != end;
     }
     //-----------------------------------------------------------------------
     bool StringConverter::parse(const String& val, unsigned long& ret)
     {
         char* end;
-        unsigned long tmp = strtoull_l(val.c_str(), &end, 0, _numLocale);
-        return assignValid(val.c_str() != end, tmp, ret);
+        ret = strtoull_l(val.c_str(), &end, 0, _numLocale);
+        return val.c_str() != end;
     }
     bool StringConverter::parse(const String& val, unsigned long long& ret)
     {
         char* end;
-        unsigned long long tmp = strtoull_l(val.c_str(), &end, 0, _numLocale);
-        return assignValid(val.c_str() != end, tmp, ret);
+        ret = strtoull_l(val.c_str(), &end, 0, _numLocale);
+        return val.c_str() != end;
     }
     //-----------------------------------------------------------------------
     bool StringConverter::parse(const String& val, uint32& ret)
     {
         char* end;
-        auto tmp = (uint32)strtoul_l(val.c_str(), &end, 0, _numLocale);
-        return assignValid(val.c_str() != end, tmp, ret);
+        ret = (uint32)strtoul_l(val.c_str(), &end, 0, _numLocale);
+        return val.c_str() != end;
     }
     bool StringConverter::parse(const String& val, bool& ret)
     {
@@ -304,8 +297,7 @@ namespace Ogre {
         return true;
     }
 
-    template<typename T>
-    static bool parseReals(const String& val, T* dst, size_t n)
+    static bool parseReals(const String& val, Real* dst, size_t n)
     {
         // Split on space
         std::vector<String> vec = StringUtil::split(val);

@@ -24,6 +24,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
+PCZSceneNode.h  -  Node Zone Info header file.
+The PCZSceneNode is an extension used to store zone information and provide
+additional functionality for a given Ogre::SceneNode.  A PCZSceneNode contains
+a pointer to the home zone for the node and a list of all zones being visited by
+the node.  The PCZSceneManager contains a STD::MAP of PCZSceneNodes which are
+keyed by the name of each node (each PCZSceneNode has an identical name to the 
+scene node which it is associated with).  This allows quick lookup of
+a given scenenode's PCZSceneNode by the scene manager.
+-----------------------------------------------------------------------------
+begin                : Sat Mar 24 2007
+author               : Eric Cha
+email                : ericc@xenopi.com
+Code Style Update    :
+-----------------------------------------------------------------------------
 */
 
 #ifndef PCZ_SCENE_NODE_H
@@ -35,12 +49,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    /** \addtogroup Plugins
-    *  @{
-    */
-    /** \addtogroup PCZSceneManager
-    *  @{
-    */
     // forward declarations
     class PCZone;
     class ZoneData;
@@ -48,15 +56,6 @@ namespace Ogre
     typedef std::map<String, PCZone*> ZoneMap;
     typedef std::map<String, ZoneData*> ZoneDataMap;
 
-    /**
-        The PCZSceneNode is an extension used to store zone information and provide
-        additional functionality for a given Ogre::SceneNode.  A PCZSceneNode contains
-        a pointer to the home zone for the node and a list of all zones being visited by
-        the node.  The PCZSceneManager contains a STD::MAP of PCZSceneNodes which are
-        keyed by the name of each node (each PCZSceneNode has an identical name to the
-        scene node which it is associated with).  This allows quick lookup of
-        a given scenenode's PCZSceneNode by the scene manager.
-     */
     class _OgrePCZPluginExport PCZSceneNode : public SceneNode
     {
     public:
@@ -115,8 +114,6 @@ namespace Ogre
         bool            mEnabled;
         mutable bool    mMoved;
     };
-    /** @} */
-    /** @} */
 }
 
 #endif // PCZ_SCENE_NODE_H

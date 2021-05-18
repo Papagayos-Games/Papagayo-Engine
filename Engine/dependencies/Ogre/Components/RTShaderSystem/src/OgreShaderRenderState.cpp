@@ -88,7 +88,7 @@ void RenderState::addTemplateSubRenderState(SubRenderState* subRenderState)
         // and destroy the base sub render state.
         else if ((*it)->getType() == subRenderState->getType())
         {
-            removeSubRenderState(*it);
+            removeTemplateSubRenderState(*it);
             break;
         }
     }
@@ -101,22 +101,23 @@ void RenderState::addTemplateSubRenderState(SubRenderState* subRenderState)
 }
 
 //-----------------------------------------------------------------------
-void RenderState::removeSubRenderState(SubRenderState* subRenderState)
+void RenderState::removeTemplateSubRenderState(SubRenderState* subRenderState)
 {
-    auto it = std::find(mSubRenderStateList.begin(), mSubRenderStateList.end(), subRenderState);
-    if(it == mSubRenderStateList.end()) return;
-
-    mSubRenderStateList.erase(it);
-    ShaderGenerator::getSingleton().destroySubRenderState(subRenderState);
+    for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
+    {
+        if ((*it) == subRenderState)
+        {
+            ShaderGenerator::getSingleton().destroySubRenderState(*it);
+            mSubRenderStateList.erase(it);
+            break;
+        }       
+    }
 }
 
 //-----------------------------------------------------------------------
-TargetRenderState::TargetRenderState() : mSubRenderStateSortValid(false), mParent(nullptr) {}
-
-TargetRenderState::~TargetRenderState()
+TargetRenderState::TargetRenderState()
 {
-    if(mParent)
-        releasePrograms(mParent);
+    mSubRenderStateSortValid = false;
 }
 
 //-----------------------------------------------------------------------
@@ -124,6 +125,20 @@ void TargetRenderState::addSubRenderStateInstance(SubRenderState* subRenderState
 {
     mSubRenderStateList.push_back(subRenderState);
     mSubRenderStateSortValid = false;
+}
+
+//-----------------------------------------------------------------------
+void TargetRenderState::removeSubRenderStateInstance(SubRenderState* subRenderState)
+{
+    for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
+    {
+        if ((*it) == subRenderState)
+        {
+            ShaderGenerator::getSingleton().destroySubRenderState(*it);
+            mSubRenderStateList.erase(it);
+            break;
+        }       
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -146,17 +161,7 @@ void TargetRenderState::acquirePrograms(Pass* pass)
 {
     createCpuPrograms();
 
-    try
-    {
-        ProgramManager::getSingleton().createGpuPrograms(mProgramSet.get());
-    }
-    catch(Ogre::Exception& e)
-    {
-        LogManager::getSingleton().logError(StringUtil::format("RTSS - creating GpuPrograms for pass %d of '%s' failed",
-                                                               pass->getIndex(),
-                                                               pass->getParent()->getParent()->getName().c_str()));
-        throw;
-    }
+    ProgramManager::getSingleton().createGpuPrograms(mProgramSet.get());
 
     for(auto type : {GPT_VERTEX_PROGRAM, GPT_FRAGMENT_PROGRAM})
     {
@@ -166,7 +171,7 @@ void TargetRenderState::acquirePrograms(Pass* pass)
         bindUniformParameters(mProgramSet->getCpuProgram(type), pass->getGpuProgramParameters(type));
     }
 
-    mParent = pass;
+    pass->getUserObjectBindings().setUserAny(UserKey, Any(this));
 }
 
 
@@ -181,40 +186,14 @@ void TargetRenderState::releasePrograms(Pass* pass)
     ProgramManager::getSingleton().releasePrograms(mProgramSet.get());
 
     mProgramSet.reset();
-}
 
-/// we cannot resolve this at preAddToRenderState time as addition order is arbitrary
-static void fixupFFPLighting(TargetRenderState* renderState)
-{
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-    const SubRenderStateList& subRenderStateList = renderState->getSubRenderStates();
-    auto it = std::find_if(subRenderStateList.begin(), subRenderStateList.end(),
-                           [](const SubRenderState* e) { return e->getType() == FFPLighting::Type; });
-
-    if (it == subRenderStateList.end())
-        return;
-
-    auto ffpLighting = static_cast<FFPLighting*>(*it);
-
-    it = std::find_if(subRenderStateList.begin(), subRenderStateList.end(),
-                      [](const SubRenderState* e) { return e->getType() == FFPColour::Type; });
-
-    OgreAssert(it != subRenderStateList.end(), "FFPColour required");
-
-    auto ffpColour = static_cast<FFPColour*>(*it);
-    ffpColour->addResolveStageMask(FFPColour::SF_VS_OUTPUT_DIFFUSE);
-
-    if(ffpLighting->getSpecularEnable())
-        ffpColour->addResolveStageMask(FFPColour::SF_VS_OUTPUT_SPECULAR);
-#endif
+    pass->getUserObjectBindings().eraseUserAny(UserKey);
 }
 
 //-----------------------------------------------------------------------
 void TargetRenderState::createCpuPrograms()
 {
     sortSubRenderStates();
-
-    fixupFFPLighting(this);
 
     ProgramSet* programSet = createProgramSet();
     programSet->setCpuProgram(std::unique_ptr<Program>(new Program(GPT_VERTEX_PROGRAM)));
@@ -252,70 +231,73 @@ void TargetRenderState::updateGpuProgramsParams(Renderable* rend, const Pass* pa
     }
 }
 
-void TargetRenderState::link(const StringVector& srsTypes, Pass* srcPass, Pass* dstPass)
-{
-    for (const auto& srsType : srsTypes)
-    {
-        auto srs = ShaderGenerator::getSingleton().createSubRenderState(srsType);
-
-        if (srs->preAddToRenderState(this, srcPass, dstPass))
-        {
-            addSubRenderStateInstance(srs);
-        }
-        else
-        {
-            ShaderGenerator::getSingleton().destroySubRenderState(srs);
-        }
-    }
-}
-
 //-----------------------------------------------------------------------
-void TargetRenderState::link(const RenderState& templateRS, Pass* srcPass, Pass* dstPass)
-{
-    for (auto srcSubRenderState : templateRS.getSubRenderStates())
+void TargetRenderState::link(const RenderState& rhs, Pass* srcPass, Pass* dstPass)
+{   
+    SubRenderStateList customSubRenderStates;
+
+    // Sort current render states.
+    sortSubRenderStates();
+
+    // Insert all custom sub render states. (I.E Not FFP sub render states).
+    const SubRenderStateList& subRenderStateList = rhs.getTemplateSubRenderStateList();
+
+    for (SubRenderStateListConstIterator itSrc=subRenderStateList.begin(); itSrc != subRenderStateList.end(); ++itSrc)
     {
-        auto it = mSubRenderStateList.end();
-        switch (srcSubRenderState->getExecutionOrder())
+        const SubRenderState* srcSubRenderState = *itSrc;
+        bool isCustomSubRenderState = true;
+
+        if (srcSubRenderState->getExecutionOrder() == FFP_TRANSFORM ||
+            srcSubRenderState->getExecutionOrder() == FFP_COLOUR ||
+            srcSubRenderState->getExecutionOrder() == FFP_LIGHTING ||
+            srcSubRenderState->getExecutionOrder() == FFP_TEXTURING ||
+            srcSubRenderState->getExecutionOrder() == FFP_FOG)
         {
-        case FFP_TRANSFORM:
-        case FFP_COLOUR:
-        case FFP_LIGHTING:
-        case FFP_TEXTURING:
-        case FFP_FOG:
-            // Check if this FFP stage already exists.
-            it = std::find_if(mSubRenderStateList.begin(), mSubRenderStateList.end(),
-                              [srcSubRenderState](const SubRenderState* e) {
-                                  return srcSubRenderState->getExecutionOrder() == e->getExecutionOrder();
-                              });
-        default:
-            break;
-        }
+            isCustomSubRenderState = false;
+        }       
 
-        if(it != mSubRenderStateList.end())
-            continue;
 
-        // Check if this type of sub render state already exists.
-        it = std::find_if(mSubRenderStateList.begin(), mSubRenderStateList.end(),
-                          [srcSubRenderState](const SubRenderState* e) {
-                              return srcSubRenderState->getType() == e->getType();
-                          });
-
-        if(it != mSubRenderStateList.end())
-            continue;
-
-        // Case custom sub render state not exits -> add it to custom list.
-        auto newSubRenderState = ShaderGenerator::getSingleton().createSubRenderState(srcSubRenderState->getType());
-        *newSubRenderState = *srcSubRenderState;
-
-        if (newSubRenderState->preAddToRenderState(this, srcPass, dstPass))
+        // Case it is a custom sub render state.
+        if (isCustomSubRenderState)
         {
-            addSubRenderStateInstance(newSubRenderState);
+            bool subStateTypeExists = false;
+
+            // Check if this type of sub render state already exists.
+            for (SubRenderStateListConstIterator itDst=mSubRenderStateList.begin(); itDst != mSubRenderStateList.end(); ++itDst)
+            {
+                if ((*itDst)->getType() == srcSubRenderState->getType())
+                {
+                    subStateTypeExists = true;
+                    break;
+                }               
+            }
+
+            // Case custom sub render state not exits -> add it to custom list.
+            if (subStateTypeExists == false)
+            {
+                SubRenderState* newSubRenderState = NULL;
+
+                newSubRenderState = ShaderGenerator::getSingleton().createSubRenderState(srcSubRenderState->getType());
+                *newSubRenderState = *srcSubRenderState;
+                customSubRenderStates.push_back(newSubRenderState);
+            }                       
+        }                       
+    }   
+
+    // Merge the local custom sub render states.
+    for (SubRenderStateListIterator itSrc=customSubRenderStates.begin(); itSrc != customSubRenderStates.end(); ++itSrc)
+    {
+        SubRenderState* customSubRenderState = *itSrc;
+
+        if (customSubRenderState->preAddToRenderState(this, srcPass, dstPass))
+        {
+            addSubRenderStateInstance(customSubRenderState);
         }
         else
         {
-            ShaderGenerator::getSingleton().destroySubRenderState(newSubRenderState);
-        }
-    }
+            ShaderGenerator::getSingleton().destroySubRenderState(customSubRenderState);
+        }       
+    }   
 }
 
 namespace {

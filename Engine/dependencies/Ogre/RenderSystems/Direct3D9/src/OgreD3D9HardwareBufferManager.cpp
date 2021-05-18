@@ -27,7 +27,8 @@ THE SOFTWARE.
 */
 #include "OgreD3D9RenderSystem.h"
 #include "OgreD3D9HardwareBufferManager.h"
-#include "OgreD3D9HardwareBuffer.h"
+#include "OgreD3D9HardwareVertexBuffer.h"
+#include "OgreD3D9HardwareIndexBuffer.h"
 #include "OgreD3D9VertexDeclaration.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
@@ -51,13 +52,42 @@ namespace Ogre {
         bool useShadowBuffer)
     {
         assert (numVerts > 0);
-		auto impl = new D3D9HardwareBuffer(D3DFMT_VERTEXDATA, vertexSize * numVerts, usage, useShadowBuffer);
-        auto buf = std::make_shared<HardwareVertexBuffer>(this, vertexSize, numVerts, impl);
+#if OGRE_D3D_MANAGE_BUFFERS
+        // Override shadow buffer setting; managed buffers are automatically
+        // backed by system memory
+        // Don't override shadow buffer if discardable, since then we use
+        // unmanaged buffers for speed (avoids write-through overhead)
+        // Don't override if we use directX9EX, since then we don't have managed
+        // pool. And creating non-write only default pool causes a performance warning. 
+        if (useShadowBuffer && !(usage & HardwareBuffer::HBU_DISCARDABLE) &&
+            !D3D9RenderSystem::isDirectX9Ex())
         {
-            OGRE_LOCK_MUTEX(mVertexBuffersMutex);
-            mVertexBuffers.insert(buf.get());
+            useShadowBuffer = false;
+            // Also drop any WRITE_ONLY so we can read direct
+            if (usage == HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY)
+            {
+                usage = HardwareBuffer::HBU_DYNAMIC;
+            }
+            else if (usage == HardwareBuffer::HBU_STATIC_WRITE_ONLY)
+            {
+                usage = HardwareBuffer::HBU_STATIC;
+            }
         }
-        return buf;
+        //If we have write only buffers in DirectX9Ex we will turn on the discardable flag.
+        //Otherwise Ogre will operates in far less framerate
+        if (D3D9RenderSystem::isDirectX9Ex() && (usage & HardwareBuffer::HBU_WRITE_ONLY))
+        {
+            usage = (HardwareBuffer::Usage)
+                ((unsigned int)usage | (unsigned int)HardwareBuffer::HBU_DISCARDABLE);
+        }
+#endif
+        D3D9HardwareVertexBuffer* vbuf = OGRE_NEW D3D9HardwareVertexBuffer(
+            this, vertexSize, numVerts, usage, false, useShadowBuffer);
+        {
+                    OGRE_LOCK_MUTEX(mVertexBuffersMutex);
+            mVertexBuffers.insert(vbuf);
+        }
+        return HardwareVertexBufferSharedPtr(vbuf);
     }
     //-----------------------------------------------------------------------
     HardwareIndexBufferSharedPtr 
@@ -66,20 +96,52 @@ namespace Ogre {
         HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
         assert (numIndexes > 0);
-        auto indexSize = HardwareIndexBuffer::indexSize(itype);
-        auto impl = new D3D9HardwareBuffer(D3D9Mappings::get(itype), indexSize * numIndexes, usage, useShadowBuffer);
-
-        auto buf = std::make_shared<HardwareIndexBuffer>(this, itype, numIndexes, impl);
+#if OGRE_D3D_MANAGE_BUFFERS
+        // Override shadow buffer setting; managed buffers are automatically
+        // backed by system memory
+        // Don't override shadow buffer if discardable, since then we use
+        // unmanaged buffers for speed (avoids write-through overhead)
+        // Don't override if we use directX9EX, since then we don't have managed
+        // pool. And creating non-write only default pool causes a performance warning. 
+        if (useShadowBuffer && !(usage & HardwareBuffer::HBU_DISCARDABLE) &&
+            !D3D9RenderSystem::isDirectX9Ex())
         {
-            OGRE_LOCK_MUTEX(mIndexBuffersMutex);
-            mIndexBuffers.insert(buf.get());
+            useShadowBuffer = false;
+            // Also drop any WRITE_ONLY so we can read direct
+            if (usage == HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY)
+            {
+                usage = HardwareBuffer::HBU_DYNAMIC;
+            }
+            else if (usage == HardwareBuffer::HBU_STATIC_WRITE_ONLY)
+            {
+                usage = HardwareBuffer::HBU_STATIC;
+            }
         }
-        return buf;
+        //If we have write only buffers in DirectX9Ex we will turn on the discardable flag.
+        //Otherwise Ogre will operates in far less framerate
+        if (D3D9RenderSystem::isDirectX9Ex() && (usage & HardwareBuffer::HBU_WRITE_ONLY))
+        {
+            usage = (HardwareBuffer::Usage)
+                ((unsigned int)usage | (unsigned int)HardwareBuffer::HBU_DISCARDABLE);
+        }
+#endif
+        D3D9HardwareIndexBuffer* idx = OGRE_NEW D3D9HardwareIndexBuffer(
+            this, itype, numIndexes, usage, false, useShadowBuffer);
+        {
+                    OGRE_LOCK_MUTEX(mIndexBuffersMutex);
+            mIndexBuffers.insert(idx);
+        }
+        return HardwareIndexBufferSharedPtr(idx);
             
     }
     //-----------------------------------------------------------------------
     VertexDeclaration* D3D9HardwareBufferManager::createVertexDeclarationImpl(void)
     {
         return OGRE_NEW D3D9VertexDeclaration();
+    }
+    //-----------------------------------------------------------------------
+    void D3D9HardwareBufferManager::destroyVertexDeclarationImpl(VertexDeclaration* decl)
+    {
+        OGRE_DELETE decl;
     }
 }

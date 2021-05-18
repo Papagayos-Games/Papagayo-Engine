@@ -32,19 +32,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    struct MeshCodec : public Codec
-    {
-        String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const { return ""; }
-        String getType() const { return "mesh"; }
-        void decode(const DataStreamPtr& input, const Any& output) const override
-        {
-            Mesh* dst = any_cast<Mesh*>(output);
-            MeshSerializer serializer;
-            serializer.setListener(MeshManager::getSingleton().getListener());
-            serializer.importMesh(input, dst);
-        }
-    };
-
     //-----------------------------------------------------------------------
     template<> MeshManager* Singleton<MeshManager>::msSingleton = 0;
     MeshManager* MeshManager::getSingletonPtr(void)
@@ -65,16 +52,12 @@ namespace Ogre
         mLoadOrder = 350.0f;
         mResourceType = "Mesh";
 
-        mMeshCodec.reset(new MeshCodec());
-        Codec::registerCodec(mMeshCodec.get());
-
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
 
     }
     //-----------------------------------------------------------------------
     MeshManager::~MeshManager()
     {
-        Codec::unregisterCodec(mMeshCodec.get());
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
     }
     //-----------------------------------------------------------------------
@@ -163,7 +146,7 @@ namespace Ogre
         // Planes can never be manifold
         pMesh->setAutoBuildEdgeLists(false);
         // store parameters
-        MeshBuildParams params = {};
+        MeshBuildParams params;
         params.type = MBT_PLANE;
         params.plane = plane;
         params.width = width;
@@ -199,7 +182,7 @@ namespace Ogre
         // Planes can never be manifold
         pMesh->setAutoBuildEdgeLists(false);
         // store parameters
-        MeshBuildParams params = {};
+        MeshBuildParams params;
         params.type = MBT_CURVED_PLANE;
         params.plane = plane;
         params.width = width;
@@ -481,7 +464,9 @@ namespace Ogre
         Real xTex = (1.0f * params.xTile) / params.xsegments;
         Real yTex = (1.0f * params.yTile) / params.ysegments;
         Vector3 vec;
-        AxisAlignedBox aabb;
+        Vector3 min = Vector3::ZERO, max = Vector3::UNIT_SCALE;
+        Real maxSquaredLength = 0;
+        bool firstTime = true;
 
         for (int y = 0; y < params.ysegments + 1; ++y)
         {
@@ -499,7 +484,19 @@ namespace Ogre
                 *pReal++ = vec.z;
 
                 // Build bounds as we go
-                aabb.merge(vec);
+                if (firstTime)
+                {
+                    min = vec;
+                    max = vec;
+                    maxSquaredLength = vec.squaredLength();
+                    firstTime = false;
+                }
+                else
+                {
+                    min.makeFloor(vec);
+                    max.makeCeil(vec);
+                    maxSquaredLength = std::max(maxSquaredLength, vec.squaredLength());
+                }
 
                 if (params.normals)
                 {
@@ -530,7 +527,8 @@ namespace Ogre
         tesselate2DMesh(pSub, params.xsegments + 1, params.ysegments + 1, false, 
             params.indexBufferUsage, params.indexShadowBuffer);
 
-        pMesh->_setBounds(aabb, true);
+        pMesh->_setBounds(AxisAlignedBox(min, max), true);
+        pMesh->_setBoundingSphereRadius(Math::Sqrt(maxSquaredLength));
     }
     //-----------------------------------------------------------------------
     void MeshManager::PrefabLoader::loadManualCurvedPlane(Mesh* pMesh, MeshBuildParams& params)
@@ -608,7 +606,9 @@ namespace Ogre
         Real yTex = (1.0f * params.yTile) / params.ysegments;
         Vector3 vec;
 
-        AxisAlignedBox aabb;
+        Vector3 min = Vector3::ZERO, max = Vector3::UNIT_SCALE;
+        Real maxSqLen = 0;
+        bool first = true;
 
         Real diff_x, diff_y, dist;
 
@@ -634,7 +634,18 @@ namespace Ogre
                 *pFloat++ = pos.z;
 
                 // Record bounds
-                aabb.merge(vec);
+                if (first)
+                {
+                    min = max = vec;
+                    maxSqLen = vec.squaredLength();
+                    first = false;
+                }
+                else
+                {
+                    min.makeFloor(vec);
+                    max.makeCeil(vec);
+                    maxSqLen = std::max(maxSqLen, vec.squaredLength());
+                }
 
                 if (params.normals)
                 {
@@ -667,7 +678,9 @@ namespace Ogre
         tesselate2DMesh(pSub, params.xsegments + 1, params.ysegments + 1, 
             false, params.indexBufferUsage, params.indexShadowBuffer);
 
-        pMesh->_setBounds(aabb, true);
+        pMesh->_setBounds(AxisAlignedBox(min, max), true);
+        pMesh->_setBoundingSphereRadius(Math::Sqrt(maxSqLen));
+
     }
     //-----------------------------------------------------------------------
     void MeshManager::PrefabLoader::loadManualCurvedIllusionPlane(Mesh* pMesh, MeshBuildParams& params)
@@ -769,7 +782,9 @@ namespace Ogre
         Real halfWidth = params.width / 2;
         Real halfHeight = params.height / 2;
         Vector3 vec, norm;
-        AxisAlignedBox aabb;
+        Vector3 min = Vector3::ZERO, max = Vector3::UNIT_SCALE;
+        Real maxSquaredLength = 0;
+        bool firstTime = true;
 
         for (int y = params.ysegments - params.ySegmentsToKeep; y < params.ysegments + 1; ++y)
         {
@@ -787,7 +802,19 @@ namespace Ogre
                 *pFloat++ = vec.z;
 
                 // Build bounds as we go
-                aabb.merge(vec);
+                if (firstTime)
+                {
+                    min = vec;
+                    max = vec;
+                    maxSquaredLength = vec.squaredLength();
+                    firstTime = false;
+                }
+                else
+                {
+                    min.makeFloor(vec);
+                    max.makeCeil(vec);
+                    maxSquaredLength = std::max(maxSquaredLength, vec.squaredLength());
+                }
 
                 if (params.normals)
                 {
@@ -832,7 +859,8 @@ namespace Ogre
         tesselate2DMesh(pSub, params.xsegments + 1, params.ySegmentsToKeep + 1, false, 
             params.indexBufferUsage, params.indexShadowBuffer);
 
-        pMesh->_setBounds(aabb, true);
+        pMesh->_setBounds(AxisAlignedBox(min, max), true);
+        pMesh->_setBoundingSphereRadius(Math::Sqrt(maxSquaredLength));
     }
     //-----------------------------------------------------------------------
     PatchMeshPtr MeshManager::createBezierPatch(const String& name, const String& groupName,

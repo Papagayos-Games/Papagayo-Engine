@@ -65,7 +65,7 @@ namespace Ogre
         }
 
         template<typename ValueType>
-        Any(const ValueType & value)
+        explicit Any(const ValueType & value)
           : mContent(OGRE_NEW_T(holder<ValueType>, MEMCATEGORY_GENERAL)(value))
         {
         }
@@ -119,8 +119,7 @@ namespace Ogre
         /// @deprecated use type() instead
         OGRE_DEPRECATED const std::type_info& getType() const { return type(); }
 
-        /// @deprecated no longer supported
-        OGRE_DEPRECATED friend std::ostream& operator <<
+        inline friend std::ostream& operator <<
             ( std::ostream& o, const Any& v )
         {
             if (v.mContent)
@@ -181,7 +180,7 @@ namespace Ogre
 
             virtual void writeToStream(std::ostream& o)
             {
-                o << "Any::ValueType";
+                o << held;
             }
 
 

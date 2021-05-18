@@ -10,10 +10,6 @@
 
 namespace OgreBites
 {
-    /** \addtogroup Optional
-    *   \addtogroup Bites
-    *   \addtogroup Input
-    */
     struct _OgreBitesExport ImGuiInputListener : public InputListener
     {
         ImGuiInputListener();

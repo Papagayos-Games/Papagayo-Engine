@@ -1,7 +1,5 @@
 # Guide to building OGRE {#building-ogre}
 
-@tableofcontents
-
 Ogre uses [CMake](https://cmake.org/) as its build system on all supported platforms.
 This guide will explain to you how to use CMake to build Ogre from source. You need a CMake version >= 3.3.
 
@@ -22,54 +20,55 @@ You should now create a build directory for Ogre somewhere outside
 Ogre's sources. This is the directory where CMake will create the
 build system for your chosen platform and compiler, and this is also
 where the Ogre libraries will be compiled. This way, the Ogre source
-dir stays clean, and you can have multiple build directories (e.g. for Android and for Linux) all
+dir stays clean, and you can have multiple build directories all
 working from the same Ogre source.
 
 Getting dependencies
 --------------------
 
-By default ogre will build the essential dependencies automatically when you run cmake configure the first time.
-Ogre will install the dependencies into the subfolder `Dependencies` in the build dir by default. You can configure it by setting `OGRE_DEPENDENCIES_DIR` in cmake.
+By default ogre will build the essential dependencies automatically when you run cmake the first time. If you would rather use system wide libraries set `OGRE_BUILD_DEPENDENCIES=OFF`.
 
-@note As the dependencies are built during the *configure* stage of CMake, you must specify the desired `CMAKE_BUILD_TYPE` via command-line. Changing the value in the CMake GUI will have no effect.
+Ogre will install the dependencies into the subfolder `Dependencies` in the build dir by default. You can configure it by setting `OGRE_DEPENDENCIES_DIR` in cmake. For instance to point to a common dependencies folder for all of your projects. Inside
+this directory you must have the subdirectories bin, lib and include
+where you place .dll, .lib and header files of the dependencies, respectively
 
-If you would rather use system wide libraries set `OGRE_BUILD_DEPENDENCIES=OFF`.
-On windows, you would then point `OGRE_DEPENDENCIES_DIR` to a common dependencies folder for all of your middleware projects. Inside this directory you must have the subdirectories bin, lib and include
-where you place .dll, .lib and header files of the dependencies, respectively.
+On linux you additionally need the following system headers to build the GL RenderSystems (command for Ubuntu):
 
-For manually building the dependencies, please refer to the list below and get a source package from the website, then build it according to its documentation.
-
-### Linux
-
-On linux you additionally need the following system headers to build the GL & GLES2 RenderSystems (command for Ubuntu):
-
-    sudo apt-get install libgles2-mesa-dev
+    sudo apt-get install libgles2-mesa-dev libxt-dev libxaw7-dev
 
 furthermore we recommend installing the following optional packages
 
-    sudo apt-get install libsdl2-dev libxt-dev libxaw7-dev doxygen
+    sudo apt-get install nvidia-cg-toolkit libsdl2-dev doxygen
 
 these will enable input handling in the SampleBrowser and building the documentation.
 
-### Essential dependencies
+If you cannot obtain prebuilt binaries of a dependency for your platform,
+please refer to the list below and get a source package from the website,
+then build it according to its documentation.
+
+### Essential dependencies:
 
 * freetype: http://www.freetype.org
 
-### Recommended dependencies
+### Recommended dependencies:
 
 * zlib: http://www.zlib.net
 * zziplib: https://github.com/gdraheim/zziplib
 * pugixml: https://github.com/zeux/pugixml
 * SDL: https://www.libsdl.org/
 
-### Optional dependencies
+### Optional dependencies:
 
 * DirectX SDK: http://msdn.microsoft.com/en-us/directx/
 * FreeImage: http://freeimage.sourceforge.net
 * Doxygen: http://doxygen.org
 * Cg: http://developer.nvidia.com/object/cg_toolkit.html
 * Remotery: https://github.com/Celtoys/Remotery
-* %Assimp: https://www.assimp.org/
+* Boost: http://www.boost.org (+)
+* POCO: http://pocoproject.org (+)
+* TBB: http://www.threadingbuildingblocks.org (+)
+
+(+) can be used for threading instead of `std::thread`
 
 Running CMake
 -------------
@@ -91,7 +90,6 @@ a list of build options. You can adjust the settings to your liking;
 particular component/ plugin from being built
 - `OGRE_CONFIG_XXX` on the other hand allows you to configure Core features e.g. threading or zip file support.
 - `OGRE_CONFIG_NODE_INHERIT_TRANSFORM` enables shearing and non-uniform scaling for Ogre::SceneNode. This requires slightly more storage and computation time.
-- `OGRE_CONFIG_ENABLE_MESHLOD` If enabled, LOD levels from *.mesh files are used to reduce triangle count. If disabled, they are skipped at loading. Reducing submesh size and entity size.
 - `OGRE_PROFILING` add profiling instrumentation the ogre library.
 - `OGRE_PROFILING_REMOTERY_PATH` if set, Remotery is used for profiling instead of the Ogre internal profiler.
 - `OGRE_ASSERT_MODE` allows you to to disable all runtime assertion exceptions or turn them into calls to `std::abort`.
@@ -117,8 +115,6 @@ If you rather want to trigger the build form a console, then cd to your build di
 
 to start the build process.
 
-@note on multi-config generators, notably Xcode and MSVC, `--config` must match the `CMAKE_BUILD_TYPE` specified when building the dependencies. This does not apply if you manually provide the dependencies as release *and* debug.
-
 If you have doxygen installed and CMake picked it up, then there will
 be an additional build target called *OgreDoc* which you can optionally build.
 This will freshly generate the API documentation for Ogre's classes from the header files. In Visual Studio, just select and build the target *OgreDoc*, on Linux type:
@@ -142,20 +138,6 @@ For Makefile based generators, type:
 
 On Linux Ogre will be installed to `/usr/local` by default. On Windows this will create the folder `sdk` inside your build directory and copy all the
 required libraries there. You can change the install location by changing the variable `CMAKE_INSTALL_PREFIX` in CMake.
-
-Installing and building via vcpkg
----------------------------------
-You can download and install ogre using the [vcpkg](https://github.com/Microsoft/vcpkg) dependency manager:
-```
-git clone https://github.com/Microsoft/vcpkg.git
-cd vcpkg
-./bootstrap-vcpkg.sh
-./vcpkg integrate install
-vcpkg install ogre
-```
-The ogre port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
-
-# Cross-Compiling
 
 Building on Ubuntu for Android
 --------------------------------------------
@@ -192,7 +174,7 @@ Building on Mac OS X for iOS OS
 
 To build Ogre for iOS, you need to specify the ios cross toolchain to cmake as
 
-    cmake -DCMAKE_TOOLCHAIN_FILE=CMake/toolchain/ios.toolchain.xcode.cmake -DIOS_PLATFORM=SIMULATOR -G Xcode .
+    cmake -DCMAKE_TOOLCHAIN_FILE=CMake/toolchain/ios.toolchain.xcode.cmake -G Xcode .
 
 
 Unfortunately, you will now have to do a few manual steps to
@@ -218,18 +200,30 @@ Building as Windows Store or Windows Phone application
 
 You need Windows 8.0 or later, Windows 10 is recommended.
 
-Visual Studio 2015 is recommended as it is bundled with Universal 10.0.240.0, WinStore 8.0/8.1 and WinPhone 8.0/8.1 SDKs.
+You need Visual Studio 2012 or later, Visual Studio 2015 is recommended
+as it is bundled with Universal 10.0.240.0, WinStore 8.0/8.1 and WinPhone 8.0/8.1 SDKs.
 
 Download and install CMake 3.4 or later.
 
-Dependencies for Win32 and for WinRT must be located in
-separate folders. Cg is not supported.
+Patched dependencies must be used, compiled with appropriate WINAPI_FAMILY.
+Cg is not supported.
+You can use https://bitbucket.org/eugene_gff/ogre-dependencies-winrt -
+has VS2012 and VS2013 projects for Win32, WinRT (can be reused for WinPhone)
+Compile dependencies for all configurations that you plan to use before
+running CMake. Dependencies for Win32 and for WinRT must be located in
+separate folders, Win32 version can be built from OgreDependencies.VS201x.sln, 
+WinRT from OgreDependencies.VS201x.WinRT.sln
 
-    cmake.exe -G "Visual Studio 15 2017" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0 ..
+Run CMake, specify source and binaries folders, than "Configure", select
+"Visual Studio 14 2015" generator and "Specify options for cross-compiling"
+option, specify Operating System = "WindowsStore" or "WindowsPhone",
+Version = "8.0", "8.1" or for UAP Operating System = "WindowsStore", Version = "10.0.10240.0", "10.0.10586.0" then "Finish", specify WinRT dependencies folder
+for OGRE_DEPENDENCIES_DIR, "Configure", should be no more errors, then press
+"Generate".
 
 Select SampleBrowser as the start up project and run.
 
-@par Notes
+### Notes
 
 1. The code and generated CMake solution should be on local NTFS drive,
 and can't be on a network drive, including VMWare shared folders - or

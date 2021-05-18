@@ -349,14 +349,8 @@ namespace Ogre {
             LinkedSkeletonAnimSourceList;
         typedef ConstVectorIterator<LinkedSkeletonAnimSourceList> 
             LinkedSkeletonAnimSourceIterator;
-        /// Get the linked skeletons used as animation sources
-        virtual const LinkedSkeletonAnimSourceList& getLinkedSkeletonAnimationSources() const
-        {
-            return mLinkedSkeletonAnimSourceList;
-        }
-
-        /// @deprecated use getLinkedSkeletonAnimationSources
-        OGRE_DEPRECATED virtual LinkedSkeletonAnimSourceIterator
+        /// Get an iterator over the linked skeletons used as animation sources
+        virtual LinkedSkeletonAnimSourceIterator 
             getLinkedSkeletonAnimationSourceIterator(void) const;
 
         /// Internal method for marking the manual bones as dirty
@@ -460,11 +454,13 @@ namespace Ogre {
         /// Debugging method
         void _dumpContents(const String& filename);
 
-        void loadImpl() {}
-        void unloadImpl() { unprepareImpl(); }
+        /** @copydoc Resource::loadImpl
+        */
+        void loadImpl(void);
 
-        void prepareImpl(void);
-        void unprepareImpl(void);
+        /** @copydoc Resource::unloadImpl
+        */
+        void unloadImpl(void);
         /// @copydoc Resource::calculateSize
         size_t calculateSize(void) const;
 

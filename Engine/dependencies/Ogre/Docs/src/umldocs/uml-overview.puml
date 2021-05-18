@@ -16,14 +16,14 @@ package Plugin as Plugin1 #DDD {
 package "Resource Management" {
     class ResourceGroupManager
     class ResourceManager
-    class ImageCodec
+    class ArchiveFactory
     class Mesh
     class Material
     class GpuProgram
     class Texture
 }
 package Plugin as Plugin2 #DDD {
-    ImageCodec <|-down- FreeImageCodec
+    ArchiveFactory <|-down- CustomArchiveFactory
 }
 package Rendering {
     class RenderWindow
@@ -41,7 +41,7 @@ Root -right[hidden]- SceneManagement
 Light -down[hidden]- Rendering
 Light -down[hidden] "Resource Management"
 ResourceGroupManager -down[hidden]- Texture
-ResourceGroupManager -down[hidden]- ImageCodec
+ResourceGroupManager -down[hidden]- ArchiveFactory
 HardwareBufferManager -down[hidden]- RenderSystem
 @enduml 
 

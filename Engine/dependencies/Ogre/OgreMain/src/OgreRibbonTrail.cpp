@@ -543,6 +543,14 @@ namespace Ogre
         return OGRE_NEW RibbonTrail(name, maxElements, numberOfChains, useTex, useCol);
 
     }
+    //-----------------------------------------------------------------------
+    void RibbonTrailFactory::destroyInstance( MovableObject* obj)
+    {
+        OGRE_DELETE obj;
+    }
+
+
+
 
 }
 

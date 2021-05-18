@@ -354,9 +354,17 @@ namespace Ogre {
         /** Inputs (for material used for rendering the quad).
             An empty string signifies that no input is used */
         InputTex mInputs[OGRE_MAX_TEXTURE_LAYERS];
-        Vector3i mThreadGroups;
         /// Stencil operation parameters
-        StencilState mStencilState;
+        bool mStencilCheck;
+        CompareFunction mStencilFunc; 
+        uint32 mStencilRefValue;
+        uint32 mStencilMask;
+        StencilOperation mStencilFailOp;
+        StencilOperation mStencilDepthFailOp;
+        StencilOperation mStencilPassOp;
+        Vector3i mThreadGroups;
+
+        bool mStencilTwoSidedOperation;
         bool mStencilReadBackAsTexture;
 
         /// True if quad should not cover whole screen

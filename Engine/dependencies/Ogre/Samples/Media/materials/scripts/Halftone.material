@@ -1,7 +1,8 @@
-fragment_program Ogre/Compositor/HalftoneFPCg hlsl
+fragment_program Ogre/Compositor/HalftoneFPCg cg
 {
 	source HalftoneFP.cg
 	entry_point Halftone_ps
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 	
 	default_params
 	{
@@ -31,7 +32,7 @@ fragment_program Ogre/Compositor/HalftoneFPGLSL glsl
 fragment_program Ogre/Compositor/HalftoneFPGLSLES glsles
 {
 	source HalftoneFP.glsles
-	syntax glsl300es
+	syntax glsles
 	
 	default_params
 	{

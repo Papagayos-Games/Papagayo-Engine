@@ -283,7 +283,7 @@ namespace Ogre
                 LoadLodRequest req(this,mHighestLodPrepared,mHighestLodLoaded,mTargetLodLevel);
                 Root::getSingleton().getWorkQueue()->addRequest(
                     mWorkQueueChannel, WORKQUEUE_LOAD_LOD_DATA_REQUEST,
-                    req, 0, synchronous);
+                    Any(req), 0, synchronous);
             }
             else if(synchronous)
                 waitForDerivedProcesses();

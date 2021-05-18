@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    typedef size_t ResourceHandle;
+    typedef unsigned long long int ResourceHandle;
 
 
     // Forward declaration
@@ -151,14 +151,13 @@ namespace Ogre {
         String mOrigin;
         /// Optional manual loader; if provided, data is loaded from here instead of a file
         ManualResourceLoader* mLoader;
-    protected: // private in 1.13
         /// State count, the number of times this resource has changed state
         size_t mStateCount;
 
         typedef std::set<Listener*> ListenerList;
         ListenerList mListenerList;
         OGRE_MUTEX(mListenerListMutex);
-    protected:
+
         /** Protected unnamed constructor to prevent default construction. 
         */
         Resource() 
@@ -166,9 +165,6 @@ namespace Ogre {
               mIsBackgroundLoaded(0), mIsManual(0), mSize(0), mLoader(0), mStateCount(0)
         { 
         }
-
-        /// protected assignment as this is merely abstract
-        Resource& operator=(const Resource& rhs);
 
         /** Internal hook to perform actions before the load process, but
             after the resource has been marked as 'loading'.
@@ -275,14 +271,14 @@ namespace Ogre {
 
         /** Returns true if the Resource is reloadable, false otherwise.
         */
-        bool isReloadable(void) const
+        virtual bool isReloadable(void) const
         {
             return !mIsManual || mLoader;
         }
 
         /** Is this resource manually loaded?
         */
-        bool isManuallyLoaded(void) const
+        virtual bool isManuallyLoaded(void) const
         {
             return mIsManual;
         }
@@ -294,7 +290,7 @@ namespace Ogre {
 
         /** Retrieves info about the size of the resource.
         */
-        size_t getSize(void) const
+        virtual size_t getSize(void) const
         { 
             return mSize; 
         }
@@ -305,13 +301,19 @@ namespace Ogre {
 
         /** Gets resource name.
         */
-        const String& getName(void) const { return mName; }
+        virtual const String& getName(void) const 
+        { 
+            return mName; 
+        }
 
-        ResourceHandle getHandle(void) const { return mHandle; }
+        virtual ResourceHandle getHandle(void) const
+        {
+            return mHandle;
+        }
 
         /** Returns true if the Resource has been prepared, false otherwise.
         */
-        bool isPrepared(void) const
+        virtual bool isPrepared(void) const 
         { 
             // No lock required to read this state since no modify
             return (mLoadingState.load() == LOADSTATE_PREPARED);
@@ -319,7 +321,7 @@ namespace Ogre {
 
         /** Returns true if the Resource has been loaded, false otherwise.
         */
-        bool isLoaded(void) const
+        virtual bool isLoaded(void) const 
         { 
             // No lock required to read this state since no modify
             return (mLoadingState.load() == LOADSTATE_LOADED);
@@ -328,14 +330,14 @@ namespace Ogre {
         /** Returns whether the resource is currently in the process of
             background loading.
         */
-        bool isLoading() const
+        virtual bool isLoading() const
         {
             return (mLoadingState.load() == LOADSTATE_LOADING);
         }
 
         /** Returns the current loading state.
         */
-        LoadingState getLoadingState() const
+        virtual LoadingState getLoadingState() const
         {
             return mLoadingState.load();
         }
@@ -352,7 +354,7 @@ namespace Ogre {
             other users of this resource should check isLoaded(), and if that
             returns false, don't use the resource and come back later.
         */
-        bool isBackgroundLoaded(void) const { return mIsBackgroundLoaded; }
+        virtual bool isBackgroundLoaded(void) const { return mIsBackgroundLoaded; }
 
         /** Tells the resource whether it is background loaded or not.
 
@@ -362,7 +364,7 @@ namespace Ogre {
             loaded in the background. You should use ResourceBackgroundLoadingQueue
             to manage the actual loading (which will call this method itself).
         */
-        void setBackgroundLoaded(bool bl) { mIsBackgroundLoaded = bl; }
+        virtual void setBackgroundLoaded(bool bl) { mIsBackgroundLoaded = bl; }
 
         /** Escalates the loading of a background loaded resource. 
         @remarks
@@ -386,7 +388,7 @@ namespace Ogre {
         virtual void removeListener(Listener* lis);
 
         /// Gets the group which this resource is a member of
-        const String& getGroup(void) const { return mGroup; }
+        virtual const String& getGroup(void) const { return mGroup; }
 
         /** Change the resource group ownership of a Resource.
         @remarks

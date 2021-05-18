@@ -17,6 +17,8 @@ public:
 	//Constructor
 	Vector3(const float x1, const float y1, const float z1);
 	Vector3(const std::vector<float>& pos);
+	//Constructor por copia
+	Vector3(const Vector3& other);
 	//Vector3(std::string s);
 	//Invertir todos los valores del vector
 	void invert();

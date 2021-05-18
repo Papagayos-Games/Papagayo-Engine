@@ -176,9 +176,7 @@ namespace Ogre
                     defines[pos] = '\0';
                     // No definition part, define as "1"
                     ++pos;
-
-                    if(defines[macro_name_start] != '\0') // e.g ",DEFINE" or "DEFINE,"
-                        ret.push_back({&defines[macro_name_start], "1"});
+                    ret.push_back({&defines[macro_name_start], "1"});
                 }
             }
             else
@@ -191,29 +189,6 @@ namespace Ogre
         }
 
         return ret;
-    }
-
-    String HighLevelGpuProgram::appendBuiltinDefines(String defines)
-    {
-        if(!defines.empty()) defines += ",";
-
-        auto renderSystem = Root::getSingleton().getRenderSystem();
-
-        // OGRE_HLSL, OGRE_GLSL etc.
-        String tmp = getLanguage();
-        StringUtil::toUpperCase(tmp);
-        auto ver = renderSystem ? renderSystem->getNativeShadingLanguageVersion() : 0;
-        defines += StringUtil::format("OGRE_%s=%d", tmp.c_str(), ver);
-
-        // OGRE_VERTEX_SHADER, OGRE_FRAGMENT_SHADER
-        tmp = GpuProgram::getProgramTypeName(getType());
-        StringUtil::toUpperCase(tmp);
-        defines += ",OGRE_"+tmp+"_SHADER";
-
-        if(renderSystem && renderSystem->isReverseDepthBufferEnabled())
-            defines += ",OGRE_REVERSED_Z";
-
-        return defines;
     }
 
     //---------------------------------------------------------------------------
@@ -260,7 +235,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    String HighLevelGpuProgram::_resolveIncludes(const String& inSource, Resource* resourceBeingLoaded, const String& fileName, bool supportsFilename)
+    String HighLevelGpuProgram::_resolveIncludes(const String& inSource, Resource* resourceBeingLoaded, const String& fileName)
     {
         String outSource;
         // output will be at least this big
@@ -269,6 +244,7 @@ namespace Ogre
         size_t startMarker = 0;
         size_t i = inSource.find("#include");
 
+        bool supportsFilename = StringUtil::endsWith(fileName, "cg");
         String lineFilename = supportsFilename ? StringUtil::format(" \"%s\"", fileName.c_str()) : " 0";
 
         while (i != String::npos)
@@ -303,10 +279,10 @@ namespace Ogre
             }
 
             // find following newline (or EOF)
-            size_t newLineAfter = std::min(inSource.find('\n', afterIncludePos), inSource.size());
+            size_t newLineAfter = inSource.find('\n', afterIncludePos);
             // find include file string container
-            char endDelimiter = '"';
-            size_t startIt = inSource.find('"', afterIncludePos);
+            String endDelimeter = "\"";
+            size_t startIt = inSource.find('\"', afterIncludePos);
             if (startIt == String::npos || startIt > newLineAfter)
             {
                 // try <>
@@ -319,16 +295,15 @@ namespace Ogre
                 }
                 else
                 {
-                    endDelimiter = '>';
+                    endDelimeter = ">";
                 }
             }
-            size_t endIt = inSource.find(endDelimiter, startIt+1);
+            size_t endIt = inSource.find(endDelimeter, startIt+1);
             if (endIt == String::npos || endIt <= startIt)
             {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                            "Badly formed #include directive (expected " + String(1, endDelimiter) +
-                                ") in file " + fileName + ": " +
-                                inSource.substr(includePos, newLineAfter - includePos));
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Badly formed #include directive (expected " + endDelimeter +
+                                                               ") in file " + fileName + ": " +
+                                                               inSource.substr(includePos, newLineAfter - includePos));
             }
 
             // extract filename
@@ -352,8 +327,7 @@ namespace Ogre
             // Add #line to the start of the included file to correct the line count)
             outSource.append("#line 1 " + incLineFilename + "\n");
 
-            // recurse into include
-            outSource.append(_resolveIncludes(resource->getAsString(), resourceBeingLoaded, filename, supportsFilename));
+            outSource.append(resource->getAsString());
 
             // Add #line to the end of the included file to correct the line count
             outSource.append("\n#line " + std::to_string(lineCount) + lineFilename);

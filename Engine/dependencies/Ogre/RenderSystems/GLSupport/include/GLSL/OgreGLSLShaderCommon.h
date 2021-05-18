@@ -139,8 +139,6 @@ namespace Ogre {
         /// GL handle for program object the shader is bound to.
         uint mGLProgramHandle;
 
-        int mShaderVersion;
-
         /// Pointer to the uniform cache for this shader
         GLUniformCache    mUniformCache;
 

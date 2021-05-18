@@ -15,9 +15,9 @@ void Component::setId(int id) {
 	_id = id;
 }
 
-int Component::getId() {
-	return _id;
-}
+//int Component::getId() {
+//	return _id;
+//}
 
 int Component::getId() const {
 	return _id;
@@ -31,9 +31,9 @@ void Component::setActive(bool act) {
 	_active = act;
 }
 
-Entity* Component::getEntity() {
-	return _entity;
-}
+//Entity* Component::getEntity() {
+//	return _entity;
+//}
 
 Entity* Component::getEntity() const {
 	return _entity;
@@ -43,9 +43,9 @@ void Component::setEntity(Entity* e) {
 	_entity = e;
 }
 
-Manager* Component::getManager() {
-	return _manager;
-}
+//Manager* Component::getManager() {
+//	return _manager;
+//}
 
 Manager* Component::getManager() const {
 	return _manager;

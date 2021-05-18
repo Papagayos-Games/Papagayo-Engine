@@ -76,8 +76,6 @@ namespace Ogre {
         /// in-situ parsing of defines
         static std::vector<std::pair<const char*, const char*>> parseDefines(String& defines);
 
-        String appendBuiltinDefines(String defines);
-
         /// Internal load high-level portion if not loaded
         virtual void loadHighLevel(void);
         /// Internal unload high-level portion if loaded
@@ -135,7 +133,7 @@ namespace Ogre {
         const String& getPreprocessorDefines(void) const { return mPreprocessorDefines; }
 
         /// Scan the source for \#include and replace with contents from OGRE resources
-        static String _resolveIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName, bool supportsFilename = false);
+        static String _resolveIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName);
     };
     /** @} */
     /** @} */

@@ -124,9 +124,6 @@ public:
     */
     SubRenderStateAccessorPtr getAccessor() const;
 
-    /// generic set method for parameters that connot be derived in @ref preAddToRenderState
-    virtual bool setParameter(const String& name, const String& value) { return false; }
-
 // Protected methods
 protected:
 

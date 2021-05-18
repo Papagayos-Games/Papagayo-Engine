@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreGpuProgramManager.h"
+#include "OgreGLES2HardwareUniformBuffer.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreGLSLESProgram.h"
 

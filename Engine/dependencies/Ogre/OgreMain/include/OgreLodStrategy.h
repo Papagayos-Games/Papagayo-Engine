@@ -40,7 +40,7 @@ namespace Ogre {
     /** \addtogroup Core
     *  @{
     */
-    /** \defgroup LOD Level of Detail
+    /** \addtogroup LOD
     *  @{
     */
     /** Strategy for determining level of detail.

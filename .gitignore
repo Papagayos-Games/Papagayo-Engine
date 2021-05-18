@@ -1,3 +1,6 @@
+#Cegui folder
+[Ee]ngine/[Dd]ependencies/cegui/
+
 # Prerequisites
 *.d
 
@@ -23,6 +26,7 @@
 *.iobj
 *.pdb
 *.ipdb
+*.idb
 *.ilk
 
 # Precompiled Headers

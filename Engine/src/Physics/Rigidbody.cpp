@@ -17,6 +17,15 @@
 #include "PhysicsManager.h"
 #include "Transform.h"
 #include "CommonManager.h"
+#include "MeshComponent.h"
+#include "RenderManager.h"
+#include <OgreEntity.h>
+#include <OgreSceneManager.h>
+#include <OgreSceneNode.h>
+#include "OgreContext.h"
+#include "MeshStrider.h"
+#include <Managers/SceneManager.h>
+#include <Scene/Scene.h>
 
 inline Vector3 convertVector(const btVector3& V) {
 	return Vector3(V.x(), V.y(), V.z());
@@ -33,7 +42,12 @@ RigidBody::RigidBody() : Component(PhysicsManager::getInstance(), 0)
 
 RigidBody::~RigidBody()
 {
-	//delete rb;
+	//if (rb) {
+	//	delete rb;
+	//}
+	//delete rb->getCollisionShape();
+	//delete rb->getMotionState();
+	//PhysicsManager::getInstance()->destroyRigidBody(rb);
 }
 
 #pragma region Generales
@@ -45,6 +59,20 @@ void RigidBody::setUp()
 	Vector3 vRot = tr_->getRot();
 	q.setEulerZYX(vRot.x, vRot.y, vRot.z);
 	rb->setWorldTransform(btTransform(q, convertVector(tr_->getPos())));
+
+	MeshComponent* mesh = static_cast<MeshComponent*>(_entity->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
+	if (mesh) {
+		Ogre::MeshPtr meshPtr = mesh->getOgreEntity()->getMesh();
+		//float x = meshPtr.getPointer()->getBounds().getSize().x;
+		//float y = meshPtr.getPointer()->getBounds().getSize().y;
+		//float z = meshPtr.getPointer()->getBounds().getSize().z;
+		//rb->getCollisionShape()->setLocalScaling(btVector3(x, y, z));
+
+		MeshStrider strider = MeshStrider(meshPtr.get());
+		//btCollisionShape* newShape = new btBvhTriangleMeshShape(strider, true, true);
+		//btConvexTriangleMeshShape* a = new btConvexTriangleMeshShape(strider, true);
+		setCollisionShape(new btConvexTriangleMeshShape(&strider, true));
+	}
 }
 
 void RigidBody::init()
@@ -52,18 +80,11 @@ void RigidBody::init()
 	rb = PhysicsManager::getInstance()->createRB(Vector3(0, 0, 0), mass);
 	rb->setMassProps(1.0f, btVector3(1.0, 1.0, 1.0));
 	rb->setDamping(0.5, 0.5);
-	//CommonManager* instance = CommonManager::getInstance();
-	//auto* transform = reinterpret_cast<Transform*>(
-	//	_entity->getComponent(instance->getId(), (int)CommonManager::CommonCmpId::TransId));
 }
 
 void RigidBody::update()
 {
 	//actualizacion del transform a partir del btRigidbody
-	//CommonManager* instance = CommonManager::getInstance();
-	//auto* transform = reinterpret_cast<Transform*>(
-	//	_entity->getComponent(instance->getId(), (int)CommonManager::CommonCmpId::TransId));
-
 	const auto worldTransform = rb->getWorldTransform();
 	const auto origin = worldTransform.getOrigin();
 
@@ -289,22 +310,23 @@ void RigidBody::setFriction(float friction)
 
 void RigidBody::setCollisionShape(btCollisionShape* newShape)
 {
+	delete rb->getCollisionShape();
 	rb->setCollisionShape(newShape);
 }
 #pragma endregion
 
 #pragma region Getters
 
-const Vector3& RigidBody::getLinearVelocity()
-{
-	if (_active) {
-		btVector3 vel = rb->getLinearVelocity();
-		return Vector3(vel.x(), vel.y(), vel.z());
-	}
-	else {
-		return Vector3(0, 0, 0);
-	}
-}
+//const Vector3& RigidBody::getLinearVelocity()
+//{
+//	if (_active) {
+//		btVector3 vel = rb->getLinearVelocity();
+//		return Vector3(vel.x(), vel.y(), vel.z());
+//	}
+//	else {
+//		return Vector3(0, 0, 0);
+//	}
+//}
 
 const Vector3& RigidBody::getLinearVelocity() const
 {
@@ -332,20 +354,20 @@ bool RigidBody::isStatic() const
 	return rb->isStaticObject();
 }
 
-btCollisionShape* RigidBody::getShape()
-{
-	return rb->getCollisionShape();
-}
+//btCollisionShape* RigidBody::getShape()
+//{
+//	return rb->getCollisionShape();
+//}
 
 btCollisionShape* RigidBody::getShape() const
 {
 	return rb->getCollisionShape();
 }
 
-btRigidBody* RigidBody::getBtRb()
-{
-	return rb;
-}
+//btRigidBody* RigidBody::getBtRb()
+//{
+//	return rb;
+//}
 
 btRigidBody* RigidBody::getBtRb() const
 {
@@ -356,21 +378,21 @@ btRigidBody* RigidBody::getBtRb() const
 
 #pragma region Adders
 
-void RigidBody::addForce(const Vector3& force, Vector3& relativePos, Forces type)
+void RigidBody::addForce(const Vector3& force, Vector3& relativePos, int type)
 {
 	if (_active) {
 		if (relativePos == Vector3(0.0f, 0.0f, 0.0f)) {
-			if (type == Forces::NORMAL)
+			if (type == (int)Forces::NORMAL)
 				rb->applyCentralForce(btVector3(btScalar(force.x), btScalar(force.y), btScalar(force.z)));
-			else if (type == Forces::IMPULSE)
+			else if (type == (int)Forces::IMPULSE)
 				rb->applyCentralImpulse(btVector3(btScalar(force.x), btScalar(force.y), btScalar(force.z)));
 		}
 		else {
-			if (type == Forces::NORMAL)
+			if (type == (int)Forces::NORMAL)
 				rb->applyForce(
 					(btVector3(btScalar(force.x), btScalar(force.y), btScalar(force.z))),
 					(btVector3(btScalar(relativePos.x), btScalar(relativePos.y), btScalar(relativePos.z))));
-			else if (type == Forces::IMPULSE)
+			else if (type == (int)Forces::IMPULSE)
 				rb->applyImpulse(
 					(btVector3(btScalar(force.x), btScalar(force.y), btScalar(force.z))),
 					(btVector3(btScalar(relativePos.x), btScalar(relativePos.y), btScalar(relativePos.z))));
@@ -429,8 +451,8 @@ bool RigidBody::onCollisionEnter(const std::string& id) const
 	//Devuelve true en caso de existir colision
 	if (_active) {
 		//Se obtiene la entidad de la escena y se comprueba la colision
-		//Entity* other = scene_->getEntityById(id);
-		//return collidesWithEntity(other);
+		Entity* other = SceneManager::getInstance()->getCurrentScene()->getEntity(id);
+		return collidesWithEntity(other);
 	}
 
 	return false;
