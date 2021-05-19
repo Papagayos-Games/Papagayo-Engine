@@ -22,15 +22,15 @@ void UIImage::init()
 	size.first = 50;
 	size.second = 50;
 
-	image = "peblo.png";
-
 	name = "ImageDefault";
-
-	uiWindow = UIManager::getInstance()->createImage(image, pos, size, name);
+	type = "StaticImage";
+	
+	uiWindow = UIManager::getInstance()->createImage(pos, size, name, type);
 }
 
 void UIImage::load(const nlohmann::json& params)
 {
+//--------------ASIGNACIONES_UI_COMPONENT--------------//
 	auto it = params.find("position");
 	if (it != params.end()) {
 		std::vector<float> p = it->get<std::vector<float>>();
@@ -51,16 +51,10 @@ void UIImage::load(const nlohmann::json& params)
 		name = n;
 	}
 
-	it = params.find("image");
+	it = params.find("type");
 	if (it != params.end()) {
-		std::string i = it->get<std::string>();
-		image = i;
-	}
-
-	it = params.find("active");
-	if (it != params.end()) {
-		bool ac = it->get<bool>();
-		_active = ac;
+		std::string t = it->get<std::string>();
+		type = t;
 	}
 
 	//Reposicionamiento para que parezca que el pivote esta
@@ -70,9 +64,23 @@ void UIImage::load(const nlohmann::json& params)
 	//position.first -= sizeN.first / 2;
 	//position.second -= sizeN.second/ 2;
 
-	uiWindow = UIManager::getInstance()->createImage(image, pos, size, name);
+	uiWindow = UIManager::getInstance()->createImage(pos, size, name, type);
+	
+//------------ASIGNACIONES_UI_IMAGE--------------//
 
-	if (!_active) {
-		uiWindow->hide();
+	//Propiedades de la Imagen
+	it = params.find("property");
+	if (it != params.end()) {
+		std::vector<std::vector<std::string>> prop = 
+			it->get<std::vector<std::vector<std::string>>>();
+		for (int i = 0; i < prop.size(); i++) {
+			setProperty(prop.at(i).at(0), prop.at(i).at(1));
+		}
+	}
+	
+	it = params.find("active");
+	if (it != params.end()) {
+		bool ac = it->get<bool>();
+		setActive(ac);
 	}
 }

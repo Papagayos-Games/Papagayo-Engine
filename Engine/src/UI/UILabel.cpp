@@ -25,12 +25,14 @@ void UILabel::init()
 	text = "Label Default";
 
 	name = "LabelDefault";
+	type = "Label";
 
-	uiWindow = UIManager::getInstance()->createLabel(text, pos, size, name);
+	uiWindow = UIManager::getInstance()->createLabel(text, pos, size, name, type);
 }
 
 void UILabel::load(const nlohmann::json& params)
 {
+	//--------------ASIGNACIONES_UI_COMPONENT--------------//
 	auto it = params.find("position");
 	if (it != params.end()) {
 		std::vector<float> p = it->get<std::vector<float>>();
@@ -51,16 +53,17 @@ void UILabel::load(const nlohmann::json& params)
 		name = n;
 	}
 
+	it = params.find("type");
+	if (it != params.end()) {
+		std::string t = it->get<std::string>();
+		type = t;
+	}
+
+//----------MENSAJE_LABEL------------------//
 	it = params.find("text");
 	if (it != params.end()) {
 		std::string t = it->get<std::string>();
 		text = t;
-	}
-
-	it = params.find("active");
-	if (it != params.end()) {
-		bool ac = it->get<bool>();
-		_active = ac;
 	}
 
 	//Reposicionamiento para que parezca que el pivote esta
@@ -70,9 +73,21 @@ void UILabel::load(const nlohmann::json& params)
 	//position.first -= sizeN.first / 2;
 	//position.second -= sizeN.second/ 2;
 
-	uiWindow = UIManager::getInstance()->createLabel(text, pos, size, name);
+	uiWindow = UIManager::getInstance()->createLabel(text, pos, size, name, type);
+	
+	//Propiedades de la Imagen
+	it = params.find("property");
+	if (it != params.end()) {
+		std::vector<std::vector<std::string>> prop =
+			it->get<std::vector<std::vector<std::string>>>();
+		for (int i = 0; i < prop.size(); i++) {
+			setProperty(prop.at(i).at(0), prop.at(i).at(1));
+		}
+	}
 
-	if (!_active) {
-		uiWindow->hide();
+	it = params.find("active");
+	if (it != params.end()) {
+		bool ac = it->get<bool>();
+		setActive(ac);
 	}
 }

@@ -114,8 +114,8 @@ void PapagayoEngine::destroy()
 
 	// render
 	render->destroy();
-	ogre->destroy();
 	gui->destroy();
+	ogre->destroy();
 	
 	// fisicas
 	phys->destroy();

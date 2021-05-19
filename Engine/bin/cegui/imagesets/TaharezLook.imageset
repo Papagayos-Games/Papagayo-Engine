@@ -1,5 +1,8 @@
-<Imageset autoScaled="vertical" imagefile="TaharezLook.png" name="TaharezLook" nativeHorzRes="1280" nativeVertRes="720" version="2">
-    <Image height="64" name="ClientBrush" width="64" xPos="2" yPos="2" />
+<Imageset autoScaled="true" imagefile="TaharezLook.png" name="TaharezLook" nativeHorzRes="1280" nativeVertRes="720" version="2">
+    <Image height="50" name="GreenArrow" width="40" xPos="0" yPos="225" />
+    <Image height="50" name="PebloPuntero" width="40" xPos="40" yPos="225" />
+    <Image height="220" name="Peblo" width="155" xPos="256" yPos="0" />
+	<Image height="64" name="ClientBrush" width="64" xPos="2" yPos="2" />
     <Image height="1" name="GenericBrush" width="1" xPos="9" yPos="71" />
     <Image height="22" name="WindowLeftEdge" width="1" xOffset="4" xPos="6" yOffset="0" yPos="95" />
     <Image height="22" name="WindowRightEdge" width="1" xOffset="-4" xPos="34" yOffset="0" yPos="95" />

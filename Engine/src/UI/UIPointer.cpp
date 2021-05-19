@@ -13,7 +13,7 @@ UIPointer::~UIPointer()
 
 void UIPointer::init()
 {
-	pointer = "TaharezLook/MouseArrow";
+	pointer = "TaharezLook/GreenArrow";
 	visible = true;
 
 	UIManager::getInstance()->setMouseImage(pointer);
@@ -30,13 +30,8 @@ void UIPointer::load(const nlohmann::json& params)
 
 	it = params.find("visible");
 	if (it != params.end()) {
-		std::string v = it->get<std::string>();
-		if (v == "true") {
-			visible = true;
-		}
-		else {
-			visible = false;
-		}
+		bool v = it->get<bool>();
+		visible = v;
 	}
 
 	UIManager::getInstance()->setMouseImage(pointer);

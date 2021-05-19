@@ -20,6 +20,7 @@ protected:
 	vector2 pos;
 	vector2 size;
 	std::string name;
+	std::string type;
 	CEGUI::Window* uiWindow = nullptr;
 
 	//Normaliza el vector size del objeto para poder 
@@ -41,9 +42,10 @@ public:
 	virtual void load(const nlohmann::json& params) = 0;
 
 	// Setters
-	void setPosition(vector2 p);
-	void setSize(vector2 s);
-	void setName(std::string n);
+	void setPosition(const vector2& p);
+	void setSize(const vector2& s);
+	void setName(const std::string& n);
+	void setProperty(const std::string nameProp, const std::string value);
 };
 
 #endif

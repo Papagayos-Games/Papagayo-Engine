@@ -7,7 +7,8 @@
         "position": [ 0.5, 0.5 ],
         "size": [ 50, 50 ],
         "name": "BotonPrueba",
-        "text": "Jelouda"
+        "text": "Jelouda",
+        "type": "Button"
       }
     },
     {
@@ -16,34 +17,50 @@
       "Parameters": {
         "position": [ 0, 0 ],
         "size": [ 100, 100 ],
-        "name": "sliderPrueba"
+        "name": "sliderPrueba",
+        "type": "Slider"
       }
     },
     {
       "Component": "Image",
       "Type": "UI",
       "Parameters": {
-        "position": [ 0.5, 0.5 ],
-        "size": [ 300, 300 ],
-        "image": "ClientBrush/StaticImage",
-        "name": "peblo"
+        "position": [ 0, 0.5 ],
+        "size": [ 100, 200 ],
+        "type": "StaticImage",
+        "name": "peblo",
+        "property": [
+          [
+            "Image",
+            "TaharezLook/Peblo"
+          ],
+          [
+            "FrameEnabled",
+            "false"
+          ],
+          [
+            "BackgroundEnabled",
+            "false"
+          ]
+        ]
       }
     },
     {
       "Component": "Label",
       "Type": "UI",
       "Parameters": {
-        "position": [ 0, 0.75 ],
+        "position": [ 0, 0.55 ],
         "size": [ 100, 100 ],
         "name": "labelito",
-        "text": "Puto Rulo"
+        "text": "Pabloski",
+        "type": "Label"
       }
     },
     {
       "Component": "Pointer",
       "Type": "UI",
       "Parameters": {
-        "pointerImage": "TaharezLook/MouseArrow",
+        "pointerImage": "TaharezLook/PebloPuntero",
         "visible": true
       }
     },
@@ -51,7 +68,7 @@
       "Component": "UIclase",
       "Type": "LUA",
       "Parameters": {
-          
+
       }
     }
   ]

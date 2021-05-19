@@ -27,13 +27,14 @@ void UIButton::init()
 	text = "Boton Default";
 
 	name = "ButtonDefault";
-
-	uiWindow = UIManager::getInstance()->createButton(text, pos, size, name);
+	type = "Button";
+	uiWindow = UIManager::getInstance()->createButton(text, pos, size, name, type);
 	
 }
 
 void UIButton::load(const nlohmann::json& params)
 {
+//--------------ASIGNACIONES_UI_COMPONENT--------------//
 	auto it = params.find("position");
 	if (it != params.end()) {
 		std::vector<float> p = it->get<std::vector<float>>();
@@ -54,16 +55,17 @@ void UIButton::load(const nlohmann::json& params)
 		name = n;
 	}
 
+	it = params.find("type");
+	if (it != params.end()) {
+		std::string t = it->get<std::string>();
+		type = t;
+	}
+
+	//Texto que se muestra en el boton
 	it = params.find("text");
 	if (it != params.end()) {
 		std::string t = it->get<std::string>();
 		text = t;
-	}
-
-	it = params.find("active");
-	if (it != params.end()) {
-		bool ac = it->get<bool>();
-		_active = ac;
 	}
 
 	//Reposicionamiento para que parezca que el pivote esta
@@ -73,13 +75,27 @@ void UIButton::load(const nlohmann::json& params)
 	//position.first -= sizeN.first / 2;
 	//position.second -= sizeN.second/ 2;
 
-	uiWindow = UIManager::getInstance()->createButton(text, pos, size, name);
+	uiWindow = UIManager::getInstance()->createButton(text, pos, size, name, type);
 	uiWindow->subscribeEvent(
 		CEGUI::PushButton::EventClicked,
 		CEGUI::Event::Subscriber(&UIButton::buttonWasPressed, this));
 
-	if (!_active) {
-		uiWindow->hide();
+//------------ASIGNACIONES_UI_IMAGE--------------//
+
+	//Propiedades de la Imagen
+	it = params.find("property");
+	if (it != params.end()) {
+		std::vector<std::vector<std::string>> prop =
+			it->get<std::vector<std::vector<std::string>>>();
+		for (int i = 0; i < prop.size(); i++) {
+			setProperty(prop.at(i).at(0), prop.at(i).at(1));
+		}
+	}
+
+	it = params.find("active");
+	if (it != params.end()) {
+		bool ac = it->get<bool>();
+		setActive(ac);
 	}
 }
 

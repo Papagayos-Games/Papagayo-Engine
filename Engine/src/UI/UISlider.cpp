@@ -23,12 +23,13 @@ void UISlider::init()
 	size.second = 100;
 
 	name = "SliderDefault";
-
-	uiWindow = UIManager::getInstance()->createSlider(pos, size, name);
+	type = "Slider";
+	uiWindow = UIManager::getInstance()->createSlider(pos, size, name, type);
 }
 
 void UISlider::load(const nlohmann::json& params)
 {
+	//--------------ASIGNACIONES_UI_COMPONENT--------------//
 	auto it = params.find("position");
 	if (it != params.end()) {
 		std::vector<float> p = it->get<std::vector<float>>();
@@ -49,10 +50,10 @@ void UISlider::load(const nlohmann::json& params)
 		name = n;
 	}
 
-	it = params.find("active");
+	it = params.find("type");
 	if (it != params.end()) {
-		bool ac = it->get<bool>();
-		_active = ac;
+		std::string t = it->get<std::string>();
+		type = t;
 	}
 
 	//Reposicionamiento para que parezca que el pivote esta
@@ -62,9 +63,23 @@ void UISlider::load(const nlohmann::json& params)
 	//position.first -= sizeN.first / 2;
 	//position.second -= sizeN.second/ 2;
 
-	uiWindow = UIManager::getInstance()->createSlider(pos, size, name);
+	uiWindow = UIManager::getInstance()->createSlider(pos, size, name, type);
 
-	if (!_active) {
-		uiWindow->hide();
+	//------------ASIGNACIONES_UI_IMAGE--------------//
+
+	//Propiedades de la Imagen
+	it = params.find("property");
+	if (it != params.end()) {
+		std::vector<std::vector<std::string>> prop =
+			it->get<std::vector<std::vector<std::string>>>();
+		for (int i = 0; i < prop.size(); i++) {
+			setProperty(prop.at(i).at(0), prop.at(i).at(1));
+		}
+	}
+
+	it = params.find("active");
+	if (it != params.end()) {
+		bool ac = it->get<bool>();
+		setActive(ac);
 	}
 }

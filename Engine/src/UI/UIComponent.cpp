@@ -52,7 +52,7 @@ void UIComponent::setActive(bool act)
 	}
 }
 
-void UIComponent::setPosition(vector2 p)
+void UIComponent::setPosition(const vector2& p)
 {
 	pos = p;
 	CEGUI::UDim x(pos.first, 0);
@@ -62,7 +62,7 @@ void UIComponent::setPosition(vector2 p)
 	uiWindow->setPosition(pU);
 }
 
-void UIComponent::setSize(vector2 s)
+void UIComponent::setSize(const vector2& s)
 {
 	size = s;
 	CEGUI::UDim x(size.first, 0);
@@ -72,8 +72,20 @@ void UIComponent::setSize(vector2 s)
 	uiWindow->setPosition(sU);
 }
 
-void UIComponent::setName(std::string n)
+void UIComponent::setName(const std::string& n)
 {
 	name = n;
 	uiWindow->setName(name);
+}
+
+void UIComponent::setProperty(const std::string nameProp, const std::string value)
+{
+	try
+	{
+		uiWindow->setProperty(nameProp, value);
+	}
+	catch (const std::exception& e )
+	{
+		std::cout << e.what() << std::endl;
+	}
 }
