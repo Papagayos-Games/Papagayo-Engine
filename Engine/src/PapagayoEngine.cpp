@@ -178,6 +178,8 @@ void PapagayoEngine::init()
 	//unos string que se reciban como parametro, de manera
 	//que sea el usuario el que decida que configuracion
 	//desea usuar.
+	gui->loadScheme("TaharezLook", "TaharezLook.scheme");
+
 	//gui->loadScheme("TaharezLook", "TaharezLook.scheme");
 	//gui->setMouseImage("TaharezLook/MouseArrow");
 	gui->loadFont("DejaVuSans-12.font");
@@ -226,7 +228,6 @@ void PapagayoEngine::update()
 			render->update();
 
 			lua->update();
-
 			mSM->update();
 		}
 	}

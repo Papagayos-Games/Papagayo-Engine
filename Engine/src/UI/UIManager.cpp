@@ -93,6 +93,7 @@ void UIManager::clean()
 void UIManager::destroy()
 {
 	clean();
+	//CEGUI::SchemeManager::getSingleton().destroyAll();
 	CEGUI::OgreRenderer::destroySystem();
 	delete instance_;
 }
@@ -159,6 +160,8 @@ void UIManager::setMouseImage(const std::string& imageFile)
 	CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setDefaultImage(imageFile);
 
 	CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setImage(imageFile);
+	auto image = CEGUI::System::getSingleton().getDefaultGUIContext().
+		getMouseCursor().getImage();
 }
 
 void UIManager::setMouseVisibility(bool b)
@@ -173,11 +176,11 @@ void UIManager::setMouseVisibility(bool b)
 
 #pragma region Widget
 
-CEGUI::Window* UIManager::createButton(const std::string& text, vector2 position,
-	vector2 size, const std::string& name)
+CEGUI::Window* UIManager::createButton(const std::string& text, const vector2& position, const vector2& size,
+	const std::string& name, const std::string& type)
 {
 	CEGUI::Window* button = NULL;
-	button = guiWinMng->createWindow(schemeName + "/Button", name);  // Create Window
+	button = guiWinMng->createWindow(schemeName + "/" + type, name);  // Create Window
 
 	setWidgetDestRect(button, position, size);
 
@@ -186,44 +189,39 @@ CEGUI::Window* UIManager::createButton(const std::string& text, vector2 position
 	return button;
 }
 
-CEGUI::Window* UIManager::createSlider(vector2 position, vector2 size, const std::string& name)
+CEGUI::Window* UIManager::createSlider(const vector2& position, const vector2& size,
+	const std::string& name, const std::string& type)
 {
 	CEGUI::Window* slider = CEGUI::WindowManager::getSingleton().createWindow(
-		schemeName + "/Slider");
+		schemeName + "/" + type);
 	setWidgetDestRect(slider, position, size);
-	slider->setRotation(CEGUI::Quaternion(1, 0, 0, 0.71));
 	slider->setName(name);
 	winRoot->addChild(slider);
 
 	return slider;
 }
 
-CEGUI::Window* UIManager::createLabel(const std::string& text, vector2 position, vector2 size, const std::string& name)
+CEGUI::Window* UIManager::createLabel(const std::string& text, const vector2& position, const vector2& size,
+	const std::string& name, const std::string& type)
 {
 	CEGUI::Window* label = CEGUI::WindowManager::getSingleton().createWindow(
-		schemeName + "/Label", name);
+		schemeName + "/" + type, name);
 	setWidgetDestRect(label, position, size);
 
 	label->setText(text);
-
-	//label->setProperty("FrameEnabled", "false");
-	//label->setProperty("BackgroundEnabled", "false");
 
 	winRoot->addChild(label);
 
 	return label;
 }
 
-CEGUI::Window* UIManager::createImage(const std::string& image, vector2 position, vector2 size, const std::string& name)
+CEGUI::Window* UIManager::createImage(const vector2& position, const vector2& size,
+	const std::string& name, const std::string& type)
 {
 	CEGUI::Window* staticImage =
 		CEGUI::WindowManager::getSingleton().createWindow(
-			schemeName + "/StaticImage", name);
+			schemeName + "/" + type, name);
 	setWidgetDestRect(staticImage, position, size);
-
-	staticImage->setProperty("FrameEnabled", "false");
-	staticImage->setProperty("BackgroundEnabled", "false");
-	staticImage->setProperty("Image", image);
 
 	winRoot->addChild(staticImage);
 
@@ -294,6 +292,11 @@ CEGUI::OgreRenderer* UIManager::getRenderer() const
 CEGUI::GUIContext* UIManager::getContext() const
 {
 	return guiContext;
+}
+
+CEGUI::WindowManager* UIManager::getWindowMngr() const
+{
+	return guiWinMng;
 }
 
 #pragma endregion

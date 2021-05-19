@@ -6,11 +6,15 @@
 
 #include "UIComponent.h"
 
+
 class UIButton:public UIComponent
 {
 private:
 	std::string text;
 	std::string scene;
+
+	bool buttonPressed = false;
+
 public:
 	UIButton();
 	virtual ~UIButton();
@@ -22,16 +26,19 @@ public:
 	/// </summary>
 	virtual void load(const nlohmann::json& params);
 
-	/// <summary>
-	/// Metodo encargado de hacer lo que corresponda cuando el boton ha sido clickado.
-	/// ¿Debera hacer la llamada correspondiente con lua segun el evento?
-	/// </summary>
-	void onClick();
+	//Evento que se suscribe al pulsar el boton, el cual activa
+	//el booleano que usara lua para su logica
+	void buttonWasPressed();
 
-	/// <summary>
-	/// Metodo encargado de hacer el cambio de escena cuando el boton es clickado
-	/// </summary>
-	void changeScene();
+	//Cuando en lua se aplique la logica correspondiente al pulsar el 
+	//boton se desasctivara el booleano para que pueda ser pulsado de nuevo
+	void buttonNotPressed();
+
+	//Devuelve el estado del boton (pulsado o no pulsado)
+	bool getButtonPressed();
+
+	//Aplica un nuevo texto al boton
+	void setText(std::string t);
 };
 
 #endif

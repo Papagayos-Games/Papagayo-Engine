@@ -28,6 +28,10 @@
 #include <RenderManager.h>
 #include <OgreContext.h>
 
+//UI
+#include "UIButton.h"
+#include "UIManager.h"
+
 //LUA
 #include "LuaComponent.h"
 #include <LuaBridge.h>
@@ -197,6 +201,12 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getWindowWidth", &OgreContext::getWindowWidth)
 		.addFunction("getWindowHeight", &OgreContext::getWindowHeight)
 		.endClass();
+	//UI
+	getGlobalNamespace(L).deriveClass<UIButton, Component>("Button")
+		.addFunction("getButtonPressed", &UIButton::getButtonPressed)
+		.addFunction("buttonWasPressed", &UIButton::buttonWasPressed)
+		.addFunction("buttonNotPressed", &UIButton::buttonNotPressed)
+		.endClass();
 
 
 	getGlobalNamespace(L).beginClass<Scene>("Scene")
@@ -220,9 +230,10 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getTransform", &LUAManager::getTransform)
 		.addFunction("getLuaClass", &LUAManager::getLuaClass)
 		.addFunction("instantiate", &LUAManager::instantiate)
+		.addFunction("getCurrentScene", &LUAManager::getCurrentScene)
+		.addFunction("getUIButton", &LUAManager::getUIButton)
 		.addFunction("getOgreContext", &LUAManager::getOgreContext)
 		.addFunction("getCurrentScene", &LUAManager::getCurrentScene)
-
 		.endClass();
 }
 
@@ -314,6 +325,14 @@ Entity* LUAManager::instantiate(std::string prefabName)
 	SceneManager::getCurrentScene()->addEntity(prefabName, e);
 	//e->start();
 	return e;
+}
+
+UIButton* LUAManager::getUIButton(Entity* ent)
+{
+	UIButton* b = nullptr;
+	if (ent->hasComponent((int)ManID::UI, (int)UIManager::UICmpId::Button))
+		b = static_cast<UIButton*>(ent->getComponent((int)ManID::UI, (int)UIManager::UICmpId::Button));
+	return b;
 }
 
 void LUAManager::addRegistry(const std::string& compName)

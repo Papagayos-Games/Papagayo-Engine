@@ -27,7 +27,7 @@ class PlaneComponent;
 class Transform;
 class OgreContext;
 class Scene;
-
+class UIButton;
 
 class LUAManager : public Manager {
 private:
@@ -66,6 +66,8 @@ public:
 	Entity* instantiate(std::string prefabName);
 	OgreContext* getOgreContext();
 	Scene* getCurrentScene();
+	UIButton* getUIButton(Entity* ent);
+
 
 	void addRegistry(const std::string& compName);
 
