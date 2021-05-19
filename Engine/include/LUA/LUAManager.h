@@ -25,7 +25,7 @@ class Camera;
 class LightComponent;
 class PlaneComponent;
 class Transform;
-
+class UIButton;
 
 class LUAManager : public Manager {
 private:
@@ -62,6 +62,8 @@ public:
 	Transform* getTransform(Entity* ent);
 	luabridge::LuaRef getLuaClass(const std::string& c_name);
 	Entity* instantiate(std::string prefabName);
+	UIButton* getUIButton(Entity* ent);
+
 
 	void addRegistry(const std::string& compName);
 

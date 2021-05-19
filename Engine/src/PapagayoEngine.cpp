@@ -179,9 +179,7 @@ void PapagayoEngine::init()
 	//que sea el usuario el que decida que configuracion
 	//desea usuar.
 	gui->loadScheme("TaharezLook", "TaharezLook.scheme");
-	gui->setMouseImage("TaharezLook/MouseArrow");
-	gui->loadFont("DejaVuSans-12.font"); 
-	
+
 	mSM->createStartScene();
 
 
@@ -228,7 +226,7 @@ void PapagayoEngine::update()
 			lua->update();
 			++timer_;
 
-			if (timer_ == 300) {
+			if (timer_ == 3000) {
 				SceneManager::getCurrentScene()->killEntityByName("pepito");
 				std::cout << "Cambio de escena\n";
 				mSM->changeScene("test3");

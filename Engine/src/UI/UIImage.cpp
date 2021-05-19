@@ -1,5 +1,9 @@
 #include "UIImage.h"
 #include "UIManager.h"
+
+#include "CEGUI/Window.h"
+#include "CEGUI/CEGUI.h"
+
 #include <glm/glm.hpp>
 
 UIImage::UIImage() : UIComponent((int)UIManager::UICmpId::Image)
@@ -12,26 +16,26 @@ UIImage::~UIImage()
 
 void UIImage::init()
 {
-	position.first = 35;
-	position.second = 35;
+	pos.first = 35;
+	pos.second = 35;
 
 	size.first = 50;
 	size.second = 50;
 
-	image = "peblo.png";
-
 	name = "ImageDefault";
-
-	uiWindow = UIManager::getInstance()->createImage(image, position, size, name);
+	type = "StaticImage";
+	
+	uiWindow = UIManager::getInstance()->createImage(pos, size, name, type);
 }
 
 void UIImage::load(const nlohmann::json& params)
 {
+//--------------ASIGNACIONES_UI_COMPONENT--------------//
 	auto it = params.find("position");
 	if (it != params.end()) {
-		std::vector<float> pos = it->get<std::vector<float>>();
-		position.first = pos[0];
-		position.second = pos[1];
+		std::vector<float> p = it->get<std::vector<float>>();
+		pos.first = p[0];
+		pos.second = p[1];
 	}
 
 	it = params.find("size");
@@ -47,29 +51,36 @@ void UIImage::load(const nlohmann::json& params)
 		name = n;
 	}
 
-	it = params.find("image");
+	it = params.find("type");
 	if (it != params.end()) {
-		std::string i = it->get<std::string>();
-		image = i;
+		std::string t = it->get<std::string>();
+		type = t;
 	}
 
-	//	//TODO: a la constructora de subscriberSlot habria que pasarle el metodo de lua que queramos que haga, ¿como? no se sabeh
+	//Reposicionamiento para que parezca que el pivote esta
+	//en el centro del boton (esto se puede meter en el resto de Widgets)
+	//vector2 sizeN = normalizeVector2(size);
+	//
+	//position.first -= sizeN.first / 2;
+	//position.second -= sizeN.second/ 2;
 
-	//auto it = params.find("clickEvent");
-	//if (it != params.end()) {
-	//	auto _event = it->find("event");
-	//	if (_event != it->end()) {
-	//		std::string e = _event->get<std::string>();
-	//		event_ = new CEGUI::String(e);
-	//	}
+	uiWindow = UIManager::getInstance()->createImage(pos, size, name, type);
+	
+//------------ASIGNACIONES_UI_IMAGE--------------//
 
-	//	auto _subs = it->find("subscriber");
-	//	if (_subs != it->end()) {
-	//		std::string sub = _subs->get<std::string>();
-	//		
-	//		//subscriberEvent = new CEGUI::SubscriberSlot();
-	//	}
-
-	//	uiWindow->subscribeEvent(*event_, *subscriberEvent);
-	//}
+	//Propiedades de la Imagen
+	it = params.find("property");
+	if (it != params.end()) {
+		std::vector<std::vector<std::string>> prop = 
+			it->get<std::vector<std::vector<std::string>>>();
+		for (int i = 0; i < prop.size(); i++) {
+			setProperty(prop.at(i).at(0), prop.at(i).at(1));
+		}
+	}
+	
+	it = params.find("active");
+	if (it != params.end()) {
+		bool ac = it->get<bool>();
+		setActive(ac);
+	}
 }
