@@ -57,7 +57,7 @@ UIManager::UIManager() : Manager(ManID::UI)
 	guiWinMng = &CEGUI::WindowManager::getSingleton();
 	winRoot = guiWinMng->createWindow("DefaultWindow", "rootWindow");
 	guiContext->setRootWindow(winRoot);
-	
+
 	createFrameListener();
 }
 
@@ -87,7 +87,9 @@ void UIManager::clean()
 	//if (instance_->sch != nullptr)
 	//	delete instance_->sch;
 	instance_->destroyAllComponents();
-	instance_->guiWinMng->destroyAllWindows();
+	for (int i = 0; i < instance_->ceguiWindows.size(); i++) {
+		instance_->guiWinMng->destroyWindow(instance_->ceguiWindows[i]);
+	}
 }
 
 void UIManager::destroy()
@@ -186,6 +188,9 @@ CEGUI::Window* UIManager::createButton(const std::string& text, const vector2& p
 
 	button->setText(text);
 	winRoot->addChild(button);
+
+	ceguiWindows.push_back(button);
+
 	return button;
 }
 
@@ -197,6 +202,8 @@ CEGUI::Window* UIManager::createSlider(const vector2& position, const vector2& s
 	setWidgetDestRect(slider, position, size);
 	slider->setName(name);
 	winRoot->addChild(slider);
+
+	ceguiWindows.push_back(slider);
 
 	return slider;
 }
@@ -212,6 +219,8 @@ CEGUI::Window* UIManager::createLabel(const std::string& text, const vector2& po
 
 	winRoot->addChild(label);
 
+	ceguiWindows.push_back(label);
+
 	return label;
 }
 
@@ -224,6 +233,8 @@ CEGUI::Window* UIManager::createImage(const vector2& position, const vector2& si
 	setWidgetDestRect(staticImage, position, size);
 
 	winRoot->addChild(staticImage);
+
+	ceguiWindows.push_back(staticImage);
 
 	return staticImage;
 }
