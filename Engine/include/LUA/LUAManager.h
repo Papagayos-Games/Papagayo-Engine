@@ -55,6 +55,7 @@ public:
 
 	//METODOS DE PRUEBA
 	Entity* getEntity(std::string name);
+	void changeScene(std::string name);
 	InputSystem* getInputManager();
 	RigidBody* getRigidbody(Entity* ent);
 	MeshComponent* getMeshComponent(Entity* ent);

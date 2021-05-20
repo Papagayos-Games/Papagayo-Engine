@@ -233,7 +233,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getCurrentScene", &LUAManager::getCurrentScene)
 		.addFunction("getUIButton", &LUAManager::getUIButton)
 		.addFunction("getOgreContext", &LUAManager::getOgreContext)
-		.addFunction("getCurrentScene", &LUAManager::getCurrentScene)
+		.addFunction("changeScene", &LUAManager::changeScene)
 		.endClass();
 }
 
@@ -252,6 +252,10 @@ Entity* LUAManager::getEntity(std::string name)
 	return ent;
 }
 
+void LUAManager::changeScene(std::string name)
+{
+	SceneManager::getInstance()->changeScene(name);
+}
 
 RigidBody* LUAManager::getRigidbody(Entity* ent)
 {

@@ -105,8 +105,9 @@ void SceneManager::changeScene(const std::string& sceneName)
 	}
 }
 
-void SceneManager::createStartScene() {
+void SceneManager::createStartScene(const std::string& startScene) {
 	
-	sceneFiles_ = loader_->loadScenes("Scenes/scenes.json");
+	//sceneFiles_ = loader_->loadScenes("Scenes/scenes.json");
+	sceneFiles_ = loader_->loadScenes(startScene);
 	loadScene(sceneFiles_[0]);
 }

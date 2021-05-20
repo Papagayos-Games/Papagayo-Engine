@@ -86,8 +86,8 @@ void UIManager::clean()
 {
 	//if (instance_->sch != nullptr)
 	//	delete instance_->sch;
-
 	instance_->destroyAllComponents();
+	instance_->guiWinMng->destroyAllWindows();
 }
 
 void UIManager::destroy()
