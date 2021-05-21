@@ -231,6 +231,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("instantiate", &LUAManager::instantiate)
 		.addFunction("getCurrentScene", &LUAManager::getCurrentScene)
 		.addFunction("getUIButton", &LUAManager::getUIButton)
+		.addFunction("getLuaSelf", &LUAManager::getLuaSelf)
 		.endClass();
 }
 
@@ -329,6 +330,14 @@ UIButton* LUAManager::getUIButton(Entity* ent)
 	UIButton* b = nullptr;
 	if (ent->hasComponent((int)ManID::UI, (int)UIManager::UICmpId::Button))
 		b = static_cast<UIButton*>(ent->getComponent((int)ManID::UI, (int)UIManager::UICmpId::Button));
+	return b;
+}
+
+luabridge::LuaRef LUAManager::getLuaSelf(Entity* ent, const std::string& c_name)
+{
+	luabridge::LuaRef b = luabridge::LuaRef(L);
+	if (ent->hasComponent((int)ManID::LUA, enum_map_[c_name]))
+		b = static_cast<LuaComponent*>(ent->getComponent((int)ManID::LUA, enum_map_[c_name]))->getSelf();
 	return b;
 }
 

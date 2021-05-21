@@ -21,8 +21,9 @@ miclase["start"] = function (_self, lua)
     --_self.rb = lua:getRigidbody(lua:getEntity("testScene2"))
     print("Start: mi clase")
     print(_self.entity:getName())
-    local _printer = lua:getLuaClass(_self.entity, "printer")
-    _printer["print"]("probando")
+    local _printer = lua:getLuaSelf(_self.entity, "printer")
+   
+    _printer.printer("probando")
     -- local _nullCamera = lua:getCamera(_self.entity)
     -- camera:setNearClipDistance(40) 
 

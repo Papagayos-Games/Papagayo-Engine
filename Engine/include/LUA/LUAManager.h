@@ -65,6 +65,8 @@ public:
 	Entity* instantiate(std::string prefabName);
 	UIButton* getUIButton(Entity* ent);
 	Scene* getCurrentScene();
+	luabridge::LuaRef getLuaSelf(Entity* ent, const std::string& c_name);
+
 
 
 	void addRegistry(const std::string& compName);

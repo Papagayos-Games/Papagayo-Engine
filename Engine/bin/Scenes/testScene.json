@@ -7,19 +7,75 @@
           "Component": "Transform",
           "Type": "Common",
           "Parameters": {
-            "position": [ 0, 100, 500 ]
+            "position": [
+              0,
+              100,
+              500
+            ]
           }
         }
       ]
     },
     {
-      "Prefab":  "Canvas"
+      "Prefab": "Canvas"
     },
     {
       "Prefab": "DefaultLight"
     },
     {
-      "Prefab" : "Player"
+      "Prefab": "Player"
+    },
+    {
+      "Prefab": "Penguin",
+      "Components": [
+        {
+          "Component": "Transform",
+          "Type": "Common",
+          "Parameters": {
+            "position": [
+              10,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "Component": "Transform",
+          "Type": "Common",
+          "Parameters": {
+            "position": [
+              50,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "Component": "printer",
+          "Type": "LUA"
+        },
+        {
+          "Component": "miclase",
+          "Type": "LUA",
+          "Parameters": {}
+        }
+      ]
+    },
+    {
+      "Prefab": "Penguin",
+      "Components": [
+        {
+          "Component": "Transform",
+          "Type": "Common",
+          "Parameters": {
+            "position": [
+              10,
+              0,
+              0
+            ]
+          }
+        }
+      ]
     }
   ]
 }

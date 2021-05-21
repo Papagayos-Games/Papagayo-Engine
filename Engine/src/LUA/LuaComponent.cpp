@@ -61,3 +61,8 @@ const std::string& LuaComponent::getFileName() const
 {
 	return fileName_;
 }
+
+const luabridge::LuaRef* LuaComponent::getSelf() const
+{
+	return self_;
+}
