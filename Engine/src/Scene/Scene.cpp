@@ -25,6 +25,7 @@ void Scene::eraseEntities()
 {
     for (auto it = entities_to_erase.begin(); it != entities_to_erase.end(); ++it) {
         (*it)->second->destroy();
+        delete (*it)->second;
         entities.erase(*it);
         //PapagayoEngine::getInstance()->closeApp();
     }
