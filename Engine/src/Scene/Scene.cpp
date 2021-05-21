@@ -3,6 +3,8 @@
 #include <PapagayoEngine.h>
 #include <algorithm>
 
+std::list<Entity*> Scene::nullList;
+
 Scene::Scene()
 {
 }
@@ -19,15 +21,19 @@ void Scene::clean()
     }
     entities.clear();
     usedNames.clear();
+    pool_name.clear();
 }
 
 void Scene::eraseEntities()
 {
     for (auto it = entities_to_erase.begin(); it != entities_to_erase.end(); ++it) {
-        (*it)->second->destroy();
-        delete (*it)->second;
+        Entity* ent = (*it)->second;
+        std::string n = ent->getName();
+        n = n.substr(0, n.find(SPECIAL_CHAR));
+        pool_name[n].remove(ent);
+        ent->destroy();
+        delete ent;
         entities.erase(*it);
-        //PapagayoEngine::getInstance()->closeApp();
     }
     entities_to_erase.clear();
 }
@@ -55,9 +61,12 @@ void Scene::addEntity(const std::string& name, Entity* ent)
     //entities.pushback(name, ent);
     std::string n = name;
     if (usedNames.find(name) != usedNames.end())
-        n += std::to_string(++usedNames[name]);
-    else usedNames.insert(std::pair<std::string, int>(name, 0));
+        n += SPECIAL_CHAR + std::to_string(++usedNames[name]);
+    else {
+        usedNames.insert(std::pair<std::string, int>(name, 0));
+    }
     entities.insert(std::pair<std::string, Entity*>(n, ent));
+    pool_name[name].push_back(ent);
     ent->setName(n);
 }
 
@@ -77,4 +86,13 @@ Entity* Scene::getEntity(const std::string& name) {
         return nullptr;
     else
         return entity->second;
+}
+
+std::list<Entity*>& Scene::getAllEntitiesWith(const std::string& name) {
+    std::list<Entity*> list;
+    std::map<std::string, std::list<Entity*>>::iterator l = pool_name.find(name);
+    if (l == pool_name.end())
+        return nullList;
+    else
+        return l->second;
 }

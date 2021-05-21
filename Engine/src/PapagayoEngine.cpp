@@ -226,6 +226,11 @@ void PapagayoEngine::update()
 			lua->update();
 			++timer_;
 
+			if (timer_ % 250 == 0) {
+				auto l = mSM->getCurrentScene()->getAllEntitiesWith("bulletasd");
+				std::cout << "TEST: " << l.size() << "\n";
+			}
+
 			if (timer_ == 1000) {
 				SceneManager::getCurrentScene()->killEntityByName("penguin");
 				std::cout << "Cambio de escena\n";
