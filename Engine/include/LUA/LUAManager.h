@@ -69,7 +69,7 @@ public:
 	OgreContext* getOgreContext();
 	Scene* getCurrentScene();
 	UIButton* getUIButton(Entity* ent);
-
+	void closeApp();
 
 	void addRegistry(const std::string& compName);
 

@@ -39,6 +39,7 @@
 //Papagayo
 #include "LoaderSystem.h"
 #include "Managers/SceneManager.h"
+#include "PapagayoEngine.h"
 
 using namespace luabridge;
 
@@ -208,7 +209,6 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("buttonNotPressed", &UIButton::buttonNotPressed)
 		.endClass();
 
-
 	getGlobalNamespace(L).beginClass<Scene>("Scene")
 		.addFunction("clean", &Scene::clean)
 		.addFunction("addEntity", &Scene::addEntity)
@@ -234,6 +234,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getUIButton", &LUAManager::getUIButton)
 		.addFunction("getOgreContext", &LUAManager::getOgreContext)
 		.addFunction("changeScene", &LUAManager::changeScene)
+		.addFunction("closeApp", &LUAManager::closeApp)
 		.endClass();
 }
 
@@ -367,6 +368,10 @@ Scene* LUAManager::getCurrentScene()
 lua_State* LUAManager::getLuaState() const
 {
 	return L;
+}
+
+void LUAManager::closeApp() {
+	PapagayoEngine::getInstance()->closeApp();
 }
 
 LUAManager::LUAManager() : Manager(ManID::LUA), registeredFiles(0)
