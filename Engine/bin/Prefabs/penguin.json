@@ -42,6 +42,10 @@
         "hp": 30,
         "name": "prueba"
       }
+    },
+    {
+      "Component": "bullet",
+      "Type": "LUA"
     }
   ]
 }

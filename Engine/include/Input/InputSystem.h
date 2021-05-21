@@ -35,6 +35,8 @@ public:
 	int getMouseX()const { return mousePos.x; };
 	int getMouseY()const { return mousePos.y; };
 
+	uint32_t getTicks() const;
+
 	SDL_Scancode lastKey()
 	{
 		return lstKey;

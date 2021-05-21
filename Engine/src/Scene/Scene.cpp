@@ -1,5 +1,6 @@
 #include "Scene/Scene.h"
 #include "Common/Entity.h"
+#include <PapagayoEngine.h>
 #include <algorithm>
 
 Scene::Scene()
@@ -12,6 +13,7 @@ Scene::~Scene()
 
 void Scene::clean()
 {
+    eraseEntities();
     for (auto it = entities.begin(); it != entities.end(); it++) {
         delete it->second;
     }
@@ -24,6 +26,7 @@ void Scene::eraseEntities()
     for (auto it = entities_to_erase.begin(); it != entities_to_erase.end(); ++it) {
         (*it)->second->destroy();
         entities.erase(*it);
+        //PapagayoEngine::getInstance()->closeApp();
     }
     entities_to_erase.clear();
 }

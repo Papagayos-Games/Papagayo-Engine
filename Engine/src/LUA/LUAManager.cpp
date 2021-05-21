@@ -109,11 +109,12 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 
 	getGlobalNamespace(L).beginClass<Entity>("Entity")
 		.addFunction("getName", &Entity::getName)
+		.addFunction("start", &Entity::start)
 		.endClass();
 
 	getGlobalNamespace(L).beginClass<Vector3>("Vector3")
 		.addConstructor<void (*) (float, float, float)>()
-		.addConstructor<void (*) (const Vector3 &)>()
+		//.addConstructor<void (*) (const Vector3 &)>()
 		.addProperty("x", &Vector3::x)
 		.addProperty("y", &Vector3::y)
 		.addProperty("z", &Vector3::z)
@@ -127,6 +128,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 	getGlobalNamespace(L).beginClass<InputSystem>("InputSystem")
 		.addFunction("keyPressed", &InputSystem::isKeyDown)
 		.addFunction("mouseButtonPressed", &InputSystem::clickEvent)
+		.addFunction("getTicks", &InputSystem::getTicks)
 		.endClass();
 	
 	//common
@@ -203,6 +205,8 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("setName", &Scene::setName)
 		.addFunction("getName", &Scene::getName)
 		.addFunction("getEntity", &Scene::getEntity)
+		.addFunction("destroyEntity", &Scene::killEntity)
+		.addFunction("destroyEntityByName", &Scene::killEntityByName)
 		.endClass();		
 
 
@@ -217,6 +221,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getTransform", &LUAManager::getTransform)
 		.addFunction("getLuaClass", &LUAManager::getLuaClass)
 		.addFunction("instantiate", &LUAManager::instantiate)
+		.addFunction("getCurrentScene", &LUAManager::getCurrentScene)
 		.addFunction("getUIButton", &LUAManager::getUIButton)
 		.endClass();
 }
@@ -355,4 +360,9 @@ LUAManager::LUAManager() : Manager(ManID::LUA), registeredFiles(0)
 	//Registro de componentes
 	//registerComponent("default", registeredFiles++, []() -> LuaComponent* { return new LuaComponent(); });
 	addRegistry("default");
+}
+
+Scene* LUAManager::getCurrentScene()
+{
+	return SceneManager::getInstance()->getCurrentScene();
 }
