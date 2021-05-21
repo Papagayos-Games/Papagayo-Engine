@@ -2,6 +2,8 @@
 #include "lua.hpp"
 #include <LuaBridge.h>
 
+#include "checkML.h"
+
 struct lua_State;
 class LuaRef;
 

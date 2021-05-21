@@ -386,3 +386,8 @@ LUAManager::LUAManager() : Manager(ManID::LUA), registeredFiles(0)
 	//registerComponent("default", registeredFiles++, []() -> LuaComponent* { return new LuaComponent(); });
 	addRegistry("default");
 }
+
+Scene* LUAManager::getCurrentScene()
+{
+	return SceneManager::getInstance()->getCurrentScene();
+}
