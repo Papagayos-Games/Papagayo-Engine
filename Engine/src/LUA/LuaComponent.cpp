@@ -3,6 +3,8 @@
 #include <LuaBridge.h>
 #include "lua.hpp"
 
+#include "checkML.h"
+
 LuaComponent::LuaComponent(const std::string& fileName, int id) : Component(LUAManager::getInstance(), id), fileName_(fileName)
 {
 	init();

@@ -53,7 +53,7 @@ void Scene::addEntity(const std::string& name, Entity* ent)
 {
     //entities.pushback(name, ent);
     std::string n = name;
-    if (entities.find(name) != entities.end())
+    if (usedNames.find(name) != usedNames.end())
         n += std::to_string(++usedNames[name]);
     else usedNames.insert(std::pair<std::string, int>(name, 0));
     entities.insert(std::pair<std::string, Entity*>(n, ent));
