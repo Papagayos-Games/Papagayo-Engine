@@ -2,6 +2,10 @@ local printer = {}
 
 printer["instantiate"] = function (params, entity)
     local self = {}
+    self.printer =function (sth)
+	   print(sth)
+    end
+
     self.entity = entity
     return self
 end
@@ -12,7 +16,7 @@ end
 printer["update"] = function (_self, lua)
 end
 
-printer["print"] = function (sth)
-    print(sth)
-end
+--printer["print"] = function (sth)
+   -- print(sth)
+--end
 return printer

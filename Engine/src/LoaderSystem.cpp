@@ -80,6 +80,7 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 	nlohmann::json component;
 	nlohmann::json params;
 	for (int i = 0; i < compSize; i++) {
+
 		// Comprueba el tipo de componente
 		auto it = comps[i].find("Type");
 		if (it == comps[i].end() || !it.value().is_string())
@@ -115,10 +116,8 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 		else {
 			c = entity->getComponent(mans[type]->getId(), mans[type]->getCompID(component));
 		}
-		// TO DO: Cargar LUA components si no tienen "Parameters" en el json
 		it = comps[i].find("Parameters");
 		if (it != comps[i].end() && it.value().is_object()) {
-
 			try { c->load(it.value()); }
 			catch (std::exception e) {
 				//resetear los valores del componente si hay algun parametro con un formato erroneo
@@ -127,7 +126,12 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 				//throw std::exception("WARNING: Component parametrs are wrong\n");
 			}
 		}
-
+		//Si es lua y no tiene parametros se hace el load
+		else if (type == "LUA") {
+          c->load(nullptr);
+		}
+		
+		
 		entity->addComponent(c);
 	}
 }

@@ -36,9 +36,15 @@
           }
         },
         {
-          "Component": "miclase",
+          "Component": "printer",
           "Type": "LUA"
-        }
+        },
+        {
+          "Component": "miclase",
+          "Type": "LUA",
+          "Parameters": {}
+          }
+       
       ]
     },
     {
