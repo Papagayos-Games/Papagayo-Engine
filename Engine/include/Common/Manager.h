@@ -43,7 +43,7 @@ public:
 	///				PhysicsManager::PhysicsCmpId::Nombre
 	/// </param>
 	virtual void start() = 0;
-	virtual void update() = 0;
+	virtual void update(float deltaTime) = 0;
 
 	const std::list<Component*>& getComponents();
 	const std::list<Component*>& getComponents() const;

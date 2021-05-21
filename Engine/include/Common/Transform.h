@@ -24,7 +24,7 @@ public:
 
 	virtual void init();
 	virtual void load(const nlohmann::json& params);
-	virtual void update();
+	virtual void update(float deltaTime);
 
 	// position
 	//const Vector3& getPos();

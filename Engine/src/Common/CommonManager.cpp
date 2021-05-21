@@ -48,7 +48,7 @@ void CommonManager::start() {
 
 }
 
-void CommonManager::update() {
+void CommonManager::update(float deltaTime) {
 
 }
 

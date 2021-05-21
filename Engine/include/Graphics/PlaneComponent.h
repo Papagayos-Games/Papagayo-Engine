@@ -29,7 +29,7 @@ public:
 
     void setMaterial(const std::string& matName);
     virtual void init();
-    virtual void update();
+    virtual void update(float deltaTime);
     virtual void load(const nlohmann::json& params)override;
 };
 

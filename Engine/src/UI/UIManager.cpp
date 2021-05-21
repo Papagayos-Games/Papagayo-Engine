@@ -102,7 +102,7 @@ void UIManager::start()
 {
 }
 
-void UIManager::update()
+void UIManager::update(float deltaTime)
 {
 }
 

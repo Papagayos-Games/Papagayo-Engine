@@ -204,7 +204,7 @@ void PapagayoEngine::start()
 	lua->start();
 }
 
-void PapagayoEngine::update()
+void PapagayoEngine::update(float delta)
 {
 	try {
 		SDL_Event event;
@@ -220,49 +220,74 @@ void PapagayoEngine::update()
 			running_ = run;
 		}
 		else {
-			phys->update();
-			render->update();
+			render->update(delta);
+			phys->update(delta);
 
-			lua->update();
+			lua->update(delta);
+			
 			++timer_;
-
-			if (timer_ % 250 == 0) {
-				auto l = mSM->getCurrentScene()->getAllEntitiesWith("bulletasd");
-				std::cout << "TEST: " << l.size() << "\n";
-			}
-
 			if (timer_ == 1000) {
 				SceneManager::getCurrentScene()->killEntityByName("penguin");
 				std::cout << "Cambio de escena\n";
 				mSM->changeScene("test3");
 			}
+
 			mSM->update();
 		}
 	}
 	catch (const std::exception& e)
 	{
-		throw std::runtime_error("Fallo de renderizado \n" + (std::string)e.what() + "\n");
+		throw std::runtime_error("Fallo en el update:\n" + (std::string)e.what() + "\n");
+	}
+	catch (...) {
+		throw "Excepcion no controlada\n";
 	}
 
+}
+
+void PapagayoEngine::fixedUpdate(float delta) {
+	try {
+		lua->fixedUpdate(delta);
+	}
+	catch (const std::exception& e)
+	{
+		throw std::runtime_error("Fallo en el fixedUpdate:\n" + (std::string)e.what() + "\n");
+	}
+	catch (...) {
+		throw "Excepcion no controlada en fixedUpdate\n";
+	}
 }
 
 void PapagayoEngine::run() {
 	//running_ = false;
 	// ciclo principal de juego
 	startTime = SDL_GetTicks();
+	float deltaSum = 0;
+	float deltaTime = 0;
 	while (running_) {
 
 		//RETARDO DE FPS
-		auto current = SDL_GetTicks();
-		auto elapsed = current - startTime;
-		startTime = current;
-		lag += elapsed;
+		//auto current = SDL_GetTicks();
+		//auto elapsed = current - startTime;
+		//startTime = current;
+		//lag += elapsed;
 
-		while (lag >= frame_rate) {
-			lag -= frame_rate;
+		//while (lag >= frame_rate) {
+		//	lag -= frame_rate;
+		//}
+
+		deltaSum += deltaTime;
+
+		update(deltaTime);
+
+		if (deltaSum > sToCallFixedUpdate) {
+			fixedUpdate(deltaTime);
+			deltaSum = 0;
 		}
 
-		update();
+		deltaTime = SDL_GetTicks() - startTime;
+		deltaTime /= 1000;
+		startTime = SDL_GetTicks();
 	}
 }
 

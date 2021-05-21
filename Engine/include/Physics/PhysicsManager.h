@@ -72,7 +72,7 @@ public:
 
 	virtual void addComponent(Entity* ent, int compId);
 	virtual void start();
-	virtual void update();
+	virtual void update(float deltaTime);
 	
 	static void clean();
 	static void destroy();

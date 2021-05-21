@@ -39,6 +39,7 @@ private:
 	uint32_t startTime = 0;
 	uint32_t lag = 0;
 	uint32_t frame_rate = 1000 / 60;
+	float sToCallFixedUpdate = 0.15;
 	
 	InputSystem* input;
 	UIManager* gui;
@@ -57,7 +58,8 @@ private:
 	int timer_ = 0;
 	PapagayoEngine(const std::string& appName);
 	virtual ~PapagayoEngine();
-	void update();
+	void update(float delta);
+	void fixedUpdate(float delta);
 };
 
 #endif

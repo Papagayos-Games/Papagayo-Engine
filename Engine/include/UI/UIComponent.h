@@ -33,7 +33,7 @@ protected:
 public:
 
 	virtual void init() = 0;
-	virtual void update() {};
+	virtual void update(float deltaTime) {};
 	virtual void setActive(bool act);
 
 	/// <summary>

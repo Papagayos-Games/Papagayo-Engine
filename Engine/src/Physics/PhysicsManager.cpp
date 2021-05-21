@@ -123,7 +123,7 @@ void PhysicsManager::start()
 	}
 }
 
-void PhysicsManager::update()
+void PhysicsManager::update(float deltaTime)
 {
 	dynamicsWorld->stepSimulation(1.f / 60.f, 10);
 
@@ -133,7 +133,7 @@ void PhysicsManager::update()
 		//	static_cast<RigidBody*>(*it)->addTorque(Vector3(0.0f, 0.0, -5.0), Forces::IMPULSE);
 		//	//static_cast<RigidBody*>(*it)->addForce(Vector3(0.0f, 1, 0.0f), Vector3(1.0f, 0.0, 1.0), Forces::IMPULSE);
 		//}
-		(*it)->update();
+		(*it)->update(deltaTime);
 	}
 
 #ifdef _DEBUG

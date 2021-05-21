@@ -73,7 +73,9 @@ public:
 	lua_State* getLuaState()const;
 	//Metodos heredados de la clase padre
 	virtual void start() override;
-	virtual void update() override;
+	virtual void update(float deltaTime) override;
+
+	void fixedUpdate(float deltaTime);
 
 	static void clean();
 	static void destroy();

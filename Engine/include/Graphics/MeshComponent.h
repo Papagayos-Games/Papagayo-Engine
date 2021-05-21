@@ -31,7 +31,7 @@ public:
 	virtual void setActive( bool act) override;
 	
 	virtual ~MeshComponent();
-	virtual void update() override;
+	virtual void update(float deltaTime) override;
 	virtual void setUp() override;
 	virtual void load(const nlohmann::json& params) override;
 	virtual void init()override;

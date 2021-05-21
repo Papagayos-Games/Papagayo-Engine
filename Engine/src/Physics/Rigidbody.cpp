@@ -87,7 +87,7 @@ void RigidBody::init()
 	rb->setDamping(0.5, 0.5);
 }
 
-void RigidBody::update()
+void RigidBody::update(float deltaTime)
 {
 	//actualizacion del transform a partir del btRigidbody
 	const auto worldTransform = rb->getWorldTransform();

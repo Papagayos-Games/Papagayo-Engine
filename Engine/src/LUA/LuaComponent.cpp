@@ -42,9 +42,14 @@ void LuaComponent::setUp()
 	LUAManager::getInstance()->getLuaClass(fileName_)["start"](self_, LUAManager::getInstance());
 }
 
-void LuaComponent::update()
+void LuaComponent::update(float deltaTime)
 {
-	LUAManager::getInstance()->getLuaClass(fileName_)["update"](self_, LUAManager::getInstance());
+	LUAManager::getInstance()->getLuaClass(fileName_)["update"](self_, LUAManager::getInstance(), deltaTime);
+}
+
+void LuaComponent::fixedUpdate(float deltaTime)
+{
+	LUAManager::getInstance()->getLuaClass(fileName_)["fixedUpdate"](self_, LUAManager::getInstance(), deltaTime);
 }
 
 const std::string& LuaComponent::getFileName()

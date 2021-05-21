@@ -29,7 +29,7 @@ Camera::~Camera()
 		OgreContext::getInstance()->getSceneManager()->destroySceneNode(camNode_);
 }
 
-void Camera::update()
+void Camera::update(float deltaTime)
 {
 	//posicion
 	Vector3 pos = tr_->getPos();

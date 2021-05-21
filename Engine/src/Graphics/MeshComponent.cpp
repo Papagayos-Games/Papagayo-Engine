@@ -30,7 +30,7 @@ MeshComponent::~MeshComponent()
 	if (mNode_ != nullptr) OgreContext::getInstance()->getSceneManager()->destroySceneNode(mNode_);
 }
 
-void MeshComponent::update()
+void MeshComponent::update(float deltaTime)
 {
 	//posicion
 	Vector3 pos = tr_->getPos();

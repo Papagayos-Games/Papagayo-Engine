@@ -52,7 +52,7 @@ void Transform::init() {
 	_dimensions = Vector3(1.0f, 1.0f, 1.0f);
 }
 
-void Transform::update() {
+void Transform::update(float deltaTime) {
 
 }
 //

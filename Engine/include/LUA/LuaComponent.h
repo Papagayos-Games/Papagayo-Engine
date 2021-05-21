@@ -32,7 +32,9 @@ public:
 	// 
 	virtual void setUp() override;
 	//Llamada a funciones de LUA
-	virtual void update() override;
+	virtual void update(float deltaTime) override;
+
+	void fixedUpdate(float deltaTime);
 
 	const std::string& getFileName();
 	const std::string& getFileName() const;

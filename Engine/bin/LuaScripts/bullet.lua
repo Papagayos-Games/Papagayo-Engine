@@ -20,12 +20,15 @@ bullet["start"] = function (_self, lua)
     _self.startTime = lua:getInputManager():getTicks()
 end
 
-bullet["update"] = function (_self, lua)
-
+bullet["update"] = function (_self, lua, deltaTime)
     if (lua:getInputManager():getTicks() - _self.startTime)/1000  >= _self.lifetime then
         lua:getCurrentScene():destroyEntity(_self.entity)
         print("ded")
     end 
+end
+
+bullet["fixedUpdate"] = function (_self, lua, deltaTime)
+    print(deltaTime)
 end
 
 return bullet

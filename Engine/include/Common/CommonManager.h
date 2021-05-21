@@ -25,7 +25,7 @@ public:
 
 	void addComponent(Entity* ent, int compId);
 	void start();
-	void update();
+	void update(float deltaTime);
 };
 
 #endif 

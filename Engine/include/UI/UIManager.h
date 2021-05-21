@@ -53,7 +53,7 @@ public:
 	static void destroy();
 
 	virtual void start();
-	virtual void update();
+	virtual void update(float deltaTime);
 
 	void windowResized(Ogre::RenderWindow* rw);
 

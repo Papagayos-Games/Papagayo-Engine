@@ -86,11 +86,19 @@ void LUAManager::start()
 	}
 }
 
-void LUAManager::update()
+void LUAManager::update(float deltaTime)
 {
 	for (Component* cmp : _compsList)
 	{
-		cmp->update();
+		cmp->update(deltaTime);
+	}
+}
+
+void LUAManager::fixedUpdate(float deltaTime)
+{
+	for (Component* cmp : _compsList)
+	{
+		static_cast<LuaComponent*>(cmp)->fixedUpdate(deltaTime);
 	}
 }
 
