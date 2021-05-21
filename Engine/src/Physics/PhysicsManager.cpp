@@ -86,7 +86,7 @@ btDiscreteDynamicsWorld* PhysicsManager::getWorld() const
 	return dynamicsWorld;
 }
 
-btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass)
+btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass, int group, int mask)
 {
 	btTransform transform;
 	transform.setIdentity();
@@ -101,7 +101,7 @@ btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass)
 
 	rb->forceActivationState(DISABLE_DEACTIVATION);
 
-	dynamicsWorld->addRigidBody(rb);
+	dynamicsWorld->addRigidBody(rb, group, mask);
 
 	//rbs.push_back(rb);
 	/*shapes_.push_back(box);

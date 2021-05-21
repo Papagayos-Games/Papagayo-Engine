@@ -232,6 +232,16 @@ void RigidBody::load(const nlohmann::json& params)
 			setCollisionShape(shapeColl);
 		}
 	}
+	// Grupo
+	it = params.find("group");
+	if (it != params.end() && it->is_number()) {
+		 rb->getBroadphaseProxy()->m_collisionFilterGroup = it->get<short>();
+	}
+	// Mascara
+	it = params.find("mask");
+	if (it != params.end() && it->is_number()) {
+		rb->getBroadphaseProxy()->m_collisionFilterMask = it->get<short>();
+	}
 }
 
 #pragma endregion

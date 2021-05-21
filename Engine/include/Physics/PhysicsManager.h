@@ -15,6 +15,7 @@ class btRigidBody;
 class OgreDebugDrawer;
 class Vector3;
 
+
 class PhysicsManager : public Manager
 {
 private:
@@ -68,7 +69,7 @@ public:
 
 	//Crea el componente Rigidbody a partir de los siguientes parametros:
 	//Posicion, masa e identificador (el cual determina la forma del collider)
-	btRigidBody* createRB(Vector3 pos, float mass);
+	btRigidBody* createRB(Vector3 pos, float mass, int group = -1, int mask = -1);
 
 	virtual void addComponent(Entity* ent, int compId);
 	virtual void start();
