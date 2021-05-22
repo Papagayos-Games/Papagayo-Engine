@@ -117,14 +117,16 @@ void PapagayoEngine::destroy()
 	gui->destroy();
 	ogre->destroy();
 
-	// fisicas
-	phys->destroy();
 
 	// common
 	common->destroy();
 
+	// fisicas
+	phys->destroy();
+
 	// logica
 	lua->destroy();
+
 
 	// escena
 	mSM->destroy();

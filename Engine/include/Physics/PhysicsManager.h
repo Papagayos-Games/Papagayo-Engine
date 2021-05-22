@@ -14,7 +14,8 @@ class btDiscreteDynamicsWorld;
 class btRigidBody;
 class OgreDebugDrawer;
 class Vector3;
-
+class CollisionObject;
+class btCollisionObject;
 
 class PhysicsManager : public Manager
 {
@@ -39,6 +40,9 @@ private:
 	//estoy seria para dibujar los colliders en un modo debug, lo queremos?
 	OgreDebugDrawer* mDebugDrawer_ = nullptr;
 
+	std::map<const btCollisionObject*, std::pair<CollisionObject*,  CollisionObject*>> contacts;
+	
+
 	//esto hay que ver si al eliminar el vector de rigidbodies deja basura y si es asi entonces es porque hay que eliminar
 	//por partes el shape y el motionstate
 	/*std::vector<btBoxShape*> shapes_;
@@ -53,7 +57,7 @@ private:
 	bool applyTorque = true;
 
 public:
-	
+
 	//nos devuelve la instancia
 	static PhysicsManager* getInstance();
 	static bool setUpInstance();
@@ -76,7 +80,7 @@ public:
 	virtual void addComponent(Entity* ent, int compId);
 	virtual void start();
 	virtual void update(float deltaTime);
-	
+
 	static void clean();
 	static void destroy();
 

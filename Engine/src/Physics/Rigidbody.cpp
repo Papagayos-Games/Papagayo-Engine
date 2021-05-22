@@ -498,9 +498,10 @@ Entity* RigidBody::collidesWithTag(const std::string& tag) const
 	return nullptr;
 }
 
-void RigidBody::setUserPtr(CollisionObject* co)
+void RigidBody::setUserPtr(CollisionObject* _co)
 {
-	delete rb->getUserPointer();
+	if(co)delete co;
+	co = _co;
 	rb->setUserPointer((void*)co);
 }
 

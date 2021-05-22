@@ -30,7 +30,7 @@ private:
 	Transform* tr_ = nullptr;
 	bool trigger = false;
 	bool meshShape = true;
-	CollisionObject* co;
+	CollisionObject* co=nullptr;
 
 	bool collidesWithEntity(Entity* other) const;
 public:
