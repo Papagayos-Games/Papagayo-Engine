@@ -27,11 +27,11 @@
 #include <Managers/SceneManager.h>
 #include <Scene/Scene.h>
 
-inline Vector3 convertVector(const btVector3& V) {
+inline Vector3 cvt(const btVector3& V) {
 	return Vector3(V.x(), V.y(), V.z());
 }
 
-inline btVector3 convertVector(const Vector3& V) {
+inline btVector3 cvt(const Vector3& V) {
 	return btVector3(V.x, V.y, V.z);
 }
 
@@ -61,7 +61,7 @@ void RigidBody::setUp()
 	btQuaternion q;
 	Vector3 vRot = tr_->getRot();
 	q.setEulerZYX(vRot.x, vRot.y, vRot.z);
-	rb->setWorldTransform(btTransform(q, convertVector(tr_->getPos())));
+	rb->setWorldTransform(btTransform(q, cvt(tr_->getPos())));
 
 	MeshComponent* mesh = static_cast<MeshComponent*>(_entity->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
 	if (meshShape && mesh) {
@@ -70,6 +70,7 @@ void RigidBody::setUp()
 		if (st) delete st;
 
 		st = new MeshStrider(meshPtr.get());
+		st->setScaling(cvt(tr_->getDimensions()));
 		setCollisionShape(new btConvexTriangleMeshShape(st, true));
 	}
 }
@@ -255,7 +256,7 @@ void RigidBody::setPosition(const Vector3& newPos)
 {
 	if (_active) {
 		btTransform tr;
-		tr.setOrigin(convertVector(newPos));
+		tr.setOrigin(cvt(newPos));
 		tr.setRotation(rb->getOrientation());
 
 		rb->setWorldTransform(tr);
@@ -264,7 +265,7 @@ void RigidBody::setPosition(const Vector3& newPos)
 
 void RigidBody::setGravity(const Vector3& newGrav)
 {
-	rb->setGravity(convertVector(newGrav));
+	rb->setGravity(cvt(newGrav));
 }
 
 void RigidBody::setTrigger(const bool trigger_) {
