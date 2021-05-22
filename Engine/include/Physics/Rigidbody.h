@@ -28,6 +28,7 @@ private:
 	MeshStrider* st;
 	Transform* tr_ = nullptr;
 	bool trigger = false;
+	bool meshShape = true;
 
 	bool collidesWithEntity(Entity* other) const;
 public:
