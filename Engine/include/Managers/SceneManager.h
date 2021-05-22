@@ -20,7 +20,7 @@ public:
 	
 	void update();
 	void changeScene(const std::string& sceneName);
-	void createStartScene();
+	void createStartScene(const std::string& startScene);
 private:
 	SceneManager();	
 	~SceneManager();

@@ -50,6 +50,8 @@ public:
 	void setNearClipDistance(int distance);
 	void setFarClipDistance(int distance);
 
+	Vector3 getScreenCoordinates(const Vector3& iPoint);
+
 	//const Vector3& getCameraPosition();
 	const Vector3& getCameraPosition() const;
 	//inline Ogre::Camera* getCamera();

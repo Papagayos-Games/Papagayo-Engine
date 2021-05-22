@@ -38,6 +38,8 @@ private:
 	//Referencia al scheme actual
 	CEGUI::Scheme* sch = nullptr;
 
+	std::vector<CEGUI::Window*> ceguiWindows;
+
 	UIManager();
 	virtual ~UIManager();
 

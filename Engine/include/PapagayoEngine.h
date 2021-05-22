@@ -26,7 +26,27 @@ class PapagayoEngine {
 public:
 	static PapagayoEngine* getInstance();
 	static bool setupInstance(const std::string& appName);
-	void init();
+
+	/// <summary>
+	/// Inicia el juego
+	/// </summary>
+	/// <param name="schemeName">
+	/// Nombre del Scheme de configuracion que se usa para cargar CEGUI
+	/// Ejemplo: TaharezLook
+	/// </param>
+	/// <param name="schemeFile">
+	/// Archivo donde se guarda la configuracion Scheme para cargar CEGUI
+	/// Ejemplo: TaharezLook.scheme
+	/// </param>
+	/// <param name="fontFile">
+	/// Nombre del archivo de la fuente de texto que se usara con CEGUI
+	/// Ejemplo: DejaVuSans-12.font
+	/// </param>
+	/// <param name="startScene">
+	/// Nombre de la escena inicial del juego
+	/// Ejemplo: mainMenu.json
+	/// </param>
+	void init(std::string schemeName, std::string schemeFile, std::string fontFile, std::string startScene);
 	void destroy();
 	void clean();
 	void start();
@@ -55,7 +75,7 @@ private:
 	std::string appName_;
 	std::map<std::string, Manager*> manRegistry_;
 	bool running_ = true;
-	int timer_ = 0;
+
 	PapagayoEngine(const std::string& appName);
 	virtual ~PapagayoEngine();
 	void update(float delta);

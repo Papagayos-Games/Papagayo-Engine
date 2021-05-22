@@ -1,5 +1,4 @@
-#include "..\..\include\Graphics\OgreContext.h"
-#include "..\..\include\Graphics\OgreContext.h"
+
 #include "OgreContext.h"
 #include "RTShaderTecnhiqueResolveListener.h"
 #include <Ogre.h>
@@ -80,7 +79,7 @@ void OgreContext::createRoot()
 #else
 	mResourcesCfg = "Ogre/resources.cfg";
 	mPluginsCfg = "Ogre/plugins.cfg";
-	mOgreCfg = "Ogre/ogre.cfg";
+	mOgreCfg =  "Ogre/ogre.cfg";
 #endif
 	ogreRoot_ = new Ogre::Root(mPluginsCfg, mOgreCfg);
 
@@ -99,12 +98,11 @@ void OgreContext::createWindow()
 
 	std::istringstream mode(ropts["Video Mode"].currentValue);
 	Ogre::String token;
-	uint32_t w, h;
-	mode >> w;     // width
+	mode >> windowWidth;     // width
 	mode >> token; // 'x' as separator between width and height
-	mode >> h;     // height
+	mode >> windowHeight;     // height
 
-	std::cout << '\n' << w << " " << h << '\n';
+	std::cout << '\n' << windowWidth << " " << windowHeight << '\n';
 	if (!SDL_WasInit(SDL_INIT_VIDEO | SDL_INIT_TIMER))
 		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
 			SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
@@ -118,7 +116,7 @@ void OgreContext::createWindow()
 #endif
 
 	native = SDL_CreateWindow(appName_.c_str(), SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED, w, h, flags);
+		SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, flags);
 
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
@@ -134,7 +132,7 @@ void OgreContext::createWindow()
 	miscParams["externalWindowHandle"] =
 		Ogre::StringConverter::toString(size_t(wmInfo.info.win.window));
 
-	render = ogreRoot_->createRenderWindow(appName_, w, h, false, &miscParams);
+	render = ogreRoot_->createRenderWindow(appName_, windowWidth, windowHeight, false, &miscParams);
 
 	// create a SceneManager instance
 	mSM = ogreRoot_->createSceneManager();
@@ -296,6 +294,16 @@ Ogre::RenderWindow* OgreContext::getRenderWindow() const
 SDL_Window* OgreContext::getSDLWindow() const
 {
 	return native;
+}
+
+
+uint32_t OgreContext::getWindowWidth() const
+{
+	return  windowWidth	;
+}
+uint32_t OgreContext::getWindowHeight() const
+{
+	return windowHeight;
 }
 
 #pragma endregion

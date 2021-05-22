@@ -86,7 +86,7 @@ btDiscreteDynamicsWorld* PhysicsManager::getWorld() const
 	return dynamicsWorld;
 }
 
-btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass)
+btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass, int group, int mask)
 {
 	btTransform transform;
 	transform.setIdentity();
@@ -101,7 +101,7 @@ btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass)
 
 	rb->forceActivationState(DISABLE_DEACTIVATION);
 
-	dynamicsWorld->addRigidBody(rb);
+	dynamicsWorld->addRigidBody(rb, group, mask);
 
 	//rbs.push_back(rb);
 	/*shapes_.push_back(box);
@@ -128,11 +128,6 @@ void PhysicsManager::update(float deltaTime)
 	dynamicsWorld->stepSimulation(1.f / 60.f, 10);
 
 	for (auto it = _compsList.begin(); it != _compsList.end(); ++it) {
-		//if (applyTorque) {
-		//	applyTorque = false;
-		//	static_cast<RigidBody*>(*it)->addTorque(Vector3(0.0f, 0.0, -5.0), Forces::IMPULSE);
-		//	//static_cast<RigidBody*>(*it)->addForce(Vector3(0.0f, 1, 0.0f), Vector3(1.0f, 0.0, 1.0), Forces::IMPULSE);
-		//}
 		(*it)->update(deltaTime);
 	}
 

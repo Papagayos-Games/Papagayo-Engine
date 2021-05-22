@@ -26,7 +26,7 @@
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
 
 PapagayoEngine::PapagayoEngine(const std::string& appName) : appName_(appName) {
-	
+
 	// OGRE CONTEXT
 	if (!OgreContext::setUpInstance(appName_)) {
 		throw std::exception("ERROR: Couldn't load OgreContext\n");
@@ -116,19 +116,19 @@ void PapagayoEngine::destroy()
 	render->destroy();
 	gui->destroy();
 	ogre->destroy();
-	
+
 	// fisicas
 	phys->destroy();
 
 	// common
 	common->destroy();
-	
+
 	// logica
 	lua->destroy();
 
 	// escena
 	mSM->destroy();
-	
+
 	delete instance_;
 }
 
@@ -155,15 +155,16 @@ void PapagayoEngine::clean()
 	mSM->clean();
 }
 
-void PapagayoEngine::init()
+void PapagayoEngine::init(std::string schemeName, std::string schemeFile,
+	std::string fontFile, std::string startScene)
 {
 	try { ogre->setUpInstance("PAPAGAYO ENGINE"); }
-	catch (const std::exception & e)
+	catch (const std::exception& e)
 	{
 		throw std::runtime_error("OgreContext init fail \n" + (std::string)e.what() + "\n");
 	}
-	
-	try { mSM->setupInstance();}
+
+	try { mSM->setupInstance(); }
 	catch (const std::exception& e)
 	{
 		throw std::runtime_error("SceneManager init fail \n" + (std::string)e.what() + "\n");
@@ -178,9 +179,27 @@ void PapagayoEngine::init()
 	//unos string que se reciban como parametro, de manera
 	//que sea el usuario el que decida que configuracion
 	//desea usuar.
-	gui->loadScheme("TaharezLook", "TaharezLook.scheme");
 
-	mSM->createStartScene();
+	try {
+		gui->loadScheme(schemeName, schemeFile);
+	}
+	catch (const std::exception& e) {
+		throw std::runtime_error("Fallo al cargar Scheme. Revise el nombre de el Scheme.\n" + (std::string)e.what() + "\n");
+	}
+
+	try
+	{
+		gui->loadFont(fontFile);
+	}
+	catch (const std::exception& e)
+	{
+		throw std::runtime_error("Fallo al cargar Fuente. Revise el nombre de la fuente.\n" + (std::string)e.what() + "\n");
+	}
+	//gui->loadScheme("TaharezLook", "TaharezLook.scheme");
+	//gui->setMouseImage("TaharezLook/MouseArrow");
+	//gui->loadFont("DejaVuSans-12.font");
+
+	mSM->createStartScene(startScene);
 
 
 #pragma region TOERASE
@@ -190,7 +209,7 @@ void PapagayoEngine::init()
 	ogre->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
 
 	//Audio de bad bunny metido 
-	audio->playSound("Assets/badbunny.mp3", {0,0,0});
+	audio->playSound("Assets/badbunny.mp3", { 0,0,0 });
 
 #pragma endregion
 
@@ -223,15 +242,7 @@ void PapagayoEngine::update(float delta)
 			render->update(delta);
 			phys->update(delta);
 
-			lua->update(delta);
-			
-			++timer_;
-			if (timer_ == 1000) {
-				SceneManager::getCurrentScene()->killEntityByName("penguin");
-				std::cout << "Cambio de escena\n";
-				mSM->changeScene("test3");
-			}
-
+			lua->update();
 			mSM->update();
 		}
 	}

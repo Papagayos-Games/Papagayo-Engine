@@ -61,6 +61,9 @@ private:
 	bool grab = false;
 	bool showCursor = false;
 	bool exit;
+   //width y height de la ventana
+	uint32_t windowWidth, windowHeight;
+
 
 	OgreContext(const std::string& appName);
 	virtual ~OgreContext();
@@ -94,6 +97,10 @@ public:
 	
 
 	SDL_Window* getSDLWindow() const;
+
+	uint32_t getWindowWidth()const;
+	uint32_t getWindowHeight()const;
+	
 };
 
 #endif

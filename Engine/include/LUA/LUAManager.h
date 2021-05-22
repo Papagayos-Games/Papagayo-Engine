@@ -25,6 +25,8 @@ class Camera;
 class LightComponent;
 class PlaneComponent;
 class Transform;
+class OgreContext;
+class Scene;
 class UIButton;
 class Scene;
 
@@ -54,6 +56,7 @@ public:
 
 	//METODOS DE PRUEBA
 	Entity* getEntity(std::string name);
+	void changeScene(std::string name);
 	InputSystem* getInputManager();
 	RigidBody* getRigidbody(Entity* ent);
 	MeshComponent* getMeshComponent(Entity* ent);
@@ -63,16 +66,19 @@ public:
 	Transform* getTransform(Entity* ent);
 	luabridge::LuaRef getLuaClass(const std::string& c_name);
 	Entity* instantiate(std::string prefabName);
-	UIButton* getUIButton(Entity* ent);
+	OgreContext* getOgreContext();
 	Scene* getCurrentScene();
 	luabridge::LuaRef getLuaSelf(Entity* ent, const std::string& c_name);
 
 
+	UIButton* getUIButton(Entity* ent);
+	void closeApp();
 
 	void addRegistry(const std::string& compName);
 
 	//Obtener el estado de LUA
 	lua_State* getLuaState()const;
+
 	//Metodos heredados de la clase padre
 	virtual void start() override;
 	virtual void update(float deltaTime) override;

@@ -26,6 +26,7 @@
 #include <LightComponent.h>
 #include <PlaneComponent.h>
 #include <RenderManager.h>
+#include <OgreContext.h>
 
 //UI
 #include "UIButton.h"
@@ -35,8 +36,10 @@
 #include "LuaComponent.h"
 #include <LuaBridge.h>
 
-//
+//Papagayo
 #include "LoaderSystem.h"
+#include "Managers/SceneManager.h"
+#include "PapagayoEngine.h"
 
 using namespace luabridge;
 
@@ -121,8 +124,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.endClass();
 
 	getGlobalNamespace(L).beginClass<Vector3>("Vector3")
-		.addConstructor<void (*) (float, float, float)>()
-		//.addConstructor<void (*) (const Vector3 &)>()
+		.addConstructor<void (*) (const float, const float, const float)>()
 		.addProperty("x", &Vector3::x)
 		.addProperty("y", &Vector3::y)
 		.addProperty("z", &Vector3::z)
@@ -130,12 +132,15 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("substract", &Vector3::operator-=)
 		.addFunction("multiplyByNumber",&Vector3::operator*=)
 		.addFunction("isEqual", &Vector3::operator==)
+		.addFunction("normalize", &Vector3::normalize)
 		.endClass();
 	
 	//input
 	getGlobalNamespace(L).beginClass<InputSystem>("InputSystem")
 		.addFunction("keyPressed", &InputSystem::isKeyDown)
 		.addFunction("mouseButtonPressed", &InputSystem::clickEvent)
+		.addFunction("getMouseX", &InputSystem::getMouseX)
+		.addFunction("getMouseY", &InputSystem::getMouseY)
 		.addFunction("getTicks", &InputSystem::getTicks)
 		.endClass();
 	
@@ -187,6 +192,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("setBackgroundColor", &Camera::setBackgroundColor)
 		.addFunction("setNearClipDistance", &Camera::setNearClipDistance)
 		.addFunction("setFarClipDistance", &Camera::setFarClipDistance)
+		.addFunction("getScreenCoordinates", &Camera::getScreenCoordinates)
 		.endClass();
 
 	getGlobalNamespace(L).deriveClass<LightComponent,Component>("Light")
@@ -200,6 +206,10 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("setMaterial", &PlaneComponent::setMaterial)
 		.endClass();
 
+	getGlobalNamespace(L).beginClass<OgreContext>("OgreContext")
+		.addFunction("getWindowWidth", &OgreContext::getWindowWidth)
+		.addFunction("getWindowHeight", &OgreContext::getWindowHeight)
+		.endClass();
 	//UI
 	getGlobalNamespace(L).deriveClass<UIButton, Component>("Button")
 		.addFunction("getButtonPressed", &UIButton::getButtonPressed)
@@ -217,7 +227,6 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("destroyEntityByName", &Scene::killEntityByName)
 		.endClass();		
 
-
 	getGlobalNamespace(L).beginClass<LUAManager>("LuaManager")
 		.addFunction("getEntity", &LUAManager::getEntity)
 		.addFunction("getInputManager", &LUAManager::getInputManager)
@@ -232,6 +241,9 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getCurrentScene", &LUAManager::getCurrentScene)
 		.addFunction("getUIButton", &LUAManager::getUIButton)
 		.addFunction("getLuaSelf", &LUAManager::getLuaSelf)
+		.addFunction("getOgreContext", &LUAManager::getOgreContext)
+		.addFunction("changeScene", &LUAManager::changeScene)
+		.addFunction("closeApp", &LUAManager::closeApp)
 		.endClass();
 }
 
@@ -250,6 +262,10 @@ Entity* LUAManager::getEntity(std::string name)
 	return ent;
 }
 
+void LUAManager::changeScene(std::string name)
+{
+	SceneManager::getInstance()->changeScene(name);
+}
 
 RigidBody* LUAManager::getRigidbody(Entity* ent)
 {
@@ -321,7 +337,7 @@ Entity* LUAManager::instantiate(std::string prefabName)
 
 	s.loadPrefabByName(prefabName, e);
 	SceneManager::getCurrentScene()->addEntity(prefabName, e);
-	e->start();
+	//e->start();
 	return e;
 }
 
@@ -356,9 +372,23 @@ void LUAManager::addRegistry(const std::string& compName)
 	}
 }
 
+OgreContext* LUAManager::getOgreContext()
+{
+	return OgreContext::getInstance();
+}
+
+Scene* LUAManager::getCurrentScene()
+{
+	return SceneManager::getInstance()->getCurrentScene();
+}
+
 lua_State* LUAManager::getLuaState() const
 {
 	return L;
+}
+
+void LUAManager::closeApp() {
+	PapagayoEngine::getInstance()->closeApp();
 }
 
 LUAManager::LUAManager() : Manager(ManID::LUA), registeredFiles(0)
@@ -377,9 +407,4 @@ LUAManager::LUAManager() : Manager(ManID::LUA), registeredFiles(0)
 	//Registro de componentes
 	//registerComponent("default", registeredFiles++, []() -> LuaComponent* { return new LuaComponent(); });
 	addRegistry("default");
-}
-
-Scene* LUAManager::getCurrentScene()
-{
-	return SceneManager::getInstance()->getCurrentScene();
 }
