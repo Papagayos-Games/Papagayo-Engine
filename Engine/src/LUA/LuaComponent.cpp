@@ -6,7 +6,7 @@
 
 #include "checkML.h"
 
-LuaComponent::LuaComponent(const std::string& fileName, int id) : Component(LUAManager::getInstance(), id), fileName_(fileName)
+LuaComponent::LuaComponent(const std::string& fileName, int id) : Component(LUAManager::getInstance(), id), CollisionObject(), fileName_(fileName)
 {
 	init();
 }
@@ -32,9 +32,10 @@ void LuaComponent::load(const nlohmann::json& params)
 		fileName_ = "default";
 		throw std::exception("Assigned LUA component couldn't be instantiated\n");
 	}
-	//if (_entity->hasComponent((int)ManID::Physics, 0) && class_["onCollisionEnter"].isFunction()) {
-	//	_entity->getComponent((int)ManID::Physics, 0).set
-	//}
+	if (_entity->hasComponent((int)ManID::Physics, 0) && class_["onCollisionEnter"].isFunction()) {
+		coll_ent_ = _entity;
+		static_cast<RigidBody*>(_entity->getComponent((int)ManID::Physics, 0))->setUserPtr(this);
+	}
 	(*self_) = LUAManager::getInstance()->getLuaClass(fileName_)["instantiate"](params.dump(), getEntity())[0];
 	
 #ifdef _DEBUG
@@ -57,9 +58,9 @@ void LuaComponent::fixedUpdate(float deltaTime)
 	LUAManager::getInstance()->getLuaClass(fileName_)["fixedUpdate"](self_, LUAManager::getInstance(), deltaTime);
 }
 
-void LuaComponent::onCollisionEnter(Rigidbody* rb)
+void LuaComponent::onCollisionEnter(Entity* e)
 {
-	LUAManager::getInstance()->getLuaClass(fileName_)["onCollisionEnter"](self_, LUAManager::getInstance());
+	LUAManager::getInstance()->getLuaClass(fileName_)["onCollisionEnter"](self_, LUAManager::getInstance(), e);
 }
 
 const std::string& LuaComponent::getFileName()

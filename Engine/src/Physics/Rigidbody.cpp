@@ -26,6 +26,7 @@
 #include "MeshStrider.h"
 #include <Managers/SceneManager.h>
 #include <Scene/Scene.h>
+#include <CollisionObject.h>
 
 inline Vector3 cvt(const btVector3& V) {
 	return Vector3(V.x(), V.y(), V.z());
@@ -44,7 +45,9 @@ RigidBody::~RigidBody()
 {
 	if(st) delete st;
 	st = nullptr;
-	
+	if(co) 
+		delete co;
+	co = nullptr;
 	//if (rb) {
 	//	delete rb;
 	//}
@@ -57,6 +60,7 @@ RigidBody::~RigidBody()
 
 void RigidBody::setUp()
 {
+	co->coll_ent_ = _entity;
 	tr_ = static_cast<Transform*>(_entity->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
 	btQuaternion q;
 	Vector3 vRot = tr_->getRot();
@@ -80,6 +84,8 @@ void RigidBody::init()
 	rb = PhysicsManager::getInstance()->createRB(Vector3(0, 0, 0), mass);
 	rb->setMassProps(1.0f, btVector3(1.0, 1.0, 1.0));
 	rb->setDamping(0.5, 0.5);
+	co = new CollisionObject();
+	rb->setUserPointer((void*)co);
 }
 
 void RigidBody::update(float deltaTime)
@@ -490,6 +496,12 @@ Entity* RigidBody::collidesWithTag(const std::string& tag) const
 	}
 
 	return nullptr;
+}
+
+void RigidBody::setUserPtr(CollisionObject* co)
+{
+	delete rb->getUserPointer();
+	rb->setUserPointer((void*)co);
 }
 
 #pragma endregion

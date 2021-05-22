@@ -6,6 +6,7 @@
 #include "Rigidbody.h"
 #include "Entity.h"
 #include "OgreContext.h"
+#include "CollisionObject.h"
 
 PhysicsManager* PhysicsManager::instance_ = nullptr;
 
@@ -57,9 +58,12 @@ void PhysicsManager::checkCollision()
 				const btVector3& normalOnB = pt.m_normalWorldOnB;
 				bool x = (ContactProcessedCallback)(pt, obA, obB);
 
-				//obA->getUserPointer();
-				if (x)
-					printf("collision\n");  // collisionEnter(other)
+				
+				CollisionObject* coA = static_cast<CollisionObject*>(obA->getUserPointer());
+				CollisionObject* coB = static_cast<CollisionObject*>(obB->getUserPointer());
+				coA->onCollisionEnter(coB->coll_ent_);
+				coB->onCollisionEnter(coA->coll_ent_);
+
 			}
 		}
 	}
@@ -81,9 +85,9 @@ void PhysicsManager::init(const Vector3 gravity) {
 	dynamicsWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
 
 #ifdef _DEBUG
-	mDebugDrawer_ = new OgreDebugDrawer(OgreContext::getInstance()->getSceneManager());
-	mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	dynamicsWorld->setDebugDrawer(mDebugDrawer_);
+	//mDebugDrawer_ = new OgreDebugDrawer(OgreContext::getInstance()->getSceneManager());
+	//mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+	//dynamicsWorld->setDebugDrawer(mDebugDrawer_);
 #endif // DEBUG
 }
 
@@ -164,7 +168,7 @@ void PhysicsManager::update(float deltaTime)
 	}
 
 #ifdef _DEBUG
-	dynamicsWorld->debugDrawWorld();
+	//dynamicsWorld->debugDrawWorld();
 #endif // _DEBUG
 
 }

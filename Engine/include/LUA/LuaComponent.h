@@ -1,4 +1,5 @@
 #include "Component.h"
+#include "CollisionObject.h"
 #include "lua.hpp"
 #include <LuaBridge.h>
 
@@ -8,7 +9,7 @@ struct lua_State;
 class LuaRef;
 class Rigidbody;
 
-class LuaComponent : public Component {
+class LuaComponent : public Component, public CollisionObject {
 private:
 	//luabridge::LuaRef* class_;
 	luabridge::LuaRef* self_;
@@ -38,7 +39,7 @@ public:
 	void fixedUpdate(float deltaTime);
 
 	// Callbacks de colision
-	void onCollisionEnter(Rigidbody* rb);
+	void onCollisionEnter(Entity* other) override;
 
 
 	const std::string& getFileName();

@@ -12,6 +12,7 @@ class Entity;
 class btRigidBody;
 class Transform;
 class MeshStrider;
+class CollisionObject;
 
 enum class Forces {
 	NORMAL = 0,
@@ -29,6 +30,7 @@ private:
 	Transform* tr_ = nullptr;
 	bool trigger = false;
 	bool meshShape = true;
+	CollisionObject* co;
 
 	bool collidesWithEntity(Entity* other) const;
 public:
@@ -121,6 +123,8 @@ public:
 	//Comprueba la colisiones con otros objetos con un tag
 	//dentro de la escena especifica
 	Entity* collidesWithTag(const std::string& tag) const;
+
+	void setUserPtr(CollisionObject* co);
 #pragma endregion
 };
 
