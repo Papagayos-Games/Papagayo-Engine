@@ -51,10 +51,6 @@ void MeshComponent::update(float deltaTime)
 void MeshComponent::setUp()
 {
 	tr_ = static_cast<Transform*>(_entity->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
-	
-	//Hacemos una primera llamada a update para settear correctamente los valores del transform en 
-	//relacion a la mesh
-	update();
 }
 
 void MeshComponent::load(const nlohmann::json& params)

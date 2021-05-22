@@ -242,7 +242,7 @@ void PapagayoEngine::update(float delta)
 			render->update(delta);
 			phys->update(delta);
 
-			lua->update();
+			lua->update(delta);
 			mSM->update();
 		}
 	}
