@@ -481,13 +481,13 @@ bool RigidBody::onCollisionEnter(const std::string& id) const
 Entity* RigidBody::collidesWithTag(const std::string& tag) const
 {
 	//Obtiene la lista de entidades de la escena
-	//std::vector<Entity*> tagEntities = scene_->getEntitiesByTag(tag);
+	std::list<Entity*> tagEntities = SceneManager::getInstance()->getCurrentScene()->getAllEntitiesWith(tag);
 
 	//Busqueda de la entidad con el tag propuesto
-	//for (auto it : tagEntities) {
-	//	if (collidesWithEntity(it))
-	//		return it;
-	//}
+	for (auto it : tagEntities) {
+		if (collidesWithEntity(it))
+			return it;
+	}
 
 	return nullptr;
 }
