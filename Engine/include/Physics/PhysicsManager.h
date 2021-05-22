@@ -47,6 +47,8 @@ private:
 	PhysicsManager();
 	virtual ~PhysicsManager();
 
+	void checkCollision();
+
 	//TO ERASE
 	bool applyTorque = true;
 

@@ -34,7 +34,37 @@ PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {
 };
 
 PhysicsManager::~PhysicsManager() {
-};
+}
+void PhysicsManager::checkCollision()
+{
+	int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
+	for (int i = 0; i < numManifolds; i++)
+	{
+		btPersistentManifold* contactManifold = dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+		const btCollisionObject* obA = contactManifold->getBody0();
+		const btCollisionObject* obB = contactManifold->getBody1();
+
+		int numContacts = contactManifold->getNumContacts();
+		std::cout << numContacts << '\n';
+
+		for (int j = 0; j < numContacts; j++)
+		{
+			btManifoldPoint& pt = contactManifold->getContactPoint(j);
+			if (pt.getDistance() < 0.f)
+			{
+				const btVector3& ptA = pt.getPositionWorldOnA();
+				const btVector3& ptB = pt.getPositionWorldOnB();
+				const btVector3& normalOnB = pt.m_normalWorldOnB;
+				bool x = (ContactProcessedCallback)(pt, obA, obB);
+
+				//obA->getUserPointer();
+				if (x)
+					printf("collision\n");  // collisionEnter(other)
+			}
+		}
+	}
+}
+
 
 void PhysicsManager::init(const Vector3 gravity) {
 
@@ -51,9 +81,9 @@ void PhysicsManager::init(const Vector3 gravity) {
 	dynamicsWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
 
 #ifdef _DEBUG
-	//mDebugDrawer_ = new OgreDebugDrawer(OgreContext::getInstance()->getSceneManager());
-	//mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	//dynamicsWorld->setDebugDrawer(mDebugDrawer_);
+	mDebugDrawer_ = new OgreDebugDrawer(OgreContext::getInstance()->getSceneManager());
+	mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+	dynamicsWorld->setDebugDrawer(mDebugDrawer_);
 #endif // DEBUG
 }
 
@@ -127,12 +157,14 @@ void PhysicsManager::update(float deltaTime)
 {
 	dynamicsWorld->stepSimulation(1.f / 60.f, 10);
 
+	checkCollision();
+
 	for (auto it = _compsList.begin(); it != _compsList.end(); ++it) {
 		(*it)->update(deltaTime);
 	}
 
 #ifdef _DEBUG
-	//dynamicsWorld->debugDrawWorld();
+	dynamicsWorld->debugDrawWorld();
 #endif // _DEBUG
 
 }

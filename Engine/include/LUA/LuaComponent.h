@@ -6,6 +6,7 @@
 
 struct lua_State;
 class LuaRef;
+class Rigidbody;
 
 class LuaComponent : public Component {
 private:
@@ -35,6 +36,10 @@ public:
 	virtual void update(float deltaTime) override;
 
 	void fixedUpdate(float deltaTime);
+
+	// Callbacks de colision
+	void onCollisionEnter(Rigidbody* rb);
+
 
 	const std::string& getFileName();
 	const std::string& getFileName() const;

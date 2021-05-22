@@ -2,6 +2,7 @@
 #include "LUAManager.h"
 #include <LuaBridge.h>
 #include "lua.hpp"
+#include "Entity.h"
 
 #include "checkML.h"
 
@@ -23,15 +24,19 @@ void LuaComponent::init()
 
 void LuaComponent::load(const nlohmann::json& params)
 {
-	if (!LUAManager::getInstance()->getLuaClass(fileName_)["instantiate"].isFunction()) {
+	luabridge::LuaRef class_ = LUAManager::getInstance()->getLuaClass(fileName_);
+	if (!class_["instantiate"].isFunction()) {
 #ifdef _DEBUG
 		std::cout << "No table created while loading LUAComponent. Assigned default\n";
 #endif
 		fileName_ = "default";
 		throw std::exception("Assigned LUA component couldn't be instantiated\n");
 	}
+	//if (_entity->hasComponent((int)ManID::Physics, 0) && class_["onCollisionEnter"].isFunction()) {
+	//	_entity->getComponent((int)ManID::Physics, 0).set
+	//}
 	(*self_) = LUAManager::getInstance()->getLuaClass(fileName_)["instantiate"](params.dump(), getEntity())[0];
-
+	
 #ifdef _DEBUG
 	std::cout << fileName_ << " loaded correctly\n";
 #endif
@@ -50,6 +55,11 @@ void LuaComponent::update(float deltaTime)
 void LuaComponent::fixedUpdate(float deltaTime)
 {
 	LUAManager::getInstance()->getLuaClass(fileName_)["fixedUpdate"](self_, LUAManager::getInstance(), deltaTime);
+}
+
+void LuaComponent::onCollisionEnter(Rigidbody* rb)
+{
+	LUAManager::getInstance()->getLuaClass(fileName_)["onCollisionEnter"](self_, LUAManager::getInstance());
 }
 
 const std::string& LuaComponent::getFileName()
