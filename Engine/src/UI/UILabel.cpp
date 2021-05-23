@@ -91,3 +91,9 @@ void UILabel::load(const nlohmann::json& params)
 		setActive(ac);
 	}
 }
+
+void UILabel::setText(std::string t)
+{
+	text = t;
+	uiWindow->setText(text);
+}

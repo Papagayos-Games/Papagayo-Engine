@@ -28,6 +28,7 @@
 
 //UI
 #include "UIButton.h"
+#include "UILabel.h"
 #include "UIManager.h"
 
 //LUA
@@ -218,6 +219,11 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getButtonPressed", &UIButton::getButtonPressed)
 		.addFunction("buttonWasPressed", &UIButton::buttonWasPressed)
 		.addFunction("buttonNotPressed", &UIButton::buttonNotPressed)
+		.addFunction("setText", &UIButton::setText)
+		.endClass();
+
+	getGlobalNamespace(L).deriveClass<UILabel, Component>("Label")
+		.addFunction("setText", &UILabel::setText)
 		.endClass();
 
 	getGlobalNamespace(L).beginClass<Scene>("Scene")
@@ -243,6 +249,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("instantiate", &LUAManager::instantiate)
 		.addFunction("getCurrentScene", &LUAManager::getCurrentScene)
 		.addFunction("getUIButton", &LUAManager::getUIButton)
+		.addFunction("getUILabel", &LUAManager::getUILabel)
 		.addFunction("getLuaSelf", &LUAManager::getLuaSelf)
 		.addFunction("getOgreContext", &LUAManager::getOgreContext)
 		.addFunction("changeScene", &LUAManager::changeScene)
@@ -372,6 +379,14 @@ UIButton* LUAManager::getUIButton(Entity* ent)
 	UIButton* b = nullptr;
 	if (ent->hasComponent((int)ManID::UI, (int)UIManager::UICmpId::Button))
 		b = static_cast<UIButton*>(ent->getComponent((int)ManID::UI, (int)UIManager::UICmpId::Button));
+	return b;
+}
+
+UILabel* LUAManager::getUILabel(Entity* ent)
+{
+	UILabel* b = nullptr;
+	if (ent->hasComponent((int)ManID::UI, (int)UIManager::UICmpId::Label))
+		b = static_cast<UILabel*>(ent->getComponent((int)ManID::UI, (int)UIManager::UICmpId::Label));
 	return b;
 }
 

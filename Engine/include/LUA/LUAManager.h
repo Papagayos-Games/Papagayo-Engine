@@ -28,6 +28,7 @@ class Transform;
 class OgreContext;
 class Scene;
 class UIButton;
+class UILabel;
 class Scene;
 
 class LUAManager : public Manager {
@@ -74,6 +75,8 @@ public:
 
 
 	UIButton* getUIButton(Entity* ent);
+	UILabel* getUILabel(Entity* ent);
+
 	void closeApp();
 
 	void addRegistry(const std::string& compName);
