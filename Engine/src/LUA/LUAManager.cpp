@@ -1,5 +1,3 @@
-#include "..\..\include\LUA\LUAManager.h"
-#include "..\..\include\LUA\LUAManager.h"
 #include "LUAManager.h"
 #include <iostream>
 
@@ -40,6 +38,9 @@
 #include "LoaderSystem.h"
 #include "Managers/SceneManager.h"
 #include "PapagayoEngine.h"
+
+//Audio
+#include "AudioSystem.h"
 
 using namespace luabridge;
 
@@ -244,7 +245,30 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getOgreContext", &LUAManager::getOgreContext)
 		.addFunction("changeScene", &LUAManager::changeScene)
 		.addFunction("closeApp", &LUAManager::closeApp)
+		.addFunction("setSkyPlane", &LUAManager::closeApp)
+		.addFunction("setMusic", &LUAManager::closeApp)
 		.endClass();
+}
+
+void LUAManager::setSkyPlane(std::string skyPlane) {
+
+	try {
+		OgreContext::getInstance()->setSkyPlane(skyPlane, Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
+	}
+	catch (std::exception& e) {
+		std::cout << "El nombre /" << skyPlane << "/ es inapropiado.\n" << e.what() << std::endl;
+	}
+}
+
+void LUAManager::setMusic(std::string music) {
+
+	try {
+		AudioSystem::getInstance()->stopAllChannels();
+		AudioSystem::getInstance()->playSound(music, { 0, 0, 0 });
+	}
+	catch (std::exception& e) {
+		std::cout << "El nombre /" << music << "/ es inapropiado.\n" << e.what() << std::endl;
+	}
 }
 
 bool LUAManager::reloadLuaScript(lua_State* L, const std::string& luafile) {

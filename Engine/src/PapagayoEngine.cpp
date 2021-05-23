@@ -158,7 +158,7 @@ void PapagayoEngine::clean()
 }
 
 void PapagayoEngine::init(std::string schemeName, std::string schemeFile,
-	std::string fontFile, std::string startScene)
+	std::string fontFile, std::string startScene, std::string music, std::string skyPlane)
 {
 	try { ogre->setUpInstance("PAPAGAYO ENGINE"); }
 	catch (const std::exception& e)
@@ -197,23 +197,27 @@ void PapagayoEngine::init(std::string schemeName, std::string schemeFile,
 	{
 		throw std::runtime_error("Fallo al cargar Fuente. Revise el nombre de la fuente.\n" + (std::string)e.what() + "\n");
 	}
-	//gui->loadScheme("TaharezLook", "TaharezLook.scheme");
-	//gui->setMouseImage("TaharezLook/MouseArrow");
-	//gui->loadFont("DejaVuSans-12.font");
 
 	mSM->createStartScene(startScene);
 
+	try
+	{
+		audio->playSound(music, { 0,0,0 });
+	}
+	catch (const std::exception& e)
+	{
+		std::cout << "Fallo al cargar la pista /" << music << "/\n";
+		std::cout << e.what() << std::endl;
+	}
 
-#pragma region TOERASE
-	//gui->createButton("Probando_boton", glm::vec2(0, 0), glm::vec2(200, 200), "Prueba");
-	//ui->createLabel("Probando_boton", glm::vec2(100, 100), glm::vec2(10, 10), "Prueba");
-
-	ogre->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
-
-	//Audio de bad bunny metido 
-	audio->playSound("Assets/badbunny.mp3", { 0,0,0 });
-
-#pragma endregion
+	try
+	{
+		ogre->setSkyPlane(skyPlane, Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
+	}
+	catch (const std::exception& e) {
+		std::cout << "Fallo al cargar el SkyPlane /" << skyPlane<< "/\n";
+		std::cout << e.what() << std::endl;
+	}
 
 	start();
 }

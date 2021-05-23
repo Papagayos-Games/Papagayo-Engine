@@ -46,7 +46,15 @@ public:
 	/// Nombre de la escena inicial del juego
 	/// Ejemplo: mainMenu.json
 	/// </param>
-	void init(std::string schemeName, std::string schemeFile, std::string fontFile, std::string startScene);
+	/// <param name="music">
+	/// Nombre del archivo de música inicial que se quiere poner
+	/// </param>
+	/// <param name="skyPlane">
+	/// Nombre del fondo que se quiere usar al inicio. Debe ser
+	/// un material crado mediante .material
+	/// </param>
+	void init(std::string schemeName, std::string schemeFile,
+		std::string fontFile, std::string startScene, std::string music, std::string skyPlane);
 	void destroy();
 	void clean();
 	void start();
