@@ -400,6 +400,17 @@ btRigidBody* RigidBody::getBtRb() const
 	return rb;
 }
 
+int RigidBody::getGroup() const
+{
+
+	return rb->getBroadphaseProxy()->m_collisionFilterGroup;
+}
+
+int RigidBody::getMask() const
+{
+	return rb->getBroadphaseProxy()->m_collisionFilterMask;
+}
+
 #pragma endregion
 
 #pragma region Adders

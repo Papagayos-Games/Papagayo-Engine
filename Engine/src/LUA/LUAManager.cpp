@@ -178,6 +178,8 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getLinearVelocity", &RigidBody::getLinearVelocity)
 		.addFunction("onCollisionEnter", &RigidBody::onCollisionEnter)
 		.addFunction("collidesWithTag", &RigidBody::collidesWithTag)
+		.addFunction("getGroup", &RigidBody::getGroup)
+		.addFunction("getMask", &RigidBody::getMask)
 		.endClass();
 
 	//graphics

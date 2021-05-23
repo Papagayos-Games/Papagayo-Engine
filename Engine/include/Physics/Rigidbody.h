@@ -103,6 +103,9 @@ public:
 
 	//btRigidBody* getBtRb();
 	btRigidBody* getBtRb() const;
+
+	int getGroup()const ;
+	int getMask()const;
 #pragma endregion
 
 #pragma region Adders
