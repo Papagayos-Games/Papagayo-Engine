@@ -48,7 +48,7 @@ void PhysicsManager::checkCollision()
 		/* Check all contacts points */
 
 		int numContacts = contactManifold->getNumContacts();
-		std::cout << numContacts << '\n';
+		//std::cout << numContacts << '\n';
 
 		for (int j = 0; j < numContacts; j++)
 		{
@@ -61,6 +61,7 @@ void PhysicsManager::checkCollision()
 				if (newContacts.find(obA) == newContacts.end())
 				{
 					newContacts[obA] = { coA,coB };
+					newContacts[obB] = { coB,coA };
 				}
 
 			}
@@ -77,11 +78,13 @@ void PhysicsManager::checkCollision()
 			if (contacts.find((*it).first) == contacts.end())
 			{
 				(*it).second.first->onCollisionEnter((*it).second.second->getEntity());
+				//(*it).second.second->onCollisionEnter((*it).second.first->getEntity());
 			}
 			else
 			{
 				// Remove to filter no more active contacts
 				(*it).second.first->onCollisionStay((*it).second.second->getEntity());
+				//(*it).second.second->onCollisionStay((*it).second.first->getEntity());
 				contacts.erase((*it).first);
 			}
 		}
@@ -94,6 +97,7 @@ void PhysicsManager::checkCollision()
 		for (it = contacts.begin(); it != contacts.end(); it++)
 		{
 			(*it).second.first->onCollisionExit((*it).second.second->getEntity());
+			//(*it).second.second->onCollisionExit((*it).second.first->getEntity());
 		}
 		contacts.clear();
 	}
