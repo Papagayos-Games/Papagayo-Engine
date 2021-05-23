@@ -177,68 +177,75 @@ void RigidBody::load(const nlohmann::json& params)
 	//Formas de la colision
 	if (!meshShape) {
 		it = params.find("shape");
-		if (it != params.end() && it->is_object()) {
-			auto shape = it->find("id");
-			if (shape != it->end()) {
-				std::string shapeName = shape->get<std::string>();
-				btCollisionShape* shapeColl = nullptr;
-				if (shapeName == "Box") {
-					auto size = it->find("size");
-					if (size != it->end()) {
-						std::vector<float> s = size->get<std::vector<float>>();
-						shapeColl = new btBoxShape(btVector3(s[0], s[1], s[2]));
+		if (it != params.end()) {
+			auto shape = it.value();
+			//auto shape = it.value().find("id");
+			if (shape.is_object()) {
+				it = shape.find("id");
+				if (it != shape.end())
+				{
+					std::string shapeName = it.value().get<std::string>();
+					//std::string shapeName = shape.value().get<std::string>();
+					btCollisionShape* shapeColl = nullptr;
+					if (shapeName == "Box") {
+						auto size = shape.find("size");
+						if (size != shape.end()) {
+							std::vector<float> s = size->get<std::vector<float>>();
+							shapeColl = new btBoxShape(btVector3(s[0], s[1], s[2]));
+						}
+						else {
+							shapeColl = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
+						}
 					}
-					else {
-						shapeColl = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
+					else if (shapeName == "Sphere") {
+						auto radius = shape.find("radius");
+						if (radius != shape.end()) {
+							float r = radius->get<float>();
+							shapeColl = new btSphereShape(r);
+						}
+						else {
+							shapeColl = new btSphereShape(1.0f);
+						}
 					}
-				}
-				else if (shapeName == "Sphere") {
-					auto radius = it->find("radius");
-					if (radius != it->end()) {
-						float r = it->get<float>();
-						shapeColl = new btSphereShape(r);
+					else if (shapeName == "Cylinder") {
+						auto size = shape.find("size");
+						if (size != shape.end()) {
+							std::vector<float> s = size->get<std::vector<float>>();
+							shapeColl = new btCylinderShape(btVector3(s[0], s[1], s[2]));
+						}
+						else {
+							shapeColl = new btCylinderShape(btVector3(1.0f, 1.0f, 1.0f));
+						}
 					}
-					else {
-						shapeColl = new btSphereShape(1.0f);
-					}
-				}
-				else if (shapeName == "Cylinder") {
-					auto size = it->find("size");
-					if (size != it->end()) {
-						std::vector<float> s = size->get<std::vector<float>>();
-						shapeColl = new btCylinderShape(btVector3(s[0], s[1], s[2]));
-					}
-					else {
-						shapeColl = new btCylinderShape(btVector3(1.0f, 1.0f, 1.0f));
-					}
-				}
-				else if (shapeName == "Cone") {
-					auto radius = it->find("radius");
-					auto height = it->find("height");
+					else if (shapeName == "Cone") {
+						auto radius = shape.find("radius");
+						auto height = shape.find("height");
 
-					if (radius != it->end() && height != it->end()) {
-						float r = it->get<float>();
-						float h = it->get<float>();
-						shapeColl = new btConeShape(r, h);
+						if (radius != shape.end() && height != shape.end()) {
+							float r = radius->get<float>();
+							float h = height->get<float>();
+							shapeColl = new btConeShape(r, h);
+						}
+						else {
+							shapeColl = new btConeShape(1.0f, 1.0f);
+						}
 					}
-					else {
-						shapeColl = new btConeShape(1.0f, 1.0f);
+					else if (shapeName == "Capsule") {
+						auto radius = shape.find("radius");
+						auto height = shape.find("height");
+						if (radius != shape.end() && height != shape.end()) {
+							float r = radius->get<float>();
+							float h = height->get<float>();
+							shapeColl = new btCapsuleShape(r, h);
+						}
+						else {
+							shapeColl = new btCapsuleShape(1.0f, 1.0f);
+						}
 					}
-				}
-				else if (shapeName == "Capsule") {
-					auto radius = it->find("radius");
-					auto height = it->find("height");
-					if (radius != it->end() && height != it->end()) {
-						float r = it->get<float>();
-						float h = it->get<float>();
-						shapeColl = new btCapsuleShape(r, h);
-					}
-					else {
-						shapeColl = new btCapsuleShape(1.0f, 1.0f);
-					}
-				}
 
-				setCollisionShape(shapeColl);
+					setCollisionShape(shapeColl);
+				}
+				
 			}
 		}
 	}
