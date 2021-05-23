@@ -245,10 +245,9 @@ void PapagayoEngine::update(float delta)
 			running_ = run;
 		}
 		else {
-			render->update(delta);
-			phys->update(delta);
-
 			lua->update(delta);
+			phys->update(delta);
+			render->update(delta);
 			mSM->update();
 		}
 	}
@@ -265,6 +264,7 @@ void PapagayoEngine::update(float delta)
 void PapagayoEngine::fixedUpdate(float delta) {
 	try {
 		lua->fixedUpdate(delta);
+		phys->fixedUpdate(delta);
 	}
 	catch (const std::exception& e)
 	{

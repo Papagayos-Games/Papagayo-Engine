@@ -65,9 +65,10 @@ void RenderManager::start()
 
 void RenderManager::update(float deltaTime)
 {
-	ogreRoot_->renderOneFrame();	//TODO: esto no lo esta lanzando el RenderManager
 	for (Component* cmp : _compsList)
 	{
 		cmp->update(deltaTime);
 	}
+	ogreRoot_->renderOneFrame();	//TODO: esto no lo esta lanzando el RenderManager
+
 }

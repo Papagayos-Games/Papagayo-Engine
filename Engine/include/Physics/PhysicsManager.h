@@ -80,6 +80,7 @@ public:
 	virtual void addComponent(Entity* ent, int compId);
 	virtual void start();
 	virtual void update(float deltaTime);
+	virtual void fixedUpdate(float deltaTime);
 
 	static void clean();
 	static void destroy();
