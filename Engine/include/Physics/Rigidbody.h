@@ -30,7 +30,7 @@ private:
 	Transform* tr_ = nullptr;
 	bool trigger = false;
 	bool meshShape = true;
-	CollisionObject* co=nullptr;
+	CollisionObject* co = nullptr;
 
 	bool collidesWithEntity(Entity* other) const;
 public:
@@ -104,7 +104,10 @@ public:
 	//btRigidBody* getBtRb();
 	btRigidBody* getBtRb() const;
 
-	int getGroup()const ;
+	//metodo que nos devuelve el grupo de colision
+	int getGroup()const;
+
+	//metodo que nos devuelve la mascara de colision
 	int getMask()const;
 #pragma endregion
 
@@ -127,6 +130,8 @@ public:
 	//dentro de la escena especifica
 	Entity* collidesWithTag(const std::string& tag) const;
 
+	// Configura el userPtr como un objeto de colision
+	// para gestionar eventos de colision
 	void setUserPtr(CollisionObject* co);
 #pragma endregion
 };

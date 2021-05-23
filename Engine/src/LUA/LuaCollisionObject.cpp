@@ -5,7 +5,7 @@
 LuaCollisionObject::LuaCollisionObject(LuaComponent* ptr):CollisionObject()
 {
 	_ptr = ptr;
-	coll_ent_ = _ptr->getEntity();
+	setEntity( _ptr->getEntity());
 }
 LuaCollisionObject::~LuaCollisionObject()
 {

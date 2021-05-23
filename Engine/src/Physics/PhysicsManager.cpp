@@ -45,8 +45,8 @@ void PhysicsManager::checkCollision()
 		btPersistentManifold* contactManifold = dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
 		const btCollisionObject* obA = contactManifold->getBody0();
 		const btCollisionObject* obB = contactManifold->getBody1();
-		/* Check all contacts points */
 
+		/* Check all contacts points */
 		int numContacts = contactManifold->getNumContacts();
 		std::cout << numContacts << '\n';
 
@@ -55,26 +55,18 @@ void PhysicsManager::checkCollision()
 			btManifoldPoint& pt = contactManifold->getContactPoint(j);
 			if (pt.getDistance() < 0.f)
 			{
-				const btVector3& ptA = pt.getPositionWorldOnA();
-				const btVector3& ptB = pt.getPositionWorldOnB();
-				const btVector3& normalOnB = pt.m_normalWorldOnB;
-				bool x = (ContactProcessedCallback)(pt, obA, obB);
-
-
 				CollisionObject* coA = static_cast<CollisionObject*>(obA->getUserPointer());
 				CollisionObject* coB = static_cast<CollisionObject*>(obB->getUserPointer());
-
 
 				if (newContacts.find(obA) == newContacts.end())
 				{
 					newContacts[obA] = { coA,coB };
 				}
-
 			}
 		}
 	}
-	/* Check for added contacts ... */
 
+	/* Check for added contacts ... */
 	std::map<const btCollisionObject*, std::pair< CollisionObject*, CollisionObject*>>::iterator it;
 
 	if (!newContacts.empty())
@@ -83,27 +75,23 @@ void PhysicsManager::checkCollision()
 		{
 			if (contacts.find((*it).first) == contacts.end())
 			{
-				(*it).second.first->onCollisionEnter((*it).second.second->coll_ent_);
-				//coB->onCollisionEnter(coA->coll_ent_);
+				(*it).second.first->onCollisionEnter((*it).second.second->getEntity());
 			}
 			else
 			{
 				// Remove to filter no more active contacts
-				(*it).second.first->onCollisionStay((*it).second.second->coll_ent_);
+				(*it).second.first->onCollisionStay((*it).second.second->getEntity());
 				contacts.erase((*it).first);
 			}
 		}
 	}
-
 
 	/* ... and removed contacts */
 	if (!contacts.empty())
 	{
 		for (it = contacts.begin(); it != contacts.end(); it++)
 		{
-			// TODO: signal
-			(*it).second.first->onCollisionExit((*it).second.second->coll_ent_);
-
+			(*it).second.first->onCollisionExit((*it).second.second->getEntity());
 		}
 		contacts.clear();
 	}

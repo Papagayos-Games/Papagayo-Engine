@@ -34,12 +34,14 @@ void LuaComponent::load(const nlohmann::json& params)
 		fileName_ = "default";
 		throw std::exception("Assigned LUA component couldn't be instantiated\n");
 	}
-	if (_entity->hasComponent((int)ManID::Physics, 0))
 
-	if(class_["onCollisionEnter"].isFunction() || class_["onCollisionStay"].isFunction() || class_["onCollisionExit"].isFunction())
-	{
-		static_cast<RigidBody*>(_entity->getComponent((int)ManID::Physics, 0))->setUserPtr(new LuaCollisionObject(this));
+	if (_entity->hasComponent((int)ManID::Physics, 0)) {
+		if (class_["onCollisionEnter"].isFunction() || class_["onCollisionStay"].isFunction() || class_["onCollisionExit"].isFunction())
+		{
+			static_cast<RigidBody*>(_entity->getComponent((int)ManID::Physics, 0))->setUserPtr(new LuaCollisionObject(this));
+		}
 	}
+
 	(*self_) = LUAManager::getInstance()->getLuaClass(fileName_)["instantiate"](params.dump(), getEntity())[0];
 	
 #ifdef _DEBUG

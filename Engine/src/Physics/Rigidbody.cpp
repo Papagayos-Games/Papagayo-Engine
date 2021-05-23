@@ -60,7 +60,7 @@ RigidBody::~RigidBody()
 
 void RigidBody::setUp()
 {
-	co->coll_ent_ = _entity;
+	co->setEntity(_entity);
 	tr_ = static_cast<Transform*>(_entity->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
 	btQuaternion q;
 	Vector3 vRot = tr_->getRot();
