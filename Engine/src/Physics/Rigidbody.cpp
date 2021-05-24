@@ -255,10 +255,25 @@ void RigidBody::load(const nlohmann::json& params)
 	if (it != params.end() && it->is_number()) {
 		 rb->getBroadphaseProxy()->m_collisionFilterGroup = it->get<short>();
 	}
+
 	// Mascara
 	it = params.find("mask");
 	if (it != params.end() && it->is_number()) {
 		rb->getBroadphaseProxy()->m_collisionFilterMask = it->get<short>();
+	}
+
+	// Factor lineal
+	it = params.find("linearFactor");
+	if (it != params.end()) {
+		std::vector<float> newLinFact = it->get<std::vector<float>>();
+		setLinearFactor(newLinFact);
+	}
+
+	// Factor Angular
+	it = params.find("angularFactor");
+	if (it != params.end()) {
+		std::vector<float> newAngFact = it->get<std::vector<float>>();
+		setAngularFactor(newAngFact);
 	}
 }
 
@@ -345,6 +360,14 @@ void RigidBody::setCollisionShape(btCollisionShape* newShape)
 {
 	delete rb->getCollisionShape();
 	rb->setCollisionShape(newShape);
+}
+void RigidBody::setLinearFactor(const Vector3& axis)
+{
+	rb->setLinearFactor(cvt(axis));
+}
+void RigidBody::setAngularFactor(const Vector3& axis)
+{
+	rb->setAngularFactor(cvt(axis));
 }
 #pragma endregion
 

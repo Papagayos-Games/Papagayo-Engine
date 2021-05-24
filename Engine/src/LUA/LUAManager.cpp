@@ -181,6 +181,8 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("collidesWithTag", &RigidBody::collidesWithTag)
 		.addFunction("getGroup", &RigidBody::getGroup)
 		.addFunction("getMask", &RigidBody::getMask)
+		.addFunction("setLinearFactor", &RigidBody::setLinearFactor)
+		.addFunction("setAngularFactor", &RigidBody::setAngularFactor)
 		.endClass();
 
 	//graphics

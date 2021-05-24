@@ -82,6 +82,12 @@ public:
 
 	//Cambia el la forma del rigidbody (ShapeCollision)
 	void setCollisionShape(btCollisionShape* newShape);
+
+	// Permite el movimiento solo en los ejes que se pasen como parametro
+	void setLinearFactor(const Vector3& axis);
+
+	// Permite rotar solo en los ejes que se pasen como parametro
+	void setAngularFactor(const Vector3& axis);
 #pragma endregion
 
 #pragma region Getters
