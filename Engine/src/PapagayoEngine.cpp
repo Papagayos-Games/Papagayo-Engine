@@ -112,6 +112,9 @@ void PapagayoEngine::destroy()
 	input->destroy();
 	audio->destroy();
 
+	// fisicas
+	phys->destroy();
+
 	// render
 	render->destroy();
 	gui->destroy();
@@ -120,9 +123,6 @@ void PapagayoEngine::destroy()
 
 	// common
 	common->destroy();
-
-	// fisicas
-	phys->destroy();
 
 	// logica
 	lua->destroy();

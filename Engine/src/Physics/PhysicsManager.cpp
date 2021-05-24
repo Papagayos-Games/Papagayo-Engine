@@ -123,16 +123,14 @@ void PhysicsManager::init(const Vector3 gravity) {
 	dynamicsWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
 
 #ifdef _DEBUG
-	//mDebugDrawer_ = new OgreDebugDrawer(OgreContext::getInstance()->getSceneManager());
-	//mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	//dynamicsWorld->setDebugDrawer(mDebugDrawer_);
+	mDebugDrawer_ = new OgreDebugDrawer(OgreContext::getInstance()->getSceneManager());
+	mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+	dynamicsWorld->setDebugDrawer(mDebugDrawer_);
 #endif // DEBUG
 }
 
 void PhysicsManager::destroyWorld()
 {
-	delete dynamicsWorld; dynamicsWorld = nullptr;
-
 	delete collConfig; collConfig = nullptr;
 
 	delete collDispatcher; collDispatcher = nullptr;
@@ -142,6 +140,8 @@ void PhysicsManager::destroyWorld()
 	delete constraintSolver; constraintSolver = nullptr;
 
 	delete mDebugDrawer_; mDebugDrawer_ = nullptr;
+
+	delete dynamicsWorld; dynamicsWorld = nullptr;
 }
 
 void PhysicsManager::destroyRigidBody(btRigidBody* body)
@@ -210,7 +210,7 @@ void PhysicsManager::update(float deltaTime)
 	}
 
 #ifdef _DEBUG
-	//dynamicsWorld->debugDrawWorld();
+	dynamicsWorld->debugDrawWorld();
 #endif // _DEBUG
 
 }
