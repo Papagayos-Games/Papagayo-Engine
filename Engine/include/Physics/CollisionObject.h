@@ -3,6 +3,7 @@
 
 class Entity;
 
+//Clase auxiliar para gestionar las colisiones entre las entidades del juego
 class CollisionObject
 {
 public:

@@ -10,18 +10,17 @@ class Rigidbody;
 
 class LuaComponent : public Component {
 private:
-	//luabridge::LuaRef* class_;
+	//Referencia a la tabla asociada a este componente de LUA
 	luabridge::LuaRef* self_;
 
 	//Referencia al LUASTATE
 	lua_State* currState = nullptr;
 	
-
 	//Gestión de errores
 	std::error_code errorCode;
 
+	//Nombre del fichero asociado a este componente
 	std::string fileName_;
-
 
 public:
 	LuaComponent(const std::string& fileName = "default", int id = 0);
@@ -38,9 +37,11 @@ public:
 
 	void fixedUpdate(float deltaTime);
 
+	//Getter: Filename
 	const std::string& getFileName();
 	const std::string& getFileName() const;
-	const luabridge::LuaRef* getSelf() const;
 
+	//Getter: tabla de lua asociada a este componente
+	const luabridge::LuaRef* getSelf() const;
 
 };

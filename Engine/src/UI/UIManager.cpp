@@ -84,8 +84,6 @@ bool UIManager::setUpInstance() {
 
 void UIManager::clean()
 {
-	//if (instance_->sch != nullptr)
-	//	delete instance_->sch;
 	instance_->destroyAllComponents();
 	for (int i = 0; i < instance_->ceguiWindows.size(); i++) {
 		instance_->guiWinMng->destroyWindow(instance_->ceguiWindows[i]);
@@ -95,7 +93,6 @@ void UIManager::clean()
 void UIManager::destroy()
 {
 	clean();
-	//CEGUI::SchemeManager::getSingleton().destroyAll();
 	CEGUI::OgreRenderer::destroySystem();
 	delete instance_;
 }
@@ -121,10 +118,6 @@ void UIManager::windowResized(Ogre::RenderWindow* rw)
 void UIManager::loadScheme(const std::string& schemeName_, const std::string& schemeFile)
 {
 	schemeName = schemeName_;
-	
-	//if (sch != nullptr)
-	//	delete sch;
-	
 	sch = &CEGUI::SchemeManager::getSingleton().createFromFile(schemeFile);
 }
 

@@ -78,13 +78,11 @@ void PhysicsManager::checkCollision()
 			if (contacts.find((*it).first) == contacts.end())
 			{
 				(*it).second.first->onCollisionEnter((*it).second.second->getEntity());
-				//(*it).second.second->onCollisionEnter((*it).second.first->getEntity());
 			}
 			else
 			{
 				// Remove to filter no more active contacts
 				(*it).second.first->onCollisionStay((*it).second.second->getEntity());
-				//(*it).second.second->onCollisionStay((*it).second.first->getEntity());
 				contacts.erase((*it).first);
 			}
 		}
@@ -97,7 +95,6 @@ void PhysicsManager::checkCollision()
 		for (it = contacts.begin(); it != contacts.end(); it++)
 		{
 			(*it).second.first->onCollisionExit((*it).second.second->getEntity());
-			//(*it).second.second->onCollisionExit((*it).second.first->getEntity());
 		}
 		contacts.clear();
 	}
@@ -168,20 +165,12 @@ btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass, int group, int ma
 	transform.setIdentity();
 	transform.setOrigin(btVector3(pos.x, pos.y, pos.z));
 
-	//btBoxShape shapeColl = btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
-
-	//btDefaultMotionState motion = btDefaultMotionState(transform);
-
 	btRigidBody::btRigidBodyConstructionInfo info(mass, new btDefaultMotionState(transform), new btBoxShape(btVector3(1.0f, 1.0f, 1.0f)));
 	btRigidBody* rb = new btRigidBody(info);
 
 	rb->forceActivationState(DISABLE_DEACTIVATION);
 
 	dynamicsWorld->addRigidBody(rb, group, mask);
-
-	//rbs.push_back(rb);
-	/*shapes_.push_back(box);
-	states_.push_back(motion);*/
 
 	return rb;
 }

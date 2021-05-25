@@ -130,10 +130,6 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addProperty("x", &Vector3::x)
 		.addProperty("y", &Vector3::y)
 		.addProperty("z", &Vector3::z)
-		.addFunction("add", &Vector3::operator+=)
-		.addFunction("substract", &Vector3::operator-=)
-		.addFunction("multiplyByNumber",&Vector3::operator*=)
-		.addFunction("isEqual", &Vector3::operator==)
 		.addFunction("normalize", &Vector3::normalize)
 		.endClass();
 	
@@ -215,6 +211,9 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 	getGlobalNamespace(L).beginClass<OgreContext>("OgreContext")
 		.addFunction("getWindowWidth", &OgreContext::getWindowWidth)
 		.addFunction("getWindowHeight", &OgreContext::getWindowHeight)
+		.addFunction("setSkyPlane", &OgreContext::setSkyPlane)
+		.addFunction("changeMaterialScroll", &OgreContext::changeMaterialScroll)
+		.addFunction("createZPlane", &OgreContext::createZPlane)
 		.endClass();
 	//UI
 	getGlobalNamespace(L).deriveClass<UIButton, Component>("Button")
@@ -256,19 +255,8 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getOgreContext", &LUAManager::getOgreContext)
 		.addFunction("changeScene", &LUAManager::changeScene)
 		.addFunction("closeApp", &LUAManager::closeApp)
-		.addFunction("setSkyPlane", &LUAManager::closeApp)
-		.addFunction("setMusic", &LUAManager::closeApp)
+		.addFunction("setMusic", &LUAManager::setMusic)
 		.endClass();
-}
-
-void LUAManager::setSkyPlane(std::string skyPlane) {
-
-	try {
-		OgreContext::getInstance()->setSkyPlane(skyPlane, Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
-	}
-	catch (std::exception& e) {
-		std::cout << "El nombre /" << skyPlane << "/ es inapropiado.\n" << e.what() << std::endl;
-	}
 }
 
 void LUAManager::setMusic(std::string music) {

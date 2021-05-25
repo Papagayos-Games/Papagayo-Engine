@@ -58,7 +58,6 @@ void Scene::killEntity(Entity* e)
 
 void Scene::addEntity(const std::string& name, Entity* ent)
 {
-    //entities.pushback(name, ent);
     std::string n = name;
     if (usedNames.find(name) != usedNames.end())
         n += SPECIAL_CHAR + std::to_string(++usedNames[name]);

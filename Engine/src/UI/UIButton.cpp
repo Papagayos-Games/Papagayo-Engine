@@ -70,10 +70,6 @@ void UIButton::load(const nlohmann::json& params)
 
 	//Reposicionamiento para que parezca que el pivote esta
 	//en el centro del boton (esto se puede meter en el resto de WBidgets)
-	//vector2 sizeN = normalizeVector2(size);
-	
-	//position.first -= sizeN.first / 2;
-	//position.second -= sizeN.second/ 2;
 
 	uiWindow = UIManager::getInstance()->createButton(text, pos, size, name, type);
 	uiWindow->subscribeEvent(

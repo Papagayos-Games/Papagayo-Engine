@@ -55,11 +55,18 @@ public:
 	/// </param>
 	void init(std::string schemeName, std::string schemeFile,
 		std::string fontFile, std::string startScene, std::string music, std::string skyPlane);
+	
+	//Destruccion de todos los managers y sus respectivos componentes asociados
 	void destroy();
+	//Limpieza de sus  managers y sus respectivos componentes
 	void clean();
+	//Inicializar managers del motor
 	void start();
+	//Bucle principal del juego
 	void run();
+	//Cerrar aplicacion
 	void closeApp();
+
 	const std::map<std::string, Manager*>& getManagers();
 	const std::map<std::string, Manager*>& getManagers() const;
 	

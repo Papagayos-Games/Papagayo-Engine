@@ -41,20 +41,11 @@ private:
 	OgreDebugDrawer* mDebugDrawer_ = nullptr;
 
 	std::map<const btCollisionObject*, std::pair<CollisionObject*,  CollisionObject*>> contacts;
-	
-
-	//esto hay que ver si al eliminar el vector de rigidbodies deja basura y si es asi entonces es porque hay que eliminar
-	//por partes el shape y el motionstate
-	/*std::vector<btBoxShape*> shapes_;
-	std::vector<btMotionState*> states_;*/
 
 	PhysicsManager();
 	virtual ~PhysicsManager();
 
 	void checkCollision();
-
-	//TO ERASE
-	bool applyTorque = true;
 
 public:
 

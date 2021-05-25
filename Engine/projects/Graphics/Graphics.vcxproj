@@ -35,7 +35,6 @@
     <ClCompile Include="..\..\src\Graphics\PlaneComponent.cpp" />
     <ClCompile Include="..\..\src\Graphics\RenderManager.cpp" />
     <ClCompile Include="..\..\src\Graphics\RTShaderTecnhiqueResolveListener.cpp" />
-    <ClCompile Include="..\..\src\Graphics\SkyPlaneComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">

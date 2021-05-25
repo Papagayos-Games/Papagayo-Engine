@@ -15,52 +15,6 @@ InputSystem::InputSystem()
 {
 }
 
-/*void InputSystem::update()
-{
-	clearState();
-	// For later knowing if the mouse moved
-	SDL_Event e;
-
-	///
-	for (int i = 0; i < numKeys_; ++i) {
-		lastKeyboardState_[i] = keyboardState_[i];
-	}
-
-	while (SDL_PollEvent(&e))
-	{
-		switch (e.type) {
-		case SDL_KEYDOWN:
-			keyboardEvent_ = true;
-			if (read)
-			{
-				lstKey = e.key.keysym.scancode;
-
-			}
-			break;
-		case SDL_KEYUP:
-
-			keyboardEvent_ = true;
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-			mouseEvent_ = true;
-			onMouseChange(e, true);
-			break;
-		case SDL_MOUSEBUTTONUP:
-			mouseEvent_ = true;
-			onMouseChange(e, false);
-			break;
-		case SDL_MOUSEMOTION:
-			onMouseMotion(e);
-			break;
-		}
-	}
-
-	// After mouse has updated its position, update the mouse movement
-	mouseMovementInFrame_ = mousePos_ - tempMousePos;
-}*/
-
-
-
 InputSystem::~InputSystem()
 {
 }
@@ -149,6 +103,7 @@ uint32_t InputSystem::getTicks()const
 	return SDL_GetTicks();
 }
 
-void InputSystem::onMouseMotion(SDL_Event& e) const
+SDL_Scancode InputSystem::lastKey()
 {
+	return lstKey;
 }

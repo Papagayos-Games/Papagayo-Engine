@@ -212,7 +212,7 @@ void PapagayoEngine::init(std::string schemeName, std::string schemeFile,
 
 	try
 	{
-		ogre->setSkyPlane(skyPlane, Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
+		ogre->setSkyPlane(skyPlane, -70, 10, 10, 4.0);
 	}
 	catch (const std::exception& e) {
 		std::cout << "Fallo al cargar el SkyPlane /" << skyPlane<< "/\n";

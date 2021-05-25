@@ -52,13 +52,9 @@ OgreDebugDrawer::OgreDebugDrawer(Ogre::SceneManager* scm)
     mContactPoints2_ = {};
     mContactPoints_ = &mContactPoints1_;
     mLines_ = new Ogre::ManualObject("physics lines");
-    //ASSERT(mLines);
     mTriangles_ = new Ogre::ManualObject("physics triangles");
-    // ASSERT(mTriangles);
     mLines_->setDynamic(true);
     mTriangles_->setDynamic(true);
-    // mLines->estimateVertexCount( 100000 );
-    // mLines->estimateIndexCount( 0 );
 
     scm->getRootSceneNode()->attachObject(mLines_);
     scm->getRootSceneNode()->attachObject(mTriangles_);
@@ -71,10 +67,8 @@ OgreDebugDrawer::OgreDebugDrawer(Ogre::SceneManager* scm)
     mtl->setDepthBias(0.1f, 0.0f);
     Ogre::TextureUnitState* tu =
         mtl->getTechnique(0)->getPass(0)->createTextureUnitState();
-    // ASSERT(tu);
     tu->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_DIFFUSE);
     mtl->getTechnique(0)->setLightingEnabled(false);
-    // mtl->getTechnique(0)->setSelfIllumination( ColourValue::White );
 
     mLines_->begin(matName, Ogre::RenderOperation::OT_LINE_LIST);
     mLines_->position(Ogre::Vector3::ZERO);

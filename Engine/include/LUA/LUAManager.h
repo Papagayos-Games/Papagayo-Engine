@@ -47,7 +47,6 @@ private:
 	
 	bool CheckLua(lua_State* L, int r);
 	void registerClassAndFunctions(lua_State* L);
-	void setSkyPlane(std::string skyPlane);
 	void setMusic(std::string music);
 	bool reloadLuaScript(lua_State* L, const std::string& luafile);
 

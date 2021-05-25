@@ -26,7 +26,9 @@ private:
     Ogre::Entity* ent_ = nullptr;
 public:
     PlaneComponent();
+    virtual ~PlaneComponent();
 
+    //Cambiar el material asociado al plano
     void setMaterial(const std::string& matName);
     virtual void init();
     virtual void update(float deltaTime);

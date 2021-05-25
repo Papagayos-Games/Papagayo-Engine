@@ -55,9 +55,6 @@ void SceneManager::loadScene(const std::string& sceneName)
 	currentScene_->setName(sceneName);
 	//la llena de objetos
 	loader_->loadEntities(sceneName, currentScene_);
-
-	//json j = ResourceManager::getInstance()->getSceneFile(sceneName);
-	//currentScene_->load(j);
 }
 
 void SceneManager::cleanupScene()
@@ -107,7 +104,6 @@ void SceneManager::changeScene(const std::string& sceneName)
 
 void SceneManager::createStartScene(const std::string& startScene) {
 	
-	//sceneFiles_ = loader_->loadScenes("Scenes/scenes.json");
 	sceneFiles_ = loader_->loadScenes(startScene);
 	loadScene(sceneFiles_[0]);
 }

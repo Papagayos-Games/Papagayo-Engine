@@ -24,18 +24,16 @@ private:
 public:
 	//constructora por defecto
 	MeshComponent();
-	//consructora para crear un nodo hijo de otro nodo
-	//MeshComponent(Ogre::SceneNode* parentNode,const std::string meshName);
+	virtual ~MeshComponent();
 
 	//metodo para desactivar el componente y su nodo
 	virtual void setActive( bool act) override;
-	
-	virtual ~MeshComponent();
 	virtual void update(float deltaTime) override;
 	virtual void setUp() override;
 	virtual void load(const nlohmann::json& params) override;
 	virtual void init()override;
 
+	//Obtener la entidad de ogre asociada a este mesh
 	Ogre::Entity* getOgreEntity();
 	//metodo para asignar un material nuevo a la entidad
 	void setMaterial(const std::string& matName);

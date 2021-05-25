@@ -1,5 +1,3 @@
-
-
 #include "LoaderSystem.h"
 
 #include "Scene/Scene.h"
@@ -14,11 +12,6 @@
 #include <iostream>
 #include <LUA/LUAManager.h>
 
-
-
-//#include "Scene.h"
-
-// nlohmann::json;
 
 std::vector<std::string> LoaderSystem::loadScenes(const std::string& fileName)
 {

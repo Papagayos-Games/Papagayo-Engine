@@ -20,7 +20,7 @@
 
 OgreContext* OgreContext::instance_ = nullptr;
 
-OgreContext::OgreContext(const std::string& appName) : 
+OgreContext::OgreContext(const std::string& appName) :
 	mResourcesCfg(Ogre::BLANKSTRING),
 	mPluginsCfg(Ogre::BLANKSTRING)
 {
@@ -39,7 +39,7 @@ bool OgreContext::setUpInstance(const std::string& appName)
 		try {
 			instance_ = new OgreContext(appName);
 		}
-		catch (...){
+		catch (...) {
 			return false;
 		}
 	}
@@ -79,7 +79,7 @@ void OgreContext::createRoot()
 #else
 	mResourcesCfg = "Ogre/resources.cfg";
 	mPluginsCfg = "Ogre/plugins.cfg";
-	mOgreCfg =  "Ogre/ogre.cfg";
+	mOgreCfg = "Ogre/ogre.cfg";
 #endif
 	ogreRoot_ = new Ogre::Root(mPluginsCfg, mOgreCfg);
 
@@ -92,7 +92,7 @@ void OgreContext::createRoot()
 	ogreRoot_->initialise(false);
 }
 
-void OgreContext::createWindow()  
+void OgreContext::createWindow()
 {
 	Ogre::ConfigOptionMap ropts = ogreRoot_->getRenderSystem()->getConfigOptions();
 
@@ -198,14 +198,23 @@ void OgreContext::setupRTShaderGenerator()
 	}
 }
 
+void OgreContext::changeMaterialScroll(const std::string& materialName, float x, float y)
+{
+	auto mat = Ogre::MaterialManager::getSingleton().getByName(materialName);
+	auto t = mat->getTechnique(0)->getPass(0)->getTextureUnitStates();
+
+	if (t.size() > 0)t[0]->setScrollAnimation(x, y);
+}
+
+Ogre::Plane OgreContext::createZPlane(float distance)
+{
+	return Ogre::Plane(Ogre::Vector3::UNIT_Z, distance);
+}
+
 #pragma endregion
 
 void OgreContext::clean()
 {
-	//Destruir SceneManager
-	//intance_->mShaderGenerator_->removeSceneManager(instance_->mSM);
-	//instance_->mShaderGenerator_->addSceneManager(instance_->mSM); // TO DO: Devolverselo en el cambio de escena
-	//instance_->ogreRoot_->destroySceneManager(instance_->mSM);
 	OgreContext::getInstance()->getRenderWindow()->removeAllViewports();
 }
 
@@ -213,14 +222,14 @@ void OgreContext::destroy()
 {
 	clean();
 	instance_->mShaderGenerator_->removeSceneManager(instance_->mSM);
-	//instance_->mShaderGenerator_->addSceneManager(instance_->mSM); // TO DO: Devolverselo en el cambio de escena
 	instance_->ogreRoot_->destroySceneManager(instance_->mSM);
 	delete instance_;
 }
 
-void OgreContext::setSkyPlane(const std::string& materialName, const Ogre::Plane& plane, int width, int height, float bow)
+void OgreContext::setSkyPlane(const std::string& materialName, float planeDist, int width, int height, float bow)
 {
-	mSM->setSkyPlane(true, plane, materialName, 1, 1, true, bow, width, height);
+	mSM->setSkyPlane(true, Ogre::Plane(Ogre::Vector3::UNIT_Z, planeDist), materialName, 1, 1, true, bow, width, height);
+
 }
 
 OgreContext::~OgreContext()
@@ -299,7 +308,7 @@ SDL_Window* OgreContext::getSDLWindow() const
 
 uint32_t OgreContext::getWindowWidth() const
 {
-	return  windowWidth	;
+	return  windowWidth;
 }
 uint32_t OgreContext::getWindowHeight() const
 {

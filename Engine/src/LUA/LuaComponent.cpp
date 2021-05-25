@@ -4,8 +4,6 @@
 #include "lua.hpp"
 #include "Entity.h"
 #include "LuaCollisionObject.h"
-
-
 #include "checkML.h"
 
 LuaComponent::LuaComponent(const std::string& fileName, int id) : Component(LUAManager::getInstance(), id), fileName_(fileName)
@@ -63,8 +61,6 @@ void LuaComponent::fixedUpdate(float deltaTime)
 {
 	LUAManager::getInstance()->getLuaClass(fileName_)["fixedUpdate"](self_, LUAManager::getInstance(), deltaTime);
 }
-
-
 
 const std::string& LuaComponent::getFileName()
 {

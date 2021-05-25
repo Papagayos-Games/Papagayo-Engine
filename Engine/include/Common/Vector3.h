@@ -19,7 +19,7 @@ public:
 	Vector3(const std::vector<float>& pos);
 	//Constructor por copia
 	Vector3(const Vector3& other);
-	//Vector3(std::string s);
+
 	//Invertir todos los valores del vector
 	void invert();
 	// Optener la magnitud del vector

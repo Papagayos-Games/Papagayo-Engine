@@ -9,12 +9,6 @@
 #include <vector>
 #include <iterator>
 
-//#include "json.hpp"
-
-//namespace nlohmann {
-//    class json;
-//}
-
 class Entity;
 class Component;
 
@@ -37,11 +31,7 @@ public:
     std::list<Entity*>& getAllEntitiesWith(const std::string& name);
 
 private:
-    // la key seria el nombre del archivo
-    // std::map<std::string, Entity*> prefabs;
 
-    //std::list<Entity> entities_;
-    
     // para identificar con un nombre especifico
     std::map<std::string, Entity*> entities;
 
@@ -50,7 +40,6 @@ private:
 
     // para obtener todas las entidades con el mismo nombre general, no especifico
     std::map<std::string, std::list<Entity*>> pool_name;
-    //std::list<std::map<std::string, Entity*>::iterator> pool_name;
     
     // para saber cuantas veces se ha instanciado una entidad con el mismo nombre
     std::map<std::string, int> usedNames;

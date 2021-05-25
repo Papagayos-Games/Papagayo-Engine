@@ -30,36 +30,6 @@ Vector3::Vector3(const Vector3& other)
 	z = other.z;
 }
 
-// string format"[0.0, 0.0, 0.0]"
-/*Vector3::Vector3(std::string s)
-{
-	std::string delimiter = ",";
-	size_t pos = 0;
-	std::string value;
-	float values[3];
-	try {
-		s.erase(0, pos + delimiter.length());
-		s.erase(s.length() - 1, s.length());
-	}
-	catch (std::exception e) { throw std::exception("ERROR: Incorrect vector format\n"); }
-
-	int i = 0;
-	while ((pos = s.find(delimiter)) != std::string::npos) {
-		value = s.substr(0, pos);
-		s.erase(0, pos + delimiter.length());
-		try{ 
-			values[i++] = std::stof(value); 
-		}
-		catch(std::exception e) {
-			throw std::exception("ERROR: Incorrect vector format\n"); 
-		}
-		
-	}
-	x = values[0];
-	y = values[1];
-	z = std::stof(s);
-}*/
-
 void Vector3::invert()
 {
 	x = -x;

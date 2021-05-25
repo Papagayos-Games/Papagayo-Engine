@@ -77,12 +77,6 @@ void Camera::load(const nlohmann::json& params)
 		camNode_->lookAt(Ogre::Vector3(pos[0], pos[1], pos[2]), Ogre::Node::TS_WORLD);
 	}
 
-	//Tipo de camara
-	it = params.find("camType");
-	if (it != params.end()) {
-		int type = it->get<int>();
-		if (type == 0 || type == 1) type_ = (CameraType)type;
-	}
 
 	//Configurar el viewport para que no ocupe toda la ventana
 	it = params.find("viewport");
@@ -199,21 +193,11 @@ Vector3 Camera::getScreenCoordinates(const Vector3& iPoint)
 	return Vector3(((ogrePoint.x / 2.f) + 0.5f)*vp_->getActualWidth(), ((ogrePoint.y / 2.f) + 0.5f)*vp_->getActualHeight(), 0);
 }
 
-//const Vector3& Camera::getCameraPosition()
-//{
-//	Ogre::Vector3 aux = camNode_->getPosition();
-//	return Vector3(aux.x, aux.y, aux.z);
-//}
-
 const Vector3& Camera::getCameraPosition() const
 {
 	Ogre::Vector3 aux = camNode_->getPosition();
 	return Vector3(aux.x, aux.y, aux.z);
 }
-
-//Ogre::Camera* Camera::getCamera() {
-//	return mCamera_;
-//}
 
 Ogre::Camera* Camera::getCamera() const {
 	return mCamera_;
