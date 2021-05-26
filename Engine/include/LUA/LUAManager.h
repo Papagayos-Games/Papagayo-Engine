@@ -28,6 +28,7 @@ class Transform;
 class OgreContext;
 class Scene;
 class UIButton;
+class UIImage;
 class UILabel;
 class Scene;
 
@@ -75,6 +76,7 @@ public:
 
 	UIButton* getUIButton(Entity* ent);
 	UILabel* getUILabel(Entity* ent);
+	UIImage* getUIImage(Entity* ent);
 
 	void closeApp();
 

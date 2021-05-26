@@ -30,6 +30,7 @@
 #include "UIButton.h"
 #include "UILabel.h"
 #include "UIManager.h"
+#include "UIImage.h"
 
 //LUA
 #include "LuaComponent.h"
@@ -224,6 +225,10 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("setText", &UIButton::setText)
 		.endClass();
 
+	getGlobalNamespace(L).deriveClass<UIImage, Component>("Image")
+		.addFunction("setProperty", &UIComponent::setProperty)
+		.endClass();
+
 	getGlobalNamespace(L).deriveClass<UILabel, Component>("Label")
 		.addFunction("setText", &UILabel::setText)
 		.endClass();
@@ -257,6 +262,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("changeScene", &LUAManager::changeScene)
 		.addFunction("closeApp", &LUAManager::closeApp)
 		.addFunction("setMusic", &LUAManager::setMusic)
+		.addFunction("getUIImage", &LUAManager::getUIImage)
 		.endClass();
 }
 
@@ -378,6 +384,14 @@ UILabel* LUAManager::getUILabel(Entity* ent)
 	UILabel* b = nullptr;
 	if (ent->hasComponent((int)ManID::UI, (int)UIManager::UICmpId::Label))
 		b = static_cast<UILabel*>(ent->getComponent((int)ManID::UI, (int)UIManager::UICmpId::Label));
+	return b;
+}
+
+UIImage* LUAManager::getUIImage(Entity* ent)
+{
+	UIImage* b = nullptr;
+	if (ent->hasComponent((int)ManID::UI, (int)UIManager::UICmpId::Image))
+		b = static_cast<UIImage*>(ent->getComponent((int)ManID::UI, (int)UIManager::UICmpId::Image));
 	return b;
 }
 
