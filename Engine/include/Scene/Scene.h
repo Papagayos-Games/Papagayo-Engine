@@ -6,13 +6,8 @@
 #include <string>
 #include <list>
 #include <map>
+#include <vector>
 #include <iterator>
-
-//#include "json.hpp"
-
-//namespace nlohmann {
-//    class json;
-//}
 
 class Entity;
 class Component;
@@ -20,6 +15,8 @@ class Component;
 class Scene
 {
 public:
+    const char SPECIAL_CHAR = '_';
+
     Scene();
     ~Scene();
 
@@ -31,16 +28,26 @@ public:
     void setName(const std::string& s);
     const std::string& getName() const;
     Entity* getEntity(const std::string& name);
+    std::list<Entity*>& getAllEntitiesWith(const std::string& name);
 
 private:
-    // la key seria el nombre del archivo
-    // std::map<std::string, Entity*> prefabs;
 
-    //std::list<Entity> entities_;
+    // para identificar con un nombre especifico
     std::map<std::string, Entity*> entities;
+
+    // para borrar fuera del bucle principal
     std::list<std::map<std::string, Entity*>::iterator> entities_to_erase;
+
+    // para obtener todas las entidades con el mismo nombre general, no especifico
+    std::map<std::string, std::list<Entity*>> pool_name;
+    
+    // para saber cuantas veces se ha instanciado una entidad con el mismo nombre
     std::map<std::string, int> usedNames;
+
+    // nombre de la escena
     std::string name;
+
+    static std::list<Entity*> nullList;
 };
 
 #endif

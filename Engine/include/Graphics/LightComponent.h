@@ -43,7 +43,7 @@ public:
 	void setCastShadow(bool status);
 
 	virtual void init()override;
-	virtual void update()override;
+	virtual void update(float deltaTime) override;
 	virtual void setActive(bool status)override;
 	virtual void load(const nlohmann::json& params)override;
 };

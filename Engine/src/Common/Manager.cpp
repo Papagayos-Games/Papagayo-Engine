@@ -30,6 +30,7 @@ void Manager::destroyAllComponents() {
 	for (auto it = _compsList.begin(); it != _compsList.end(); it = _compsList.begin())
 	{
 		delete* it;
+		(*it) = nullptr;
 		_compsList.erase(it);
 	}
 }

@@ -6,6 +6,7 @@
 #include "Rigidbody.h"
 #include "Entity.h"
 #include "OgreContext.h"
+#include "CollisionObject.h"
 
 PhysicsManager* PhysicsManager::instance_ = nullptr;
 
@@ -34,7 +35,75 @@ PhysicsManager::PhysicsManager() : Manager(ManID::Physics) {
 };
 
 PhysicsManager::~PhysicsManager() {
-};
+}
+void PhysicsManager::checkCollision()
+{
+	std::map<const btCollisionObject*, std::pair< CollisionObject*, CollisionObject*>> newContacts;
+	int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
+	for (int i = 0; i < numManifolds; i++)
+	{
+		btPersistentManifold* contactManifold = dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+		const btCollisionObject* obA = contactManifold->getBody0();
+		const btCollisionObject* obB = contactManifold->getBody1();
+		/* Check all contacts points */
+
+		int numContacts = contactManifold->getNumContacts();
+		//std::cout << numContacts << '\n';
+
+		for (int j = 0; j < numContacts; j++)
+		{
+			btManifoldPoint& pt = contactManifold->getContactPoint(j);
+			if (pt.getDistance() < 0.f)
+			{
+				CollisionObject* coA = static_cast<CollisionObject*>(obA->getUserPointer());
+				CollisionObject* coB = static_cast<CollisionObject*>(obB->getUserPointer());
+
+				if (newContacts.find(obA) == newContacts.end())
+				{
+					newContacts[obA] = { coA,coB };
+					newContacts[obB] = { coB,coA };
+				}
+
+			}
+		}
+	}
+
+	/* Check for added contacts ... */
+	std::map<const btCollisionObject*, std::pair< CollisionObject*, CollisionObject*>>::iterator it;
+
+	if (!newContacts.empty())
+	{
+		for (it = newContacts.begin(); it != newContacts.end(); it++)
+		{
+			if (contacts.find((*it).first) == contacts.end())
+			{
+				(*it).second.first->onCollisionEnter((*it).second.second->getEntity());
+			}
+			else
+			{
+				// Remove to filter no more active contacts
+				(*it).second.first->onCollisionStay((*it).second.second->getEntity());
+				contacts.erase((*it).first);
+			}
+		}
+	}
+
+
+	/* ... and removed contacts */
+	if (!contacts.empty())
+	{
+		for (it = contacts.begin(); it != contacts.end(); it++)
+		{
+			(*it).second.first->onCollisionExit((*it).second.second->getEntity());
+		}
+		contacts.clear();
+	}
+
+	contacts = newContacts;
+
+}
+
+
 
 void PhysicsManager::init(const Vector3 gravity) {
 
@@ -51,16 +120,14 @@ void PhysicsManager::init(const Vector3 gravity) {
 	dynamicsWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
 
 #ifdef _DEBUG
-	//mDebugDrawer_ = new OgreDebugDrawer(OgreContext::getInstance()->getSceneManager());
-	//mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-	//dynamicsWorld->setDebugDrawer(mDebugDrawer_);
+	mDebugDrawer_ = new OgreDebugDrawer(OgreContext::getInstance()->getSceneManager());
+	mDebugDrawer_->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+	dynamicsWorld->setDebugDrawer(mDebugDrawer_);
 #endif // DEBUG
 }
 
 void PhysicsManager::destroyWorld()
 {
-	delete dynamicsWorld; dynamicsWorld = nullptr;
-
 	delete collConfig; collConfig = nullptr;
 
 	delete collDispatcher; collDispatcher = nullptr;
@@ -70,10 +137,16 @@ void PhysicsManager::destroyWorld()
 	delete constraintSolver; constraintSolver = nullptr;
 
 	delete mDebugDrawer_; mDebugDrawer_ = nullptr;
+
+	delete dynamicsWorld; dynamicsWorld = nullptr;
 }
 
 void PhysicsManager::destroyRigidBody(btRigidBody* body)
 {
+	auto it = contacts.find(body);
+	if (it != contacts.end()) {
+		contacts.erase(it);
+	}
 	dynamicsWorld->removeCollisionObject(body);
 	delete body->getCollisionShape();
 	delete body->getMotionState();
@@ -86,26 +159,18 @@ btDiscreteDynamicsWorld* PhysicsManager::getWorld() const
 	return dynamicsWorld;
 }
 
-btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass)
+btRigidBody* PhysicsManager::createRB(Vector3 pos, float mass, int group, int mask)
 {
 	btTransform transform;
 	transform.setIdentity();
 	transform.setOrigin(btVector3(pos.x, pos.y, pos.z));
-
-	//btBoxShape shapeColl = btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
-
-	//btDefaultMotionState motion = btDefaultMotionState(transform);
 
 	btRigidBody::btRigidBodyConstructionInfo info(mass, new btDefaultMotionState(transform), new btBoxShape(btVector3(1.0f, 1.0f, 1.0f)));
 	btRigidBody* rb = new btRigidBody(info);
 
 	rb->forceActivationState(DISABLE_DEACTIVATION);
 
-	dynamicsWorld->addRigidBody(rb);
-
-	//rbs.push_back(rb);
-	/*shapes_.push_back(box);
-	states_.push_back(motion);*/
+	dynamicsWorld->addRigidBody(rb, group, mask);
 
 	return rb;
 }
@@ -123,23 +188,27 @@ void PhysicsManager::start()
 	}
 }
 
-void PhysicsManager::update()
+void PhysicsManager::update(float deltaTime)
 {
 	dynamicsWorld->stepSimulation(1.f / 60.f, 10);
 
+	checkCollision();
+
 	for (auto it = _compsList.begin(); it != _compsList.end(); ++it) {
-		//if (applyTorque) {
-		//	applyTorque = false;
-		//	static_cast<RigidBody*>(*it)->addTorque(Vector3(0.0f, 0.0, -5.0), Forces::IMPULSE);
-		//	//static_cast<RigidBody*>(*it)->addForce(Vector3(0.0f, 1, 0.0f), Vector3(1.0f, 0.0, 1.0), Forces::IMPULSE);
-		//}
-		(*it)->update();
+		(*it)->update(deltaTime);
 	}
 
 #ifdef _DEBUG
-	//dynamicsWorld->debugDrawWorld();
+	dynamicsWorld->debugDrawWorld();
 #endif // _DEBUG
 
+}
+
+void PhysicsManager::fixedUpdate(float deltaTime)
+{
+	dynamicsWorld->stepSimulation(deltaTime, 10);
+
+	checkCollision();
 }
 
 void PhysicsManager::clean()
@@ -159,7 +228,7 @@ void PhysicsManager::destroyAllComponents()
 	while (!_compsList.empty()) {
 		auto i = _compsList.begin();
 		destroyRigidBody(static_cast<RigidBody*>((*i))->getBtRb());
-		delete *i;
+		delete* i;
 		_compsList.erase(i);
 	}
 }
@@ -170,7 +239,7 @@ bool PhysicsManager::destroyComponent(Entity* ent, int compId)
 	while (i != _compsList.end()) {
 		if (ent == (*i)->getEntity()) {
 			destroyRigidBody(static_cast<RigidBody*>((*i))->getBtRb());
-			delete *i;
+			delete* i;
 			_compsList.erase(i);
 			return true;
 		}

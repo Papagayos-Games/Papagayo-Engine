@@ -15,11 +15,6 @@ struct Vector2
 class InputSystem
 {
 public:
-	/*enum MouseButton : Uint8 {
-		Left = 0,
-		Right = 1,
-		Middle = 2
-	};*/
 
 	static InputSystem* getInstance();
 	static bool setUpInstance();
@@ -35,17 +30,14 @@ public:
 	int getMouseX()const { return mousePos.x; };
 	int getMouseY()const { return mousePos.y; };
 
-	SDL_Scancode lastKey()
-	{
-		return lstKey;
-	}
+	uint32_t getTicks() const;
+
+	SDL_Scancode lastKey();
 	
 private:
 	InputSystem();
 	virtual ~InputSystem();
 	static InputSystem* instance_;
-
-	void onMouseMotion(SDL_Event& e) const;
 	
 	// if in this frame there has been an event
 	int clickEvent_ = 0; // 1 Left, 2 Right

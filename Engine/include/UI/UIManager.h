@@ -37,7 +37,9 @@ private:
 	CEGUI::OgreRenderer* guiRenderer = nullptr;
 	//Referencia al scheme actual
 	CEGUI::Scheme* sch = nullptr;
-	
+
+	std::vector<CEGUI::Window*> ceguiWindows;
+
 	UIManager();
 	virtual ~UIManager();
 
@@ -53,7 +55,7 @@ public:
 	static void destroy();
 
 	virtual void start();
-	virtual void update();
+	virtual void update(float deltaTime);
 
 	void windowResized(Ogre::RenderWindow* rw);
 
@@ -100,29 +102,29 @@ public:
 	/// Se le aplica un tama�o 2D y un nombre que lo represente. Termina 
 	/// devolviendo un elemento CEGUI de tipo Window*
 	/// </summary>
-	CEGUI::Window* createButton(const std::string& text, vector2 position,
-		vector2 size, const std::string& name);
+	CEGUI::Window* createButton(const std::string& text, const vector2& position, const vector2& size,
+		const std::string& name, const std::string& type);
 
 	/// <summary>
 	/// Crea un deslizador en una posicion en 2D con un tama�o 2D y 
 	/// un nombre que lo represente. Termina devolviendo un elemento CEGUI
 	/// de tipo Window*
 	/// </summary>
-	CEGUI::Window* createSlider(vector2 position, vector2 size,
-		const std::string& name);
+	CEGUI::Window* createSlider(const vector2& position, const vector2& size,
+		const std::string& name, const std::string& type);
 	/// <summary>
 	/// Crea un etiqueta que contiene un texto y se coloca en el canvas en
 	/// una posicion y tama�o en 2D y con un nombre que lo represente
 	/// </summary>
-	CEGUI::Window* createLabel(const std::string& text, vector2 position,
-		vector2 size, const std::string& name = "");
+	CEGUI::Window* createLabel(const std::string& text, const vector2& position, const vector2& size,
+		const std::string& name, const std::string& type);
 	/// <summary>
 	/// Crea una imagen a partir de una ruta especifica que le diga d�nde 
 	/// se encuentra la fuente. Hace falta una posicion y un tama�o en 2D y tambien
 	/// un nombre que lo represente
 	/// </summary>
-	CEGUI::Window* createImage(const std::string& image, vector2 position,
-		vector2 size, const std::string& name = "");
+	CEGUI::Window* createImage(const vector2& position, const vector2& size,
+		const std::string& name, const std::string& type);
 #pragma endregion
 
 #pragma region INPUT
@@ -138,7 +140,7 @@ public:
 
 	CEGUI::OgreRenderer* getRenderer() const;
 	CEGUI::GUIContext* getContext() const;
-
+	CEGUI::WindowManager* getWindowMngr() const;
 #pragma endregion
 
 };

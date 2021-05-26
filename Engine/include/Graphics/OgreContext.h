@@ -61,6 +61,9 @@ private:
 	bool grab = false;
 	bool showCursor = false;
 	bool exit;
+   //width y height de la ventana
+	uint32_t windowWidth, windowHeight;
+
 
 	OgreContext(const std::string& appName);
 	virtual ~OgreContext();
@@ -77,8 +80,12 @@ public:
 	static void clean();
 	static void destroy();
 	//Hay que poner en el material un lighting off
-	void setSkyPlane(const std::string& materialName, const Ogre::Plane& plane, int width, int height, float bow);
+	void setSkyPlane(const std::string& materialName, float planeDist, int width, int height, float bow);
 	void setupRTShaderGenerator();
+	//Cambiar el scroll del material pasado por parametros
+	void changeMaterialScroll(const std::string& materialName, float x, float y);
+	//Crear un plano en el eje Z
+	Ogre::Plane createZPlane(float distance);
 
 //--------------GET-----------//
 	static OgreContext* getInstance();
@@ -94,6 +101,10 @@ public:
 	
 
 	SDL_Window* getSDLWindow() const;
+
+	uint32_t getWindowWidth()const;
+	uint32_t getWindowHeight()const;
+	
 };
 
 #endif

@@ -1,5 +1,3 @@
-#include "..\..\include\LUA\LUAManager.h"
-#include "..\..\include\LUA\LUAManager.h"
 #include "LUAManager.h"
 #include <iostream>
 
@@ -26,13 +24,25 @@
 #include <LightComponent.h>
 #include <PlaneComponent.h>
 #include <RenderManager.h>
+#include <OgreContext.h>
+
+//UI
+#include "UIButton.h"
+#include "UILabel.h"
+#include "UIManager.h"
+#include "UIImage.h"
 
 //LUA
 #include "LuaComponent.h"
 #include <LuaBridge.h>
 
-//
+//Papagayo
 #include "LoaderSystem.h"
+#include "Managers/SceneManager.h"
+#include "PapagayoEngine.h"
+
+//Audio
+#include "AudioSystem.h"
 
 using namespace luabridge;
 
@@ -51,6 +61,7 @@ bool LUAManager::CheckLua(lua_State* L, int r)
 
 LUAManager::~LUAManager()
 {
+	classes_.clear();
 	lua_close(L);
 	L = nullptr;
 }
@@ -81,11 +92,19 @@ void LUAManager::start()
 	}
 }
 
-void LUAManager::update()
+void LUAManager::update(float deltaTime)
 {
 	for (Component* cmp : _compsList)
 	{
-		cmp->update();
+		cmp->update(deltaTime);
+	}
+}
+
+void LUAManager::fixedUpdate(float deltaTime)
+{
+	for (Component* cmp : _compsList)
+	{
+		static_cast<LuaComponent*>(cmp)->fixedUpdate(deltaTime);
 	}
 }
 
@@ -104,24 +123,24 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 
 	getGlobalNamespace(L).beginClass<Entity>("Entity")
 		.addFunction("getName", &Entity::getName)
+		.addFunction("start", &Entity::start)
 		.endClass();
 
 	getGlobalNamespace(L).beginClass<Vector3>("Vector3")
-		.addConstructor<void (*) (float, float, float)>()
-		.addConstructor<void (*) (const Vector3 &)>()
+		.addConstructor<void (*) (const float, const float, const float)>()
 		.addProperty("x", &Vector3::x)
 		.addProperty("y", &Vector3::y)
 		.addProperty("z", &Vector3::z)
-		.addFunction("add", &Vector3::operator+=)
-		.addFunction("substract", &Vector3::operator-=)
-		.addFunction("multiplyByNumber",&Vector3::operator*=)
-		.addFunction("isEqual", &Vector3::operator==)
+		.addFunction("normalize", &Vector3::normalize)
 		.endClass();
 	
 	//input
 	getGlobalNamespace(L).beginClass<InputSystem>("InputSystem")
 		.addFunction("keyPressed", &InputSystem::isKeyDown)
 		.addFunction("mouseButtonPressed", &InputSystem::clickEvent)
+		.addFunction("getMouseX", &InputSystem::getMouseX)
+		.addFunction("getMouseY", &InputSystem::getMouseY)
+		.addFunction("getTicks", &InputSystem::getTicks)
 		.endClass();
 	
 	//common
@@ -157,6 +176,11 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getLinearVelocity", &RigidBody::getLinearVelocity)
 		.addFunction("onCollisionEnter", &RigidBody::onCollisionEnter)
 		.addFunction("collidesWithTag", &RigidBody::collidesWithTag)
+		.addFunction("getGroup", &RigidBody::getGroup)
+		.addFunction("getMask", &RigidBody::getMask)
+		.addFunction("setLinearFactor", &RigidBody::setLinearFactor)
+		.addFunction("setAngularFactor", &RigidBody::setAngularFactor)
+		.addFunction("setFriction", &RigidBody::setFriction)
 		.endClass();
 
 	//graphics
@@ -172,6 +196,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("setBackgroundColor", &Camera::setBackgroundColor)
 		.addFunction("setNearClipDistance", &Camera::setNearClipDistance)
 		.addFunction("setFarClipDistance", &Camera::setFarClipDistance)
+		.addFunction("getScreenCoordinates", &Camera::getScreenCoordinates)
 		.endClass();
 
 	getGlobalNamespace(L).deriveClass<LightComponent,Component>("Light")
@@ -185,6 +210,29 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("setMaterial", &PlaneComponent::setMaterial)
 		.endClass();
 
+	getGlobalNamespace(L).beginClass<OgreContext>("OgreContext")
+		.addFunction("getWindowWidth", &OgreContext::getWindowWidth)
+		.addFunction("getWindowHeight", &OgreContext::getWindowHeight)
+		.addFunction("setSkyPlane", &OgreContext::setSkyPlane)
+		.addFunction("changeMaterialScroll", &OgreContext::changeMaterialScroll)
+		.addFunction("createZPlane", &OgreContext::createZPlane)
+		.endClass();
+	//UI
+	getGlobalNamespace(L).deriveClass<UIButton, Component>("Button")
+		.addFunction("getButtonPressed", &UIButton::getButtonPressed)
+		.addFunction("buttonWasPressed", &UIButton::buttonWasPressed)
+		.addFunction("buttonNotPressed", &UIButton::buttonNotPressed)
+		.addFunction("setText", &UIButton::setText)
+		.endClass();
+
+	getGlobalNamespace(L).deriveClass<UIImage, Component>("Image")
+		.addFunction("setProperty", &UIComponent::setProperty)
+		.addFunction("setActive", &UIComponent::setActive)
+		.endClass();
+
+	getGlobalNamespace(L).deriveClass<UILabel, Component>("Label")
+		.addFunction("setText", &UILabel::setText)
+		.endClass();
 
 	getGlobalNamespace(L).beginClass<Scene>("Scene")
 		.addFunction("clean", &Scene::clean)
@@ -192,8 +240,9 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("setName", &Scene::setName)
 		.addFunction("getName", &Scene::getName)
 		.addFunction("getEntity", &Scene::getEntity)
+		.addFunction("destroyEntity", &Scene::killEntity)
+		.addFunction("destroyEntityByName", &Scene::killEntityByName)
 		.endClass();		
-
 
 	getGlobalNamespace(L).beginClass<LUAManager>("LuaManager")
 		.addFunction("getEntity", &LUAManager::getEntity)
@@ -206,7 +255,27 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getTransform", &LUAManager::getTransform)
 		.addFunction("getLuaClass", &LUAManager::getLuaClass)
 		.addFunction("instantiate", &LUAManager::instantiate)
+		.addFunction("getCurrentScene", &LUAManager::getCurrentScene)
+		.addFunction("getUIButton", &LUAManager::getUIButton)
+		.addFunction("getUILabel", &LUAManager::getUILabel)
+		.addFunction("getLuaSelf", &LUAManager::getLuaSelf)
+		.addFunction("getOgreContext", &LUAManager::getOgreContext)
+		.addFunction("changeScene", &LUAManager::changeScene)
+		.addFunction("closeApp", &LUAManager::closeApp)
+		.addFunction("setMusic", &LUAManager::setMusic)
+		.addFunction("getUIImage", &LUAManager::getUIImage)
 		.endClass();
+}
+
+void LUAManager::setMusic(std::string music) {
+
+	try {
+		AudioSystem::getInstance()->stopAllChannels();
+		AudioSystem::getInstance()->playSound(music, { 0, 0, 0 });
+	}
+	catch (std::exception& e) {
+		std::cout << "El nombre /" << music << "/ es inapropiado.\n" << e.what() << std::endl;
+	}
 }
 
 bool LUAManager::reloadLuaScript(lua_State* L, const std::string& luafile) {
@@ -220,15 +289,17 @@ bool LUAManager::reloadLuaScript(lua_State* L, const std::string& luafile) {
 
 Entity* LUAManager::getEntity(std::string name)
 {
-	std::error_code errorCode;
 	Entity* ent = SceneManager::getInstance()->getCurrentScene()->getEntity(name);
 	return ent;
 }
 
+void LUAManager::changeScene(std::string name)
+{
+	SceneManager::getInstance()->changeScene(name);
+}
 
 RigidBody* LUAManager::getRigidbody(Entity* ent)
 {
-	std::error_code errorCode;
 	RigidBody* r = nullptr;
 	if(ent->hasComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId))
 		r = static_cast<RigidBody*>(ent->getComponent((int)ManID::Physics, (int)PhysicsManager::PhysicsCmpId::RigigbodyId));
@@ -237,13 +308,11 @@ RigidBody* LUAManager::getRigidbody(Entity* ent)
 
 InputSystem* LUAManager::getInputManager()
 {
-	std::error_code errorCode;
 	return InputSystem::getInstance();
 }
 
 MeshComponent* LUAManager::getMeshComponent(Entity* ent)
 {
-	std::error_code errorCode;
 	MeshComponent* m = nullptr;
 	if(ent->hasComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh))
 		m = static_cast<MeshComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Mesh));
@@ -252,7 +321,6 @@ MeshComponent* LUAManager::getMeshComponent(Entity* ent)
 
 PlaneComponent* LUAManager::getPlaneComponent(Entity* ent)
 {
-	std::error_code errorCode;
 	PlaneComponent* m = nullptr;
 	if(ent->hasComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Plane))
 		m = static_cast<PlaneComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Plane));
@@ -261,7 +329,6 @@ PlaneComponent* LUAManager::getPlaneComponent(Entity* ent)
 
 LightComponent* LUAManager::getLightComponent(Entity* ent)
 {
-	std::error_code errorCode;
 	LightComponent* m = nullptr;
 	if(ent->hasComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Light))
 		m = static_cast<LightComponent*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Light));
@@ -270,7 +337,6 @@ LightComponent* LUAManager::getLightComponent(Entity* ent)
 
 Camera* LUAManager::getCamera(Entity* ent)
 {
-	std::error_code errorCode;
 	Camera* m = nullptr;
 	if (ent->hasComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Camera))
 		m = static_cast<Camera*>(ent->getComponent((int)ManID::Render, (int)RenderManager::RenderCmpId::Camera));
@@ -279,19 +345,19 @@ Camera* LUAManager::getCamera(Entity* ent)
 
 Transform* LUAManager::getTransform(Entity* ent)
 {
-	std::error_code errorCode;
 	Transform* m = nullptr;
 	if (ent->hasComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId))
 		m = static_cast<Transform*>(ent->getComponent((int)ManID::Common, (int)CommonManager::CommonCmpId::TransId));
 	return m;
 }
 
-luabridge::LuaRef LUAManager::getLuaClass(Entity* ent, const std::string& c_name)
+luabridge::LuaRef LUAManager::getLuaClass(const std::string& c_name)
 {
-	std::error_code errorCode;
 	luabridge::LuaRef m = luabridge::LuaRef(L);//nil
-	if(ent->hasComponent((int)ManID::LUA, enum_map_[c_name]))
-		m = (static_cast<LuaComponent*>(ent->getComponent((int)ManID::LUA, enum_map_[c_name])))->getClass();
+	auto it = classes_.find(c_name);
+	if (it != classes_.end()) {
+		m = it->second;
+	}
 	return m;
 }
 
@@ -302,15 +368,65 @@ Entity* LUAManager::instantiate(std::string prefabName)
 
 	s.loadPrefabByName(prefabName, e);
 	SceneManager::getCurrentScene()->addEntity(prefabName, e);
-	e->start();
+	//e->start();
 	return e;
+}
+
+UIButton* LUAManager::getUIButton(Entity* ent)
+{
+	UIButton* b = nullptr;
+	if (ent->hasComponent((int)ManID::UI, (int)UIManager::UICmpId::Button))
+		b = static_cast<UIButton*>(ent->getComponent((int)ManID::UI, (int)UIManager::UICmpId::Button));
+	return b;
+}
+
+UILabel* LUAManager::getUILabel(Entity* ent)
+{
+	UILabel* b = nullptr;
+	if (ent->hasComponent((int)ManID::UI, (int)UIManager::UICmpId::Label))
+		b = static_cast<UILabel*>(ent->getComponent((int)ManID::UI, (int)UIManager::UICmpId::Label));
+	return b;
+}
+
+UIImage* LUAManager::getUIImage(Entity* ent)
+{
+	UIImage* b = nullptr;
+	if (ent->hasComponent((int)ManID::UI, (int)UIManager::UICmpId::Image))
+		b = static_cast<UIImage*>(ent->getComponent((int)ManID::UI, (int)UIManager::UICmpId::Image));
+	return b;
+}
+
+luabridge::LuaRef LUAManager::getLuaSelf(Entity* ent, const std::string& c_name)
+{
+	luabridge::LuaRef b = luabridge::LuaRef(L);
+	if (ent->hasComponent((int)ManID::LUA, enum_map_[c_name]))
+		b = static_cast<LuaComponent*>(ent->getComponent((int)ManID::LUA, enum_map_[c_name]))->getSelf();
+	return b;
 }
 
 void LUAManager::addRegistry(const std::string& compName)
 {
-	int id = registeredFiles;
-	registerComponent(compName, registeredFiles, [compName, id]() -> LuaComponent* { return new LuaComponent(compName, id); });
-	registeredFiles++;
+	auto ok = reloadLuaScript(L, SCRIPTS_FILE_PATH + compName + FILE_EXTENSION);
+	if (ok) {
+		lua_setglobal(L, compName.c_str());
+		classes_.emplace(compName, luabridge::getGlobal(L, compName.c_str()));
+		int id = registeredFiles;
+		registerComponent(compName, registeredFiles, [compName, id]() -> LuaComponent* { return new LuaComponent(compName, id); });
+		registeredFiles++;
+	}
+	else {
+		throw std::runtime_error("ERROR: Couldn't load component " + compName);
+	}
+}
+
+OgreContext* LUAManager::getOgreContext()
+{
+	return OgreContext::getInstance();
+}
+
+Scene* LUAManager::getCurrentScene()
+{
+	return SceneManager::getInstance()->getCurrentScene();
 }
 
 lua_State* LUAManager::getLuaState() const
@@ -318,28 +434,24 @@ lua_State* LUAManager::getLuaState() const
 	return L;
 }
 
-void LUAManager::buildLuaEngine(const std::string& file) {
-	// need check L
-	luaL_openlibs(L);
-	auto ok = reloadLuaScript(L, file);
-	if (!ok) {
-		lua_close(L);
-		L = nullptr;
-	}
+void LUAManager::closeApp() {
+	PapagayoEngine::getInstance()->closeApp();
 }
 
 LUAManager::LUAManager() : Manager(ManID::LUA), registeredFiles(0)
 {
-	//Registro de componentes
-	registerComponent("default", registeredFiles++, []() -> LuaComponent* { return new LuaComponent(); });
-
 	//Inicializacion del estado de LUA
 	L = luaL_newstate();
-	buildLuaEngine("LuaScripts/clases.lua");
+	//buildLuaEngine("LuaScripts/clases.lua");
+	luaL_openlibs(L);
 	
 	//Registro de las funciones
 	if (L) {
 		registerClassAndFunctions(L);
 	}
 	else throw std::exception("ERROR: LUA is not compiling correctly\n");
+	
+	//Registro de componentes
+	//registerComponent("default", registeredFiles++, []() -> LuaComponent* { return new LuaComponent(); });
+	addRegistry("default");
 }

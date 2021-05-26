@@ -26,7 +26,7 @@
 PapagayoEngine* PapagayoEngine::instance_ = nullptr;
 
 PapagayoEngine::PapagayoEngine(const std::string& appName) : appName_(appName) {
-	
+
 	// OGRE CONTEXT
 	if (!OgreContext::setUpInstance(appName_)) {
 		throw std::exception("ERROR: Couldn't load OgreContext\n");
@@ -112,23 +112,25 @@ void PapagayoEngine::destroy()
 	input->destroy();
 	audio->destroy();
 
+	// fisicas
+	phys->destroy();
+
 	// render
 	render->destroy();
 	gui->destroy();
 	ogre->destroy();
-	
-	// fisicas
-	phys->destroy();
+
 
 	// common
 	common->destroy();
-	
+
 	// logica
 	lua->destroy();
 
+
 	// escena
 	mSM->destroy();
-	
+
 	delete instance_;
 }
 
@@ -149,21 +151,22 @@ void PapagayoEngine::clean()
 	common->clean();
 
 	// logica
-	//lua->clean();
+	lua->clean();
 
 	// escena
 	mSM->clean();
 }
 
-void PapagayoEngine::init()
+void PapagayoEngine::init(std::string schemeName, std::string schemeFile,
+	std::string fontFile, std::string startScene, std::string music, std::string skyPlane)
 {
 	try { ogre->setUpInstance("PAPAGAYO ENGINE"); }
-	catch (const std::exception & e)
+	catch (const std::exception& e)
 	{
 		throw std::runtime_error("OgreContext init fail \n" + (std::string)e.what() + "\n");
 	}
-	
-	try { mSM->setupInstance();}
+
+	try { mSM->setupInstance(); }
 	catch (const std::exception& e)
 	{
 		throw std::runtime_error("SceneManager init fail \n" + (std::string)e.what() + "\n");
@@ -178,23 +181,43 @@ void PapagayoEngine::init()
 	//unos string que se reciban como parametro, de manera
 	//que sea el usuario el que decida que configuracion
 	//desea usuar.
-	gui->loadScheme("TaharezLook", "TaharezLook.scheme");
-	gui->setMouseImage("TaharezLook/MouseArrow");
-	gui->loadFont("DejaVuSans-12.font"); 
-	
-	mSM->createStartScene();
 
+	try {
+		gui->loadScheme(schemeName, schemeFile);
+	}
+	catch (const std::exception& e) {
+		throw std::runtime_error("Fallo al cargar Scheme. Revise el nombre de el Scheme.\n" + (std::string)e.what() + "\n");
+	}
 
-#pragma region TOERASE
-	//gui->createButton("Probando_boton", glm::vec2(0, 0), glm::vec2(200, 200), "Prueba");
-	//ui->createLabel("Probando_boton", glm::vec2(100, 100), glm::vec2(10, 10), "Prueba");
+	try
+	{
+		gui->loadFont(fontFile);
+	}
+	catch (const std::exception& e)
+	{
+		throw std::runtime_error("Fallo al cargar Fuente. Revise el nombre de la fuente.\n" + (std::string)e.what() + "\n");
+	}
 
-	ogre->setSkyPlane("SkyPlaneMat", Ogre::Plane(Ogre::Vector3::UNIT_Z, -70), 10, 10, 4.0);
+	mSM->createStartScene(startScene);
 
-	//Audio de bad bunny metido 
-	audio->playSound("Assets/badbunny.mp3", {0,0,0});
+	try
+	{
+		audio->playSound(music, { 0,0,0 });
+	}
+	catch (const std::exception& e)
+	{
+		std::cout << "Fallo al cargar la pista /" << music << "/\n";
+		std::cout << e.what() << std::endl;
+	}
 
-#pragma endregion
+	try
+	{
+		ogre->setSkyPlane(skyPlane, -70, 10, 10, 4.0);
+	}
+	catch (const std::exception& e) {
+		std::cout << "Fallo al cargar el SkyPlane /" << skyPlane<< "/\n";
+		std::cout << e.what() << std::endl;
+	}
 
 	start();
 }
@@ -206,7 +229,7 @@ void PapagayoEngine::start()
 	lua->start();
 }
 
-void PapagayoEngine::update()
+void PapagayoEngine::update(float delta)
 {
 	try {
 		SDL_Event event;
@@ -222,44 +245,66 @@ void PapagayoEngine::update()
 			running_ = run;
 		}
 		else {
-			phys->update();
-			render->update();
-
-			lua->update();
-			++timer_;
-
-			if (timer_ == 300) {
-				SceneManager::getCurrentScene()->killEntityByName("pepito");
-				std::cout << "Cambio de escena\n";
-				mSM->changeScene("test2");
-			}
+			lua->update(delta);
+			phys->update(delta);
+			render->update(delta);
 			mSM->update();
 		}
 	}
 	catch (const std::exception& e)
 	{
-		throw std::runtime_error("Fallo de renderizado \n" + (std::string)e.what() + "\n");
+		throw std::runtime_error("Fallo en el update:\n" + (std::string)e.what() + "\n");
+	}
+	catch (...) {
+		throw "Excepcion no controlada\n";
 	}
 
+}
+
+void PapagayoEngine::fixedUpdate(float delta) {
+	try {
+		lua->fixedUpdate(delta);
+		phys->fixedUpdate(delta);
+	}
+	catch (const std::exception& e)
+	{
+		throw std::runtime_error("Fallo en el fixedUpdate:\n" + (std::string)e.what() + "\n");
+	}
+	catch (...) {
+		throw "Excepcion no controlada en fixedUpdate\n";
+	}
 }
 
 void PapagayoEngine::run() {
 	//running_ = false;
 	// ciclo principal de juego
 	startTime = SDL_GetTicks();
+	float deltaSum = 0;
+	float deltaTime = 0;
 	while (running_) {
 
 		//RETARDO DE FPS
-		auto current = SDL_GetTicks();
-		auto elapsed = current - startTime;
-		startTime = current;
-		lag += elapsed;
+		//auto current = SDL_GetTicks();
+		//auto elapsed = current - startTime;
+		//startTime = current;
+		//lag += elapsed;
 
-		while (lag >= frame_rate) {
-			lag -= frame_rate;
+		//while (lag >= frame_rate) {
+		//	lag -= frame_rate;
+		//}
+
+		deltaSum += deltaTime;
+
+		update(deltaTime);
+
+		if (deltaSum > sToCallFixedUpdate) {
+			fixedUpdate(deltaTime);
+			deltaSum = 0;
 		}
 
-		update();
+		deltaTime = SDL_GetTicks() - startTime;
+		deltaTime /= 1000;
+		startTime = SDL_GetTicks();
 	}
 }
 

@@ -13,11 +13,18 @@ PlaneComponent::PlaneComponent():
 {
 	init();
 }
+
+PlaneComponent::~PlaneComponent()
+{
+	if (ent_ != nullptr) OgreContext::getInstance()->getSceneManager()->destroyEntity(ent_);
+	if (mNode_ != nullptr) OgreContext::getInstance()->getSceneManager()->destroySceneNode(mNode_);
+}
+
 void PlaneComponent::init(){
 	mNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode();
 }
 
-void PlaneComponent::update(){}
+void PlaneComponent::update(float deltaTime){}
 void PlaneComponent::setMaterial(const std::string& matName)
 {
 	try {

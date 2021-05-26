@@ -14,6 +14,8 @@ class btDiscreteDynamicsWorld;
 class btRigidBody;
 class OgreDebugDrawer;
 class Vector3;
+class CollisionObject;
+class btCollisionObject;
 
 class PhysicsManager : public Manager
 {
@@ -38,19 +40,15 @@ private:
 	//estoy seria para dibujar los colliders en un modo debug, lo queremos?
 	OgreDebugDrawer* mDebugDrawer_ = nullptr;
 
-	//esto hay que ver si al eliminar el vector de rigidbodies deja basura y si es asi entonces es porque hay que eliminar
-	//por partes el shape y el motionstate
-	/*std::vector<btBoxShape*> shapes_;
-	std::vector<btMotionState*> states_;*/
+	std::map<const btCollisionObject*, std::pair<CollisionObject*,  CollisionObject*>> contacts;
 
 	PhysicsManager();
 	virtual ~PhysicsManager();
 
-	//TO ERASE
-	bool applyTorque = true;
+	void checkCollision();
 
 public:
-	
+
 	//nos devuelve la instancia
 	static PhysicsManager* getInstance();
 	static bool setUpInstance();
@@ -68,12 +66,13 @@ public:
 
 	//Crea el componente Rigidbody a partir de los siguientes parametros:
 	//Posicion, masa e identificador (el cual determina la forma del collider)
-	btRigidBody* createRB(Vector3 pos, float mass);
+	btRigidBody* createRB(Vector3 pos, float mass, int group = -1, int mask = -1);
 
 	virtual void addComponent(Entity* ent, int compId);
 	virtual void start();
-	virtual void update();
-	
+	virtual void update(float deltaTime);
+	virtual void fixedUpdate(float deltaTime);
+
 	static void clean();
 	static void destroy();
 

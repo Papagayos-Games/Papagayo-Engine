@@ -53,7 +53,7 @@ void LightComponent::init()
 	mNode_ = OgreContext::getInstance()->getSceneManager()->getRootSceneNode()->createChildSceneNode();
 }
 
-void LightComponent::update()
+void LightComponent::update(float deltaTime)
 {
 }
 

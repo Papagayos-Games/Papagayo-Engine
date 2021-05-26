@@ -1,5 +1,3 @@
-
-
 #include "LoaderSystem.h"
 
 #include "Scene/Scene.h"
@@ -13,9 +11,7 @@
 #include <exception>
 #include <iostream>
 #include <LUA/LUAManager.h>
-//#include "Scene.h"
 
-// nlohmann::json;
 
 std::vector<std::string> LoaderSystem::loadScenes(const std::string& fileName)
 {
@@ -54,7 +50,7 @@ void LoaderSystem::loadEntities(const std::string& fileName, Scene* scene)
 		Entity* ent = new Entity();
 		auto pref = entities[i].find("Prefab");
 		if (pref != entities[i].end() && pref.value().is_string()) {
-			loadPrefabs(entities[i], ent, fileName);
+			loadPrefabs(entities[i], ent, name);
 		}
 		if(!entities[i]["Components"].is_null() && entities[i]["Components"].is_array())
 			loadComponents(entities[i]["Components"], ent);
@@ -80,6 +76,7 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 	nlohmann::json component;
 	nlohmann::json params;
 	for (int i = 0; i < compSize; i++) {
+
 		// Comprueba el tipo de componente
 		auto it = comps[i].find("Type");
 		if (it == comps[i].end() || !it.value().is_string())
@@ -94,9 +91,16 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 		Component* c;
 
 		// si no se ha cargado este script de lua, añadelo como posible componente
+		std::string name = component;
 		if (type == "LUA") {
 			if (mans[type]->getCompID(component) == -1) {
-				LUAManager::getInstance()->addRegistry(component);
+				try {
+					LUAManager::getInstance()->addRegistry(component);
+				}
+				catch (std::exception& e) {
+					std::cout << "ERROR: " << e.what() << "\n----> SETTING COMPONENT TO DEFAULT\n";
+					name = "default";
+				}
 			}
 		}
 		if (!entity->hasComponent(mans[type]->getId(), mans[type]->getCompID(component))){
@@ -108,10 +112,8 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 		else {
 			c = entity->getComponent(mans[type]->getId(), mans[type]->getCompID(component));
 		}
-		// TO DO: Cargar LUA components si no tienen "Parameters" en el json
 		it = comps[i].find("Parameters");
 		if (it != comps[i].end() && it.value().is_object()) {
-
 			try { c->load(it.value()); }
 			catch (std::exception e) {
 				//resetear los valores del componente si hay algun parametro con un formato erroneo
@@ -120,7 +122,12 @@ void LoaderSystem::loadComponents(const nlohmann::json& comps, Entity* entity)
 				//throw std::exception("WARNING: Component parametrs are wrong\n");
 			}
 		}
-
+		//Si es lua y no tiene parametros se hace el load
+		else if (type == "LUA") {
+          c->load(nullptr);
+		}
+		
+		
 		entity->addComponent(c);
 	}
 }
@@ -148,7 +155,7 @@ void LoaderSystem::readParameters(std::string& dump, std::map<std::string, std::
 	}
 }
 
-void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent, std::string entName) {
+void LoaderSystem::loadPrefabs(nlohmann::json& pref, Entity* ent, std::string& entName) {
 	if (pref.is_null() || !pref.is_object())
 		throw std::exception("ERROR: Prefab not found\n");
 

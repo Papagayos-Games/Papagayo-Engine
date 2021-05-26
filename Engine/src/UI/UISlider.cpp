@@ -1,5 +1,9 @@
 #include "UISlider.h"
 #include "UIManager.h"
+
+#include "CEGUI/Window.h"
+#include "CEGUI/CEGUI.h"
+
 #include <glm/glm.hpp>
 
 UISlider::UISlider() : UIComponent((int)UIManager::UICmpId::Slider)
@@ -12,24 +16,25 @@ UISlider::~UISlider()
 
 void UISlider::init()
 {
-	position.first = 10;
-	position.second = 10;
+	pos.first = 10;
+	pos.second = 10;
 
 	size.first = 100;
 	size.second = 100;
 
 	name = "SliderDefault";
-
-	uiWindow = UIManager::getInstance()->createSlider(position, size, name);
+	type = "Slider";
+	uiWindow = UIManager::getInstance()->createSlider(pos, size, name, type);
 }
 
 void UISlider::load(const nlohmann::json& params)
 {
+	//--------------ASIGNACIONES_UI_COMPONENT--------------//
 	auto it = params.find("position");
 	if (it != params.end()) {
-		std::vector<float> pos = it->get<std::vector<float>>();
-		position.first = pos[0];
-		position.second = pos[1];
+		std::vector<float> p = it->get<std::vector<float>>();
+		pos.first = p[0];
+		pos.second = p[1];
 	}
 
 	it = params.find("size");
@@ -45,25 +50,29 @@ void UISlider::load(const nlohmann::json& params)
 		name = n;
 	}
 
-	//	//TODO: a la constructora de subscriberSlot habria que pasarle el metodo de lua que queramos que haga, ¿como? no se sabeh
+	it = params.find("type");
+	if (it != params.end()) {
+		std::string t = it->get<std::string>();
+		type = t;
+	}
 
-	//it = params.find("clickEvent");
-	//if (it != params.end()) {
-	//	auto _event = it->find("event");
-	//	if (_event != it->end()) {
-	//		std::string e = _event->get<std::string>();
-	//		event_ = new CEGUI::String(e);
-	//	}
+	uiWindow = UIManager::getInstance()->createSlider(pos, size, name, type);
 
-	//	auto _subs = it->find("subscriber");
-	//	if (_subs != it->end()) {
-	//		std::string sub = _subs->get<std::string>();
-	//		
-	//		//subscriberEvent = new CEGUI::SubscriberSlot();
-	//	}
+	//------------ASIGNACIONES_UI_IMAGE--------------//
 
-	//	uiWindow->subscribeEvent(*event_, *subscriberEvent);
-	//}
+	//Propiedades de la Imagen
+	it = params.find("property");
+	if (it != params.end()) {
+		std::vector<std::vector<std::string>> prop =
+			it->get<std::vector<std::vector<std::string>>>();
+		for (int i = 0; i < prop.size(); i++) {
+			setProperty(prop.at(i).at(0), prop.at(i).at(1));
+		}
+	}
 
-	uiWindow = UIManager::getInstance()->createSlider(position, size, name);
+	it = params.find("active");
+	if (it != params.end()) {
+		bool ac = it->get<bool>();
+		setActive(ac);
+	}
 }

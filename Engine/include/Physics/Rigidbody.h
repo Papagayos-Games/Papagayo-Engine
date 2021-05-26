@@ -11,6 +11,8 @@ class Vector3;
 class Entity;
 class btRigidBody;
 class Transform;
+class MeshStrider;
+class CollisionObject;
 
 enum class Forces {
 	NORMAL = 0,
@@ -24,8 +26,11 @@ private:
 	float mass = 1.0f;
 	//Rigidbody principal
 	btRigidBody* rb;
+	MeshStrider* st;
 	Transform* tr_ = nullptr;
 	bool trigger = false;
+	bool meshShape = true;
+	CollisionObject* co = nullptr;
 
 	bool collidesWithEntity(Entity* other) const;
 public:
@@ -38,7 +43,7 @@ public:
 
 	virtual void setUp();
 	virtual void init();
-	virtual void update();
+	virtual void update(float deltaTime);
 	/// <summary>
 	/// Carga datos a partir de un json
 	/// </summary>
@@ -77,6 +82,12 @@ public:
 
 	//Cambia el la forma del rigidbody (ShapeCollision)
 	void setCollisionShape(btCollisionShape* newShape);
+
+	// Permite el movimiento solo en los ejes que se pasen como parametro
+	void setLinearFactor(const Vector3& axis);
+
+	// Permite rotar solo en los ejes que se pasen como parametro
+	void setAngularFactor(const Vector3& axis);
 #pragma endregion
 
 #pragma region Getters
@@ -98,6 +109,12 @@ public:
 
 	//btRigidBody* getBtRb();
 	btRigidBody* getBtRb() const;
+
+	//metodo que nos devuelve el grupo de colision
+	int getGroup()const;
+
+	//metodo que nos devuelve la mascara de colision
+	int getMask()const;
 #pragma endregion
 
 #pragma region Adders
@@ -118,6 +135,10 @@ public:
 	//Comprueba la colisiones con otros objetos con un tag
 	//dentro de la escena especifica
 	Entity* collidesWithTag(const std::string& tag) const;
+
+	// Configura el userPtr como un objeto de colision
+	// para gestionar eventos de colision
+	void setUserPtr(CollisionObject* co);
 #pragma endregion
 };
 

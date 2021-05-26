@@ -4,6 +4,8 @@
 #define _PAPAENG_LOADERSYS_H
 
 #include <json.hpp>
+#include "checkML.h"
+
 class Scene;
 class Entity;
 
@@ -17,7 +19,7 @@ private:
 	void loadComponents(const nlohmann::json& comps, Entity* entity);
 	void readParameters(std::string& dump, std::map<std::string, std::string>& params);
 public:
-	void loadPrefabs(nlohmann::json& pref, Entity* ent, std::string entName);
+	void loadPrefabs(nlohmann::json& pref, Entity* ent, std::string& entName);
 	void loadPrefabByName(std::string fileName, Entity* ent);
 	std::vector<std::string> loadScenes(const std::string& fileName);
 	void loadEntities(const std::string& fileName, Scene* scene);

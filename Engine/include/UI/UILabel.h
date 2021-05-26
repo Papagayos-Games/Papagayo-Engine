@@ -19,6 +19,9 @@ public:
 	/// Carga datos a partir de un json
 	/// </summary>
 	virtual void load(const nlohmann::json& params);
+
+	//Aplica un nuevo texto al label
+	void setText(std::string t);
 };
 
 #endif

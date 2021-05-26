@@ -4,6 +4,7 @@
 int main(){
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	//_CrtSetBreakAlloc(163065);
 #endif
 	try {
 		if (!PapagayoEngine::setupInstance("PAPAGAYO ENGINE"))

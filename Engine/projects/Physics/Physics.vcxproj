@@ -19,12 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\Physics\CollisionObject.cpp" />
     <ClCompile Include="..\..\src\Physics\DebugDrawer.cpp" />
     <ClCompile Include="..\..\src\Physics\MeshStrider.cpp" />
     <ClCompile Include="..\..\src\Physics\PhysicsManager.cpp" />
     <ClCompile Include="..\..\src\Physics\Rigidbody.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Physics\CollisionObject.h" />
     <ClInclude Include="..\..\include\Physics\DebugDrawer.h" />
     <ClInclude Include="..\..\include\Physics\MeshStrider.h" />
     <ClInclude Include="..\..\include\Physics\PhysicsManager.h" />

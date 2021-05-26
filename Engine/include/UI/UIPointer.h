@@ -15,7 +15,7 @@ public:
 	virtual ~UIPointer();
 
 	virtual void init();
-	virtual void update() {};
+	virtual void update(float deltaTime) {};
 
 	/// <summary>
 	/// Carga datos a partir de un json

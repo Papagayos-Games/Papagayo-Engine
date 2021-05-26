@@ -1,5 +1,4 @@
-#include "..\..\include\Graphics\OgreContext.h"
-#include "..\..\include\Graphics\OgreContext.h"
+
 #include "OgreContext.h"
 #include "RTShaderTecnhiqueResolveListener.h"
 #include <Ogre.h>
@@ -21,7 +20,7 @@
 
 OgreContext* OgreContext::instance_ = nullptr;
 
-OgreContext::OgreContext(const std::string& appName) : 
+OgreContext::OgreContext(const std::string& appName) :
 	mResourcesCfg(Ogre::BLANKSTRING),
 	mPluginsCfg(Ogre::BLANKSTRING)
 {
@@ -40,7 +39,7 @@ bool OgreContext::setUpInstance(const std::string& appName)
 		try {
 			instance_ = new OgreContext(appName);
 		}
-		catch (...){
+		catch (...) {
 			return false;
 		}
 	}
@@ -93,18 +92,17 @@ void OgreContext::createRoot()
 	ogreRoot_->initialise(false);
 }
 
-void OgreContext::createWindow()  
+void OgreContext::createWindow()
 {
 	Ogre::ConfigOptionMap ropts = ogreRoot_->getRenderSystem()->getConfigOptions();
 
 	std::istringstream mode(ropts["Video Mode"].currentValue);
 	Ogre::String token;
-	uint32_t w, h;
-	mode >> w;     // width
+	mode >> windowWidth;     // width
 	mode >> token; // 'x' as separator between width and height
-	mode >> h;     // height
+	mode >> windowHeight;     // height
 
-	std::cout << '\n' << w << " " << h << '\n';
+	std::cout << '\n' << windowWidth << " " << windowHeight << '\n';
 	if (!SDL_WasInit(SDL_INIT_VIDEO | SDL_INIT_TIMER))
 		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
 			SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
@@ -118,7 +116,7 @@ void OgreContext::createWindow()
 #endif
 
 	native = SDL_CreateWindow(appName_.c_str(), SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED, w, h, flags);
+		SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, flags);
 
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
@@ -134,7 +132,7 @@ void OgreContext::createWindow()
 	miscParams["externalWindowHandle"] =
 		Ogre::StringConverter::toString(size_t(wmInfo.info.win.window));
 
-	render = ogreRoot_->createRenderWindow(appName_, w, h, false, &miscParams);
+	render = ogreRoot_->createRenderWindow(appName_, windowWidth, windowHeight, false, &miscParams);
 
 	// create a SceneManager instance
 	mSM = ogreRoot_->createSceneManager();
@@ -200,14 +198,23 @@ void OgreContext::setupRTShaderGenerator()
 	}
 }
 
+void OgreContext::changeMaterialScroll(const std::string& materialName, float x, float y)
+{
+	auto mat = Ogre::MaterialManager::getSingleton().getByName(materialName);
+	auto t = mat->getTechnique(0)->getPass(0)->getTextureUnitStates();
+
+	if (t.size() > 0)t[0]->setScrollAnimation(x, y);
+}
+
+Ogre::Plane OgreContext::createZPlane(float distance)
+{
+	return Ogre::Plane(Ogre::Vector3::UNIT_Z, distance);
+}
+
 #pragma endregion
 
 void OgreContext::clean()
 {
-	//Destruir SceneManager
-	//intance_->mShaderGenerator_->removeSceneManager(instance_->mSM);
-	//instance_->mShaderGenerator_->addSceneManager(instance_->mSM); // TO DO: Devolverselo en el cambio de escena
-	//instance_->ogreRoot_->destroySceneManager(instance_->mSM);
 	OgreContext::getInstance()->getRenderWindow()->removeAllViewports();
 }
 
@@ -215,14 +222,14 @@ void OgreContext::destroy()
 {
 	clean();
 	instance_->mShaderGenerator_->removeSceneManager(instance_->mSM);
-	//instance_->mShaderGenerator_->addSceneManager(instance_->mSM); // TO DO: Devolverselo en el cambio de escena
 	instance_->ogreRoot_->destroySceneManager(instance_->mSM);
 	delete instance_;
 }
 
-void OgreContext::setSkyPlane(const std::string& materialName, const Ogre::Plane& plane, int width, int height, float bow)
+void OgreContext::setSkyPlane(const std::string& materialName, float planeDist, int width, int height, float bow)
 {
-	mSM->setSkyPlane(true, plane, materialName, 1, 1, true, bow, width, height);
+	mSM->setSkyPlane(true, Ogre::Plane(Ogre::Vector3::UNIT_Z, planeDist), materialName, 1, 1, true, bow, width, height);
+
 }
 
 OgreContext::~OgreContext()
@@ -296,6 +303,16 @@ Ogre::RenderWindow* OgreContext::getRenderWindow() const
 SDL_Window* OgreContext::getSDLWindow() const
 {
 	return native;
+}
+
+
+uint32_t OgreContext::getWindowWidth() const
+{
+	return  windowWidth;
+}
+uint32_t OgreContext::getWindowHeight() const
+{
+	return windowHeight;
 }
 
 #pragma endregion

@@ -25,12 +25,12 @@ void WindowGenerator::initWindow(std::string name)
 
 	std::istringstream mode(ropts["Video Mode"].currentValue);
 	Ogre::String token;
-	uint32_t w, h;
-	mode >> w;     // width
+	
+	mode >> winWidth_;     // width
 	mode >> token; // 'x' as separator between width and height
-	mode >> h;     // height
+	mode >> winHeight_;     // height
 
-	std::cout << '\n' << w << " " << h << '\n';
+	std::cout << '\n' << winWidth_ << " " << winHeight_ << '\n';
 
 	if (!SDL_WasInit(SDL_INIT_VIDEO | SDL_INIT_TIMER))
 		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
@@ -45,7 +45,7 @@ void WindowGenerator::initWindow(std::string name)
 #endif
 
 	sdlWindow_ = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED, w, h, flags);
+		SDL_WINDOWPOS_CENTERED, winWidth_, winHeight_, flags);
 
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
@@ -62,7 +62,7 @@ void WindowGenerator::initWindow(std::string name)
 	params["gamma"] = ropts["sRGB Gamma Conversion"].currentValue;
 	params["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.win.window));
 
-	renderWindow_ = mRoot_->createRenderWindow(name, w, h, false, &params);
+	renderWindow_ = mRoot_->createRenderWindow(name, winWidth_, winHeight_, false, &params);
 
 	//////////por si queremos que la ventana oculte el cursor
 	SDL_SetWindowGrab(sdlWindow_, SDL_bool(false));
@@ -139,4 +139,14 @@ SDL_Window* WindowGenerator::getSDLWindow()
 SDL_Window* WindowGenerator::getSDLWindow() const
 {
 	return sdlWindow_;
+}
+
+uint32_t WindowGenerator::getWindowWidth() const
+{
+	return winWidth_;
+}
+
+uint32_t WindowGenerator::getWindowHeight() const
+{
+	return winHeight_;
 }

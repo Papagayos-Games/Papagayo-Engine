@@ -35,7 +35,6 @@
     <ClCompile Include="..\..\src\Graphics\PlaneComponent.cpp" />
     <ClCompile Include="..\..\src\Graphics\RenderManager.cpp" />
     <ClCompile Include="..\..\src\Graphics\RTShaderTecnhiqueResolveListener.cpp" />
-    <ClCompile Include="..\..\src\Graphics\SkyPlaneComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">
@@ -197,7 +196,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OgreMain.lib;OgreRTShaderSystem.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OgreMain.lib;OgreRTShaderSystem.lib;Codec_STBI.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -2,6 +2,9 @@
 #include "LUAManager.h"
 #include <LuaBridge.h>
 #include "lua.hpp"
+#include "Entity.h"
+#include "LuaCollisionObject.h"
+#include "checkML.h"
 
 LuaComponent::LuaComponent(const std::string& fileName, int id) : Component(LUAManager::getInstance(), id), fileName_(fileName)
 {
@@ -10,45 +13,35 @@ LuaComponent::LuaComponent(const std::string& fileName, int id) : Component(LUAM
 
 LuaComponent::~LuaComponent()
 {
-	delete class_;
 	delete self_;
 }
 
 void LuaComponent::init()
 {
 	currState = LUAManager::getInstance()->getLuaState();
-	class_ = new luabridge::LuaRef(currState);
 	self_ = new luabridge::LuaRef(currState);
-	(*class_) = luabridge::getGlobal(currState, "default");
-	(*self_) = (*class_)["instantiate"]()[0];
 }
 
 void LuaComponent::load(const nlohmann::json& params)
 {
-	//Cogemos el nombre del metodo al que llamar en el update
-	(*class_) = luabridge::getGlobal(currState, fileName_.c_str());
-	if (class_->isNil()) {
-#ifdef _DEBUG
-		std::cout << "No class found while loading LUAComponent. Assigned default\n";
-#endif
-		delete class_;
-		delete self_;
-		fileName_ = "default";
-		throw std::exception("Assigned LUA component to default in loader\n");
-	}
-	
-	(*self_) = (*class_)["instantiate"](params.dump(), getEntity())[0];
-
-	if (self_->isNil()) {
+	luabridge::LuaRef class_ = LUAManager::getInstance()->getLuaClass(fileName_);
+	if (!class_["instantiate"].isFunction()) {
 #ifdef _DEBUG
 		std::cout << "No table created while loading LUAComponent. Assigned default\n";
 #endif
-		delete class_;
-		delete self_;
 		fileName_ = "default";
-		throw std::exception("Assigned LUA component to default in loader\n");
+		throw std::exception("Assigned LUA component couldn't be instantiated\n");
 	}
 
+	if (_entity->hasComponent((int)ManID::Physics, 0)) {
+		if (class_["onCollisionEnter"].isFunction() || class_["onCollisionStay"].isFunction() || class_["onCollisionExit"].isFunction())
+		{
+			static_cast<RigidBody*>(_entity->getComponent((int)ManID::Physics, 0))->setUserPtr(new LuaCollisionObject(this));
+		}
+	}
+
+	(*self_) = LUAManager::getInstance()->getLuaClass(fileName_)["instantiate"](params.dump(), getEntity())[0];
+	
 #ifdef _DEBUG
 	std::cout << fileName_ << " loaded correctly\n";
 #endif
@@ -56,12 +49,17 @@ void LuaComponent::load(const nlohmann::json& params)
 
 void LuaComponent::setUp()
 {
-	(*class_)["start"](self_, LUAManager::getInstance());
+	LUAManager::getInstance()->getLuaClass(fileName_)["start"](self_, LUAManager::getInstance());
 }
 
-void LuaComponent::update()
+void LuaComponent::update(float deltaTime)
 {
-	(*class_)["update"](self_, LUAManager::getInstance());
+	LUAManager::getInstance()->getLuaClass(fileName_)["update"](self_, LUAManager::getInstance(), deltaTime);
+}
+
+void LuaComponent::fixedUpdate(float deltaTime)
+{
+	LUAManager::getInstance()->getLuaClass(fileName_)["fixedUpdate"](self_, LUAManager::getInstance(), deltaTime);
 }
 
 const std::string& LuaComponent::getFileName()
@@ -74,8 +72,8 @@ const std::string& LuaComponent::getFileName() const
 	return fileName_;
 }
 
-const luabridge::LuaRef& LuaComponent::getClass()
+const luabridge::LuaRef* LuaComponent::getSelf() const
 {
-	return (*class_);
+	return self_;
 }
 

@@ -33,7 +33,7 @@ public:
 	static void clean();
 	static void destroy();
 	virtual void start();
-	virtual void update();
+	virtual void update(float deltaTime);
 };
 
 #endif

@@ -18,8 +18,8 @@ UIButton::~UIButton()
 
 void UIButton::init()
 {
-	position.first = 0;
-	position.second = 0;
+	pos.first = 0;
+	pos.second = 0;
 
 	size.first = 100;
 	size.second = 50;
@@ -27,18 +27,19 @@ void UIButton::init()
 	text = "Boton Default";
 
 	name = "ButtonDefault";
-
-	uiWindow = UIManager::getInstance()->createButton(text, position, size, name);
+	type = "Button";
+	uiWindow = UIManager::getInstance()->createButton(text, pos, size, name, type);
 	
 }
 
 void UIButton::load(const nlohmann::json& params)
 {
+//--------------ASIGNACIONES_UI_COMPONENT--------------//
 	auto it = params.find("position");
 	if (it != params.end()) {
-		std::vector<float> pos = it->get<std::vector<float>>();
-		position.first = pos[0];
-		position.second = pos[1];
+		std::vector<float> p = it->get<std::vector<float>>();
+		pos.first = p[0];
+		pos.second = p[1];
 	}
 
 	it = params.find("size");
@@ -54,70 +55,63 @@ void UIButton::load(const nlohmann::json& params)
 		name = n;
 	}
 
+	it = params.find("type");
+	if (it != params.end()) {
+		std::string t = it->get<std::string>();
+		type = t;
+	}
+
+	//Texto que se muestra en el boton
 	it = params.find("text");
 	if (it != params.end()) {
 		std::string t = it->get<std::string>();
 		text = t;
 	}
 
-	
-
-	//TODO: a la constructora de subscriberSlot habria que pasarle el metodo de lua que queramos que haga, ¿como? no se sabeh
-
-	//it = params.find("clickEvent");
-	//if (it != params.end()) {
-	//	auto _event = it->find("event");
-	//	if (_event != it->end()) {
-	//		std::string e = _event->get<std::string>();
-	//		event_ = new CEGUI::String(e);
-	//
-	//		if (event_ == &(CEGUI::String)"changeScene") {
-	//
-	//			auto scene_ = it->find("scene");
-	//			if (scene_ != it->end()) {
-	//				scene = scene_->get<std::string>();
-	//			}
-	//
-				//uiWindow->subscribeEvent(
-				//	CEGUI::PushButton::EventClicked,
-				//	CEGUI::Event::Subscriber("Hola"));
-	//			}
-	//		
-	//	}
-	//
-	////	auto _subs = it->find("subscriber");
-	////	if (_subs != it->end()) {
-	////		std::string sub = _subs->get<std::string>();
-	////		
-	////		//subscriberEvent = new CEGUI::SubscriberSlot();
-	//
-	////	}
-	//
-	//uiWindow->subscribeEvent(*event_, *subscriberEvent);
-	//}
-
 	//Reposicionamiento para que parezca que el pivote esta
-	//en el centro del boton (esto se puede meter en el resto de Widgets)
-	//position.first -= size.first / 2;
-	//position.second -= size.second/ 2;
-	uiWindow = UIManager::getInstance()->createButton(text, position, size, name);
+	//en el centro del boton (esto se puede meter en el resto de WBidgets)
+
+	uiWindow = UIManager::getInstance()->createButton(text, pos, size, name, type);
+	uiWindow->subscribeEvent(
+		CEGUI::PushButton::EventClicked,
+		CEGUI::Event::Subscriber(&UIButton::buttonWasPressed, this));
+
+//------------ASIGNACIONES_UI_IMAGE--------------//
+
+	//Propiedades de la Imagen
+	it = params.find("property");
+	if (it != params.end()) {
+		std::vector<std::vector<std::string>> prop =
+			it->get<std::vector<std::vector<std::string>>>();
+		for (int i = 0; i < prop.size(); i++) {
+			setProperty(prop.at(i).at(0), prop.at(i).at(1));
+		}
+	}
+
+	it = params.find("active");
+	if (it != params.end()) {
+		bool ac = it->get<bool>();
+		setActive(ac);
+	}
 }
 
-void UIButton::onClick()
+void UIButton::buttonWasPressed()
 {
-	////provisional hasta hablarlo
-	//if (event_ == &(CEGUI::String)"hola") {
-	//	//metodo a hacer
-	//}
-	///*else if{
-	//
-	//}*/
-	////...
-	////...
-	////...
+	buttonPressed = true;
 }
 
-void UIButton::changeScene()
+void UIButton::buttonNotPressed()
 {
-	//aqui deberia cambiar a la escena 
+	buttonPressed = false;
+}
+
+bool UIButton::getButtonPressed()
+{
+	return buttonPressed;
+}
+
+void UIButton::setText(std::string t)
+{
+	text = t;
+	uiWindow->setText(text);
 }

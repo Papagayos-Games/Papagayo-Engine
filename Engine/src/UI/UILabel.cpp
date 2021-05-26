@@ -1,5 +1,9 @@
 #include "UILabel.h"
 #include "UIManager.h"
+
+#include "CEGUI/Window.h"
+#include "CEGUI/CEGUI.h"
+
 #include <glm/glm.hpp>
 
 UILabel::UILabel() : UIComponent((int)UIManager::UICmpId::Label)
@@ -12,8 +16,8 @@ UILabel::~UILabel()
 
 void UILabel::init()
 {
-	position.first = 15;
-	position.second = 15;
+	pos.first = 15;
+	pos.second = 15;
 
 	size.first = 50;
 	size.second = 50;
@@ -21,17 +25,19 @@ void UILabel::init()
 	text = "Label Default";
 
 	name = "LabelDefault";
+	type = "Label";
 
-	uiWindow = UIManager::getInstance()->createLabel(text, position, size, name);
+	uiWindow = UIManager::getInstance()->createLabel(text, pos, size, name, type);
 }
 
 void UILabel::load(const nlohmann::json& params)
 {
+	//--------------ASIGNACIONES_UI_COMPONENT--------------//
 	auto it = params.find("position");
 	if (it != params.end()) {
-		std::vector<float> pos = it->get<std::vector<float>>();
-		position.first = pos[0];
-		position.second = pos[1];
+		std::vector<float> p = it->get<std::vector<float>>();
+		pos.first = p[0];
+		pos.second = p[1];
 	}
 
 	it = params.find("size");
@@ -47,29 +53,40 @@ void UILabel::load(const nlohmann::json& params)
 		name = n;
 	}
 
+	it = params.find("type");
+	if (it != params.end()) {
+		std::string t = it->get<std::string>();
+		type = t;
+	}
+
+//----------MENSAJE_LABEL------------------//
 	it = params.find("text");
 	if (it != params.end()) {
 		std::string t = it->get<std::string>();
 		text = t;
 	}
 
-	//	//TODO: a la constructora de subscriberSlot habria que pasarle el metodo de lua que queramos que haga, ¿como? no se sabeh
+	uiWindow = UIManager::getInstance()->createLabel(text, pos, size, name, type);
+	
+	//Propiedades de la Imagen
+	it = params.find("property");
+	if (it != params.end()) {
+		std::vector<std::vector<std::string>> prop =
+			it->get<std::vector<std::vector<std::string>>>();
+		for (int i = 0; i < prop.size(); i++) {
+			setProperty(prop.at(i).at(0), prop.at(i).at(1));
+		}
+	}
 
-	//it = params.find("clickEvent");
-	//if (it != params.end()) {
-	//	auto _event = it->find("event");
-	//	if (_event != it->end()) {
-	//		std::string e = _event->get<std::string>();
-	//		event_ = new CEGUI::String(e);
-	//	}
+	it = params.find("active");
+	if (it != params.end()) {
+		bool ac = it->get<bool>();
+		setActive(ac);
+	}
+}
 
-	//	auto _subs = it->find("subscriber");
-	//	if (_subs != it->end()) {
-	//		std::string sub = _subs->get<std::string>();
-	//		
-	//		//subscriberEvent = new CEGUI::SubscriberSlot();
-	//	}
-
-	//	uiWindow->subscribeEvent(*event_, *subscriberEvent);
-	//}
+void UILabel::setText(std::string t)
+{
+	text = t;
+	uiWindow->setText(text);
 }

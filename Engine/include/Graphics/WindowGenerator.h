@@ -5,7 +5,7 @@
 
 #include "OgreFrameListener.h"
 #ifdef _DEBUG
-#include "checkML.h"
+//#include "checkML.h"
 #endif
 
 namespace Ogre {
@@ -28,6 +28,7 @@ private:
 	//Ogre::RenderSystem* renderSystem_;
 
 	SDL_Window* sdlWindow_;
+	uint32_t winWidth_, winHeight_;
 
 	void initWindow(std::string name);
 
@@ -46,6 +47,10 @@ public:
 	inline Ogre::RenderSystem* getRenderSystem() const;
 	SDL_Window* getSDLWindow();
 	SDL_Window* getSDLWindow() const;
+
+	uint32_t getWindowWidth()const;
+	uint32_t getWindowHeight()const;
+
 };
 
 #endif
