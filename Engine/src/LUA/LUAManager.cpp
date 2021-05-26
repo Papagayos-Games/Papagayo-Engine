@@ -179,6 +179,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("getMask", &RigidBody::getMask)
 		.addFunction("setLinearFactor", &RigidBody::setLinearFactor)
 		.addFunction("setAngularFactor", &RigidBody::setAngularFactor)
+		.addFunction("setFriction", &RigidBody::setFriction)
 		.endClass();
 
 	//graphics
