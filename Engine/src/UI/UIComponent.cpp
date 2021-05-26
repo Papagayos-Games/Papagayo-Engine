@@ -45,7 +45,7 @@ void UIComponent::setActive(bool act)
 {
 	_active = act;
 	if (_active && !uiWindow->isVisible()) {
-		uiWindow->activate();
+		uiWindow->show();
 	}
 	else if(!_active && uiWindow->isVisible()){
 		uiWindow->hide();
