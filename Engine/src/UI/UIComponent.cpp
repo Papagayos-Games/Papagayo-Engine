@@ -44,10 +44,10 @@ UIComponent::~UIComponent()
 void UIComponent::setActive(bool act)
 {
 	_active = act;
-	if (_active && !uiWindow->isActive()) {
+	if (_active && !uiWindow->isVisible()) {
 		uiWindow->activate();
 	}
-	else if(!_active && uiWindow->isActive()){
+	else if(!_active && uiWindow->isVisible()){
 		uiWindow->hide();
 	}
 }

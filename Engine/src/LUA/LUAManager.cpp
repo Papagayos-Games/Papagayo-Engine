@@ -227,6 +227,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 
 	getGlobalNamespace(L).deriveClass<UIImage, Component>("Image")
 		.addFunction("setProperty", &UIComponent::setProperty)
+		.addFunction("setActive", &UIComponent::setActive)
 		.endClass();
 
 	getGlobalNamespace(L).deriveClass<UILabel, Component>("Label")

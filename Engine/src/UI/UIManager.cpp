@@ -184,6 +184,8 @@ CEGUI::Window* UIManager::createButton(const std::string& text, const vector2& p
 
 	ceguiWindows.push_back(button);
 
+	button->activate();
+
 	return button;
 }
 
@@ -197,6 +199,8 @@ CEGUI::Window* UIManager::createSlider(const vector2& position, const vector2& s
 	winRoot->addChild(slider);
 
 	ceguiWindows.push_back(slider);
+
+	slider->activate();
 
 	return slider;
 }
@@ -214,6 +218,8 @@ CEGUI::Window* UIManager::createLabel(const std::string& text, const vector2& po
 
 	ceguiWindows.push_back(label);
 
+	label->activate();
+
 	return label;
 }
 
@@ -226,8 +232,10 @@ CEGUI::Window* UIManager::createImage(const vector2& position, const vector2& si
 	setWidgetDestRect(staticImage, position, size);
 
 	winRoot->addChild(staticImage);
-
+	
 	ceguiWindows.push_back(staticImage);
+
+	staticImage->activate();
 
 	return staticImage;
 }
