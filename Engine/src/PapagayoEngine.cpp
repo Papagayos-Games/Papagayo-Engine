@@ -202,7 +202,8 @@ void PapagayoEngine::init(std::string schemeName, std::string schemeFile,
 
 	try
 	{
-		audio->playSound(music, { 0,0,0 });
+		audio->
+			Sound(music, { 0,0,0 });
 	}
 	catch (const std::exception& e)
 	{
