@@ -54,7 +54,7 @@ public:
 	/// un material crado mediante .material
 	/// </param>
 	void init(std::string schemeName, std::string schemeFile,
-		std::string fontFile, std::string startScene, std::string music, std::string skyPlane);
+		std::string fontFile, std::string startScene, std::string music, std::string skyPlane, float iniVolume);
 	
 	//Destruccion de todos los managers y sus respectivos componentes asociados
 	void destroy();

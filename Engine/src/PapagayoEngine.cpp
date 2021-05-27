@@ -158,7 +158,7 @@ void PapagayoEngine::clean()
 }
 
 void PapagayoEngine::init(std::string schemeName, std::string schemeFile,
-	std::string fontFile, std::string startScene, std::string music, std::string skyPlane)
+	std::string fontFile, std::string startScene, std::string music, std::string skyPlane, float iniVolume)
 {
 	try { ogre->setUpInstance("PAPAGAYO ENGINE"); }
 	catch (const std::exception& e)
@@ -202,8 +202,8 @@ void PapagayoEngine::init(std::string schemeName, std::string schemeFile,
 
 	try
 	{
-		audio->
-			playSound(music, { 0,0,0 });
+		audio->loadSound(music, true, true);
+		audio->playSound(music, { 0,0,0 }, nullptr, iniVolume);
 	}
 	catch (const std::exception& e)
 	{
