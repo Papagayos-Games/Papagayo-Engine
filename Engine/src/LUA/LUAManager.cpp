@@ -264,6 +264,7 @@ void LUAManager::registerClassAndFunctions(lua_State* L) {
 		.addFunction("closeApp", &LUAManager::closeApp)
 		.addFunction("setMusic", &LUAManager::setMusic)
 		.addFunction("getUIImage", &LUAManager::getUIImage)
+		.addFunction("playSound", &LUAManager::playSound)
 		.endClass();
 }
 
@@ -402,6 +403,11 @@ luabridge::LuaRef LUAManager::getLuaSelf(Entity* ent, const std::string& c_name)
 	if (ent->hasComponent((int)ManID::LUA, enum_map_[c_name]))
 		b = static_cast<LuaComponent*>(ent->getComponent((int)ManID::LUA, enum_map_[c_name]))->getSelf();
 	return b;
+}
+
+void LUAManager::playSound(const std::string& strSoundName)
+{
+	AudioSystem::getInstance()->playSound(strSoundName, Vector3(0,0,0));
 }
 
 void LUAManager::addRegistry(const std::string& compName)

@@ -72,7 +72,7 @@ public:
 	OgreContext* getOgreContext();
 	Scene* getCurrentScene();
 	luabridge::LuaRef getLuaSelf(Entity* ent, const std::string& c_name);
-
+	void playSound(const std::string& strSoundName);
 
 	UIButton* getUIButton(Entity* ent);
 	UILabel* getUILabel(Entity* ent);
